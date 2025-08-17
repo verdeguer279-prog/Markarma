@@ -1,0 +1,809 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Control de Juicios</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #1a1a2e;
+      --card-bg: #282844;
+      --text-light: #e9e9f0;
+      --text-dark: #4a4a5a;
+      --accent-blue: #007BFF;
+      --accent-green: #28a745;
+      --accent-red: #dc3545;
+      --accent-yellow: #ffc107;
+      --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      margin: 0;
+      padding: 0;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .logo-box {
+      height: 72px;
+      width: 72px;
+      background: transparent;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    .logo-box img { max-height: 64px; max-width: 64px; }
+    .title h1 { margin: 0; font-size: clamp(1.4rem, 4vw, 2rem); }
+    .title p { margin: 4px 0 0; font-size: clamp(.85rem, 2vw, .95rem); color: #ccc; }
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    .filter-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .field { display: grid; gap: 8px; }
+    label { font-size: 0.9rem; color: #aaa; }
+    input[type="text"], input[type="date"], input[type="time"], select, textarea {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-light);
+      padding: 12px;
+      border-radius: 8px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+    input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+    }
+    select {
+        color: var(--text-dark);
+        background-color: var(--text-light);
+    }
+    /* Estilo base para todos los botones de la página */
+    .button, button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-sizing: border-box;
+    }
+    .btn-primary {
+      background: var(--accent-gradient);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(118, 75, 162, 0.5);
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-light);
+    }
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .btn-ghost.active {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--accent-blue);
+    }
+    .btn-danger {
+      background-color: var(--accent-red);
+      color: #fff;
+    }
+    .btn-success {
+      background-color: var(--accent-green);
+      color: #fff;
+    }
+    .btn-warning {
+      background-color: var(--accent-yellow);
+      color: #000;
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+    th, td {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    td.status-pendiente { color: var(--accent-red); }
+    td.status-celebrado { color: var(--accent-green); }
+    td.status-suspendido { color: var(--accent-blue); }
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+      /* Mantiene los botones en una sola línea en PC */
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    /* Estilos para los 4 botones/enlaces de la columna de acciones */
+    .action-item {
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-weight: bold;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 90px;
+        box-sizing: border-box;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--text-light);
+        background-color: transparent;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .action-item.danger {
+        background-color: var(--accent-red);
+        color: #fff;
+        border: none;
+    }
+    .action-item:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+    .action-item.danger:hover {
+        background-color: #bd2130;
+    }
+    .action-item.has-link {
+        color: var(--accent-blue);
+    }
+    td.action-cell {
+      min-width: 380px;
+      vertical-align: middle;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s, visibility 0.3s;
+      z-index: 1000;
+    }
+    .modal-overlay.open { visibility: visible; opacity: 1; }
+    .modal {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      width: 90%;
+      max-width: 800px;
+      transform: scale(0.95);
+      transition: transform 0.3s ease-out;
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px 12px 0 0;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .modal-body { padding: 1.5rem; }
+    .form-fields {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0 0 12px 12px;
+    }
+    .status-nocobrado {
+        color: var(--accent-red);
+        font-weight: bold;
+    }
+    .status-noentregada {
+        color: var(--accent-red);
+        font-weight: bold;
+    }
+    /* Solución para que la fecha y los textos de estado no se corten */
+    .col-fecha, .col-entrega, .col-mes-cobro {
+      white-space: nowrap;
+    }
+    /* Alinear los botones en el centro de la celda de acciones */
+    td.action-cell {
+        vertical-align: middle;
+    }
+    .form-actions-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .form-actions-top .btn-primary {
+        margin-left: 10px;
+    }
+    @media (max-width: 600px) {
+      .wrap { margin: 16px auto; padding: 0 10px; }
+      header { flex-direction: column; text-align: center; }
+      .title { margin-top: 10px; }
+      .actions { flex-direction: column; align-items: stretch; }
+      .filter-buttons { width: 100%; justify-content: stretch; }
+      .filter-buttons button { flex-grow: 1; }
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead tr { position: absolute; top: -9999px; left: -9999px; }
+      td {
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+      }
+      td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 50%;
+        padding-left: 10px;
+        font-weight: bold;
+        text-align: left;
+      }
+      /* Ajuste clave para los botones en móviles */
+      td.action-cell {
+        min-width: unset; /* Elimina la anchura mínima que causa el scroll */
+      }
+      .action-buttons {
+          flex-wrap: wrap; /* Permite que los botones se ajusten en una sola línea */
+          justify-content: center;
+      }
+      .action-item {
+        min-width: unset; /* Elimina la anchura mínima de los botones individuales */
+        flex: 1 1 auto; /* Permite que los botones se estiren y encojan para caber */
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo-box"><img src="logogad.png" alt="Logo Juicios" /></div>
+      <div class="title">
+        <h1>Control de Juicios</h1>
+        <p>Gestiona y lleva el control de tus fechas importantes.</p>
+      </div>
+    </header>
+
+    <div id="app-content" class="card">
+        <div class="actions">
+            <button id="btnNuevo" class="btn-primary button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                </svg>
+                Añadir Nuevo Juicio
+            </button>
+            <div class="filter-buttons">
+                <button id="show-all" class="btn-ghost active button">Todos</button>
+                <button id="show-pending" class="btn-ghost button">Pendientes</button>
+            </div>
+            <button id="btnExport" class="btn-ghost button">Exportar a Excel</button>
+        </div>
+
+        <div id="results-table">
+            <table id="juicios-table">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>Juzgado</th>
+                  <th>Entrega Citación</th>
+                  <th>Mes Cobro</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody id="juicios-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+
+  <div id="dlgNuevo" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <strong id="modal-title">Añadir Nuevo Juicio</strong>
+        <button id="dlgClose" class="btn-ghost close-btn button">✕</button>
+      </div>
+      <form id="formNuevo">
+        <div class="modal-body">
+          <input type="hidden" id="juicioId" name="juicioId" />
+          <div class="form-fields">
+            <div class="field">
+              <label for="fecha">Fecha del Juicio</label>
+              <input id="fecha" name="fecha" type="date" required />
+            </div>
+            <div class="field">
+              <label for="hora">Hora del Juicio</label>
+              <input id="hora" name="hora" type="time" required />
+            </div>
+            <div class="field">
+              <label for="juzgado">Juzgado</label>
+              <input id="juzgado" name="juzgado" type="text" placeholder="Ej: 7 PENAL" required list="juzgado-list"/>
+              <datalist id="juzgado-list"></datalist>
+            </div>
+            <div class="field">
+              <label for="fechaEntrega">Fecha de Entrega de Citación</label>
+              <input id="fechaEntrega" name="fechaEntrega" type="date" />
+            </div>
+            <div class="field">
+              <label for="mesCobro">Mes de Cobro</label>
+              <select id="mesCobro" name="mesCobro">
+                <option value="">-- SELECCIONAR --</option>
+                <option value="ENERO">ENERO</option>
+                <option value="FEBRERO">FEBRERO</option>
+                <option value="MARZO">MARZO</option>
+                <option value="ABRIL">ABRIL</option>
+                <option value="MAYO">MAYO</option>
+                <option value="JUNIO">JUNIO</option>
+                <option value="JULIO">JULIO</option>
+                <option value="AGOSTO">AGOSTO</option>
+                <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+                <option value="OCTUBRE">OCTUBRE</option>
+                <option value="NOVIEMBRE">NOVIEMBRE</option>
+                <option value="DICIEMBRE">DICIEMBRE</option>
+              </select>
+            </div>
+            <div class="field">
+                <label for="estado">Estado</label>
+                <select id="estado" name="estado">
+                    <option value="pendiente">Pendiente</option>
+                    <option value="celebrado">Celebrado</option>
+                    <option value="suspendido">Suspendido</option>
+                </select>
+            </div>
+            <div class="form-actions-top">
+                <div class="file-inputs">
+                    <div class="field">
+                        <label for="citacionUrl">Citación (URL)</label>
+                        <input id="citacionUrl" name="citacionUrl" type="text" placeholder="Pega aquí la URL de Google Drive" />
+                    </div>
+                    <div class="field">
+                        <label for="diligenciasUrl">Diligencias (URL)</label>
+                        <input id="diligenciasUrl" name="diligenciasUrl" type="text" placeholder="Pega aquí la URL de Google Drive" />
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary button">Guardar</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="dlgMessage" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <strong id="messageTitle"></strong>
+        <button id="dlgMsgClose" class="btn-ghost close-btn button">✕</button>
+      </div>
+      <div class="modal-body">
+        <p id="messageText"></p>
+      </div>
+      <div class="modal-actions">
+        <button id="messageOk" class="btn-primary button">Aceptar</button>
+        <button id="messageCancel" class="btn-ghost button" hidden>Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <script>
+    // **REEMPLAZA ESTE OBJETO CON EL QUE COPIASTE DE TU CONSOLA DE FIREBASE**
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
+      authDomain: "markarma279.firebaseapp.com",
+      databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "markarma279",
+      messagingSenderId: "280620278315",
+      appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
+    };
+
+    // Inicializa Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    
+    // Elementos del DOM
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => document.querySelectorAll(sel);
+    
+    const juiciosBody = $("#juicios-body");
+    const dlgNuevo = $("#dlgNuevo");
+    const formNuevo = $("#formNuevo");
+    const modalTitle = $("#modal-title");
+    const juicioIdInput = $("#juicioId");
+    const juzgadoInput = $("#juzgado");
+    const juzgadoList = $("#juzgado-list");
+    const citacionUrlInput = $("#citacionUrl");
+    const diligenciasUrlInput = $("#diligenciasUrl");
+    
+    // Elementos del modal de mensajes
+    const dlgMessage = $("#dlgMessage");
+    const messageTitle = $("#messageTitle");
+    const messageText = $("#messageText");
+    const messageOk = $("#messageOk");
+    const messageCancel = $("#messageCancel");
+    const dlgMsgClose = $("#dlgMsgClose");
+
+    let currentFilter = 'all';
+
+    // Funciones del modal de mensajes
+    function showMessage(title, text, isConfirm = false) {
+      return new Promise((resolve) => {
+        messageTitle.textContent = title;
+        messageText.textContent = text;
+        messageCancel.hidden = !isConfirm;
+        dlgMessage.classList.add("open");
+
+        messageOk.onclick = () => {
+          dlgMessage.classList.remove("open");
+          resolve(true);
+        };
+        messageCancel.onclick = () => {
+          dlgMessage.classList.remove("open");
+          resolve(false);
+        };
+        dlgMsgClose.onclick = () => {
+          dlgMessage.classList.remove("open");
+          resolve(false);
+        };
+      });
+    }
+    
+    // Funciones de la aplicación
+    function renderJuicios(juicios) {
+      juiciosBody.innerHTML = '';
+      
+      const filteredJuicios = juicios.filter(j => {
+          if (currentFilter === 'pending') {
+              return j.estado === 'pendiente';
+          }
+          return true;
+      });
+
+      filteredJuicios.forEach(juicio => {
+        const tr = document.createElement("tr");
+        let statusClass, statusText;
+
+        switch (juicio.estado) {
+            case 'celebrado':
+                statusClass = 'status-celebrado';
+                statusText = 'Celebrado';
+                break;
+            case 'suspendido':
+                statusClass = 'status-suspendido';
+                statusText = 'Suspendido';
+                break;
+            default:
+                statusClass = 'status-pendiente';
+                statusText = 'Pendiente';
+        }
+        
+        const mesCobroContent = juicio.mesCobro && juicio.mesCobro !== "" ? juicio.mesCobro : '<span class="status-nocobrado">NO COBRADO</span>';
+        const fechaEntregaContent = juicio.fechaEntrega && juicio.fechaEntrega !== "" ? juicio.fechaEntrega : '<span class="status-noentregada">NO ENTREGADA</span>';
+
+        // Lógica del botón de citación
+        let citacionButtonHtml;
+        if (juicio.citacionUrl) {
+          citacionButtonHtml = `<a href="${juicio.citacionUrl}" target="_blank" class="action-item has-link button">Citación</a>`;
+        } else {
+          citacionButtonHtml = `<button class="action-item button" onclick="editJuicio('${juicio.id}')">Citación</button>`;
+        }
+        
+        // Lógica del botón de diligencias
+        let diligenciasButtonHtml;
+        if (juicio.diligenciasUrl) {
+          diligenciasButtonHtml = `<a href="${juicio.diligenciasUrl}" target="_blank" class="action-item has-link button">Diligencias</a>`;
+        } else {
+          diligenciasButtonHtml = `<button class="action-item button" onclick="editJuicio('${juicio.id}')">Diligencias</button>`;
+        }
+
+        tr.innerHTML = `
+          <td class="col-fecha" data-label="Fecha">${juicio.fecha}</td>
+          <td data-label="Hora">${juicio.hora}</td>
+          <td data-label="Juzgado">${juicio.juzgado}</td>
+          <td class="col-entrega" data-label="Entrega Citación">${fechaEntregaContent}</td>
+          <td data-label="Mes Cobro">${mesCobroContent}</td>
+          <td data-label="Estado" class="${statusClass}">${statusText}</td>
+          <td class="action-cell" data-label="Acciones">
+            <div class="action-buttons">
+              <button class="action-item button" onclick="editJuicio('${juicio.id}')">Editar</button>
+              <button class="action-item danger button" onclick="deleteJuicio('${juicio.id}')">Borrar</button>
+              ${citacionButtonHtml}
+              ${diligenciasButtonHtml}
+            </div>
+          </td>
+        `;
+        juiciosBody.appendChild(tr);
+      });
+    }
+
+    function populateJuzgadoDatalist(juicios) {
+        const uniqueJuzgados = new Set();
+        juicios.forEach(j => {
+            if (j.juzgado) {
+                uniqueJuzgados.add(j.juzgado);
+            }
+        });
+        juzgadoList.innerHTML = '';
+        uniqueJuzgados.forEach(juzgado => {
+            const option = document.createElement('option');
+            option.value = juzgado;
+            juzgadoList.appendChild(option);
+        });
+    }
+
+    function fetchJuicios() {
+      db.ref('juicios').on('value', (snapshot) => {
+        const data = snapshot.val();
+        const juicios = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+        juicios.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        renderJuicios(juicios);
+        populateJuzgadoDatalist(juicios);
+        window.allJuiciosData = juicios;
+      });
+    }
+
+    window.exportToExcel = () => {
+        const headers = ['Fecha', 'Hora', 'Juzgado', 'Entrega Citación', 'Mes Cobro', 'Estado', 'Citación', 'Diligencias'];
+        let csv = headers.join(';') + '\n';
+        
+        window.allJuiciosData.forEach(juicio => {
+            const row = [
+                juicio.fecha,
+                juicio.hora,
+                `"${juicio.juzgado}"`,
+                juicio.fechaEntrega,
+                juicio.mesCobro,
+                juicio.estado,
+                `"${juicio.citacionUrl || ''}"`,
+                `"${juicio.diligenciasUrl || ''}"`
+            ];
+            csv += row.join(';') + '\n';
+        });
+
+        const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'juicios.csv';
+        link.click();
+        URL.revokeObjectURL(link.href);
+    };
+    
+    window.editJuicio = (id) => {
+      db.ref('juicios/' + id).once('value', (snapshot) => {
+        const juicio = snapshot.val();
+        if (juicio) {
+          modalTitle.textContent = 'Editar Juicio';
+          juicioIdInput.value = id;
+          $('#fecha').value = juicio.fecha;
+          $('#hora').value = juicio.hora;
+          $('#juzgado').value = juicio.juzgado;
+          $('#fechaEntrega').value = juicio.fechaEntrega;
+          $('#mesCobro').value = juicio.mesCobro;
+          $('#estado').value = juicio.estado || 'pendiente';
+          citacionUrlInput.value = juicio.citacionUrl || '';
+          diligenciasUrlInput.value = juicio.diligenciasUrl || '';
+          dlgNuevo.classList.add('open');
+        }
+      });
+    };
+    
+    window.deleteJuicio = async (id) => {
+        const confirmed = await showMessage('Confirmar Borrado', '¿Estás seguro de que quieres borrar este juicio?', true);
+        if (confirmed) {
+            db.ref('juicios/' + id).remove()
+                .then(() => {})
+                .catch(error => showMessage('Error', 'Hubo un error al borrar el juicio.'));
+        }
+    };
+    
+    // Función para manejar el reconocimiento de voz
+    function startDictation() {
+      if (!('webkitSpeechRecognition' in window)) {
+        showMessage('Error', 'El reconocimiento de voz no es compatible con este navegador.');
+        return;
+      }
+
+      const recognition = new webkitSpeechRecognition();
+      recognition.lang = 'es-ES';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      
+      showMessage('Escuchando...', 'Di la información del juicio (ej: "juicio el día 18 del 8 del 25 en penal 3 a las 11 horas").');
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        console.log('Voz reconocida:', transcript);
+        parseAndPopulateForm(transcript);
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Error de reconocimiento de voz:', event.error);
+        showMessage('Error de Voz', 'Hubo un problema al reconocer tu voz.');
+      };
+
+      recognition.onend = () => {
+        dlgMessage.classList.remove("open");
+      };
+
+      recognition.start();
+    }
+
+    function parseAndPopulateForm(text) {
+        // Regex patterns to find specific information
+        const datePattern = /(\d{1,2}) del? (\d{1,2}) del? (\d{2,4})/;
+        const timePattern = /(\d{1,2})(?::| horas?)/i;
+        const juzgadoPattern = /(juzgado|en)?\s+(penal|civil|social|familia)?\s*(\d{1,2})/i;
+
+        // Try to find the date
+        const dateMatch = text.match(datePattern);
+        if (dateMatch) {
+            let day = dateMatch[1].padStart(2, '0');
+            let month = dateMatch[2].padStart(2, '0');
+            let year = dateMatch[3].length === 2 ? `20${dateMatch[3]}` : dateMatch[3];
+            $('#fecha').value = `${year}-${month}-${day}`;
+        }
+
+        // Try to find the time
+        const timeMatch = text.match(timePattern);
+        if (timeMatch) {
+            let hour = timeMatch[1].padStart(2, '0');
+            let minute = '00';
+            $('#hora').value = `${hour}:${minute}`;
+        }
+        
+        // Try to find the court
+        const juzgadoMatch = text.match(juzgadoPattern);
+        if (juzgadoMatch) {
+            let type = juzgadoMatch[2] ? juzgadoMatch[2].toUpperCase() : '';
+            let number = juzgadoMatch[3];
+            $('#juzgado').value = `${number} ${type}`;
+        }
+        
+        // Open the modal after populating the fields
+        modalTitle.textContent = 'Añadir Nuevo Juicio';
+        juicioIdInput.value = '';
+        dlgNuevo.classList.add("open");
+    }
+
+    $("#btnNuevo").onclick = () => {
+      formNuevo.reset();
+      juicioIdInput.value = '';
+      citacionUrlInput.value = '';
+      diligenciasUrlInput.value = '';
+      
+      showMessage('Opción', '¿Quieres añadir el juicio con voz?', true)
+          .then(confirmed => {
+              if (confirmed) {
+                  startDictation();
+              } else {
+                  modalTitle.textContent = 'Añadir Nuevo Juicio';
+                  dlgNuevo.classList.add("open");
+              }
+          });
+    };
+    
+    $("#dlgClose").onclick = () => {
+      dlgNuevo.classList.remove("open");
+    };
+
+    dlgNuevo.onclick = (e) => {
+      if (e.target.id === 'dlgNuevo') {
+        dlgNuevo.classList.remove("open");
+      }
+    };
+
+    formNuevo.onsubmit = async e => {
+      e.preventDefault();
+      const fd = new FormData(formNuevo);
+      const juicio = Object.fromEntries(fd.entries());
+      const juicioId = juicioIdInput.value;
+      
+      // Limpiar los campos de URL si están vacíos antes de guardar
+      if (juicio.citacionUrl === "") {
+          delete juicio.citacionUrl;
+      }
+      if (juicio.diligenciasUrl === "") {
+          delete juicio.diligenciasUrl;
+      }
+      
+      try {
+          if (juicioId) {
+              await db.ref('juicios/' + juicioId).update(juicio);
+          } else {
+              const newJuicioRef = db.ref('juicios').push();
+              await newJuicioRef.set(juicio);
+          }
+          dlgNuevo.classList.remove('open');
+      } catch (error) {
+          showMessage('Error', 'Hubo un error al guardar los datos.');
+          console.error(error);
+      }
+    };
+    
+    $("#show-all").onclick = () => {
+        currentFilter = 'all';
+        $$('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
+        $("#show-all").classList.add('active');
+        fetchJuicios();
+    };
+
+    $("#show-pending").onclick = () => {
+        currentFilter = 'pending';
+        $$('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
+        $("#show-pending").classList.add('active');
+        fetchJuicios();
+    };
+
+    $("#btnExport").onclick = window.exportToExcel;
+
+    fetchJuicios();
+
+  </script>
+</body>
+</html>

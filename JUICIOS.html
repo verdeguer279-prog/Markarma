@@ -349,15 +349,7 @@
 
     <div id="app-content" class="card">
         <div class="actions">
-            <button id="btnNuevo" class="btn-primary button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle; margin-right: 8px;">
-                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                    <line x1="12" y1="19" x2="12" y2="23"></line>
-                    <line x1="8" y1="23" x2="16" y2="23"></line>
-                </svg>
-                Añadir Nuevo Juicio
-            </button>
+            <button id="btnNuevo" class="btn-primary button">Añadir Nuevo Juicio</button>
             <div class="filter-buttons">
                 <button id="show-all" class="btn-ghost active button">Todos</button>
                 <button id="show-pending" class="btn-ghost button">Pendientes</button>
@@ -397,24 +389,24 @@
           <div class="form-fields">
             <div class="field">
               <label for="fecha">Fecha del Juicio</label>
-              <input id="fecha" name="fecha" type="date" required />
+              <input id="fecha" name="fecha" type="date" required tabindex="1" />
             </div>
             <div class="field">
               <label for="hora">Hora del Juicio</label>
-              <input id="hora" name="hora" type="time" required />
+              <input id="hora" name="hora" type="time" required tabindex="2" />
             </div>
             <div class="field">
               <label for="juzgado">Juzgado</label>
-              <input id="juzgado" name="juzgado" type="text" placeholder="Ej: 7 PENAL" required list="juzgado-list"/>
+              <input id="juzgado" name="juzgado" type="text" placeholder="Ej: 7 PENAL" required list="juzgado-list" tabindex="3" />
               <datalist id="juzgado-list"></datalist>
             </div>
             <div class="field">
               <label for="fechaEntrega">Fecha de Entrega de Citación</label>
-              <input id="fechaEntrega" name="fechaEntrega" type="date" />
+              <input id="fechaEntrega" name="fechaEntrega" type="date" tabindex="4" />
             </div>
             <div class="field">
               <label for="mesCobro">Mes de Cobro</label>
-              <select id="mesCobro" name="mesCobro">
+              <select id="mesCobro" name="mesCobro" tabindex="5">
                 <option value="">-- SELECCIONAR --</option>
                 <option value="ENERO">ENERO</option>
                 <option value="FEBRERO">FEBRERO</option>
@@ -432,7 +424,7 @@
             </div>
             <div class="field">
                 <label for="estado">Estado</label>
-                <select id="estado" name="estado">
+                <select id="estado" name="estado" tabindex="6">
                     <option value="pendiente">Pendiente</option>
                     <option value="celebrado">Celebrado</option>
                     <option value="suspendido">Suspendido</option>
@@ -442,14 +434,14 @@
                 <div class="file-inputs">
                     <div class="field">
                         <label for="citacionUrl">Citación (URL)</label>
-                        <input id="citacionUrl" name="citacionUrl" type="text" placeholder="Pega aquí la URL de Google Drive" />
+                        <input id="citacionUrl" name="citacionUrl" type="text" placeholder="Pega aquí la URL de Google Drive" tabindex="7" />
                     </div>
                     <div class="field">
                         <label for="diligenciasUrl">Diligencias (URL)</label>
-                        <input id="diligenciasUrl" name="diligenciasUrl" type="text" placeholder="Pega aquí la URL de Google Drive" />
+                        <input id="diligenciasUrl" name="diligenciasUrl" type="text" placeholder="Pega aquí la URL de Google Drive" tabindex="8" />
                     </div>
                 </div>
-                <button type="submit" class="btn-primary button">Guardar</button>
+                <button type="submit" class="btn-primary button" tabindex="9">Guardar</button>
             </div>
           </div>
         </div>
@@ -677,84 +669,13 @@
         }
     };
     
-    function startDictation() {
-      if (!('webkitSpeechRecognition' in window)) {
-        showMessage('Error', 'El reconocimiento de voz no es compatible con este navegador.');
-        return;
-      }
-
-      const recognition = new webkitSpeechRecognition();
-      recognition.lang = 'es-ES';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
-      
-      showMessage('Escuchando...', 'Di la información del juicio (ej: "juicio el día 18 del 8 del 25 en penal 3 a las 11 horas").');
-
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        console.log('Voz reconocida:', transcript);
-        parseAndPopulateForm(transcript);
-      };
-
-      recognition.onerror = (event) => {
-        console.error('Error de reconocimiento de voz:', event.error);
-        showMessage('Error de Voz', 'Hubo un problema al reconocer tu voz.');
-      };
-
-      recognition.onend = () => {
-        dlgMessage.classList.remove("open");
-      };
-
-      recognition.start();
-    }
-
-    function parseAndPopulateForm(text) {
-        const datePattern = /(\d{1,2}) del? (\d{1,2}) del? (\d{2,4})/;
-        const timePattern = /(\d{1,2})(?::| horas?)/i;
-        const juzgadoPattern = /(juzgado|en)?\s+(penal|civil|social|familia)?\s*(\d{1,2})/i;
-
-        const dateMatch = text.match(datePattern);
-        if (dateMatch) {
-            let day = dateMatch[1].padStart(2, '0');
-            let month = dateMatch[2].padStart(2, '0');
-            let year = dateMatch[3].length === 2 ? `20${dateMatch[3]}` : dateMatch[3];
-            $('#fecha').value = `${year}-${month}-${day}`;
-        }
-
-        const timeMatch = text.match(timePattern);
-        if (timeMatch) {
-            let hour = timeMatch[1].padStart(2, '0');
-            let minute = '00';
-            $('#hora').value = `${hour}:${minute}`;
-        }
-        
-        const juzgadoMatch = text.match(juzgadoPattern);
-        if (juzgadoMatch) {
-            let type = juzgadoMatch[2] ? juzgadoMatch[2].toUpperCase() : '';
-            let number = juzgadoMatch[3];
-            $('#juzgado').value = `${number} ${type}`;
-        }
-        
-        modalTitle.textContent = 'Añadir Nuevo Juicio';
-        juicioIdInput.value = '';
-        dlgNuevo.classList.add("open");
-    }
-
     $("#btnNuevo").onclick = () => {
       formNuevo.reset();
       juicioIdInput.value = '';
       citacionUrlInput.value = '';
       diligenciasUrlInput.value = '';
-      
-      showMessage('Opción', '¿Quieres añadir el juicio con voz?', true)
-          .then(confirmed => {
-              if (confirmed) {
-                  startDictation();
-              } else {
-                  modalTitle.textContent = 'Añadir Nuevo Juicio';
-                  dlgNuevo.classList.add("open");
-              }
-          });
+      modalTitle.textContent = 'Añadir Nuevo Juicio';
+      dlgNuevo.classList.add("open");
     };
     
     $("#dlgClose").onclick = () => {

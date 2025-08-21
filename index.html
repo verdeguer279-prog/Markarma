@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Menú Principal</title>
+  <style>
+    :root {
+      --bg-dark: #1a1a2e;
+      --card-bg: #282844;
+      --text-light: #e9e9f0;
+      --accent-blue: #007BFF;
+      --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
+      --btn-active-bg: linear-gradient(135deg, #007BFF, #0056b3);
+      --btn-inactive-bg: #404060;
+      --btn-inactive-hover: #505070;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      margin: 0;
+      padding: 0;
+    }
+    .wrap {
+      max-width: 1100px; /* Incrementado para pantallas grandes */
+      margin: 32px auto;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .logo-box {
+      height: 72px;
+      width: 72px;
+      background: transparent;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    .logo-box img { max-height: 64px; max-width: 64px; }
+    .title h1 { 
+      margin: 0; 
+      font-size: clamp(2rem, 5vw, 3rem); /* Tamaño de fuente más grande */
+      background: linear-gradient(135deg, #e9e9f0, #ccc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .title p { 
+      margin: 4px 0 0; 
+      font-size: clamp(.95rem, 2vw, 1.1rem); 
+      color: #aaa; 
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 32px; /* Más padding para más espacio */
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      text-align: center; /* Centrar el contenido de la tarjeta */
+    }
+    .card-content {
+      max-width: 800px;
+      margin: 0 auto; /* Centrar el contenido */
+    }
+    .card h2 {
+      font-size: clamp(1.2rem, 3vw, 1.8rem);
+      margin-bottom: 1rem;
+    }
+    .card p.description {
+      font-size: clamp(0.9rem, 2vw, 1rem);
+      color: #ccc;
+      margin-bottom: 2rem;
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .menu-button {
+      padding: 30px 20px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.1rem; /* Fuente un poco más grande */
+      color: var(--text-light);
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s, background 0.3s ease;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .menu-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+    .menu-button.active {
+      background: var(--accent-gradient);
+    }
+    .menu-button.inactive {
+      background: var(--btn-inactive-bg);
+      color: #b0b0d0;
+    }
+    .menu-button.inactive:hover {
+        background: var(--btn-inactive-hover);
+    }
+    @media (max-width: 600px) {
+      .menu-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+      .wrap { margin: 16px auto; padding: 0 10px; }
+      header { flex-direction: column; text-align: center; }
+      .title { margin-top: 10px; }
+      .menu-button {
+          padding: 20px;
+          font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo-box"><img id="logo" alt="Mi logo de Gad" src="logogad.png" /></div>
+      <div class="title">
+        <h1>Menú Principal</h1>
+        <p>Selecciona una de las opciones disponibles</p>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="card-content">
+        <h2>Bienvenido</h2>
+        <p class="description">Accede a las diferentes secciones de la aplicación para gestionar la información de tu interés. Utiliza los botones a continuación para navegar.</p>
+        <div class="menu-grid">
+          <a href="juicios.html" class="menu-button active">JUICIOS</a>
+          <a href="usuarios.html" class="menu-button active">USUARIOS</a>
+          <button class="menu-button inactive">OPCIÓN 3</button>
+          <button class="menu-button inactive">OPCIÓN 4</button>
+          <button class="menu-button inactive">OPCIÓN 5</button>
+          <button class="menu-button inactive">OPCIÓN 6</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

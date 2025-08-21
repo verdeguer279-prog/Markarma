@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Buscador · Titular-Usuario-Descripción-Resultado</title>
+  <style>
+    :root {
+      --bg-dark: #1a1a2e;
+      --card-bg: #282844;
+      --text-light: #e9e9f0;
+      --accent-blue: #007BFF;
+      --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-light);
+      margin: 0;
+      padding: 0;
+    }
+    .wrap {
+      max-width: 940px;
+      margin: 32px auto;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between; /* Alinea los elementos en los extremos */
+      gap: 16px;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+    .logo-box {
+      height: 72px;
+      width: 72px; /* Cambiado a un cuadrado para que el círculo funcione bien */
+      background: transparent; /* Fondo transparente */
+      border-radius: 50%; /* Hecho redondo */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      overflow: hidden; /* Oculta cualquier parte de la imagen que se salga */
+    }
+    .logo-box img { max-height: 64px; max-width: 64px; }
+    .title h1 { margin: 0; font-size: clamp(1.4rem, 4vw, 2rem); }
+    .title p { margin: 4px 0 0; font-size: clamp(.85rem, 2vw, .95rem); color: #ccc; }
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+    .grid { display: grid; gap: 16px; }
+    .field { display: grid; gap: 8px; }
+    label { font-size: 0.9rem; color: #aaa; }
+    input[type="text"], input[type="password"], textarea, input[type="email"] {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-light);
+      padding: 12px;
+      border-radius: 8px;
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+    input[type="text"]:focus, input[type="password"]:focus, textarea:focus, input[type="email"]:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
+    }
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent-gradient);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(118, 75, 162, 0.5);
+    }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: var(--text-light);
+    }
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+    .btn-menu-principal {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: transform 0.2s, box-shadow 0.2s;
+        background: var(--card-bg); /* O un color más oscuro si se prefiere */
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--text-light);
+        text-decoration: none;
+        display: inline-block;
+        white-space: nowrap;
+    }
+    .btn-menu-principal:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+    }
+    table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+    th, td {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Estilos del modal mejorados */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s, visibility 0.3s;
+      z-index: 1000;
+    }
+    .modal-overlay.open { visibility: visible; opacity: 1; }
+    .modal {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      width: 90%;
+      max-width: 450px;
+      transform: scale(0.95);
+      transition: transform 0.3s ease-out;
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px 12px 0 0;
+    }
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: #aaa;
+      cursor: pointer;
+    }
+    .modal-body { padding: 1.5rem; }
+    .form-fields {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 1rem 1.5rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 0 0 12px 12px;
+    }
+    .login-container {
+      text-align: center;
+      margin-top: 50px;
+      padding: 24px;
+      border-radius: 12px;
+      background: var(--card-bg);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      max-width: 350px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .login-field {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    /* Estilos responsivos para pantallas más pequeñas (móviles) */
+    @media (max-width: 600px) {
+      .wrap { margin: 16px auto; padding: 0 10px; }
+      header { flex-direction: column; text-align: center; }
+      .title { margin-top: 10px; }
+      .grid { grid-template-columns: 1fr; }
+      button { width: 100%; margin-bottom: 8px; }
+      .login-container { margin: 2rem auto; }
+      table, thead, tbody, th, td, tr {
+        display: block;
+      }
+      thead tr { position: absolute; top: -9999px; left: -9999px; }
+      td {
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        padding-left: 50%;
+        text-align: right;
+      }
+      td:before {
+        content: attr(data-label);
+        position: absolute;
+        left: 0;
+        width: 50%;
+        padding-left: 10px;
+        font-weight: bold;
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="header-left">
+        <div class="logo-box"><img id="logo" alt="Mi logo de Gad" src="logogad.png" /></div>
+        <div class="title">
+          <h1>Buscador de contraseñas</h1>
+          <p>Puedes buscar por titular, usuario y descripción.</p>
+        </div>
+      </div>
+      <a href="index.html" class="btn-menu-principal">MENÚ PRINCIPAL</a>
+    </header>
+
+    <div id="app-content" hidden>
+        <section class="card grid">
+          <div class="field">
+            <label for="titular">Titular (buscar)</label>
+            <input id="titular" type="text" placeholder="Escriba para filtrar por Titular" />
+          </div>
+          <div class="field">
+            <label for="usuario">Usuario (buscar)</label>
+            <input id="usuario" type="text" placeholder="Escriba para filtrar por Usuario" />
+          </div>
+          <div class="field">
+            <label for="descripcionBusqueda">Descripción (buscar)</label>
+            <input id="descripcionBusqueda" type="text" placeholder="Escriba para filtrar por Descripción" />
+          </div>
+          <div class="field">
+            <label for="resultado">Contraseña</label>
+            <input id="resultado" type="text" placeholder="Resultado" readonly />
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+            <button id="btnBuscar" class="btn-primary">Buscar</button>
+            <button id="btnLimpiar" class="btn-ghost">Limpiar</button>
+            <button id="btnBorrarTodo" class="btn-ghost">Borrar todos los datos</button>
+            <button id="btnNuevo" class="btn-primary">Introduzca nuevos datos</button>
+          </div>
+
+          <div id="results" hidden>
+            <table>
+              <thead>
+                <tr><th>Titular</th><th>Usuario</th><th>Descripción</th><th>Contraseña</th></tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </section>
+    </div>
+
+    <div id="login-container">
+        <h2>Inicie sesión para continuar</h2>
+        <div class="login-field">
+            <label for="loginEmail">Correo electrónico</label>
+            <input id="loginEmail" type="email" placeholder="email@ejemplo.com" required />
+        </div>
+        <div class="login-field">
+            <label for="loginPassword">Contraseña</label>
+            <input id="loginPassword" type="password" required />
+        </div>
+        <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 15px;">
+            <button id="btnSignIn" class="btn-primary" style="flex-grow: 1;">Iniciar sesión</button>
+            <button id="btnSignUp" class="btn-ghost" style="flex-grow: 1;">Crear cuenta</button>
+        </div>
+    </div>
+
+  </div>
+
+  <div id="dlgNuevo" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <strong>Introduzca nuevos datos</strong>
+        <button id="dlgClose" class="btn-ghost close-btn">✕</button>
+      </div>
+      <form id="formNuevo">
+        <div class="modal-body">
+          <div class="form-fields">
+            <label for="nuevoTitular">Titular</label>
+            <input id="nuevoTitular" name="titular" type="text" required />
+            
+            <label for="nuevoUsuario">Usuario</label>
+            <input id="nuevoUsuario" name="usuario" type="text" required />
+            
+            <label for="nuevaDescripcion">Descripción</label>
+            <input id="nuevaDescripcion" name="descripcion" type="text" required />
+            
+            <label for="nuevoResultado">Resultado</label>
+            <input id="nuevoResultado" name="resultado" type="text" required />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="reset" class="btn-ghost">Limpiar</button>
+          <button type="submit" class="btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="dlgMessage" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <strong id="messageTitle"></strong>
+      </div>
+      <div class="modal-body">
+        <p id="messageText"></p>
+      </div>
+      <div class="modal-actions">
+        <button id="messageOk" class="btn-primary">Aceptar</button>
+        <button id="messageCancel" class="btn-ghost" hidden>Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script>
+    // Tu configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
+      authDomain: "markarma279.firebaseapp.com",
+      databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "markarma279",
+      storageBucket: "markarma279.firebasestorage.app",
+      messagingSenderId: "280620278315",
+      appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
+    };
+
+    // Inicializa Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+    
+    const $ = sel => document.querySelector(sel);
+    const titular = $("#titular"), usuario = $("#usuario"), descripcionBusqueda = $("#descripcionBusqueda"), resultado = $("#resultado"), tbody = $("#tbody"), results = $("#results");
+    const appContent = $("#app-content");
+    const loginContainer = $("#login-container");
+    const loginEmail = $("#loginEmail"), loginPassword = $("#loginPassword");
+    const btnSignIn = $("#btnSignIn"), btnSignUp = $("#btnSignUp");
+    
+    // Elementos del modal de mensajes
+    const dlgMessage = $("#dlgMessage"), messageTitle = $("#messageTitle"), messageText = $("#messageText"), messageOk = $("#messageOk"), messageCancel = $("#messageCancel");
+
+    function normalize(s) { return (s || "").toString().trim().toLowerCase(); }
+
+    function showMessage(title, text, isConfirm = false) {
+      return new Promise((resolve) => {
+        messageTitle.textContent = title;
+        messageText.textContent = text;
+        messageCancel.hidden = !isConfirm;
+        dlgMessage.classList.add("open");
+
+        messageOk.onclick = () => {
+          dlgMessage.classList.remove("open");
+          resolve(true);
+        };
+        messageCancel.onclick = () => {
+          dlgMessage.classList.remove("open");
+          resolve(false);
+        };
+      });
+    }
+
+    // Escucha cambios en el estado de autenticación
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        // El usuario está autenticado, muestra el contenido de la aplicación
+        appContent.hidden = false;
+        loginContainer.hidden = true;
+        
+        // Define la referencia a la base de datos para el usuario actual
+        // Esto crea una estructura como passwords/userId/data
+        const userPasswordsRef = db.ref('passwords/' + user.uid);
+
+        function doSearch() {
+            const f1 = normalize(titular.value), f2 = normalize(usuario.value), f3 = normalize(descripcionBusqueda.value);
+            
+            userPasswordsRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                const DATA = data ? Object.values(data) : [];
+                const matches = DATA.filter(r =>
+                    (f1 === "" || normalize(r.titular).includes(f1)) &&
+                    (f2 === "" || normalize(r.usuario).includes(f2)) &&
+                    (f3 === "" || normalize(r.descripcion).includes(f3))
+                );
+                
+                tbody.innerHTML = "";
+                matches.forEach(r => {
+                    const tr = document.createElement("tr");
+                    tr.innerHTML = `<td data-label="Titular">${r.titular}</td><td data-label="Usuario">${r.usuario}</td><td data-label="Descripción">${r.descripcion}</td><td data-label="Contraseña">${r.resultado}</td>`;
+                    tr.onclick = () => { resultado.value = r.resultado; };
+                    tbody.appendChild(tr);
+                });
+                results.hidden = matches.length === 0;
+                if (matches.length === 1) { resultado.value = matches[0].resultado; }
+            });
+        }
+
+        $("#btnBuscar").onclick = doSearch;
+        
+        $("#btnLimpiar").onclick = () => { titular.value = ""; usuario.value = ""; descripcionBusqueda.value = ""; resultado.value = ""; results.hidden = true; };
+
+        $("#btnBorrarTodo").onclick = async () => {
+          const confirmResult = await showMessage("Confirmar borrado", "¿Estás seguro de que quieres borrar TODOS los datos? Esta acción es irreversible.", true);
+          if (confirmResult) {
+              userPasswordsRef.remove().then(() => {
+                  titular.value = ""; usuario.value = ""; descripcionBusqueda.value = ""; resultado.value = ""; results.hidden = true;
+                  showMessage("Borrado completo", "Todos los datos han sido borrados de Firebase.");
+              }).catch(error => {
+                  console.error("Error al borrar los datos: ", error);
+                  showMessage("Error", "Hubo un error al intentar borrar los datos.");
+              });
+          }
+        };
+
+        const dlg = $("#dlgNuevo"), formNuevo = $("#formNuevo"), dlgClose = $("#dlgClose");
+        $("#btnNuevo").onclick = () => {
+          formNuevo.reset();
+          dlg.classList.add("open");
+        };
+        dlgClose.onclick = () => dlg.classList.remove("open");
+
+        formNuevo.onsubmit = e => {
+          e.preventDefault();
+          const fd = new FormData(formNuevo);
+          const nuevo = Object.fromEntries(fd.entries());
+          
+          userPasswordsRef.push(nuevo).then(() => {
+              dlg.classList.remove("open");
+              doSearch();
+          }).catch(error => {
+              console.error("Error al guardar los datos: ", error);
+              showMessage("Error", "Hubo un error al guardar los datos.");
+          });
+        };
+      } else {
+        // El usuario no está autenticado, muestra el contenedor de inicio de sesión
+        appContent.hidden = true;
+        loginContainer.hidden = false;
+      }
+    });
+
+    // Manejador del botón de inicio de sesión
+    btnSignIn.onclick = () => {
+        const email = loginEmail.value;
+        const password = loginPassword.value;
+        auth.signInWithEmailAndPassword(email, password).catch((error) => {
+            console.error("Error al iniciar sesión:", error);
+            showMessage("Error de Autenticación", error.message);
+        });
+    };
+
+    // Manejador del botón para crear una nueva cuenta
+    btnSignUp.onclick = () => {
+        const email = loginEmail.value;
+        const password = loginPassword.value;
+        auth.createUserWithEmailAndPassword(email, password).catch((error) => {
+            console.error("Error al crear la cuenta:", error);
+            showMessage("Error al crear la cuenta", error.message);
+        });
+    };
+  </script>
+</body>
+</html>

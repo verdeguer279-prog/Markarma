@@ -93,23 +93,25 @@
       font-size: 1.1rem; /* Fuente un poco más grande */
       color: var(--text-light);
       text-align: center;
-      transition: transform 0.2s, box-shadow 0.2s, background 0.3s ease;
+      transition: box-shadow 0.2s, background 0.3s ease;
       text-decoration: none;
       box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
     .menu-button:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
     }
     .menu-button.active {
       background: var(--accent-gradient);
+    }
+    .menu-button.active:hover {
+      filter: brightness(1.1); /* Ligero cambio de color para el estado activo */
     }
     .menu-button.inactive {
       background: var(--btn-inactive-bg);
       color: #b0b0d0;
     }
     .menu-button.inactive:hover {
-        background: var(--btn-inactive-hover);
+        background: #505070; /* Cambio de color más notable al pasar el ratón */
     }
     @media (max-width: 600px) {
       .menu-grid {

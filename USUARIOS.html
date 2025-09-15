@@ -11,6 +11,8 @@
       --text-light: #e9e9f0;
       --accent-blue: #007BFF;
       --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
+      /* Nuevo color para el botón de cerrar sesión */
+      --accent-red: #d32f2f;
     }
     body {
       font-family: 'Poppins', sans-serif;
@@ -27,16 +29,19 @@
     }
     header {
       display: flex;
+      flex-direction: column; /* Apila los elementos en vertical */
       align-items: center;
-      justify-content: space-between;
       gap: 16px;
       margin-bottom: 2rem;
       flex-wrap: wrap;
+      text-align: center;
     }
     .header-left {
         display: flex;
+        flex-direction: column;
         align-items: center;
         gap: 16px;
+        width: 100%;
     }
     .logo-box {
       height: 72px;
@@ -119,6 +124,18 @@
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         background: rgba(255, 255, 255, 0.1);
     }
+    /* Nuevo estilo para el botón de cerrar sesión */
+    .btn-logout-red {
+      background: var(--accent-red);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .btn-logout-red:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(211, 47, 47, 0.5);
+      background: #b71c1c;
+    }
+
     table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
     th, td {
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -256,10 +273,7 @@
           <p>Puedes buscar por titular, usuario y descripción.</p>
         </div>
       </div>
-      <div style="display: flex; gap: 10px;">
-        <a href="index.html" class="btn-menu-principal">MENÚ PRINCIPAL</a>
-        <button id="btnLogout" class="btn-ghost">Cerrar sesión</button>
-      </div>
+      <a href="index.html" class="btn-menu-principal">MENÚ PRINCIPAL</a>
     </header>
 
     <div id="app-content" hidden>
@@ -285,6 +299,7 @@
             <button id="btnLimpiar" class="btn-ghost">Limpiar</button>
             <button id="btnBorrarTodo" class="btn-ghost">Borrar todos los datos</button>
             <button id="btnNuevo" class="btn-primary">Introduzca nuevos datos</button>
+            <button id="btnLogout" class="btn-logout-red">Cerrar sesión</button>
           </div>
 
           <div id="results" hidden>
@@ -488,20 +503,6 @@
               showMessage("Error", "Hubo un error al guardar los datos.");
           });
         };
-
-        // Manejador del botón de cerrar sesión
- btnLogout.onclick = () => {
-  auth.signOut().then(() => {
-    console.log("Sesión cerrada correctamente.");
-    // Limpiar solo la contraseña
-    loginPassword.value = "";
-  }).catch((error) => {
-    console.error("Error al cerrar sesión:", error);
-    showMessage("Error", "Hubo un problema al intentar cerrar la sesión.");
-  });
-};
-
-
       } else {
         // El usuario no está autenticado, muestra el contenedor de inicio de sesión
         appContent.hidden = true;
@@ -509,15 +510,14 @@
       }
     });
 
-// Manejador del botón de inicio de sesión
+    // Manejador del botón de inicio de sesión
     btnSignIn.onclick = () => {
         const email = loginEmail.value;
         const password = loginPassword.value;
         auth.signInWithEmailAndPassword(email, password).catch((error) => {
-    console.error("Error al iniciar sesión:", error);
-    showMessage("Error de Autenticación", "Usuario o contraseña inválidos.");
-});
-
+          console.error("Error al iniciar sesión:", error);
+          showMessage("Error de Autenticación", "Usuario o contraseña inválidos.");
+        });
     };
 
     // Manejador del botón para crear una nueva cuenta
@@ -532,6 +532,17 @@
                 showMessage("Error al crear la cuenta", error.message);
             }
         });
+    };
+
+    // Manejador del botón de cerrar sesión
+    btnLogout.onclick = () => {
+      auth.signOut().then(() => {
+        console.log("Sesión cerrada correctamente.");
+        loginPassword.value = ""; // Borra solo la contraseña
+      }).catch((error) => {
+        console.error("Error al cerrar sesión:", error);
+        showMessage("Error", "Hubo un problema al intentar cerrar la sesión.");
+      });
     };
 
     // Manejador del botón para restablecer la contraseña

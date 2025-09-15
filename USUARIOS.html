@@ -325,10 +325,7 @@
         </div>
         <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 15px;">
             <button id="btnSignIn" class="btn-primary" style="flex-grow: 1;">Iniciar sesión</button>
-            <button id="btnSignUp" class="btn-ghost" style="flex-grow: 1;">Crear cuenta</button>
-        </div>
-        <div style="text-align: right; margin-top: 10px;">
-            <button id="btnResetPassword" class="btn-ghost" style="font-size: 0.85rem;">¿Olvidó su contraseña?</button>
+            <button id="btnResetPassword" class="btn-ghost" style="flex-grow: 1;">¿Olvidó su contraseña?</button>
         </div>
     </div>
 
@@ -404,7 +401,7 @@
     const appContent = $("#app-content");
     const loginContainer = $("#login-container");
     const loginEmail = $("#loginEmail"), loginPassword = $("#loginPassword");
-    const btnSignIn = $("#btnSignIn"), btnSignUp = $("#btnSignUp");
+    const btnSignIn = $("#btnSignIn");
     const btnResetPassword = $("#btnResetPassword");
     const btnLogout = $("#btnLogout");
     
@@ -503,6 +500,20 @@
               showMessage("Error", "Hubo un error al guardar los datos.");
           });
         };
+
+        // Manejador del botón de cerrar sesión
+ btnLogout.onclick = () => {
+  auth.signOut().then(() => {
+    console.log("Sesión cerrada correctamente.");
+    // Limpiar solo la contraseña
+    loginPassword.value = "";
+  }).catch((error) => {
+    console.error("Error al cerrar sesión:", error);
+    showMessage("Error", "Hubo un problema al intentar cerrar la sesión.");
+  });
+};
+
+
       } else {
         // El usuario no está autenticado, muestra el contenedor de inicio de sesión
         appContent.hidden = true;
@@ -510,39 +521,15 @@
       }
     });
 
-    // Manejador del botón de inicio de sesión
+// Manejador del botón de inicio de sesión
     btnSignIn.onclick = () => {
         const email = loginEmail.value;
         const password = loginPassword.value;
         auth.signInWithEmailAndPassword(email, password).catch((error) => {
-          console.error("Error al iniciar sesión:", error);
-          showMessage("Error de Autenticación", "Usuario o contraseña inválidos.");
-        });
-    };
+    console.error("Error al iniciar sesión:", error);
+    showMessage("Error de Autenticación", "Usuario o contraseña inválidos.");
+});
 
-    // Manejador del botón para crear una nueva cuenta
-    btnSignUp.onclick = () => {
-        const email = loginEmail.value;
-        const password = loginPassword.value;
-        auth.createUserWithEmailAndPassword(email, password).catch((error) => {
-            console.error("Error al crear la cuenta:", error);
-            if (error.code === 'auth/weak-password') {
-                showMessage("Error al crear la cuenta", "La contraseña es demasiado débil. Por favor, introduce una contraseña con al menos 6 caracteres.");
-            } else {
-                showMessage("Error al crear la cuenta", error.message);
-            }
-        });
-    };
-
-    // Manejador del botón de cerrar sesión
-    btnLogout.onclick = () => {
-      auth.signOut().then(() => {
-        console.log("Sesión cerrada correctamente.");
-        loginPassword.value = ""; // Borra solo la contraseña
-      }).catch((error) => {
-        console.error("Error al cerrar sesión:", error);
-        showMessage("Error", "Hubo un problema al intentar cerrar la sesión.");
-      });
     };
 
     // Manejador del botón para restablecer la contraseña

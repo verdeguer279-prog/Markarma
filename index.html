@@ -53,7 +53,7 @@
         .logo img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* CAMBIADO: 'contain' asegura que la imagen quepa dentro del contenedor */
+            object-fit: contain;
         }
         .header-title {
             flex-grow: 1; 
@@ -235,7 +235,7 @@
                 text-align: center;
             }
             .logo {
-                height: 80px; /* Reducir el tamaño del logo en móviles */
+                height: 80px;
                 width: 80px;
             }
         }
@@ -302,7 +302,7 @@
         </header>
         <div class="modal-body">
             <select id="user-selector"></select>
-            <input type="password" id="pin-input-login" placeholder="Introduce tu PIN" maxlength="4" />
+            <input type="password" id="pin-input-login" placeholder="Introduce tu PIN" maxlength="4" inputmode="numeric" />
         </div>
         <button id="pin-submit-login">Acceder</button>
         <button id="show-add-user-modal" style="background: none; border: none; color: #667eea; margin-top: 10px; font-weight: 600;">Añadir Nuevo Usuario</button>
@@ -363,7 +363,7 @@
     const pinModalChange = document.getElementById('pin-modal-change');
     const currentPinInput = document.getElementById('current-pin');
     const newPin1Input = document.getElementById('new-pin-1');
-    const newPin2Input = document.getElementById('new-pin-2');
+    const newPin2Input = document = document.getElementById('new-pin-2');
     const pinSubmitChange = document.getElementById('pin-submit-change');
     const pinMessageChange = document.getElementById('pin-message-change');
     
@@ -439,7 +439,8 @@
             pinModalLogin.style.display = 'none';
             mainContent.style.display = 'block';
             
-            userRef.child('accesos').transaction((currentValue) => {
+            // Corrección en la lógica para asegurar que el contador se actualice
+            db.ref('usuarios/' + userId + '/accesos').transaction((currentValue) => {
                 return (currentValue || 0) + 1;
             });
         } else {

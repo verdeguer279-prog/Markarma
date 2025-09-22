@@ -44,8 +44,8 @@
         width: 100%;
     }
     .logo-box {
-      height: 100px;
-      width: 100px;
+      height: 72px;
+      width: 72px;
       background: transparent;
       border-radius: 50%;
       display: flex;
@@ -54,7 +54,7 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       overflow: hidden;
     }
-    .logo-box img { max-height: 92px; max-width: 92px; }
+    .logo-box img { max-height: 64px; max-width: 64px; }
     .title h1 { margin: 0; font-size: clamp(1.4rem, 4vw, 2rem); }
     .title p { margin: 4px 0 0; font-size: clamp(.85rem, 2vw, .95rem); color: #ccc; }
     .card {
@@ -408,6 +408,12 @@
     // Elementos del modal de mensajes
     const dlgMessage = $("#dlgMessage"), messageTitle = $("#messageTitle"), messageText = $("#messageText"), messageOk = $("#messageOk"), messageCancel = $("#messageCancel");
 
+    // Mantener el correo electrónico del último inicio de sesión
+    loginEmail.value = localStorage.getItem('lastLoginEmail') || '';
+    
+    // Almacenará todos los datos del usuario en el cliente
+    let allUserPasswords = [];
+
     function normalize(s) { return (s || "").toString().trim().toLowerCase(); }
 
     function showMessage(title, text, isConfirm = false) {
@@ -435,37 +441,60 @@
         appContent.hidden = false;
         loginContainer.hidden = true;
         
+        // Guarda el correo electrónico en el almacenamiento local al iniciar sesión
+        localStorage.setItem('lastLoginEmail', user.email);
+
         // Define la referencia a la base de datos para el usuario actual
         // Esto crea una estructura como passwords/userId/data
         const userPasswordsRef = db.ref('passwords/' + user.uid);
 
+        // MODIFICACIÓN: Se carga la base de datos una sola vez
+        userPasswordsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            allUserPasswords = data ? Object.values(data) : [];
+            // Llama a doSearch para mostrar todos los datos al cargar
+            doSearch();
+        });
+
+        // MODIFICACIÓN: La función de búsqueda ahora filtra los datos locales
         function doSearch() {
-            const f1 = normalize(titular.value), f2 = normalize(usuario.value), f3 = normalize(descripcionBusqueda.value);
+            const f1 = normalize(titular.value);
+            const f2 = normalize(usuario.value);
+            const f3 = normalize(descripcionBusqueda.value);
             
-            userPasswordsRef.on('value', (snapshot) => {
-                const data = snapshot.val();
-                const DATA = data ? Object.values(data) : [];
-                const matches = DATA.filter(r =>
-                    (f1 === "" || normalize(r.titular).includes(f1)) &&
-                    (f2 === "" || normalize(r.usuario).includes(f2)) &&
-                    (f3 === "" || normalize(r.descripcion).includes(f3))
-                );
-                
-                tbody.innerHTML = "";
-                matches.forEach(r => {
-                    const tr = document.createElement("tr");
-                    tr.innerHTML = `<td data-label="Titular">${r.titular}</td><td data-label="Usuario">${r.usuario}</td><td data-label="Descripción">${r.descripcion}</td><td data-label="Contraseña">${r.resultado}</td>`;
-                    tr.onclick = () => { resultado.value = r.resultado; };
-                    tbody.appendChild(tr);
-                });
-                results.hidden = matches.length === 0;
-                if (matches.length === 1) { resultado.value = matches[0].resultado; }
+            const matches = allUserPasswords.filter(r =>
+                (f1 === "" || normalize(r.titular).includes(f1)) &&
+                (f2 === "" || normalize(r.usuario).includes(f2)) &&
+                (f3 === "" || normalize(r.descripcion).includes(f3))
+            );
+            
+            tbody.innerHTML = "";
+            matches.forEach(r => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `<td data-label="Titular">${r.titular}</td><td data-label="Usuario">${r.usuario}</td><td data-label="Descripción">${r.descripcion}</td><td data-label="Contraseña">${r.resultado}</td>`;
+                tr.onclick = () => { resultado.value = r.resultado; };
+                tbody.appendChild(tr);
             });
+            results.hidden = matches.length === 0;
+            if (matches.length === 1) { resultado.value = matches[0].resultado; }
         }
 
+        // MODIFICACIÓN: Asigna el evento 'input' para el filtrado en tiempo real
+        titular.oninput = doSearch;
+        usuario.oninput = doSearch;
+        descripcionBusqueda.oninput = doSearch;
+
+        // Mantiene el botón de buscar, pero ahora simplemente ejecuta el filtro
         $("#btnBuscar").onclick = doSearch;
         
-        $("#btnLimpiar").onclick = () => { titular.value = ""; usuario.value = ""; descripcionBusqueda.value = ""; resultado.value = ""; results.hidden = true; };
+        // MODIFICACIÓN: El botón de limpiar ahora ejecuta el filtro para mostrar todos los datos
+        $("#btnLimpiar").onclick = () => {
+            titular.value = ""; 
+            usuario.value = ""; 
+            descripcionBusqueda.value = ""; 
+            resultado.value = ""; 
+            doSearch();
+        };
 
         $("#btnBorrarTodo").onclick = async () => {
           const confirmResult = await showMessage("Confirmar borrado", "¿Estás seguro de que quieres borrar TODOS los datos? Esta acción es irreversible.", true);
@@ -494,7 +523,7 @@
           
           userPasswordsRef.push(nuevo).then(() => {
               dlg.classList.remove("open");
-              doSearch();
+              // No es necesario llamar a doSearch aquí, el 'on.value' se encargará de actualizar
           }).catch(error => {
               console.error("Error al guardar los datos: ", error);
               showMessage("Error", "Hubo un error al guardar los datos.");
@@ -502,16 +531,16 @@
         };
 
         // Manejador del botón de cerrar sesión
- btnLogout.onclick = () => {
-  auth.signOut().then(() => {
-    console.log("Sesión cerrada correctamente.");
-    // Limpiar solo la contraseña
-    loginPassword.value = "";
-  }).catch((error) => {
-    console.error("Error al cerrar sesión:", error);
-    showMessage("Error", "Hubo un problema al intentar cerrar la sesión.");
-  });
-};
+        btnLogout.onclick = () => {
+          auth.signOut().then(() => {
+            console.log("Sesión cerrada correctamente.");
+            // Limpiar solo la contraseña
+            loginPassword.value = "";
+          }).catch((error) => {
+            console.error("Error al cerrar sesión:", error);
+            showMessage("Error", "Hubo un problema al intentar cerrar la sesión.");
+          });
+        };
 
 
       } else {

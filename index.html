@@ -53,7 +53,7 @@
         .logo img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain; /* CAMBIADO: 'contain' asegura que la imagen quepa dentro del contenedor */
         }
         .header-title {
             flex-grow: 1; 
@@ -227,6 +227,18 @@
         .btn-logout:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
+        
+        /* 📱 Estilos específicos para pantallas pequeñas (móviles) */
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .logo {
+                height: 80px; /* Reducir el tamaño del logo en móviles */
+                width: 80px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -290,7 +302,8 @@
         </header>
         <div class="modal-body">
             <select id="user-selector"></select>
-<input type="password" id="pin-input-login" placeholder="Introduce tu PIN" maxlength="4" inputmode="numeric" pattern="[0-9]*" />        </div>
+            <input type="password" id="pin-input-login" placeholder="Introduce tu PIN" maxlength="4" />
+        </div>
         <button id="pin-submit-login">Acceder</button>
         <button id="show-add-user-modal" style="background: none; border: none; color: #667eea; margin-top: 10px; font-weight: 600;">Añadir Nuevo Usuario</button>
         <p id="pin-error-login" class="error-message" style="display: none;"></p>
@@ -367,17 +380,6 @@
 
     let currentUser = null;
 
-    // MODIFICACIÓN: Chequea si la sesión ya está validada
-    if (sessionStorage.getItem('pinValidated') === 'true') {
-        pinModalLogin.style.display = 'none';
-        mainContent.style.display = 'block';
-        // Guarda el ID de usuario si está almacenado en la sesión
-        currentUser = sessionStorage.getItem('currentUser');
-    } else {
-        pinModalLogin.style.display = 'flex';
-        mainContent.style.display = 'none';
-    }
-
     // Cargar usuarios al iniciar la página
     function loadUsers() {
         db.ref('usuarios').on('value', (snapshot) => {
@@ -390,10 +392,6 @@
                     option.value = key;
                     option.textContent = user.nombre;
                     userSelector.appendChild(option);
-                    // Selecciona el usuario si ya está logueado
-                    if (key === currentUser) {
-                        welcomeMessage.textContent = `Bienvenido, ${user.nombre}!`;
-                    }
                 });
                 renderUserCounters(users);
             }
@@ -437,10 +435,6 @@
 
         if (user && user.pin === pin) {
             currentUser = userId;
-            // MODIFICACIÓN: Guarda el estado de la sesión y el ID del usuario
-            sessionStorage.setItem('pinValidated', 'true');
-            sessionStorage.setItem('currentUser', userId);
-            
             welcomeMessage.textContent = `Bienvenido, ${user.nombre}!`;
             pinModalLogin.style.display = 'none';
             mainContent.style.display = 'block';
@@ -461,11 +455,9 @@
         }
     });
 
-    // Cierra la sesión y borra la validación del PIN
+    // Cierra la sesión
     btnLogout.addEventListener('click', () => {
         currentUser = null;
-        sessionStorage.removeItem('pinValidated');
-        sessionStorage.removeItem('currentUser');
         mainContent.style.display = 'none';
         pinModalLogin.style.display = 'flex';
         userSelector.value = '';

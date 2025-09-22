@@ -363,7 +363,7 @@
     const pinModalChange = document.getElementById('pin-modal-change');
     const currentPinInput = document.getElementById('current-pin');
     const newPin1Input = document.getElementById('new-pin-1');
-    const newPin2Input = document = document.getElementById('new-pin-2');
+    const newPin2Input = document.getElementById('new-pin-2');
     const pinSubmitChange = document.getElementById('pin-submit-change');
     const pinMessageChange = document.getElementById('pin-message-change');
     
@@ -404,7 +404,6 @@
         if (users) {
             Object.keys(users).forEach(key => {
                 const user = users[key];
-                // Se agregó la condición para solo mostrar usuarios con un nombre definido
                 if (user && user.nombre) { 
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -439,7 +438,7 @@
             pinModalLogin.style.display = 'none';
             mainContent.style.display = 'block';
             
-            // Corrección en la lógica para asegurar que el contador se actualice
+            // Lógica para incrementar el contador de accesos del usuario
             db.ref('usuarios/' + userId + '/accesos').transaction((currentValue) => {
                 return (currentValue || 0) + 1;
             });
@@ -490,7 +489,6 @@
     });
     document.getElementById('close-manage-users-modal').addEventListener('click', () => {
         manageUsersModal.style.display = 'none';
-        // Volver a la pantalla de login si el usuario no ha iniciado sesión
         if (!currentUser) {
           pinModalLogin.style.display = 'flex';
         }
@@ -576,7 +574,6 @@
             addUserMessage.style.color = 'var(--accent-green)';
             newUserNameInput.value = '';
             newUserPinInput.value = '';
-            // Forzar la recarga del desplegable para mostrar el nuevo usuario
             loadUsers(); 
         })
         .catch(error => {

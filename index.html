@@ -114,7 +114,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.8);
-            display: none;
+            display: none; /* Controlado por JS */
             justify-content: center;
             align-items: center;
             z-index: 9999;
@@ -175,17 +175,6 @@
             right: 15px;
             font-size: 1.5em;
             cursor: pointer;
-        }
-        
-        /* Estilos para el login de usuarios */
-        #user-selector {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=UTF-8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="white"><path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" fill-rule="evenodd"></path></svg>');
-            background-repeat: no-repeat;
-            background-position: right 1em center;
-            background-size: 1em;
         }
         
         /* Estilos para la tabla de usuarios */
@@ -289,7 +278,7 @@
     </div>
 </div>
 
-<div id="pin-modal-login" class="modal-overlay" style="display: flex;">
+<div id="pin-modal-login" class="modal-overlay"> 
     <div class="modal">
         <header class="header" style="margin-bottom: 0;">
             <div class="logo">
@@ -297,15 +286,12 @@
             </div>
             <div class="header-title">
                 <h1>Acceso</h1>
-                <p>Selecciona tu usuario e introduce tu PIN</p>
+                <p>Introduce tu PIN para acceder</p>
             </div>
         </header>
         <div class="modal-body">
-            <select id="user-selector"></select>
             <input type="password" id="pin-input-login" placeholder="Introduce tu PIN" maxlength="4" inputmode="numeric" />
         </div>
-        <button id="pin-submit-login">Acceder</button>
-        <button id="show-add-user-modal" style="background: none; border: none; color: #667eea; margin-top: 10px; font-weight: 600;">Añadir Nuevo Usuario</button>
         <p id="pin-error-login" class="error-message" style="display: none;"></p>
     </div>
 </div>
@@ -324,19 +310,6 @@
     </div>
 </div>
 
-<div id="manage-users-modal" class="modal-overlay">
-    <div class="modal">
-        <span class="modal-close" id="close-manage-users-modal">&times;</span>
-        <h2>Añadir Nuevo Usuario</h2>
-        <div class="modal-body">
-            <input type="text" id="new-user-name" placeholder="Nombre del usuario" />
-            <input type="password" id="new-user-pin" placeholder="PIN de 4 dígitos" maxlength="4" />
-        </div>
-        <button id="add-user-button">Añadir Usuario</button>
-        <p id="add-user-message" style="margin-top: 15px;"></p>
-    </div>
-</div>
-
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 <script>
@@ -352,12 +325,9 @@
 
     const mainContent = document.getElementById('main-content');
     const pinModalLogin = document.getElementById('pin-modal-login');
-    const userSelector = document.getElementById('user-selector');
     const pinInputLogin = document.getElementById('pin-input-login');
-    const pinSubmitLogin = document.getElementById('pin-submit-login');
     const pinErrorLogin = document.getElementById('pin-error-login');
     const welcomeMessage = document.getElementById('welcome-message');
-    const showAddUserModalBtn = document.getElementById('show-add-user-modal');
 
     const btnChangePin = document.getElementById('btnChangePin');
     const pinModalChange = document.getElementById('pin-modal-change');
@@ -369,35 +339,61 @@
     
     const btnLogout = document.getElementById('btn-logout');
 
-    const manageUsersModal = document.getElementById('manage-users-modal');
-    const newUserNameInput = document.getElementById('new-user-name');
-    const newUserPinInput = document.getElementById('new-user-pin');
-    const addUserButton = document.getElementById('add-user-button');
-    const addUserMessage = document.getElementById('add-user-message');
-
     const userCounterSection = document.getElementById('user-counter-section');
     const userCounterBody = document.getElementById('user-counter-body');
 
-    let currentUser = null;
+    let currentUser = localStorage.getItem('currentUser'); 
+    let uniqueUserId = null; 
 
-    // Cargar usuarios al iniciar la página
-    function loadUsers() {
-        db.ref('usuarios').on('value', (snapshot) => {
-            const users = snapshot.val();
-            userSelector.innerHTML = '<option value="">-- Selecciona tu usuario --</option>';
-            if (users) {
-                Object.keys(users).forEach(key => {
-                    const user = users[key];
-                    const option = document.createElement('option');
-                    option.value = key;
-                    option.textContent = user.nombre;
-                    userSelector.appendChild(option);
-                });
-                renderUserCounters(users);
+    // Ocultar elementos de login que ya no se usan
+    if (document.getElementById('user-selector')) document.getElementById('user-selector').style.display = 'none';
+    if (document.getElementById('pin-submit-login')) document.getElementById('pin-submit-login').style.display = 'none';
+    if (document.getElementById('show-add-user-modal')) document.getElementById('show-add-user-modal').style.display = 'none';
+    
+    pinInputLogin.placeholder = 'Introduce tu PIN';
+
+
+    // Función central para enfocar el campo del PIN
+    function focusPinInput() {
+        // Usar setTimeout para asegurar que el DOM ha terminado de pintarse y el modal está visible
+        // Esto soluciona que el foco se pierda al cargar la página o al cerrar sesión.
+        setTimeout(() => {
+            if (pinInputLogin) {
+                pinInputLogin.focus();
             }
-        });
+        }, 50); 
     }
 
+    // Función para mostrar el contenido principal e incrementar el contador
+    async function showMainContent(userId, userName) {
+        currentUser = userId;
+        welcomeMessage.textContent = `Bienvenido, ${userName}!`;
+        pinModalLogin.style.display = 'none';
+        mainContent.style.display = 'block';
+        localStorage.setItem('currentUser', userId);
+        localStorage.setItem('welcomeName', userName);
+
+        // Incrementa el contador SÓLO al entrar o al restaurar sesión
+        await db.ref('usuarios/' + userId + '/accesos').transaction((currentValue) => {
+            return (currentValue || 0) + 1;
+        });
+        
+        // Ya no necesitamos llamar a loadUsers aquí, el listener global lo actualizará.
+    }
+    
+    // Función para inicializar la vista de sesión
+    function initSessionView() {
+        if (localStorage.getItem('currentUser') && localStorage.getItem('welcomeName')) {
+            // Si hay sesión guardada, mostrar contenido principal e incrementar contador
+            showMainContent(localStorage.getItem('currentUser'), localStorage.getItem('welcomeName'));
+        } else {
+            // Si no hay sesión, mostrar modal de login
+            pinModalLogin.style.display = 'flex';
+            mainContent.style.display = 'none';
+            focusPinInput();
+        }
+    }
+    
     // Función para renderizar el contador de accesos
     function renderUserCounters(users) {
         userCounterBody.innerHTML = '';
@@ -417,14 +413,47 @@
         }
     }
 
-    // Iniciar sesión
-    pinSubmitLogin.addEventListener('click', async () => {
-        const userId = userSelector.value;
-        const pin = pinInputLogin.value;
+    // Listener global para el contador de accesos
+    // ✨ REPARACIÓN DEL CONTADOR: Esto escucha en tiempo real, pero NO escribe en la DB.
+    function startUserCounterListener() {
+        db.ref('usuarios').on('value', (snapshot) => {
+            const users = snapshot.val();
+            // Esto solo se encarga de dibujar la tabla con los datos más recientes de Firebase
+            renderUserCounters(users);
+        });
+    }
 
+
+    // Cargar usuarios al iniciar la página y determinar el usuario único
+    async function loadInitialUserData() {
+        const snapshot = await db.ref('usuarios').once('value');
+        const users = snapshot.val();
+        
+        if (users) {
+            const userKeys = Object.keys(users);
+            
+            if (userKeys.length >= 1) {
+                // Asume el primer usuario como el único para el login rápido por PIN
+                uniqueUserId = userKeys[0]; 
+                pinInputLogin.style.display = 'block';
+            } else {
+                pinInputLogin.style.display = 'none';
+                pinErrorLogin.textContent = 'ERROR: No hay usuarios registrados.';
+                pinErrorLogin.style.display = 'block';
+            }
+        }
+        
+        // Inicia la vista de sesión solo después de cargar los datos de Firebase
+        initSessionView(); 
+    }
+
+    // Iniciar sesión (Lógica centralizada)
+    async function attemptLogin(userId, pin) {
+        pinErrorLogin.style.display = 'none';
         if (!userId) {
-            pinErrorLogin.textContent = 'Por favor, selecciona un usuario.';
+            pinErrorLogin.textContent = 'Error de configuración. Contacta soporte.';
             pinErrorLogin.style.display = 'block';
+            focusPinInput();
             return;
         }
 
@@ -433,40 +462,41 @@
         const user = snapshot.val();
 
         if (user && user.pin === pin) {
-            currentUser = userId;
-            welcomeMessage.textContent = `Bienvenido, ${user.nombre}!`;
-            pinModalLogin.style.display = 'none';
-            mainContent.style.display = 'block';
-            
-            // Lógica para incrementar el contador de accesos del usuario
-            db.ref('usuarios/' + userId + '/accesos').transaction((currentValue) => {
-                return (currentValue || 0) + 1;
-            });
+            // Llama a showMainContent, que incrementa el contador y actualiza la UI
+            showMainContent(userId, user.nombre); 
+            pinInputLogin.value = ''; // Limpiar campo al acceder
         } else {
             pinErrorLogin.textContent = 'PIN incorrecto. Inténtalo de nuevo.';
             pinErrorLogin.style.display = 'block';
+            pinInputLogin.value = ''; 
+            focusPinInput(); 
         }
-    });
+    }
 
-    // Permite presionar la tecla Enter para acceder
-    pinInputLogin.addEventListener('keypress', (event) => {
-        if (event.key === 'Enter') {
-            pinSubmitLogin.click();
+    // Auto-acceso al completar el PIN
+    pinInputLogin.addEventListener('input', () => {
+        pinErrorLogin.style.display = 'none';
+        const pin = pinInputLogin.value;
+        if (pin.length === 4) {
+            attemptLogin(uniqueUserId, pin);
         }
     });
 
     // Cierra la sesión
     btnLogout.addEventListener('click', () => {
         currentUser = null;
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('welcomeName');
         mainContent.style.display = 'none';
         pinModalLogin.style.display = 'flex';
-        userSelector.value = '';
         pinInputLogin.value = '';
         pinErrorLogin.style.display = 'none';
+        focusPinInput(); 
     });
 
     // Abrir modal de cambio de PIN
     btnChangePin.addEventListener('click', () => {
+        if (!currentUser) return; 
         pinModalChange.style.display = 'flex';
         pinMessageChange.textContent = '';
         currentPinInput.value = '';
@@ -474,34 +504,14 @@
         newPin2Input.value = '';
     });
     
-    // Abrir modal para añadir nuevos usuarios (desde el login)
-    showAddUserModalBtn.addEventListener('click', () => {
-        pinModalLogin.style.display = 'none';
-        manageUsersModal.style.display = 'flex';
-        addUserMessage.textContent = '';
-        newUserNameInput.value = '';
-        newUserPinInput.value = '';
-    });
-    
     // Cerrar modales
     document.getElementById('close-change-modal').addEventListener('click', () => {
         pinModalChange.style.display = 'none';
     });
-    document.getElementById('close-manage-users-modal').addEventListener('click', () => {
-        manageUsersModal.style.display = 'none';
-        if (!currentUser) {
-          pinModalLogin.style.display = 'flex';
-        }
-    });
+
     window.addEventListener('click', (event) => {
         if (event.target === pinModalChange) {
             pinModalChange.style.display = 'none';
-        }
-        if (event.target === manageUsersModal) {
-            manageUsersModal.style.display = 'none';
-            if (!currentUser) {
-              pinModalLogin.style.display = 'flex';
-            }
         }
     });
 
@@ -547,43 +557,9 @@
         }
     });
 
-    // Añadir nuevo usuario
-    addUserButton.addEventListener('click', async () => {
-        const userName = newUserNameInput.value.trim();
-        const userPin = newUserPinInput.value.trim();
-        
-        if (!userName || !userPin) {
-            addUserMessage.textContent = 'El nombre y el PIN no pueden estar vacíos.';
-            addUserMessage.style.color = 'var(--accent-red)';
-            return;
-        }
-        if (userPin.length !== 4) {
-            addUserMessage.textContent = 'El PIN debe tener exactamente 4 dígitos.';
-            addUserMessage.style.color = 'var(--accent-red)';
-            return;
-        }
-        
-        const newUserRef = db.ref('usuarios').push();
-        await newUserRef.set({
-            nombre: userName,
-            pin: userPin,
-            accesos: 0
-        })
-        .then(() => {
-            addUserMessage.textContent = `Usuario '${userName}' añadido con éxito.`;
-            addUserMessage.style.color = 'var(--accent-green)';
-            newUserNameInput.value = '';
-            newUserPinInput.value = '';
-            loadUsers(); 
-        })
-        .catch(error => {
-            addUserMessage.textContent = 'Error al añadir el usuario.';
-            addUserMessage.style.color = 'var(--accent-red)';
-            console.error("Error adding user:", error);
-        });
-    });
-
-    loadUsers();
+    // Carga inicial y listeners
+    loadInitialUserData();
+    startUserCounterListener();
 </script>
 </body>
 </html>

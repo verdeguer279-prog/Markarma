@@ -35,7 +35,7 @@
     header {
       display: flex;
       align-items: center;
-      justify-content: space-between; /* Añadido para mover el botón a la derecha */
+      justify-content: space-between;
       gap: 16px;
       margin-bottom: 2rem;
       flex-wrap: wrap;
@@ -66,7 +66,7 @@
         cursor: pointer;
         font-weight: bold;
         transition: transform 0.2s, box-shadow 0.2s;
-        background: var(--card-bg); /* O un color más oscuro si se prefiere */
+        background: var(--card-bg);
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: var(--text-light);
         text-decoration: none;
@@ -170,6 +170,17 @@
     td.status-pendiente { color: var(--accent-red); }
     td.status-celebrado { color: var(--accent-green); }
     td.status-suspendido { color: var(--accent-blue); }
+
+    /* --- NUEVO ESTILO PARA JUICIOS SUSPENDIDOS --- */
+    tr.is-suspended {
+        text-decoration: line-through; /* Tacha el texto */
+        opacity: 0.6; /* Atenúa la fila */
+    }
+    tr.is-suspended .action-item {
+        text-decoration: none; /* Asegura que los botones no se tachen */
+    }
+    /* ------------------------------------------ */
+
     .action-buttons {
       display: flex;
       gap: 5px;
@@ -537,7 +548,8 @@
       filteredJuicios.forEach(juicio => {
         const tr = document.createElement("tr");
         let statusClass, statusText;
-
+        let rowClass = ''; // <<--- AÑADIDO: Variable para la clase de la fila
+        
         switch (juicio.estado) {
             case 'celebrado':
                 statusClass = 'status-celebrado';
@@ -546,12 +558,15 @@
             case 'suspendido':
                 statusClass = 'status-suspendido';
                 statusText = 'Suspendido';
+                rowClass = 'is-suspended'; // <<--- MODIFICADO: Añade la clase 'is-suspended'
                 break;
             default:
                 statusClass = 'status-pendiente';
                 statusText = 'Pendiente';
         }
         
+        tr.className = rowClass; // <<--- MODIFICADO: Aplica la clase a la fila (<tr>)
+
         const mesCobroContent = juicio.mesCobro && juicio.mesCobro !== "" ? juicio.mesCobro : '<span class="status-nocobrado">NO COBRADO</span>';
         const fechaEntregaContent = juicio.fechaEntrega && juicio.fechaEntrega !== "" ? juicio.fechaEntrega : '<span class="status-noentregada">NO ENTREGADA</span>';
 

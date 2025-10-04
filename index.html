@@ -3,10 +3,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GAD - Acceso</title>
+    <title>GAD - Acceso Editable</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Iconos para el modo edición/borrar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
     <style>
         :root {
             --bg-dark: #1a1a2e;
@@ -14,10 +16,9 @@
             --text-light: #e9e9f0;
             --text-dark: #4a4a5a;
             --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
-            --button-gradient-juicios: linear-gradient(135deg, #667eea, #764ba2);
-            --button-gradient-usuarios: linear-gradient(135deg, #667eea, #764ba2);
             --accent-red: #dc3545;
             --accent-green: #28a745;
+            --accent-orange: #ff9800;
         }
         body {
             font-family: 'Poppins', sans-serif;
@@ -44,17 +45,46 @@
             gap: 20px;
             margin-bottom: 20px;
         }
+        
+        /* 1. Logo Editable */
         .logo {
             height: 108px;
             width: 108px;
             border-radius: 50%;
             overflow: hidden;
+            background-color: #3e3e5c;
+            position: relative;
         }
         .logo img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover; /* Cambiado a cover para mejor ajuste redondo */
         }
+        .edit-mode .logo {
+            cursor: pointer;
+            border: 3px solid var(--accent-orange);
+        }
+        .edit-mode .logo::after {
+            content: 'Cambiar Logo';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
+            color: var(--text-light);
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .edit-mode .logo:hover::after {
+            opacity: 1;
+        }
+        /* Fin Logo Editable */
+
         .header-title {
             flex-grow: 1; 
         }
@@ -80,11 +110,30 @@
             font-size: 0.9rem;
             color: #ccc;
         }
+        
+        /* 2. Diseño de Botones Estrechos (Grid) */
         .button-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            /* Dos columnas en desktop */
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px;
+            min-height: 100px; 
         }
+        .button-wrapper {
+            position: relative;
+            cursor: grab; 
+            min-height: 80px; /* Altura mínima para arrastrar */
+        }
+        /* 3. Botones Largos (Span) */
+        .button-wrapper.long {
+            grid-column: span 2; /* Ocupa las dos columnas */
+        }
+
+        .button-wrapper.ghost {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+        
         .button {
             display: flex;
             align-items: center;
@@ -98,14 +147,82 @@
             text-align: center;
             transition: transform 0.2s, box-shadow 0.2s;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
         }
-        .button:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        .button:hover:not(.edit-mode .button) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
-        .button-juicios { background-image: var(--button-gradient-juicios); }
-        .button-usuarios { background-image: var(--button-gradient-usuarios); }
-        
+
+        /* Estilos del modo edición */
+        .edit-mode .button {
+            cursor: pointer;
+            pointer-events: none;
+        }
+        .edit-mode .button-wrapper {
+            border: 2px dashed var(--accent-orange);
+            background: rgba(255, 152, 0, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        /* Estilo para drag and drop sobre el objetivo */
+        .button-wrapper.drag-over {
+            border: 3px solid var(--accent-green);
+            background: rgba(40, 167, 69, 0.2);
+        }
+
+        .action-buttons {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+            z-index: 10;
+        }
+        .action-button {
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            color: var(--text-light);
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            pointer-events: auto;
+            transition: background 0.2s;
+        }
+        .action-button:hover {
+            background: var(--accent-red);
+        }
+        .action-button.edit:hover {
+            background: var(--accent-orange);
+        }
+        .action-button.drag-handle {
+            background: rgba(0, 0, 0, 0.7);
+            cursor: grab;
+            padding: 5px 8px;
+        }
+        .action-button.drag-handle:active {
+            cursor: grabbing;
+        }
+
+        /* Botón Añadir en modo edición */
+        #btnAddButton {
+            background-color: var(--accent-green);
+            color: var(--text-light);
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        #btnAddButton:hover {
+            background-color: #1e7e34;
+        }
+
         /* Estilos para el modal */
         .modal-overlay {
             position: fixed;
@@ -114,7 +231,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.8);
-            display: none; /* Controlado por JS */
+            display: none;
             justify-content: center;
             align-items: center;
             z-index: 9999;
@@ -123,16 +240,15 @@
             background-color: var(--card-bg);
             padding: 25px;
             border-radius: 10px;
-            text-align: center;
             color: var(--text-light);
             width: 90%;
             max-width: 400px;
             position: relative;
         }
-        .modal h2 { margin-top: 0; }
+        .modal h2 { margin-top: 0; text-align: center; }
         .modal input, .modal select {
             padding: 12px;
-            font-size: 1.1em;
+            font-size: 1em;
             border-radius: 8px;
             border: 1px solid #555;
             background-color: var(--bg-dark);
@@ -141,8 +257,13 @@
             box-sizing: border-box;
             margin-bottom: 15px;
         }
-        .modal input[type="password"] {
-            text-align: center;
+        .modal-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .modal-input-group > div {
+            flex: 1;
         }
         .modal button {
             padding: 10px 20px;
@@ -158,10 +279,11 @@
         .modal-body {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
         }
         .modal p {
-            margin: 15px 0 0;
+            margin: 10px 0 0;
+            text-align: center;
         }
         .modal .error-message {
             color: var(--accent-red);
@@ -177,7 +299,23 @@
             cursor: pointer;
         }
         
-        /* Estilos para la tabla de usuarios */
+        /* Área de Drop en el Modal */
+        #drop-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            background-color: rgba(102, 126, 234, 0.1);
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        #drop-area.drag-over-file {
+            background-color: rgba(40, 167, 69, 0.2);
+            border-color: var(--accent-green);
+        }
+        /* Fin Área de Drop */
+
+        /* Otros estilos (mantenidos) */
         #user-counter-section {
             display: none;
             margin-top: 30px;
@@ -195,14 +333,6 @@
         #user-counter-table th {
             background-color: rgba(255, 255, 255, 0.05);
         }
-        #user-counter-table tr:nth-child(even) {
-            background-color: rgba(255, 255, 255, 0.02);
-        }
-        .header-with-button {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
         .btn-logout {
             padding: 8px 16px;
             font-size: 0.9em;
@@ -212,12 +342,24 @@
             color: #ccc;
             cursor: pointer;
             transition: background-color 0.3s;
+            margin-left: 10px;
         }
-        .btn-logout:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+        #btnToggleEdit {
+            background: var(--accent-orange);
+            color: var(--bg-dark);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .session-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
-        /* 📱 Estilos específicos para pantallas pequeñas (móviles) */
+        /* 📱 Adaptación a Móvil (Botones vuelven a una columna) */
         @media (max-width: 600px) {
             .header {
                 flex-direction: column;
@@ -227,6 +369,23 @@
                 height: 80px;
                 width: 80px;
             }
+            .session-controls {
+                flex-direction: column;
+                width: 100%;
+                gap: 5px;
+            }
+            #btnToggleEdit, .btn-logout {
+                width: 100%;
+                margin-left: 0;
+            }
+            .button-grid {
+                /* Una sola columna en móvil */
+                grid-template-columns: 1fr; 
+            }
+            .button-wrapper.long {
+                /* El botón largo sigue ocupando el 100% (que es 1 columna) */
+                grid-column: span 1; 
+            }
         }
     </style>
 </head>
@@ -235,35 +394,47 @@
 <div class="container" id="main-content" style="display: none;">
     <div class="card">
         <header class="header">
-            <div class="logo">
-                <img src="logogad.png" alt="Logo de GAD" />
+            <div class="logo" id="appLogo">
+                <!-- La imagen se cargará aquí -->
+                <img id="logoImage" src="https://placehold.co/108x108/282844/e9e9f0?text=LOGO" alt="Logo de GAD" />
             </div>
+            <!-- Input oculto para la subida del logo -->
+            <input type="file" id="logoFileInput" style="display: none;" accept="image/*">
+
             <div class="header-title">
                 <h1>Menú Principal</h1>
                 <p>Selecciona una de las opciones disponibles</p>
+            </div>
+            <div class="session-controls">
+                <button id="btnToggleEdit">Modo Edición</button>
+                <button id="btnChangePin" class="btn-logout">Cambiar PIN</button>
+                <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
             </div>
         </header>
         <section class="welcome">
             <h2 id="welcome-message">Bienvenido</h2>
             <p>Accede a las diferentes secciones de la aplicación para gestionar la información de tu interés. Utiliza los botones a continuación para navegar.</p>
         </section>
-        <div class="button-grid">
-            <a href="JUICIOS.html" class="button button-juicios">JUICIOS</a>
-            <a href="USUARIOS.html" class="button button-usuarios">USUARIOS</a>
-            <a href="#" id="btnChangePin" class="button">CAMBIAR PIN</a>
-            <a href="#" class="button">OPCIÓN 3</a>
-            <a href="#" class="button">OPCIÓN 4</a>
-            <a href="#" class="button">OPCIÓN 5</a>
+        
+        <!-- Contenedor de botones cargados dinámicamente -->
+        <div class="button-grid" id="buttonGrid">
+            <!-- Los botones se insertarán aquí por JavaScript -->
         </div>
+
+        <!-- Botón para añadir nuevo botón (solo visible en modo edición) -->
+        <div id="btnAddButton" style="display: none;">
+            <i class="fas fa-plus-circle"></i> AÑADIR NUEVO BOTÓN
+        </div>
+
     </div>
 
+    <!-- Sección de Contador de Accesos (mantenida de tu código original) -->
     <div class="card" id="user-counter-section">
         <header class="header-with-button">
             <div class="header-title">
                 <h2>Contador de Accesos</h2>
                 <p>Historial de inicios de sesión por usuario.</p>
             </div>
-            <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
         </header>
         <table id="user-counter-table">
             <thead>
@@ -278,11 +449,13 @@
     </div>
 </div>
 
+<!-- Modal de Login (mantenido) -->
 <div id="pin-modal-login" class="modal-overlay"> 
     <div class="modal">
+        <span class="modal-close" id="close-login-modal" style="display: none;">&times;</span>
         <header class="header" style="margin-bottom: 0;">
             <div class="logo">
-                <img src="logogad.png" alt="Logo de GAD" />
+                <img id="loginLogoImage" src="https://placehold.co/108x108/282844/e9e9f0?text=LOGO" alt="Logo de GAD" />
             </div>
             <div class="header-title">
                 <h1>Acceso</h1>
@@ -296,6 +469,7 @@
     </div>
 </div>
 
+<!-- Modal de Cambio de PIN (mantenido) -->
 <div id="pin-modal-change" class="modal-overlay">
     <div class="modal">
         <span class="modal-close" id="close-change-modal">&times;</span>
@@ -310,9 +484,46 @@
     </div>
 </div>
 
+<!-- NUEVO: Modal de Edición/Creación de Botón -->
+<div id="button-modal" class="modal-overlay">
+    <div class="modal">
+        <span class="modal-close" id="close-button-modal">&times;</span>
+        <h2 id="button-modal-title">Añadir Nuevo Botón</h2>
+        
+        <div class="modal-body">
+            <label for="button-name">Nombre del Botón:</label>
+            <input type="text" id="button-name" placeholder="Ej: Reportes" maxlength="30" />
+
+            <div class="modal-input-group">
+                <div>
+                    <label for="button-type">Tamaño:</label>
+                    <select id="button-type">
+                        <option value="short">Corto (1 columna)</option>
+                        <option value="long">Largo (2 columnas)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="button-url">URL de Destino:</label>
+                    <input type="text" id="button-url" placeholder="Ej: reportes.html" />
+                </div>
+            </div>
+            
+            <p style="margin: 0; text-align: left;">* Opcional: Arrastra un archivo HTML para asignar la URL.</p>
+            <div id="drop-area">
+                <i class="fas fa-upload"></i> Arrastra y suelta tu archivo HTML aquí
+                <p id="drop-message" style="font-size: 0.9rem; color: #ccc; margin-top: 5px;">(Nombre del archivo aparecerá en "URL de Destino")</p>
+            </div>
+        </div>
+        <button id="button-submit">Guardar Botón</button>
+        <p id="button-message" class="success-message" style="margin-top: 15px;"></p>
+    </div>
+</div>
+
+
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 <script>
+    // Configuración de Firebase (usando la URL que proporcionaste)
     const firebaseConfig = {
       apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
       authDomain: "markarma279.firebaseapp.com",
@@ -323,40 +534,76 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
+    // --- Referencias de la UI ---
     const mainContent = document.getElementById('main-content');
     const pinModalLogin = document.getElementById('pin-modal-login');
     const pinInputLogin = document.getElementById('pin-input-login');
     const pinErrorLogin = document.getElementById('pin-error-login');
     const welcomeMessage = document.getElementById('welcome-message');
-
     const btnChangePin = document.getElementById('btnChangePin');
     const pinModalChange = document.getElementById('pin-modal-change');
-    const currentPinInput = document.getElementById('current-pin');
-    const newPin1Input = document.getElementById('new-pin-1');
-    const newPin2Input = document.getElementById('new-pin-2');
-    const pinSubmitChange = document.getElementById('pin-submit-change');
-    const pinMessageChange = document.getElementById('pin-message-change');
-    
     const btnLogout = document.getElementById('btn-logout');
-
     const userCounterSection = document.getElementById('user-counter-section');
     const userCounterBody = document.getElementById('user-counter-body');
+    const btnToggleEdit = document.getElementById('btnToggleEdit');
+    const buttonGrid = document.getElementById('buttonGrid');
+    const btnAddButton = document.getElementById('btnAddButton');
+    const appLogo = document.getElementById('appLogo');
+    const logoImage = document.getElementById('logoImage');
+    const loginLogoImage = document.getElementById('loginLogoImage');
+    const logoFileInput = document.getElementById('logoFileInput');
 
+
+    // Referencias para el modal de botones
+    const buttonModal = document.getElementById('button-modal');
+    const buttonModalTitle = document.getElementById('button-modal-title');
+    const buttonNameInput = document.getElementById('button-name');
+    const buttonUrlInput = document.getElementById('button-url');
+    const buttonTypeSelect = document.getElementById('button-type');
+    const buttonSubmit = document.getElementById('button-submit');
+    const buttonMessage = document.getElementById('button-message');
+    const dropArea = document.getElementById('drop-area');
+    const dropMessage = document.getElementById('drop-message');
+
+
+    // --- Estado de la Aplicación ---
     let currentUser = localStorage.getItem('currentUser'); 
     let uniqueUserId = null; 
+    let isEditMode = false;
+    let draggedButtonKey = null; 
+    let editingButtonKey = null; 
 
-    // Ocultar elementos de login que ya no se usan
-    if (document.getElementById('user-selector')) document.getElementById('user-selector').style.display = 'none';
-    if (document.getElementById('pin-submit-login')) document.getElementById('pin-submit-login').style.display = 'none';
-    if (document.getElementById('show-add-user-modal')) document.getElementById('show-add-user-modal').style.display = 'none';
-    
-    pinInputLogin.placeholder = 'Introduce tu PIN';
+    // --- Funciones de Persistencia (Logo) ---
 
+    // 1. Cargar el Logo desde Firebase
+    function loadLogo() {
+        db.ref('config/logo').once('value').then(snapshot => {
+            const logoData = snapshot.val();
+            if (logoData) {
+                // Actualiza el logo en el header y el modal de login
+                logoImage.src = logoData;
+                loginLogoImage.src = logoData; 
+            }
+        }).catch(error => {
+            console.error("Error al cargar el logo:", error);
+        });
+    }
 
-    // Función central para enfocar el campo del PIN
+    // 2. Guardar el Logo en Firebase (Base64)
+    async function saveLogo(base64Image) {
+        try {
+            await db.ref('config/logo').set(base64Image);
+            console.log("Logo guardado con éxito.");
+            loadLogo(); // Recarga para actualizar ambas imágenes
+        } catch (error) {
+            console.error("Error al guardar el logo:", error);
+            // Mostrar un mensaje al usuario si es posible
+        }
+    }
+
+    // --- Funciones de Utilidad y Sesión (Mantenidas y Refactorizadas) ---
+
     function focusPinInput() {
-        // Usar setTimeout para asegurar que el DOM ha terminado de pintarse y el modal está visible
-        // Esto soluciona que el foco se pierda al cargar la página o al cerrar sesión.
         setTimeout(() => {
             if (pinInputLogin) {
                 pinInputLogin.focus();
@@ -364,7 +611,6 @@
         }, 50); 
     }
 
-    // Función para mostrar el contenido principal e incrementar el contador
     async function showMainContent(userId, userName) {
         currentUser = userId;
         welcomeMessage.textContent = `Bienvenido, ${userName}!`;
@@ -373,28 +619,22 @@
         localStorage.setItem('currentUser', userId);
         localStorage.setItem('welcomeName', userName);
 
-        // Incrementa el contador SÓLO al entrar o al restaurar sesión
+        // Incrementa el contador SÓLO al entrar
         await db.ref('usuarios/' + userId + '/accesos').transaction((currentValue) => {
             return (currentValue || 0) + 1;
         });
-        
-        // Ya no necesitamos llamar a loadUsers aquí, el listener global lo actualizará.
     }
     
-    // Función para inicializar la vista de sesión
     function initSessionView() {
         if (localStorage.getItem('currentUser') && localStorage.getItem('welcomeName')) {
-            // Si hay sesión guardada, mostrar contenido principal e incrementar contador
             showMainContent(localStorage.getItem('currentUser'), localStorage.getItem('welcomeName'));
         } else {
-            // Si no hay sesión, mostrar modal de login
             pinModalLogin.style.display = 'flex';
             mainContent.style.display = 'none';
             focusPinInput();
         }
     }
     
-    // Función para renderizar el contador de accesos
     function renderUserCounters(users) {
         userCounterBody.innerHTML = '';
         if (users) {
@@ -413,18 +653,13 @@
         }
     }
 
-    // Listener global para el contador de accesos
-    // ✨ REPARACIÓN DEL CONTADOR: Esto escucha en tiempo real, pero NO escribe en la DB.
     function startUserCounterListener() {
         db.ref('usuarios').on('value', (snapshot) => {
             const users = snapshot.val();
-            // Esto solo se encarga de dibujar la tabla con los datos más recientes de Firebase
             renderUserCounters(users);
         });
     }
 
-
-    // Cargar usuarios al iniciar la página y determinar el usuario único
     async function loadInitialUserData() {
         const snapshot = await db.ref('usuarios').once('value');
         const users = snapshot.val();
@@ -433,7 +668,6 @@
             const userKeys = Object.keys(users);
             
             if (userKeys.length >= 1) {
-                // Asume el primer usuario como el único para el login rápido por PIN
                 uniqueUserId = userKeys[0]; 
                 pinInputLogin.style.display = 'block';
             } else {
@@ -443,11 +677,9 @@
             }
         }
         
-        // Inicia la vista de sesión solo después de cargar los datos de Firebase
         initSessionView(); 
     }
 
-    // Iniciar sesión (Lógica centralizada)
     async function attemptLogin(userId, pin) {
         pinErrorLogin.style.display = 'none';
         if (!userId) {
@@ -462,9 +694,8 @@
         const user = snapshot.val();
 
         if (user && user.pin === pin) {
-            // Llama a showMainContent, que incrementa el contador y actualiza la UI
             showMainContent(userId, user.nombre); 
-            pinInputLogin.value = ''; // Limpiar campo al acceder
+            pinInputLogin.value = '';
         } else {
             pinErrorLogin.textContent = 'PIN incorrecto. Inténtalo de nuevo.';
             pinErrorLogin.style.display = 'block';
@@ -472,6 +703,329 @@
             focusPinInput(); 
         }
     }
+
+    // --- Lógica de Botones y Edición ---
+
+    function sortButtons(buttons) {
+        if (!buttons) return [];
+        return Object.keys(buttons)
+            .map(key => ({ key, ...buttons[key] }))
+            .sort((a, b) => (a.order || 999) - (b.order || 999));
+    }
+
+    function renderButtons(buttonsData) {
+        buttonGrid.innerHTML = '';
+        const sortedButtons = sortButtons(buttonsData);
+
+        sortedButtons.forEach(button => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'button-wrapper';
+            wrapper.id = 'btn-wrapper-' + button.key;
+            wrapper.setAttribute('data-key', button.key);
+            wrapper.setAttribute('draggable', isEditMode);
+            
+            // 3. Aplicar clase 'long' si corresponde
+            if (button.span === 'long') {
+                wrapper.classList.add('long');
+            }
+
+            const btnLink = document.createElement('a');
+            btnLink.href = button.url || '#';
+            btnLink.className = `button ${button.class || ''}`;
+            btnLink.textContent = button.name || 'Botón sin Nombre';
+            btnLink.target = '_self'; 
+
+            wrapper.appendChild(btnLink);
+
+            if (isEditMode) {
+                wrapper.classList.add('edit-mode');
+                
+                const actions = document.createElement('div');
+                actions.className = 'action-buttons';
+                
+                const btnEdit = document.createElement('button');
+                btnEdit.className = 'action-button edit';
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
+                btnEdit.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openButtonModal(button.key, button.name, button.url, button.span);
+                };
+                
+                const btnDelete = document.createElement('button');
+                btnDelete.className = 'action-button delete';
+                btnDelete.innerHTML = '<i class="fas fa-trash"></i>';
+                btnDelete.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (confirm(`¿Estás seguro de que quieres borrar el botón "${button.name}"?`)) {
+                        deleteButton(button.key);
+                    }
+                };
+
+                const dragHandle = document.createElement('button');
+                dragHandle.className = 'action-button drag-handle';
+                dragHandle.innerHTML = '<i class="fas fa-arrows-alt"></i>';
+                dragHandle.onmousedown = (e) => {
+                    e.stopPropagation(); 
+                };
+                
+                actions.appendChild(dragHandle);
+                actions.appendChild(btnEdit);
+                actions.appendChild(btnDelete);
+                wrapper.appendChild(actions);
+
+                // Configurar eventos Drag & Drop para reordenar
+                setupDragEvents(wrapper);
+            } else {
+                wrapper.classList.remove('edit-mode');
+                wrapper.removeAttribute('draggable');
+            }
+            
+            buttonGrid.appendChild(wrapper);
+        });
+
+        if (isEditMode) {
+            buttonGrid.classList.add('edit-mode');
+            document.body.classList.add('edit-mode'); // Para el logo
+        } else {
+            buttonGrid.classList.remove('edit-mode');
+            document.body.classList.remove('edit-mode');
+        }
+    }
+    
+    function startButtonsListener() {
+        db.ref('botones').on('value', (snapshot) => {
+            const buttons = snapshot.val();
+            renderButtons(buttons);
+        });
+    }
+
+    async function saveButtonOrder() {
+        const buttonWrappers = Array.from(buttonGrid.querySelectorAll('.button-wrapper'));
+        const updates = {};
+        
+        buttonWrappers.forEach((wrapper, index) => {
+            const key = wrapper.getAttribute('data-key');
+            if (key) {
+                updates[`/botones/${key}/order`] = index;
+            }
+        });
+
+        if (Object.keys(updates).length > 0) {
+             await db.ref('/').update(updates)
+                .catch(error => console.error("Error al guardar el orden:", error));
+        }
+    }
+
+    function deleteButton(key) {
+        db.ref('botones/' + key).remove()
+            .catch(error => console.error("Error al borrar el botón:", error));
+    }
+
+    // Abrir modal para crear/editar botón
+    function openButtonModal(key = null, name = '', url = '', span = 'short') {
+        editingButtonKey = key;
+        buttonModalTitle.textContent = key ? 'Editar Botón' : 'Añadir Nuevo Botón';
+        buttonNameInput.value = name;
+        buttonUrlInput.value = url;
+        buttonTypeSelect.value = span; // Establecer el tamaño (short/long)
+        buttonMessage.textContent = '';
+        buttonModal.style.display = 'flex';
+
+        // Limpiar el estado de drop
+        dropArea.classList.remove('drag-over-file');
+        dropMessage.textContent = '(Nombre del archivo aparecerá en "URL de Destino")';
+        dropMessage.style.color = '#ccc';
+    }
+
+    // Guarda el botón (crea o actualiza)
+    buttonSubmit.addEventListener('click', async () => {
+        const name = buttonNameInput.value.trim();
+        let url = buttonUrlInput.value.trim();
+        const span = buttonTypeSelect.value;
+
+        if (!name) {
+            buttonMessage.textContent = 'El nombre del botón es obligatorio.';
+            buttonMessage.style.color = 'var(--accent-red)';
+            return;
+        }
+        
+        if (!url) {
+            url = '#'; 
+        }
+
+        const buttonData = {
+            name: name,
+            url: url,
+            span: span, // Guardar si es 'short' o 'long'
+            class: 'button-' + name.toLowerCase().replace(/\s/g, '-'),
+            order: 999
+        };
+        
+        buttonMessage.style.color = 'var(--accent-green)';
+        buttonMessage.textContent = 'Guardando...';
+
+        try {
+            if (editingButtonKey) {
+                // Actualizar
+                await db.ref('botones/' + editingButtonKey).update(buttonData);
+                buttonMessage.textContent = 'Botón actualizado con éxito.';
+            } else {
+                // Crear nuevo
+                const snapshot = await db.ref('botones').once('value');
+                const nextOrder = snapshot.numChildren();
+                buttonData.order = nextOrder;
+                
+                await db.ref('botones').push(buttonData);
+                buttonMessage.textContent = 'Botón añadido con éxito.';
+            }
+            
+            setTimeout(() => {
+                buttonModal.style.display = 'none';
+            }, 1000);
+
+        } catch (error) {
+            buttonMessage.textContent = 'Error al guardar el botón: ' + error.message;
+            buttonMessage.style.color = 'var(--accent-red)';
+            console.error(error);
+        }
+    });
+
+    // --- Drag and Drop (Reordenamiento) ---
+    function setupDragEvents(wrapper) {
+        wrapper.addEventListener('dragstart', (e) => {
+            if (!isEditMode) return;
+            draggedButtonKey = wrapper.getAttribute('data-key');
+            e.dataTransfer.effectAllowed = 'move';
+            // Para evitar arrastrar el botón que se está moviendo sobre sí mismo
+            e.dataTransfer.setData('text/plain', draggedButtonKey); 
+            setTimeout(() => wrapper.classList.add('ghost'), 0);
+        });
+
+        wrapper.addEventListener('dragover', (e) => {
+            e.preventDefault(); 
+            if (!isEditMode) return;
+            e.dataTransfer.dropEffect = 'move';
+
+            const targetKey = wrapper.getAttribute('data-key');
+            if (targetKey !== draggedButtonKey) {
+                const draggedEl = document.getElementById('btn-wrapper-' + draggedButtonKey);
+                if (!draggedEl) return;
+                
+                const rect = wrapper.getBoundingClientRect();
+                const center = rect.left + rect.width / 2;
+
+                // Simple lógica de inserción
+                if (e.clientX < center) {
+                    // Mover antes del target (izquierda)
+                    buttonGrid.insertBefore(draggedEl, wrapper);
+                } else {
+                    // Mover después del target (derecha)
+                    buttonGrid.insertBefore(draggedEl, wrapper.nextSibling);
+                }
+            }
+        });
+
+        wrapper.addEventListener('dragend', () => {
+            const draggedEl = document.getElementById('btn-wrapper-' + draggedButtonKey);
+            if(draggedEl) draggedEl.classList.remove('ghost');
+            draggedButtonKey = null;
+            saveButtonOrder();
+        });
+    }
+
+    // --- Drag and Drop (Asignar Archivo en Modal) ---
+    function setupModalDropArea() {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function preventDefaults (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight() {
+            dropArea.classList.add('drag-over-file');
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('drag-over-file');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === 'text/html' || file.name.toLowerCase().endsWith('.html')) {
+                    const newUrl = file.name;
+                    buttonUrlInput.value = newUrl;
+                    dropMessage.textContent = `Archivo "${newUrl}" asignado.`;
+                    dropMessage.style.color = 'var(--accent-green)';
+                } else {
+                    dropMessage.textContent = 'Solo se aceptan archivos HTML.';
+                    dropMessage.style.color = 'var(--accent-red)';
+                }
+            }
+        }
+    }
+
+
+    // --- Event Listeners de la Interfaz ---
+
+    // Toggle Modo Edición
+    btnToggleEdit.addEventListener('click', () => {
+        isEditMode = !isEditMode;
+        btnToggleEdit.textContent = isEditMode ? 'Salir de Edición' : 'Modo Edición';
+        btnToggleEdit.style.background = isEditMode ? 'var(--accent-red)' : 'var(--accent-orange)';
+        
+        btnAddButton.style.display = isEditMode ? 'block' : 'none';
+        
+        // El listener de botones se encarga de re-renderizar y aplicar/quitar clases
+        db.ref('botones').once('value').then(snapshot => {
+            renderButtons(snapshot.val());
+        });
+    });
+
+    // Subida de Logo (Clic en el Logo en modo edición)
+    appLogo.addEventListener('click', () => {
+        if (isEditMode) {
+            logoFileInput.click();
+        }
+    });
+
+    // Manejo de la subida de archivo de Logo
+    logoFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                // Guarda la imagen como Base64 en Firebase
+                saveLogo(event.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Abrir modal de nuevo botón
+    btnAddButton.addEventListener('click', () => {
+        if (isEditMode) {
+            openButtonModal(null, '', '', 'short');
+        }
+    });
 
     // Auto-acceso al completar el PIN
     pinInputLogin.addEventListener('input', () => {
@@ -491,6 +1045,10 @@
         pinModalLogin.style.display = 'flex';
         pinInputLogin.value = '';
         pinErrorLogin.style.display = 'none';
+        isEditMode = false;
+        btnToggleEdit.textContent = 'Modo Edición';
+        btnToggleEdit.style.background = 'var(--accent-orange)';
+        btnAddButton.style.display = 'none';
         focusPinInput(); 
     });
 
@@ -499,28 +1057,36 @@
         if (!currentUser) return; 
         pinModalChange.style.display = 'flex';
         pinMessageChange.textContent = '';
-        currentPinInput.value = '';
-        newPin1Input.value = '';
-        newPin2Input.value = '';
+        document.getElementById('current-pin').value = '';
+        document.getElementById('new-pin-1').value = '';
+        document.getElementById('new-pin-2').value = '';
     });
     
-    // Cerrar modales
+    // Cerrar modales (PIN Change y Button Modal)
     document.getElementById('close-change-modal').addEventListener('click', () => {
         pinModalChange.style.display = 'none';
     });
+    document.getElementById('close-button-modal').addEventListener('click', () => {
+        buttonModal.style.display = 'none';
+    });
 
+    // Cerrar modales al hacer clic fuera
     window.addEventListener('click', (event) => {
         if (event.target === pinModalChange) {
             pinModalChange.style.display = 'none';
         }
+        if (event.target === buttonModal) {
+            buttonModal.style.display = 'none';
+        }
     });
 
-    // Cambiar PIN
-    pinSubmitChange.addEventListener('click', async () => {
+    // Cambiar PIN (mantenido)
+    document.getElementById('pin-submit-change').addEventListener('click', async () => {
         const userId = currentUser;
-        const currentPin = currentPinInput.value;
-        const newPin1 = newPin1Input.value;
-        const newPin2 = newPin2Input.value;
+        const currentPin = document.getElementById('current-pin').value;
+        const newPin1 = document.getElementById('new-pin-1').value;
+        const newPin2 = document.getElementById('new-pin-2').value;
+        const pinMessageChange = document.getElementById('pin-message-change');
 
         if (newPin1 !== newPin2) {
             pinMessageChange.textContent = 'Los nuevos PIN no coinciden.';
@@ -557,9 +1123,13 @@
         }
     });
 
-    // Carga inicial y listeners
+
+    // Inicialización
+    loadLogo(); // Carga el logo al iniciar
     loadInitialUserData();
     startUserCounterListener();
+    startButtonsListener(); 
+    setupModalDropArea(); // Configura el área de drop para el modal de botones
 </script>
 </body>
 </html>

@@ -11,7 +11,7 @@
   <style>
     :root {
       --bg-dark: #1a1a2e;
-      --card-bg: #282844; /* Fondo para el card del formulario */
+      --card-bg: #282844;
       --text-light: #e9e9f0;
       --accent-blue: #667eea;
       --accent-purple: #764ba2;
@@ -19,15 +19,28 @@
       --accent-red: #dc3545;
       --accent-green: #28a745;
       --accent-orange: #ff9800;
-      --header-bg: #3e3e5c; /* Usado para la cabecera de tabla y card de stats */
+      --header-bg: #3e3e5c;
     }
-    body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg,#667eea,#764ba2); color: var(--text-light); margin:0; }
+    
+    html {
+        box-sizing: border-box;
+        overflow-x: hidden;
+    }
+    *, *::before, *::after {
+        box-sizing: inherit;
+    }
+    
+    body { 
+      font-family: 'Poppins', sans-serif; 
+      background: linear-gradient(135deg,#667eea,#764ba2); 
+      color: var(--text-light); 
+      margin:0; 
+      overflow-x: hidden;
+    }
     .container { max-width:1400px; margin:30px auto; padding:0 16px; }
     h1 { text-align:center; margin-bottom:20px; font-size:2.2rem; font-weight:700; color:#fff; }
-    /* Card principal: un poco más transparente */
     .card { background-color: rgba(0,0,0,0.55); border-radius:12px; padding:25px; margin-bottom:25px; box-shadow:0 6px 16px rgba(0,0,0,0.3); }
 
-    /* Controles de botones */
     .toggle-form-container { 
         text-align:center; 
         margin-bottom:15px; 
@@ -36,8 +49,7 @@
         gap: 15px;
     }
 
-    #btnToggleForm, #btnMainMenu { padding:12px 24px; font-size:1rem; border:none; border-radius:8px; cursor:pointer; font-weight:600;
-      transition:0.3s; }
+    #btnToggleForm, #btnMainMenu { padding:12px 24px; font-size:1rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
 
     #btnToggleForm {
         background-image: var(--accent-gradient); 
@@ -51,62 +63,109 @@
     }
     #btnMainMenu:hover { transform:scale(1.05); }
 
-    /* --- FORMULARIO AHORA ES UN MODAL --- */
     #data-entry-form { 
         position: fixed;
         inset: 0;
-        background: rgba(0,0,0,0.85); /* Fondo oscuro semitransparente */
+        background: rgba(0,0,0,0.85); 
         align-items: center;
         justify-content: center;
-        z-index: 1001; /* Z-index alto para superponer */
+        z-index: 1001; 
         display: none; 
         opacity: 0; 
         transition: opacity .3s ease; 
+        padding: 10px 0;
     }
     #data-entry-form.visible { 
-        display: flex; /* Usamos flex para centrar */
+        display: flex; 
         opacity: 1; 
     }
-    /* Contenido del modal */
     .modal-content-wrapper {
         background-color: var(--card-bg);
         border-radius: 12px;
-        padding: 30px; 
-        max-width: 900px;
-        width: 90%;
-        max-height: 95vh; 
-        overflow-y: auto; /* Scroll interno si es necesario */
+        padding: 20px;
+        max-width: 95%;
+        width: 900px;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         transform: scale(0.95);
         transition: transform .3s ease;
-        position: relative; /* REQ: Necesario para posicionar el mensaje de estado absoluto */
+        position: relative; 
+        margin: auto;
     }
     #data-entry-form.visible .modal-content-wrapper {
         transform: scale(1);
     }
+    
+    @media (max-width: 768px) {
+        .modal-content-wrapper {
+            padding: 15px; 
+            width: 95%;
+        }
+        .form-grid { 
+            grid-template-columns: 1fr !important;
+            gap: 15px !important;
+        }
+        .nav-actions {
+            flex-direction: column;
+        }
+        .form-actions {
+            margin-top: 15px;
+            justify-content: center;
+        }
+        .nav-actions button {
+            width: 100%;
+            text-align: center;
+        }
+    }
 
-    /* Estilos para el contenedor de mensajes de estado (Posicionamiento Absoluto) */
     #statusMessageContainer {
-        position: absolute; /* Posicionamiento absoluto para no alterar el tamaño del modal */
-        top: 80px; /* Colocarlo debajo del título */
+        position: absolute; 
+        top: 80px; 
         left: 50%;
         transform: translateX(-50%);
-        width: 85%; /* Ancho fijo para centrarlo */
+        width: 85%; 
         z-index: 1010; 
-        
-        /* Estilos de mensaje */
         padding: 10px; 
         border-radius: 6px; 
         text-align: center; 
         font-weight: 600; 
-        display: none; /* Por defecto oculto */
+        display: none; 
         transition: opacity 0.3s ease;
     }
 
-    #data-entry-form h2 { color:#ffd54f; margin-bottom:15px; }
+    #data-entry-form h2 { 
+        color:#ffd54f; 
+        margin-bottom:15px; 
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: background-color 0.2s;
+    }
+    
+    #data-entry-form h2:hover {
+        background-color: rgba(255, 213, 79, 0.1);
+    }
+    
+    .course-title-input {
+        background: transparent;
+        border: 2px solid #ffd54f;
+        border-radius: 6px;
+        color: #ffd54f;
+        font-size: 1.5rem;
+        font-weight: 700;
+        padding: 8px 12px;
+        width: 100%;
+        font-family: 'Poppins', sans-serif;
+        margin-bottom: 15px;
+    }
+    
+    .course-title-input:focus {
+        outline: none;
+        box-shadow: 0 0 5px rgba(255, 213, 79, 0.5);
+    }
+    
     .form-grid { 
         display:grid; 
-        grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); 
+        grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); 
         gap: 28px; 
         margin-bottom: 20px;
     } 
@@ -117,29 +176,27 @@
     }
     .form-group label { font-weight:600; margin-bottom:6px; color:var(--text-light); }
     
-    /* Campos de input en el formulario superior */
     #data-entry-form input:not([type="checkbox"]), #data-entry-form select, #data-entry-form textarea {
       padding:10px; border-radius:6px; border:1px solid #ccc;
       background-color: #fff; 
       color: #333; 
       width: 100%; 
     }
-    /* Estilo específico para el campo calculado de solo lectura */
-    #importeNetoCobrado {
+    
+    #importeNetoCobrado, #importeHoraNeto {
         background-color: #f7e096;
         color: #333;
         font-weight: 700;
         border: 2px solid #ff9800;
     }
-    /* Estilos para los NUEVOS campos calculados de precio/hora */
-    #precioHoraBruto {
-        background-color: #f0f0f0;
+    
+    #importeBruto {
+        background-color: #e6e6fa; 
         color: #333;
     }
-    #importeHoraNeto {
-        background-color: #e0f7fa;
+    #precioHoraBruto {
+        background-color: #e8f5e9; 
         color: #333;
-        font-weight: 600;
     }
 
     #data-entry-form input:focus, #data-entry-form select:focus, #data-entry-form textarea:focus {
@@ -149,19 +206,17 @@
     }
     textarea { min-height:80px; resize:vertical; }
     
-    /* Controles de Acción y Navegación */
     .form-actions { 
         grid-column:1/-1; 
         display:flex; 
         gap:12px; 
         margin-top:15px; 
-        justify-content: flex-end; /* Alinear los botones de Guardar/Cerrar a la derecha */
+        justify-content: flex-end; 
     }
     #btnSubmitCourse, #btnCancelEdit { padding:10px 20px; font-weight:600; border:none; border-radius:8px; cursor:pointer; }
     #btnSubmitCourse { background-image: var(--accent-gradient); color:#fff; flex-grow:0; }
     #btnCancelEdit { background-color: var(--accent-red); color:#fff; }
 
-    /* Estilo para los botones de navegación */
     .nav-actions {
         display: flex;
         justify-content: space-between;
@@ -188,7 +243,6 @@
         opacity: 0.6;
     }
     
-    /* Stats Card (Desglose de Ingresos) */
     #stats-card { 
         background-color: var(--header-bg); 
         padding: 20px 25px; 
@@ -207,7 +261,6 @@
         flex-grow: 1; 
     }
     
-    /* REQ Alineación: Estructura de alineación forzada para Pagador y Año */
     .stats-controls select {
         width: 100%;
         min-width: 150px; 
@@ -215,10 +268,9 @@
         border-radius: 6px;
         background-color: #fff;
         color: #333;
-        height: 38px; /* Altura forzada para que coincida con el botón */
+        height: 38px;
     }
     
-    /* Estilos para el nuevo botón de limpiar pagadores */
     #btnCleanPagadores {
         background-color: var(--accent-orange); 
         color: #333;
@@ -230,22 +282,20 @@
         transition: background-color 0.2s;
         font-size: 0.9rem;
         line-height: 1.2;
-        height: 38px; /* Altura forzada para que coincida con el select */
+        height: 38px;
     }
     #btnCleanPagadores:hover {
         background-color: #e68900;
     }
 
-    /* Contenedor que alinea el select y el botón del Pagador */
     .pagador-filter-row {
         display: flex;
-        align-items: flex-end; /* Alinea los ítems en la parte inferior */
+        align-items: flex-end;
         gap: 10px;
     }
     .pagador-filter-row select {
         flex-grow: 1; 
     }
-
 
     .stats-results { 
         display: flex; 
@@ -258,7 +308,6 @@
     .stats-results strong { color: #ffd54f; font-weight: 700; }
     #totalImporte, #totalHoras { font-weight: 700; }
     
-    /* NUEVO: Listado Header (Alineación) */
     .listado-header {
         display: flex;
         justify-content: space-between;
@@ -267,9 +316,9 @@
     }
     .listado-header h2 {
         margin: 0;
+        font-size: 1.4rem;
     }
 
-    /* Exportar a Excel */
     #btnExportExcel {
         background-color: var(--accent-green); 
         color: white; 
@@ -278,97 +327,125 @@
         border-radius: 8px; 
         cursor: pointer; 
         font-weight: 600;
+        font-size: 0.95rem;
     }
     
-    /* Tabla */
-    .courses-table { width:100%; border-collapse:collapse; font-size:.95em; table-layout: fixed; } 
-    .courses-table th, .courses-table td { padding:10px 6px; border-bottom:1px solid rgba(255,255,255,0.1); vertical-align: middle; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .courses-table th { background-color: var(--header-bg); color:#ffd54f; text-transform:uppercase; }
-    .action-btns { display:flex; gap:8px; }
+    /* TABLA MEJORADA - FUENTES MÁS GRANDES Y MEJOR DISTRIBUCIÓN */
+    .courses-table { 
+        width: 100%; 
+        border-collapse: collapse; 
+        font-size: 0.95em; /* Aumentado el tamaño de fuente general */
+        table-layout: fixed;
+    } 
     
-    /* Estilos de botones de acción para que se vean bien */
+    .courses-table th, .courses-table td { 
+        padding: 10px 6px; /* Aumentado el padding para mejor legibilidad */
+        border-bottom: 1px solid rgba(255,255,255,0.1); 
+        vertical-align: middle; 
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.3;
+    }
+    
+    .courses-table th { 
+        background-color: var(--header-bg); 
+        color: #ffd54f; 
+        text-transform: uppercase; 
+        font-weight: 700;
+        font-size: 0.9em; /* Tamaño aumentado para encabezados */
+        padding: 12px 6px;
+        text-align: left; /* Alineado a la izquierda como solicitado */
+    }
+
+    /* ANCHOS OPTIMIZADOS CON FUENTES MÁS GRANDES */
+    .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 4%; }  /* # */
+    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 8%; font-size: 0.95em; }  /* Inicio - Mismo tamaño que el resto */
+    .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 11%; } /* Tipo Curso */
+    .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 11%; } /* Pagador */
+    .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 13%; } /* Lugar */
+    .courses-table th:nth-child(6), .courses-table td:nth-child(6) { width: 6%; }  /* Horas */
+    .courses-table th:nth-child(7), .courses-table td:nth-child(7) { width: 8%; }  /* Importe */
+    .courses-table th:nth-child(8), .courses-table td:nth-child(8) { width: 8%; }  /* Pago */
+    .courses-table th:nth-child(9), .courses-table td:nth-child(9) { width: 8%; }  /* Cobrado */
+    .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; } /* Renta */
+    .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 13%; min-width: 140px; } /* Acciones */
+
+    /* BOTONES DE ACCIÓN MEJORADOS CON MÁS ESPACIO */
+    .action-btns { 
+        display: flex; 
+        gap: 6px; 
+        flex-wrap: nowrap;
+        justify-content: center;
+        align-items: center;
+        min-width: 130px;
+    }
+    
     .action-btns button {
-        background: var(--accent-blue);
-        color: #fff;
         border: none;
-        padding: 4px 8px;
-        border-radius: 6px;
+        padding: 7px 10px;
+        border-radius: 5px;
         cursor: pointer;
-        transition: background-color 0.2s;
-        line-height: 1; /* Asegura que el icono esté centrado */
-        font-size: 1rem; /* Asegura el tamaño del icono */
+        transition: all 0.2s;
+        line-height: 1;
+        font-size: 0.85rem; /* Tamaño aumentado para botones */
+        white-space: nowrap;
+        min-width: 40px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
     }
-    /* Estilo para el botón de editar */
-    .edit-btn { background-color: #4caf50; } 
-    /* Estilo para el botón de eliminar */
-    .delete-btn { background-color: #f44336; }
-    /* Estilo para el botón de observaciones */
-    .obs-btn { background-color: #2196f3; }
-    
-    /* REQ: Estilo para el botón de alerta (Ojo Rojo) */
-    .obs-btn.alert {
-        background-color: var(--accent-red); /* Fondo Rojo */
+
+    .edit-btn { 
+        background-color: #4caf50; 
         color: white;
-        border: 2px solid var(--accent-orange); /* Borde Naranja para destacarse */
+    } 
+
+    .delete-btn { 
+        background-color: #f44336; 
+        color: white;
+    }
+
+    .obs-btn { 
+        background-color: #2196f3; 
+        color: white;
+    }
+    
+    .obs-btn.alert {
+        background-color: #f44336;
+        color: white;
+        border: 1px solid #ff9800;
     }
     
     .action-btns button:hover {
-        opacity: 0.8;
+        opacity: 0.9;
+        transform: scale(1.05);
     }
-    
-    /* REQUERIMIENTO: Definición de anchos de columna corregida */
-    .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 4%; } /* # */
-    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 9%; } /* Inicio */
-    .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 9%; } /* Fin */
-    .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 15%; } /* Pagador - REDUCIDO */
-    .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 15%; } /* Lugar - AUMENTADO */
-    .courses-table th:nth-child(6), .courses-table td:nth-child(6) { width: 6%; } /* Horas */
-    .courses-table th:nth-child(7), .courses-table td:nth-child(7) { width: 8%; } /* Importe (Neto) */
-    .courses-table th:nth-child(8), .courses-table td:nth-child(8) { width: 7%; } /* Pago (Pendiente/Cobrado) */
-    .courses-table th:nth-child(9), .courses-table td:nth-child(9) { width: 7%; } /* Cobrado (Fecha) - REDUCIDO */
-    .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; } /* Renta */
-    .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 14%; } /* Acciones */
 
-    /* Las fechas NO se cortan (cells 2 y 3) */
-    .courses-table td:nth-child(2), .courses-table td:nth-child(3) {
-        white-space: nowrap; 
-        overflow: visible; 
+    /* MEJORAS PARA TEXTO VISIBLE CON FUENTE MÁS GRANDE */
+    .courses-table td:nth-child(3),
+    .courses-table td:nth-child(4),
+    .courses-table td:nth-child(5) {
+        max-width: 0;
+        overflow: visible;
         text-overflow: clip;
-        padding: 10px 4px; /* Reducir padding para más espacio */
-    }
-    /* Aseguramos que el contenido de cobrado (Fecha Cobro, cell 9) se corte si es necesario */
-    .courses-table td:nth-child(9) {
-        white-space: nowrap; 
-        overflow: hidden; 
-        text-overflow: ellipsis;
-        padding: 10px 4px; 
+        font-size: 0.95em; /* Tamaño consistente */
     }
 
-
-    /* Pago */
-    .status-cobrado { color: var(--accent-green); font-weight:700; }
-    .status-pendiente { color: var(--accent-red); font-weight:700; }
-
-    /* Modal observaciones */
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1000; }
-    .modal-content { background:#fff; color:#333; padding:20px; border-radius:10px; max-width:500px; width:90%; }
-    .close-modal { float:right; background:var(--accent-red); color:#fff; border:none; border-radius:4px; padding:4px 10px; cursor:pointer; }
-  
-    /* Ajuste columna de Acciones */
-    .courses-table th:nth-child(11),
-    .courses-table td:nth-child(11) {
-        width: 14%;
-        min-width: 140px;   /* Evita que se haga demasiado estrecha */
+    /* FECHAS CON EL MISMO TAMAÑO QUE EL RESTO */
+    .courses-table td:nth-child(2) {
+        font-size: 0.95em; /* Mismo tamaño que el resto de campos */
         white-space: nowrap;
     }
 
-    /* Botones de acción */
-    .action-btns {
-        display: flex;
-        gap: 8px;
-        flex-wrap: nowrap;   /* No deja que los botones salten de línea */
-        justify-content: center; /* Centra los botones en la celda */
-    }
+    .status-cobrado { color: var(--accent-green); font-weight:700; }
+    .status-pendiente { color: var(--accent-red); font-weight:700; }
+
+    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1000; }
+    .modal-content { background:#fff; color:#333; padding:20px; border-radius:10px; max-width:500px; width:90%; }
+    .close-modal { float:right; background:var(--accent-red); color:#fff; border:none; border-radius:4px; padding:4px 10px; cursor:pointer; }
 
 </style>
 </head>
@@ -385,7 +462,12 @@
 
   <div id="data-entry-form">
     <div class="modal-content-wrapper">
-        <h2><i class="fas fa-edit"></i> <span id="formTitle">Agregar Curso</span></h2>
+        <h2 id="formTitleDisplay">
+            <i class="fas fa-edit"></i> <span id="formTitleText">Agregar Curso</span>
+        </h2>
+        <input type="text" id="formTitleInput" class="course-title-input" style="display: none;" 
+               placeholder="Nombre del curso..." maxlength="100">
+        
         <div id="statusMessageContainer"></div>
 
         <form id="courseForm">
@@ -393,18 +475,52 @@
         <div class="form-grid">
             <div class="form-group"><label for="inicio">Fecha Inicio</label><input type="date" id="inicio" required></div>
             <div class="form-group"><label for="fin">Fecha Fin</label><input type="date" id="fin" required></div>
+            
+            <div class="form-group"><label for="nombreCurso">Nombre del Curso</label><input type="text" id="nombreCurso"></div>
+            
+            <div class="form-group">
+                <label for="tipoCurso">Tipo de Curso</label> 
+                <input type="text" id="tipoCurso" list="tipoCursosListForm">
+                <datalist id="tipoCursosListForm"></datalist>
+            </div>
+            
             <div class="form-group">
                 <label for="pagador">Pagador</label>
                 <input type="text" id="pagador" list="pagadoresListForm" required>
                 <datalist id="pagadoresListForm"></datalist>
             </div> 
-            <div class="form-group"><label for="horas">Horas</label><input type="number" step="0.01" id="horas" required oninput="calculateNeto()"></div>
             
-            <div class="form-group"><label for="importeBruto">Importe Bruto (€)</label><input type="number" step="0.01" id="importeBruto" required oninput="calculateNeto()"></div>
-            <div class="form-group"><label for="irpf">IRPF (%)</label><input type="number" step="0.01" id="irpf" value="0" oninput="calculateNeto()"></div>
+            <div class="form-group">
+                <label for="horas">Horas</label>
+                <input type="text" inputmode="decimal" id="horas" required 
+                       onblur="formatNumericDisplay(this); calculateBrutoAndNeto();">
+            </div>
+            
+            <div class="form-group">
+                <label for="precioHoraBruto">Precio Hora (Bruto €)</label>
+                <input type="text" inputmode="decimal" id="precioHoraBruto" value="0,00" 
+                       onblur="formatNumericDisplay(this); calculateBrutoAndNeto();"> 
+            </div>
+
+            <div class="form-group">
+                <label for="importeBruto">Importe Bruto (€)</label>
+                <input type="text" inputmode="decimal" id="importeBruto" required 
+                       onblur="formatNumericDisplay(this); calculateNetoOnly();">
+            </div> 
+            
+            <div class="form-group">
+                <label for="irpf">IRPF (%)</label>
+                <input type="text" inputmode="decimal" id="irpf" value="0" 
+                       onblur="formatNumericDisplay(this); calculateNetoOnly();">
+            </div> 
+            
             <div class="form-group">
                 <label for="importeNetoCobrado">Total Cobrado (Neto €)</label>
-                <input type="number" step="0.01" id="importeNetoCobrado" readonly value="0.00">
+                <input type="text" inputmode="decimal" id="importeNetoCobrado" readonly value="0,00">
+            </div>
+            <div class="form-group">
+                <label for="importeHoraNeto">Importe Hora (Neto €)</label>
+                <input type="text" inputmode="decimal" id="importeHoraNeto" readonly value="0,00">
             </div>
             
             <div class="form-group">
@@ -417,14 +533,6 @@
             <div class="form-group"><label for="fechaCobro">Detalle/Fecha Cobro</label><input type="text" id="fechaCobro"></div>
             <div class="form-group"><label for="renta">Año Renta</label><input type="number" id="renta"></div>
 
-            <div class="form-group">
-                <label for="precioHoraBruto">Precio Hora (Bruto €)</label>
-                <input type="number" step="0.01" id="precioHoraBruto" readonly value="0.00">
-            </div>
-            <div class="form-group">
-                <label for="importeHoraNeto">Importe Hora (Neto €)</label>
-                <input type="number" step="0.01" id="importeHoraNeto" readonly value="0.00">
-            </div>
             <div class="form-group"><label for="lugarCelebracion">Lugar de Celebración</label><input type="text" id="lugarCelebracion"></div>
             <div class="form-group"><label for="horario">Horario</label><input type="text" id="horario"></div>
             <div class="form-group"><label for="asistentes">Asistentes</label><input type="text" id="asistentes"></div>
@@ -474,8 +582,8 @@
         </div>
     </div>
     <div class="stats-results">
-        <p><strong>Importe Total Cobrado (Neto):</strong> <span id="totalImporte">0.00 €</span></p>
-        <p><strong>Total Horas Cobradas:</strong> <span id="totalHoras">0.00 h</span></p>
+        <p><strong>Importe Total Cobrado (Neto):</strong> <span id="totalImporte">0,00 €</span></p>
+        <p><strong>Total Horas Cobradas:</strong> <span id="totalHoras">0,00 h</span></p>
     </div>
   </div>
 
@@ -492,7 +600,7 @@
         <tr>
           <th>#</th>
           <th>Inicio</th>
-          <th>Fin</th>
+          <th>Tipo Curso</th> 
           <th>Pagador</th>
           <th>Lugar</th> 
           <th>Horas</th>
@@ -519,18 +627,22 @@
 </div>
 
 <script>
-// La ruta de la base de datos se mantiene
-const BASE = "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app/FORMACION";
-const COMPANIES_PATH = "EMPRESAS"; 
-
+// CORRECCIÓN: Rutas de Firebase corregidas - Los cursos están en FORMACION directamente
+const BASE = "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app";
 const tbody = document.getElementById('coursesTableBody');
 const formModal = document.getElementById('data-entry-form'); 
 const btnToggleForm = document.getElementById('btnToggleForm');
 const form = document.getElementById('courseForm');
 const statusMessageContainer = document.getElementById('statusMessageContainer');
-// Elemento del campo oculto (clave de edición)
 const courseKeyInput = document.getElementById('courseKey'); 
 
+// Elementos para el título editable
+const formTitleDisplay = document.getElementById('formTitleDisplay');
+const formTitleText = document.getElementById('formTitleText');
+const formTitleInput = document.getElementById('formTitleInput');
+
+// Campo nombreCurso para sincronización
+const nombreCursoInput = document.getElementById('nombreCurso');
 
 const filterInicioYear = document.getElementById('filterInicioYear');
 const filterPagador = document.getElementById('filterPagador');
@@ -541,14 +653,15 @@ const btnNextCourse = document.getElementById('btnNextCourse');
 let editingKey = null; 
 let courses = [];
 let masterCompanies = []; 
+let masterTiposCurso = []; 
 let initialFormData = {}; 
 let isSaveSuccess = false; 
 let successTimeout = null; 
 
-
 // Elementos del formulario
 const inicio = document.getElementById('inicio');
 const fin = document.getElementById('fin');
+const tipoCurso = document.getElementById('tipoCurso'); 
 const pagador = document.getElementById('pagador'); 
 const horas = document.getElementById('horas');
 const importeBruto = document.getElementById('importeBruto');
@@ -565,15 +678,35 @@ const precioHoraBruto = document.getElementById('precioHoraBruto');
 const importeHoraNeto = document.getElementById('importeHoraNeto'); 
 const alerta = document.getElementById('alerta'); 
 
+// --- Lógica de Manejo de Input Numérico (Coma/Punto) ---
+function getNumericValue(element) {
+    const rawValue = element.value.toString().replace(",", ".");
+    return parseFloat(rawValue) || 0;
+}
 
-// --- Lógica de Cálculo de Neto y Precio/Hora ---
-function calculateNeto() {
-    const bruto = parseFloat(importeBruto.value) || 0;
-    const irpfPerc = parseFloat(irpf.value) || 0;
-    const h = parseFloat(horas.value) || 0; 
+function formatNumericDisplay(element) {
+    const numericValue = getNumericValue(element);
+    element.value = numericValue.toFixed(2).replace('.', ',');
+}
+window.formatNumericDisplay = formatNumericDisplay;
+
+// --- Lógica de Cálculo de Neto, Bruto y Precio/Hora ---
+function calculateBrutoAndNeto() {
+    const h = getNumericValue(horas); 
+    const precioHBruto = getNumericValue(precioHoraBruto);
+
+    let bruto = h * precioHBruto;
+    importeBruto.value = bruto.toFixed(2).replace('.', ',');
+    calculateNetoOnly();
+}
+window.calculateBrutoAndNeto = calculateBrutoAndNeto;
+
+function calculateNetoOnly() {
+    const bruto = getNumericValue(importeBruto);
+    const irpfPerc = getNumericValue(irpf);
+    const h = getNumericValue(horas); 
     
     let neto = 0;
-    let precioHBruto = 0;
     let precioHNeto = 0;
 
     if (bruto > 0) {
@@ -581,196 +714,146 @@ function calculateNeto() {
         neto = bruto - retencion;
     }
     
-    if (h > 0) {
+    let precioHBruto = 0;
+    if (h > 0 && bruto > 0) {
         precioHBruto = bruto / h;
+        formatNumericDisplay(precioHoraBruto);
+        precioHoraBruto.value = precioHBruto.toFixed(2).replace('.', ',');
+    } else if (h > 0 && getNumericValue(precioHoraBruto) > 0) {
+        // Ya está correcto
+    } else {
+        precioHoraBruto.value = (0).toFixed(2).replace('.', ',');
+    }
+    
+    if (h > 0 && neto > 0) {
         precioHNeto = neto / h;
     }
-
-    importeNetoCobrado.value = neto.toFixed(2);
-    precioHoraBruto.value = precioHBruto.toFixed(2);
-    importeHoraNeto.value = precioHNeto.toFixed(2);
-}
-window.calculateNeto = calculateNeto;
-
-// Obtener los datos del formulario de forma consistente para comparación
-function getFormData() {
-    calculateNeto(); 
-    return {
-        inicio: inicio.value,
-        fin: fin.value,
-        pagador: pagador.value, 
-        horas: horas.value, 
-        importeBruto: importeBruto.value, 
-        irpf: irpf.value,
-        importeNeto: importeNetoCobrado.value, 
-        cobrado: cobrado.value, 
-        fechaCobro: fechaCobro.value,
-        renta: renta.value, 
-        observaciones: observaciones.value,
-        lugarCelebracion: lugarCelebracion.value,
-        horario: horario.value,
-        asistentes: asistentes.value,
-        alerta: alerta.checked 
-    };
-}
-
-
-// --- Lógica para mostrar mensajes de estado ---
-function displayStatus(message, type) {
-    statusMessageContainer.textContent = message;
     
-    // Aplicar estilos según el tipo
-    if (type === "success") { // Verde
-        statusMessageContainer.style.backgroundColor = '#d4edda'; 
-        statusMessageContainer.style.color = '#155724'; 
-        statusMessageContainer.style.border = '1px solid #c3e6cb';
-    } else if (type === "warning") { // Rojo
-        statusMessageContainer.style.backgroundColor = '#f8d7da'; 
-        statusMessageContainer.style.color = '#721c24'; 
-        statusMessageContainer.style.border = '1px solid #f5c6cb';
-    }
-    statusMessageContainer.style.display = 'block';
+    importeNetoCobrado.value = neto.toFixed(2).replace('.', ',');
+    importeHoraNeto.value = precioHNeto.toFixed(2).replace('.', ',');
+}
+window.calculateNetoOnly = calculateNetoOnly;
+
+// --- Lógica de Título Editable - CORREGIDA: Sincronización bidireccional ---
+function enableTitleEditing() {
+    formTitleDisplay.style.display = 'none';
+    formTitleInput.style.display = 'block';
+    formTitleInput.value = formTitleText.textContent;
+    formTitleInput.focus();
+    formTitleInput.select();
 }
 
-function clearStatus() {
-    statusMessageContainer.style.display = 'none';
-    statusMessageContainer.textContent = '';
-    statusMessageContainer.style.backgroundColor = 'transparent';
-    statusMessageContainer.style.color = 'inherit';
-    statusMessageContainer.style.border = 'none';
-}
-
-
-// --- Funciones para el Modal ---
-function closeFormModal() {
-    editingKey = null; // Reseteamos la clave global
-    courseKeyInput.value = ''; // Reseteamos el campo oculto
-    form.reset(); 
-    importeNetoCobrado.value = (0).toFixed(2);
-    precioHoraBruto.value = (0).toFixed(2); 
-    importeHoraNeto.value = (0).toFixed(2); 
-    formModal.classList.remove('visible'); 
-    clearStatus(); 
+function disableTitleEditing() {
+    formTitleDisplay.style.display = 'block';
+    formTitleInput.style.display = 'none';
+    const newTitle = formTitleInput.value || 'Agregar Curso';
+    formTitleText.textContent = newTitle;
     
-    // Limpiar el timeout si existe
-    if (successTimeout) { 
-        clearTimeout(successTimeout);
-        successTimeout = null;
+    // CORRECCIÓN: Sincronizar también con el campo nombreCurso
+    if (nombreCursoInput.value !== newTitle && !newTitle.includes('Editar Curso:')) {
+        nombreCursoInput.value = newTitle;
     }
-    isSaveSuccess = false; // Resetear el flag al cerrar
 }
-window.closeFormModal = closeFormModal; 
 
-// Función para manejar el cierre del modal en modo edición
-window.handleCancelEdit = () => {
-    // Usamos courseKeyInput.value en lugar de editingKey por si se perdió el estado global
-    const currentKey = courseKeyInput.value; 
-
-    if (!currentKey) { // Modo Añadir (clave vacía)
-        closeFormModal();
-        return;
+// CORRECCIÓN: Sincronización cuando se edita el campo nombreCurso
+nombreCursoInput.addEventListener('input', function() {
+    if (nombreCursoInput.value && !formTitleInput.value.includes('Editar Curso:')) {
+        formTitleText.textContent = nombreCursoInput.value;
+        formTitleInput.value = nombreCursoInput.value;
     }
+});
 
-    if (isSaveSuccess) {
-        // Si ya se ha guardado con éxito (mensaje verde visible), cerramos inmediatamente y cancelamos el auto-cierre
-        closeFormModal(); 
-        return;
+formTitleDisplay.addEventListener('click', enableTitleEditing);
+formTitleInput.addEventListener('blur', disableTitleEditing);
+formTitleInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        disableTitleEditing();
     }
+});
 
-    const currentData = getFormData();
-    // Comparar con el estado inicial (guardado o al abrir la edición)
-    const changed = JSON.stringify(currentData) !== JSON.stringify(initialFormData); 
-
-    if (changed) {
-        // Si hay cambios reales sin guardar, preguntar con confirm()
-        if (confirm("Hay cambios sin guardar. ¿Cerrar de todos modos?")) {
-            closeFormModal();
+// --- Funciones principales de carga ---
+async function load() {
+    try {
+        // CORRECCIÓN: Los cursos están en FORMACION directamente, no en FORMACION/cursos
+        const coursesResponse = await fetch(`${BASE}/FORMACION.json`);
+        const coursesData = await coursesResponse.json();
+        
+        courses = [];
+        if (coursesData) {
+            for (const key in coursesData) {
+                const course = coursesData[key];
+                // Asegurar que importeBruto existe
+                course.importeBruto = course.importeBruto || course.importe; 
+                // Recalcular el importe neto por seguridad
+                course.importeNeto = calculateNetoValue(course.importeBruto, course.irpf);
+                courses.push({ key, ...course });
+            }
         }
-    } else {
-        // Mostrar mensaje de no cambio en rojo y cerrar con un delay (1.5s)
-        displayStatus("No se efectuó ningún cambio.", "warning");
-        // Usamos setTimeout sin la variable global ya que solo se ejecuta aquí
-        setTimeout(closeFormModal, 1500); 
+        courses.sort((a, b) => new Date(b.inicio) - new Date(a.inicio));
+
+        // Cargar empresas (pagadores)
+        const companiesResponse = await fetch(`${BASE}/EMPRESAS.json`);
+        const companiesData = await companiesResponse.json();
+        masterCompanies = Array.isArray(companiesData) ? companiesData : [];
+
+        // Cargar tipos de curso
+        const tiposCursoResponse = await fetch(`${BASE}/TIPOS_CURSO.json`);
+        const tiposCursoData = await tiposCursoResponse.json();
+        masterTiposCurso = Array.isArray(tiposCursoData) ? tiposCursoData : [];
+
+        // Sincronizar pagadores
+        const existingPagadoresInCourses = new Set(courses.map(c => c.empresa || c.pagador).filter(e => e));
+        let needsUpdatePagadores = false;
+        existingPagadoresInCourses.forEach(comp => {
+            if (comp && !masterCompanies.includes(comp)) {
+                masterCompanies.push(comp);
+                needsUpdatePagadores = true;
+            }
+        });
+
+        if (needsUpdatePagadores) {
+            await fetch(`${BASE}/EMPRESAS.json`, {
+                method: 'PUT',
+                body: JSON.stringify(masterCompanies.sort())
+            });
+        }
+
+        // Sincronizar Tipos Curso 
+        const existingTiposCursoInCourses = new Set(courses.map(c => c.tipoCurso).filter(e => e));
+        let needsUpdateTipos = false;
+        existingTiposCursoInCourses.forEach(tipo => {
+            if (tipo && !masterTiposCurso.includes(tipo)) {
+                masterTiposCurso.push(tipo);
+                needsUpdateTipos = true;
+            }
+        });
+
+        if (needsUpdateTipos) {
+            await fetch(`${BASE}/TIPOS_CURSO.json`, {
+                method: 'PUT',
+                body: JSON.stringify(masterTiposCurso.sort())
+            });
+        }
+
+        updateFilters();
+        renderStats();
+        render();
+
+    } catch (error) {
+        console.error("Error cargando datos:", error);
+        tbody.innerHTML = "<tr><td colspan='11' style='text-align:center;color:var(--accent-red);'>Error cargando datos</td></tr>";
     }
-};
-window.handleCancelEdit = handleCancelEdit; 
-
-
-function resetFormForAdd() {
-    closeFormModal(); // Garantizar limpieza total (editingKey y courseKeyInput se resetean aquí)
-    document.getElementById('formTitle').textContent = 'Agregar Curso';
-    document.getElementById('btnSubmitCourse').textContent = 'Guardar';
-    document.getElementById('btnCancelEdit').style.display = 'inline-block';
-    
-    // Ocultar botones de navegación al añadir
-    btnPrevCourse.style.display = 'none';
-    btnNextCourse.style.display = 'none';
-
-    // Mostrar modal
-    formModal.classList.add('visible');
 }
 
-// Event Listener para el botón de Añadir
-btnToggleForm.onclick = resetFormForAdd;
-
-
-// --- Firebase helpers ---
-const url = (path="") => `${BASE}${path}.json`;
-const urlCompanies = (path="") => `https://markarma279-default-rtdb.europe-west1.firebasedatabase.app/${COMPANIES_PATH}${path}.json`;
-const GET = async(path="")=> (await fetch(url(path))).json();
-const GET_COMPANIES = async()=> (await fetch(urlCompanies())).json();
-const POST = async obj => (await fetch(url(),{method:"POST",body:JSON.stringify(obj)})).json();
-const PUT = async (id,obj)=> (await fetch(url("/"+id),{method:"PUT",body:JSON.stringify(obj)})).json();
-const DEL = async id=> (await fetch(url("/"+id),{method:"DELETE"})).json();
-const PUT_COMPANIES = async list => (await fetch(urlCompanies(),{method:"PUT",body:JSON.stringify(list)})).json();
-
-// Función auxiliar para calcular el neto fuera del formulario
+// Función auxiliar para calcular neto
 function calculateNetoValue(bruto, irpfPerc) {
-    const b = parseFloat(bruto) || 0;
-    const i = parseFloat(irpfPerc) || 0;
+    const b = parseFloat((bruto || 0).toString().replace(',', '.')) || 0;
+    const i = parseFloat((irpfPerc || 0).toString().replace(',', '.')) || 0;
     if (b <= 0) return 0;
     return b - (b * (i / 100));
 }
 
-
-// Cargar cursos y pagadores
-async function load(){
-  const [data, pagadoresData] = await Promise.all([GET(), GET_COMPANIES()]);
-  
-  courses = [];
-  if(data) {
-      for(const k in data) {
-          const course = data[k];
-          course.importeBruto = course.importeBruto || course.importe; 
-          course.importeNeto = calculateNetoValue(course.importeBruto, course.irpf);
-
-          courses.push({key:k, ...course});
-      }
-  }
-  courses.sort((a,b)=> new Date(b.inicio) - new Date(a.inicio));
-
-  masterCompanies = Array.isArray(pagadoresData) ? pagadoresData : [];
-  
-  // Sincronizar pagadores
-  const existingPagadoresInCourses = new Set(courses.map(c => c.empresa || c.pagador).filter(e => e));
-  let needsUpdate = false;
-  existingPagadoresInCourses.forEach(comp => {
-      if (comp && !masterCompanies.includes(comp)) {
-          masterCompanies.push(comp);
-          needsUpdate = true;
-      }
-  });
-
-  if (needsUpdate) {
-      await PUT_COMPANIES(masterCompanies.sort()); 
-  }
-  
-  updateFilters(); 
-  renderStats(); 
-  render(); 
-}
-
-function updateFilters(){
+function updateFilters() {
     const pagadores = masterCompanies.sort();
 
     // 1. Años de Inicio
@@ -790,9 +873,13 @@ function updateFilters(){
         
     // 3. Pagadores para el Datalist del Formulario Superior
     document.getElementById('pagadoresListForm').innerHTML = pagadores.map(e => `<option value="${e}">`).join('');
+    
+    // 4. Tipos Curso para el Datalist del Formulario Superior
+    const tiposCurso = masterTiposCurso.sort();
+    document.getElementById('tipoCursosListForm').innerHTML = tiposCurso.map(t => `<option value="${t}">`).join('');
 }
 
-function renderStats(){
+function renderStats() {
     const selectedYear = filterInicioYear.value; 
     const selectedPagador = filterPagador.value;
 
@@ -805,63 +892,65 @@ function renderStats(){
     const totalImporte = filteredCourses.reduce((sum, c) => sum + (parseFloat(c.importeNeto) || 0), 0);
     const totalHoras = filteredCourses.reduce((sum, c) => sum + (parseFloat(c.horas) || 0), 0);
 
-    document.getElementById('totalImporte').textContent = `${totalImporte.toFixed(2)} €`;
-    document.getElementById('totalHoras').textContent = `${totalHoras.toFixed(2)} h`;
+    document.getElementById('totalImporte').textContent = `${totalImporte.toFixed(2).replace('.', ',')} €`;
+    document.getElementById('totalHoras').textContent = `${totalHoras.toFixed(2).replace('.', ',')} h`;
 }
 
+function render() {
+    if (courses.length === 0) { 
+        tbody.innerHTML = "<tr><td colspan='11' style='text-align:center;'>No hay cursos</td></tr>"; 
+        return; 
+    }
+    
+    tbody.innerHTML = courses.map((c, i) => {
+        const statusSpan = c.cobrado === "COBRADO" ? 
+            "<span class='status-cobrado'>COBRADO</span>" : 
+            "<span class='status-pendiente'>PENDIENTE</span>";
+        const pagadorName = c.empresa || c.pagador || "";
+        const lugar = c.lugarCelebracion || ""; 
+        const importeDisplay = (parseFloat(c.importeNeto) || 0).toFixed(2).replace('.', ','); 
+        const isAlert = c.alerta ? ' alert' : ''; 
+        const tipoCursoDisplay = c.tipoCurso || ""; 
 
-// Función principal para renderizar la tabla
-function render(){
-  if(courses.length===0){ tbody.innerHTML="<tr><td colspan=11 style=\"text-align:center;\">No hay cursos</td></tr>"; return; }
-  tbody.innerHTML = courses.map((c,i)=>{
-      const statusSpan = c.cobrado==="COBRADO" ? "<span class='status-cobrado'>COBRADO</span>" : "<span class='status-pendiente'>PENDIENTE</span>";
-      const pagadorName = c.empresa || c.pagador || "";
-      const lugar = c.lugarCelebracion || ""; 
-      const importeDisplay = (parseFloat(c.importeNeto) || 0).toFixed(2); 
-      const isAlert = c.alerta ? ' alert' : ''; 
-
-      return `
-        <tr>
-          <td>${i+1}</td>
-          <td>${c.inicio||""}</td>
-          <td>${c.fin||""}</td>
-          <td>${pagadorName}</td> 
-          <td>${lugar}</td> 
-          <td>${c.horas||""}</td>
-          <td>${importeDisplay} €</td> 
-          <td>${statusSpan}</td> 
-          <td>${c.fechaCobro||""}</td>
-          <td>${c.renta||""}</td>
-          <td class="action-btns">
-            <button class="obs-btn${isAlert}" onclick="showObs('${c.key}')" title="Ver Detalles Adicionales">👁</button>
-            <button class="edit-btn" onclick="editCourse('${c.key}')" title="Editar Curso Completo"><i class="fas fa-edit"></i></button>
-            <button class="delete-btn" onclick="delCourse('${c.key}')" title="Eliminar"><i class="fas fa-trash"></i></button>
-          </td>
-        </tr>`;
-  }).join("");
+        return `
+            <tr>
+                <td>${i+1}</td>
+                <td>${c.inicio||""}</td>
+                <td>${tipoCursoDisplay}</td> 
+                <td>${pagadorName}</td> 
+                <td>${lugar}</td> 
+                <td>${c.horas||""}</td>
+                <td>${importeDisplay} €</td> 
+                <td>${statusSpan}</td> 
+                <td>${c.fechaCobro||""}</td>
+                <td>${c.renta||""}</td>
+                <td class="action-btns">
+                    <button class="obs-btn${isAlert}" onclick="showObs('${c.key}')" title="Ver Detalles Adicionales">👁</button>
+                    <button class="edit-btn" onclick="editCourse('${c.key}')" title="Editar Curso Completo"><i class="fas fa-edit"></i></button>
+                    <button class="delete-btn" onclick="delCourse('${c.key}')" title="Eliminar"><i class="fas fa-trash"></i></button>
+                </td>
+            </tr>`;
+    }).join("");
 }
 
 // --- LÓGICA DE NAVEGACIÓN Y EDICIÓN ---
-
-// Función que abre el formulario superior y carga los datos para edición
 window.editCourse = key => {
     const c = courses.find(x => x.key === key);
     if (!c) return;
     
-    // 1. Limpiar estado primero (Esto garantiza que el courseKeyInput se ponga en vacío)
     closeFormModal(); 
     
-    // 2. Establecer la clave de edición *después* de la limpieza
     editingKey = key; 
     courseKeyInput.value = key; 
     
-    // 3. Poblar los campos 
     inicio.value = c.inicio || "";
     fin.value = c.fin || "";
+    nombreCurso.value = c.nombreCurso || "";
+    tipoCurso.value = c.tipoCurso || ""; 
     pagador.value = c.empresa || c.pagador || ""; 
-    horas.value = c.horas || "";
-    importeBruto.value = (parseFloat(c.importeBruto) || 0).toFixed(2);
-    irpf.value = (parseFloat(c.irpf) || 0).toFixed(2);
+    horas.value = (parseFloat(c.horas) || 0).toFixed(2).replace('.', ',');
+    importeBruto.value = (parseFloat(c.importeBruto) || 0).toFixed(2).replace('.', ',');
+    irpf.value = (parseFloat(c.irpf) || 0).toFixed(2).replace('.', ',');
     cobrado.value = c.cobrado || "PENDIENTE";
     fechaCobro.value = c.fechaCobro || "";
     renta.value = c.renta || "";
@@ -871,34 +960,65 @@ window.editCourse = key => {
     asistentes.value = c.asistentes || "";
     alerta.checked = c.alerta || false; 
 
-    // 4. CALCULAR NETO Y PRECIOS/HORA
-    calculateNeto(); 
+    const h = getNumericValue(horas); 
+    const bruto = getNumericValue(importeBruto); 
     
-    // Guardar estado inicial del formulario para la detección de cambios
+    if (h > 0 && bruto > 0) {
+        precioHoraBruto.value = (bruto / h).toFixed(2).replace('.', ',');
+    } else {
+        precioHoraBruto.value = (0).toFixed(2).replace('.', ',');
+    }
+
+    calculateNetoOnly(); 
+    
     initialFormData = getFormData();
 
-    // 5. Actualizar la interfaz del formulario
-    document.getElementById('formTitle').textContent = `Editar Curso #${courses.findIndex(x => x.key === key) + 1}`;
-    document.getElementById('btnSubmitCourse').textContent = 'Guardar Cambios';
-    document.getElementById('btnCancelEdit').style.display = 'inline-block';
+    // CORRECCIÓN: Usar el título del curso si existe, sino el nombre del curso
+    const cursoTitulo = c.tituloCurso || c.nombreCurso || "Curso sin nombre";
+    formTitleText.textContent = `Editar Curso: ${cursoTitulo}`;
+    formTitleInput.value = `Editar Curso: ${cursoTitulo}`;
     
-    // 6. Configurar botones de navegación
+    document.getElementById('btnSubmitCourse').textContent = 'Guardar Cambios';
+    
     updateNavigationButtons(key);
 
-    // 7. Mostrar el modal
     formModal.classList.add('visible');
 };
 
-// Navegación (dir: -1 para Anterior, 1 para Siguiente)
+function getFormData() {
+    const currentData = {
+        inicio: inicio.value,
+        fin: fin.value,
+        nombreCurso: nombreCurso.value,
+        tipoCurso: tipoCurso.value, 
+        pagador: pagador.value, 
+        horas: horas.value, 
+        precioHoraBruto: precioHoraBruto.value,
+        importeBruto: importeBruto.value, 
+        irpf: irpf.value, 
+        importeNeto: importeNetoCobrado.value, 
+        cobrado: cobrado.value, 
+        fechaCobro: fechaCobro.value,
+        renta: renta.value, 
+        observaciones: observaciones.value,
+        lugarCelebracion: lugarCelebracion.value,
+        horario: horario.value,
+        asistentes: asistentes.value,
+        alerta: alerta.checked,
+        tituloCurso: formTitleInput.value.replace('Editar Curso: ', '') // CORRECCIÓN: Guardar solo el título sin el prefijo
+    };
+    return currentData;
+}
+
 window.navigateCourse = dir => {
-    // Usamos courseKeyInput.value para obtener la clave actual (más fiable)
     const currentKey = courseKeyInput.value;
     if (!currentKey) return;
 
-    // Lógica para detectar si hay cambios ANTES de navegar
+    calculateBrutoAndNeto(); 
+    calculateNetoOnly(); 
+    
     const currentData = getFormData();
     
-    // Si hay un guardado exitoso y el mensaje está visible, lo cerramos para permitir navegar
     if (isSaveSuccess) {
         closeFormModal(); 
         const currentIndex = courses.findIndex(c => c.key === currentKey);
@@ -910,7 +1030,6 @@ window.navigateCourse = dir => {
         return; 
     }
     
-    // Si no hay guardado exitoso activo, comprobamos si hay cambios
     const changed = JSON.stringify(currentData) !== JSON.stringify(initialFormData);
     if (changed) {
          if (!confirm("Hay cambios sin guardar. ¿Moverse a otro curso y perder los cambios?")) {
@@ -927,48 +1046,44 @@ window.navigateCourse = dir => {
     }
 };
 
-
-// Habilitar/Deshabilitar botones de navegación
 function updateNavigationButtons(currentKey) {
     const currentIndex = courses.findIndex(c => c.key === currentKey);
-
-    // Los botones de navegación solo aparecen en modo edición
     btnPrevCourse.style.display = 'inline-block';
     btnNextCourse.style.display = 'inline-block';
-    
-    // Deshabilitar si está en el primer/último elemento
     btnPrevCourse.disabled = currentIndex === 0;
     btnNextCourse.disabled = currentIndex === courses.length - 1;
 }
 
 // --- MODALES Y EXPORTACIÓN ---
-
-// Modal Observaciones (Muestra también Importe Bruto e IRPF, además del Neto)
 function showObs(key){ 
     const c = courses.find(x => x.key === key);
     if (!c) return;
 
-    // Calcular precios por hora para el modal
-    const h = parseFloat(c.horas) || 0;
-    const bruto = parseFloat(c.importeBruto) || 0;
-    const neto = parseFloat(c.importeNeto) || 0;
-    const precioHBruto = h > 0 ? (bruto / h).toFixed(2) : "N/A";
-    const precioHNeto = h > 0 ? (neto / h).toFixed(2) : "N/A";
+    const h = parseFloat(c.horas || 0);
+    const bruto = parseFloat(c.importeBruto || 0);
+    const neto = parseFloat(c.importeNeto || 0);
+    const irpfPerc = parseFloat(c.irpf || 0);
+    
+    const precioHBruto = h > 0 ? (bruto / h).toFixed(2) : "0.00";
+    const precioHNeto = h > 0 ? (neto / h).toFixed(2) : "0.00";
 
     const alertaStatus = c.alerta ? 
         '<p style="color:var(--accent-red); font-weight:700;"><i class="fas fa-exclamation-triangle"></i> ¡ALERTA! Incidencia Marcada</p>' : 
         '<p style="color:var(--accent-green);">Sin incidencias marcadas.</p>';
 
+    const format = (value) => (value || 0).toString().replace('.', ',');
 
     const details = `
         ${alertaStatus}
         <hr style="border-top: 1px solid rgba(0,0,0,0.1); margin-top: 15px;">
-        <p><strong>Importe Bruto:</strong> ${(parseFloat(c.importeBruto) || 0).toFixed(2)} €</p>
-        <p><strong>IRPF Aplicado:</strong> ${(parseFloat(c.irpf) || 0).toFixed(2)} %</p>
-        <p><strong>Total Cobrado (Neto):</strong> <strong style="color:var(--accent-green);">${(parseFloat(c.importeNeto) || 0).toFixed(2)} €</strong></p>
+        <p><strong>Nombre del Curso:</strong> ${c.nombreCurso || 'N/A'}</p>
+        <p><strong>Tipo de Curso:</strong> ${c.tipoCurso || 'N/A'}</p>
+        <p><strong>Importe Bruto:</strong> ${format(bruto.toFixed(2))} €</p>
+        <p><strong>IRPF Aplicado:</strong> ${format(irpfPerc.toFixed(2))} %</p>
+        <p><strong>Total Cobrado (Neto):</strong> <strong style="color:var(--accent-green);">${format(neto.toFixed(2))} €</strong></p>
         <hr style="border-top: 1px solid rgba(0,0,0,0.1); margin-top: 15px;">
-        <p><strong>Precio/Hora (Bruto):</strong> ${precioHBruto} €</p>
-        <p><strong>Importe/Hora (Neto):</strong> ${precioHNeto} €</p>
+        <p><strong>Precio/Hora (Bruto):</strong> ${format(precioHBruto)} €</p>
+        <p><strong>Importe/Hora (Neto):</strong> ${format(precioHNeto)} €</p>
         <hr style="border-top: 1px solid rgba(0,0,0,0.1); margin-top: 15px;">
         <p><strong>Lugar de Celebración:</strong> ${c.lugarCelebracion || 'N/A'}</p>
         <p><strong>Horario:</strong> ${c.horario || 'N/A'}</p>
@@ -991,15 +1106,13 @@ function showObs(key){
 function closeObsModal(){ document.getElementById('obsModal').style.display="none"; }
 window.showObs = showObs; window.closeObsModal = closeObsModal;
 
-
-// Exportar a Excel (CSV)
 function exportToExcel() {
-    const headers = ["ID", "Inicio", "Fin", "Pagador", "Lugar Celebración", "Horas", "Importe Bruto", "IRPF (%)", "Importe Neto Cobrado", "Precio Hora Bruto", "Importe Hora Neto", "Pago", "Detalle Cobro", "Año Renta", "Horario", "Asistentes", "Observaciones", "Alerta"];
+    const headers = ["ID", "Inicio", "Fin", "Nombre Curso", "Tipo Curso", "Pagador", "Lugar Celebración", "Horas", "Importe Bruto", "IRPF (%)", "Importe Neto Cobrado", "Precio Hora Bruto", "Importe Hora Neto", "Pago", "Detalle Cobro", "Año Renta", "Horario", "Asistentes", "Observaciones", "Alerta"];
     
     const csvData = courses.map((c, index) => {
-        const h = parseFloat(c.horas) || 0;
-        const bruto = parseFloat(c.importeBruto) || 0;
-        const neto = parseFloat(c.importeNeto) || 0;
+        const h = parseFloat(c.horas || 0);
+        const bruto = parseFloat(c.importeBruto || 0);
+        const neto = parseFloat(c.importeNeto || 0);
         const precioHBruto = h > 0 ? (bruto / h).toFixed(2) : 0;
         const precioHNeto = h > 0 ? (neto / h).toFixed(2) : 0;
 
@@ -1007,12 +1120,14 @@ function exportToExcel() {
             index + 1,
             `"${c.inicio || ''}"`,
             `"${c.fin || ''}"`,
+            `"${(c.nombreCurso || '').replace(/"/g, '""')}"`,
+            `"${(c.tipoCurso || '').replace(/"/g, '""')}"`, 
             `"${(c.empresa || c.pagador || '').replace(/"/g, '""')}"`, 
             `"${(c.lugarCelebracion || '').replace(/"/g, '""')}"`, 
-            c.horas || 0,
-            c.importeBruto || 0,
+            h,
+            bruto,
             c.irpf || 0,
-            (parseFloat(c.importeNeto) || 0).toFixed(2), 
+            neto.toFixed(2), 
             precioHBruto,
             precioHNeto,
             c.cobrado || 'PENDIENTE',
@@ -1042,14 +1157,12 @@ function exportToExcel() {
 }
 window.exportToExcel = exportToExcel;
 
-// --- Lógica para Eliminar Pagadores No Usados ---
 window.cleanUnusedPagadores = async () => {
     if (!confirm("¿Está seguro de que desea eliminar todos los pagadores que NO están asignados a ningún curso en la tabla?")) {
         return;
     }
     
     const pagadoresUsados = new Set(courses.map(c => c.empresa || c.pagador).filter(e => e));
-    
     const pagadoresUsadosArray = Array.from(pagadoresUsados).filter(Boolean); 
     const pagadoresAntiguos = masterCompanies.filter(p => !pagadoresUsadosArray.includes(p));
     
@@ -1059,7 +1172,10 @@ window.cleanUnusedPagadores = async () => {
     }
     
     masterCompanies = pagadoresUsadosArray.sort();
-    await PUT_COMPANIES(masterCompanies); 
+    await fetch(`${BASE}/EMPRESAS.json`, {
+        method: 'PUT',
+        body: JSON.stringify(masterCompanies)
+    });
     
     alert(`Se han eliminado ${pagadoresAntiguos.length} pagadores antiguos: ${pagadoresAntiguos.join(', ')}.`);
     
@@ -1067,87 +1183,191 @@ window.cleanUnusedPagadores = async () => {
     renderStats(); 
     render(); 
 };
-window.cleanUnusedPagadores = cleanUnusedPagadores;
-
 
 // CRUD (Formulario Modal - Añadir y Editar)
-form.onsubmit = async e=>{
-  e.preventDefault();
-  
-  // 1. Recalcular y asegurar valores finales del neto y precios/hora
-  calculateNeto();
-  const importeNeto = parseFloat(importeNetoCobrado.value) || 0;
-  
-  // 2. Recoger todos los campos
-  const obj = {
-    inicio:inicio.value, 
-    fin:fin.value, 
-    empresa:pagador.value, 
-    pagador:pagador.value, 
-    horas:horas.value, 
-    importeBruto:importeBruto.value, 
-    irpf:irpf.value,
-    importeNeto: importeNeto.toFixed(2), 
-    cobrado:cobrado.value, 
-    fechaCobro:fechaCobro.value,
-    renta:renta.value, 
-    observaciones:observaciones.value,
-    lugarCelebracion:lugarCelebracion.value,
-    horario:horario.value,
-    asistentes:asistentes.value,
-    alerta:alerta.checked
-  };
-  
-  // 3. Manejar nuevo Pagador
-  if (obj.empresa && !masterCompanies.includes(obj.empresa)) {
-      masterCompanies.push(obj.empresa);
-      await PUT_COMPANIES(masterCompanies.sort());
-  }
-  
-  // CORRECCIÓN CRÍTICA: Obtenemos la clave de edición del campo oculto. Es la fuente más fiable.
-  const keyToUpdate = courseKeyInput.value;
+form.onsubmit = async e => {
+    e.preventDefault();
+    
+    calculateBrutoAndNeto();
+    calculateNetoOnly();
+    
+    const horasValue = getNumericValue(horas);
+    const importeBrutoValue = getNumericValue(importeBruto);
+    const irpfValue = getNumericValue(irpf);
+    const importeNetoValue = getNumericValue(importeNetoCobrado);
 
-  // 4. Guardar datos: Si existe una clave (modificando), ACTUALIZAMOS (PUT), si no, CREAMOS (POST)
-  if(keyToUpdate){ 
-      // Sincronizamos la variable global (necesaria para la navegación y cancelación)
-      editingKey = keyToUpdate; 
-      
-      await PUT(keyToUpdate, obj); 
-      
-      // Mostrar feedback de guardado (verde) INMEDIATAMENTE
-      displayStatus("¡Se han realizado los cambios con éxito!", "success");
-      isSaveSuccess = true; 
-      
-      // FIX: Pequeño retraso para forzar el renderizado del mensaje
-      await new Promise(r => setTimeout(r, 50)); 
-      
-      // Actualizar la tabla principal y los datos internos (esperamos a que se complete)
-      await load(); 
-      
-      // 5. Actualizar el estado inicial para que coincida con lo que acabamos de guardar
-      initialFormData = getFormData();
-      
-      // REQ: Auto-cierre del modal 2 segundos DESPUÉS de que se haya actualizado la tabla
-      if (successTimeout) clearTimeout(successTimeout); 
-      successTimeout = setTimeout(closeFormModal, 2000); // 2 segundos antes de cerrar
+    // CORRECCIÓN: Sincronización final antes de guardar
+    const tituloFinal = formTitleInput.value.replace('Editar Curso: ', '');
+    if (nombreCursoInput.value !== tituloFinal) {
+        nombreCursoInput.value = tituloFinal;
+    }
 
-  }
-  else { 
-      await POST(obj); 
-      closeFormModal(); 
-      await load(); // Recargar la tabla tras añadir
-  }
+    const obj = {
+        inicio: inicio.value, 
+        fin: fin.value, 
+        nombreCurso: nombreCursoInput.value, // Usar el valor sincronizado
+        tipoCurso: tipoCurso.value, 
+        empresa: pagador.value, 
+        pagador: pagador.value, 
+        horas: horasValue,
+        importeBruto: importeBrutoValue,
+        irpf: irpfValue,
+        importeNeto: importeNetoValue.toFixed(2),
+        cobrado: cobrado.value, 
+        fechaCobro: fechaCobro.value,
+        renta: renta.value, 
+        observaciones: observaciones.value,
+        lugarCelebracion: lugarCelebracion.value,
+        horario: horario.value,
+        asistentes: asistentes.value,
+        alerta: alerta.checked,
+        tituloCurso: tituloFinal // Guardar también el título por separado
+    };
+    
+    if (obj.empresa && !masterCompanies.includes(obj.empresa)) {
+        masterCompanies.push(obj.empresa);
+        await fetch(`${BASE}/EMPRESAS.json`, {
+            method: 'PUT',
+            body: JSON.stringify(masterCompanies.sort())
+        });
+    }
+    
+    if (obj.tipoCurso && !masterTiposCurso.includes(obj.tipoCurso)) {
+        masterTiposCurso.push(obj.tipoCurso);
+        await fetch(`${BASE}/TIPOS_CURSO.json`, {
+            method: 'PUT',
+            body: JSON.stringify(masterTiposCurso.sort())
+        });
+    }
+    
+    const keyToUpdate = courseKeyInput.value;
+
+    if (keyToUpdate) { 
+        editingKey = keyToUpdate; 
+        // CORRECCIÓN: Guardar en FORMACION directamente
+        await fetch(`${BASE}/FORMACION/${keyToUpdate}.json`, {
+            method: 'PUT',
+            body: JSON.stringify(obj)
+        });
+        
+        displayStatus("¡Se han realizado los cambios con éxito!", "success");
+        isSaveSuccess = true; 
+        
+        await new Promise(r => setTimeout(r, 50)); 
+        await load(); 
+        initialFormData = getFormData();
+        
+        if (successTimeout) clearTimeout(successTimeout); 
+        successTimeout = setTimeout(closeFormModal, 2000);
+    } else { 
+        // CORRECCIÓN: Guardar en FORMACION directamente
+        await fetch(`${BASE}/FORMACION.json`, {
+            method: 'POST',
+            body: JSON.stringify(obj)
+        });
+        closeFormModal(); 
+        await load(); 
+    }
 };
 
-window.delCourse = async key=>{
-  if(confirm("¿Eliminar curso?")){ await DEL(key); load(); }
+function displayStatus(message, type) {
+    statusMessageContainer.textContent = message;
+    if (type === "success") {
+        statusMessageContainer.style.backgroundColor = '#d4edda'; 
+        statusMessageContainer.style.color = '#155724'; 
+        statusMessageContainer.style.border = '1px solid #c3e6cb';
+    } else if (type === "warning") {
+        statusMessageContainer.style.backgroundColor = '#f8d7da'; 
+        statusMessageContainer.style.color = '#721c24'; 
+        statusMessageContainer.style.border = '1px solid #f5c6cb';
+    }
+    statusMessageContainer.style.display = 'block';
+}
+
+function clearStatus() {
+    statusMessageContainer.style.display = 'none';
+    statusMessageContainer.textContent = '';
+}
+
+function closeFormModal() {
+    editingKey = null;
+    courseKeyInput.value = '';
+    form.reset();
+    importeNetoCobrado.value = (0).toFixed(2).replace('.', ',');
+    importeBruto.value = (0).toFixed(2).replace('.', ',');
+    precioHoraBruto.value = (0).toFixed(2).replace('.', ',');
+    importeHoraNeto.value = (0).toFixed(2).replace('.', ','); 
+    irpf.value = (0).toFixed(2).replace('.', ',');
+    
+    formTitleText.textContent = 'Agregar Curso';
+    formTitleInput.value = 'Agregar Curso';
+    
+    formModal.classList.remove('visible'); 
+    clearStatus(); 
+    
+    if (successTimeout) { 
+        clearTimeout(successTimeout);
+        successTimeout = null;
+    }
+    isSaveSuccess = false;
+}
+window.closeFormModal = closeFormModal; 
+
+window.handleCancelEdit = () => {
+    const currentKey = courseKeyInput.value; 
+
+    if (!currentKey) {
+        closeFormModal();
+        return;
+    }
+
+    if (isSaveSuccess) {
+        closeFormModal(); 
+        return;
+    }
+    
+    calculateBrutoAndNeto(); 
+    calculateNetoOnly();
+    
+    const currentData = getFormData();
+    const changed = JSON.stringify(currentData) !== JSON.stringify(initialFormData); 
+
+    if (changed) {
+        if (confirm("Hay cambios sin guardar. ¿Cerrar de todos modos?")) {
+            closeFormModal();
+        }
+    } else {
+        displayStatus("No se efectuó ningún cambio.", "warning");
+        setTimeout(closeFormModal, 1500); 
+    }
 };
 
-// Exponer funciones globales necesarias
+function resetFormForAdd() {
+    closeFormModal();
+    document.getElementById('btnSubmitCourse').textContent = 'Guardar';
+    document.getElementById('btnCancelEdit').style.display = 'inline-block';
+    btnPrevCourse.style.display = 'none';
+    btnNextCourse.style.display = 'none';
+    formModal.classList.add('visible');
+}
+
+btnToggleForm.onclick = resetFormForAdd;
+
+window.delCourse = async key => {
+    if (confirm("¿Eliminar curso?")) { 
+        // CORRECCIÓN: Eliminar de FORMACION directamente
+        await fetch(`${BASE}/FORMACION/${key}.json`, {
+            method: 'DELETE'
+        });
+        load(); 
+    }
+};
+
 window.delCourse = delCourse;
 window.renderStats = renderStats;
 window.editCourse = editCourse;
 
+// Inicializar la aplicación
 load();
 </script>
 </body>

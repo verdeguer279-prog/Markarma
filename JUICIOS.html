@@ -19,6 +19,9 @@
       --accent-yellow: #ffc107;
       --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
     }
+    * {
+      box-sizing: border-box;
+    }
     body {
       font-family: 'Poppins', sans-serif;
       background: var(--bg-dark);
@@ -27,10 +30,9 @@
       padding: 0;
     }
     .wrap {
-      max-width: 1200px;
-      margin: 32px auto;
-      padding: 0 16px;
-      box-sizing: border-box;
+      max-width: 1400px; /* AUMENTADO de 1200px a 1400px */
+      margin: 20px auto;
+      padding: 0 20px;
     }
     header {
       display: flex;
@@ -83,6 +85,7 @@
       border-radius: 12px;
       padding: 24px;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      width: 100%;
     }
     .actions {
         display: flex;
@@ -105,7 +108,6 @@
       color: var(--text-light);
       padding: 12px;
       border-radius: 8px;
-      box-sizing: border-box;
       transition: all 0.3s ease;
     }
     input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus, select:focus, textarea:focus {
@@ -124,7 +126,6 @@
       cursor: pointer;
       font-weight: bold;
       transition: transform 0.2s, box-shadow 0.2s;
-      box-sizing: border-box;
     }
     .btn-primary {
       background: var(--accent-gradient);
@@ -158,51 +159,82 @@
       background-color: var(--accent-yellow);
       color: #000;
     }
-    table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+
+    /* TABLA MEJORADA */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 1.5rem;
+    }
+    table { 
+      width: 100%; 
+      border-collapse: collapse;
+      min-width: 1000px; /* Mínimo ancho para evitar cortes */
+    }
     th, td {
       border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 12px;
+      padding: 12px 8px;
       text-align: left;
+      white-space: nowrap;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     th {
       background: rgba(255, 255, 255, 0.05);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
     }
-    td.status-pendiente { color: var(--accent-red); }
-    td.status-celebrado { color: var(--accent-green); }
-    td.status-suspendido { color: var(--accent-blue); }
 
-    /* --- NUEVO ESTILO PARA JUICIOS SUSPENDIDOS --- */
+    /* ANCHOS OPTIMIZADOS PARA COLUMNAS */
+    th:nth-child(1), td:nth-child(1) { width: 110px; min-width: 110px; } /* Fecha */
+    th:nth-child(2), td:nth-child(2) { width: 80px; min-width: 80px; } /* Hora */
+    th:nth-child(3), td:nth-child(3) { width: 150px; min-width: 150px; } /* Juzgado */
+    th:nth-child(4), td:nth-child(4) { width: 140px; min-width: 140px; } /* Entrega */
+    th:nth-child(5), td:nth-child(5) { width: 120px; min-width: 120px; } /* Mes Cobro */
+    th:nth-child(6), td:nth-child(6) { width: 110px; min-width: 110px; } /* Estado */
+    th:nth-child(7), td:nth-child(7) { width: 280px; min-width: 280px; } /* Acciones */
+
+    /* ESTADOS MEJORADOS */
+    .status-pendiente { color: var(--accent-red); font-weight: bold; }
+    .status-celebrado { color: var(--accent-green); font-weight: bold; }
+    .status-suspendido { color: var(--accent-blue); font-weight: bold; }
+    .status-webex { color: var(--accent-yellow); font-weight: bold; }
+
+    /* JUICIOS SUSPENDIDOS */
     tr.is-suspended {
-        text-decoration: line-through; /* Tacha el texto */
-        opacity: 0.6; /* Atenúa la fila */
+        text-decoration: line-through;
+        opacity: 0.6;
     }
     tr.is-suspended .action-item {
-        text-decoration: none; /* Asegura que los botones no se tachen */
+        text-decoration: none;
     }
-    /* ------------------------------------------ */
 
+    /* BOTONES DE ACCIÓN MEJORADOS */
     .action-buttons {
       display: flex;
-      gap: 5px;
+      gap: 6px;
       flex-wrap: nowrap;
       align-items: center;
       justify-content: flex-start;
     }
     .action-item {
-        padding: 10px 15px;
-        border-radius: 8px;
+        padding: 8px 12px;
+        border-radius: 6px;
         font-weight: bold;
         text-decoration: none;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        min-width: 90px;
-        box-sizing: border-box;
+        min-width: 70px;
         border: 1px solid rgba(255, 255, 255, 0.2);
         color: var(--text-light);
         background-color: transparent;
         transition: all 0.2s ease;
         cursor: pointer;
+        font-size: 0.8rem;
+        white-space: nowrap;
     }
     .action-item.danger {
         background-color: var(--accent-red);
@@ -211,17 +243,32 @@
     }
     .action-item:hover {
         background-color: rgba(255, 255, 255, 0.1);
+        transform: translateY(-1px);
     }
     .action-item.danger:hover {
         background-color: #bd2130;
     }
     .action-item.has-link {
         color: var(--accent-blue);
+        text-decoration: none;
     }
-    td.action-cell {
-      min-width: 380px;
-      vertical-align: middle;
+    .action-item.has-link:hover {
+        background-color: rgba(0, 123, 255, 0.1);
     }
+
+    /* ESTILOS ESPECIALES */
+    .status-nocobrado {
+        color: var(--accent-red);
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
+    .status-noentregada {
+        color: var(--accent-red);
+        font-weight: bold;
+        font-size: 0.85rem;
+    }
+
+    /* MODALES */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -246,6 +293,8 @@
       max-width: 800px;
       transform: scale(0.95);
       transition: transform 0.3s ease-out;
+      max-height: 90vh;
+      overflow-y: auto;
     }
     .modal-overlay.open .modal { transform: scale(1); }
     .modal-header {
@@ -279,68 +328,78 @@
       border-top: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 0 0 12px 12px;
     }
-    .status-nocobrado {
-        color: var(--accent-red);
-        font-weight: bold;
-    }
-    .status-noentregada {
-        color: var(--accent-red);
-        font-weight: bold;
-    }
-    .col-fecha, .col-entrega, .col-mes-cobro {
-      white-space: nowrap;
-    }
-    td.action-cell {
-        vertical-align: middle;
-    }
+
     .form-actions-top {
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: flex-start;
         margin-bottom: 20px;
+        gap: 20px;
     }
     .form-actions-top .btn-primary {
         margin-left: 10px;
+        white-space: nowrap;
     }
+    .file-inputs {
+        flex: 1;
+        min-width: 0;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .wrap {
+        max-width: 100%;
+        margin: 10px auto;
+        padding: 0 15px;
+      }
+      
+      .form-actions-top {
+        flex-direction: column;
+      }
+      .form-actions-top .btn-primary {
+        margin-left: 0;
+        margin-top: 10px;
+        align-self: flex-end;
+      }
+      
+      .actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .filter-buttons {
+        width: 100%;
+        justify-content: stretch;
+      }
+      .filter-buttons button {
+        flex-grow: 1;
+      }
+    }
+
     @media (max-width: 600px) {
-      .wrap { margin: 16px auto; padding: 0 10px; }
-      header { flex-direction: column; text-align: center; }
-      .header-left { flex-direction: column; text-align: center; gap: 10px; }
+      header { 
+        flex-direction: column; 
+        text-align: center; 
+      }
+      .header-left { 
+        flex-direction: column; 
+        text-align: center; 
+        gap: 10px; 
+      }
       .title { margin-top: 10px; }
-      .actions { flex-direction: column; align-items: stretch; }
-      .filter-buttons { width: 100%; justify-content: stretch; }
-      .filter-buttons button { flex-grow: 1; }
-      table, thead, tbody, th, td, tr {
-        display: block;
+      
+      .table-container {
+        font-size: 0.8rem;
       }
-      thead tr { position: absolute; top: -9999px; left: -9999px; }
-      td {
-        border: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        position: relative;
-        padding-left: 50%;
-        text-align: right;
-      }
-      td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 0;
-        width: 50%;
-        padding-left: 10px;
-        font-weight: bold;
-        text-align: left;
-      }
-      td.action-cell {
-        min-width: unset;
-      }
+      
       .action-buttons {
-          flex-wrap: wrap;
-          justify-content: center;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
       }
       .action-item {
-        min-width: unset;
-        flex: 1 1 auto;
-        max-width: 100%;
+        min-width: 60px;
+        padding: 6px 8px;
+        font-size: 0.75rem;
       }
     }
   </style>
@@ -368,7 +427,7 @@
             <button id="btnExport" class="btn-ghost button">Exportar a Excel</button>
         </div>
 
-        <div id="results-table">
+        <div class="table-container">
             <table id="juicios-table">
               <thead>
                 <tr>
@@ -382,12 +441,14 @@
                 </tr>
               </thead>
               <tbody id="juicios-body">
-                </tbody>
+                <!-- Los datos se cargarán aquí -->
+              </tbody>
             </table>
         </div>
     </div>
   </div>
 
+  <!-- Modal para añadir/editar juicios -->
   <div id="dlgNuevo" class="modal-overlay">
     <div class="modal">
       <div class="modal-header">
@@ -439,6 +500,7 @@
                     <option value="pendiente">Pendiente</option>
                     <option value="celebrado">Celebrado</option>
                     <option value="suspendido">Suspendido</option>
+                    <option value="webex">Webex</option>
                 </select>
             </div>
             <div class="form-actions-top">
@@ -460,6 +522,7 @@
     </div>
   </div>
 
+  <!-- Modal de mensajes -->
   <div id="dlgMessage" class="modal-overlay">
     <div class="modal">
       <div class="modal-header">
@@ -548,7 +611,7 @@
       filteredJuicios.forEach(juicio => {
         const tr = document.createElement("tr");
         let statusClass, statusText;
-        let rowClass = ''; // <<--- AÑADIDO: Variable para la clase de la fila
+        let rowClass = '';
         
         switch (juicio.estado) {
             case 'celebrado':
@@ -558,14 +621,18 @@
             case 'suspendido':
                 statusClass = 'status-suspendido';
                 statusText = 'Suspendido';
-                rowClass = 'is-suspended'; // <<--- MODIFICADO: Añade la clase 'is-suspended'
+                rowClass = 'is-suspended';
+                break;
+            case 'webex':
+                statusClass = 'status-webex';
+                statusText = 'Webex';
                 break;
             default:
                 statusClass = 'status-pendiente';
                 statusText = 'Pendiente';
         }
         
-        tr.className = rowClass; // <<--- MODIFICADO: Aplica la clase a la fila (<tr>)
+        tr.className = rowClass;
 
         const mesCobroContent = juicio.mesCobro && juicio.mesCobro !== "" ? juicio.mesCobro : '<span class="status-nocobrado">NO COBRADO</span>';
         const fechaEntregaContent = juicio.fechaEntrega && juicio.fechaEntrega !== "" ? juicio.fechaEntrega : '<span class="status-noentregada">NO ENTREGADA</span>';
@@ -585,13 +652,13 @@
         }
 
         tr.innerHTML = `
-          <td class="col-fecha" data-label="Fecha">${juicio.fecha}</td>
-          <td data-label="Hora">${juicio.hora}</td>
-          <td data-label="Juzgado">${juicio.juzgado}</td>
-          <td class="col-entrega" data-label="Entrega Citación">${fechaEntregaContent}</td>
-          <td data-label="Mes Cobro">${mesCobroContent}</td>
-          <td data-label="Estado" class="${statusClass}">${statusText}</td>
-          <td class="action-cell" data-label="Acciones">
+          <td>${juicio.fecha}</td>
+          <td>${juicio.hora}</td>
+          <td>${juicio.juzgado}</td>
+          <td>${fechaEntregaContent}</td>
+          <td>${mesCobroContent}</td>
+          <td class="${statusClass}">${statusText}</td>
+          <td>
             <div class="action-buttons">
               <button class="action-item button" onclick="editJuicio('${juicio.id}')">Editar</button>
               <button class="action-item danger button" onclick="deleteJuicio('${juicio.id}')">Borrar</button>

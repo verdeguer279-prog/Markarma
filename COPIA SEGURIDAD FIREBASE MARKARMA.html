@@ -53,6 +53,24 @@
         #backupNowBtn:active {
             transform: scale(0.99);
         }
+        /* ESTILO NUEVO: Botón de menú principal */
+        #mainMenuBtn {
+            background-color: #ffc107; /* Amarillo */
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 20px; /* Espacio debajo del botón */
+            text-align: center;
+            text-decoration: none; /* Quita el subrayado del enlace */
+            display: inline-block; /* Permite centrar o controlar el ancho */
+            width: 100%; /* Ocupa el ancho completo */
+            line-height: 1; /* Para centrar el texto verticalmente */
+            padding: 12px 20px; /* Mantiene el mismo padding que otros botones */
+            box-sizing: border-box; /* Asegura que el padding se incluya en el ancho */
+        }
+        #mainMenuBtn:hover {
+            background-color: #e0a800; /* Tono más oscuro al pasar el ratón */
+        }
+        /* FIN ESTILO NUEVO */
         .logs-header {
             display: flex;
             justify-content: space-between;
@@ -115,6 +133,10 @@
 <body>
     <div class="container">
         <h1>Copia de Seguridad de Firebase RDB</h1>
+        
+        <a id="mainMenuBtn" href="index.html">
+            ⬅️ Volver a Menú Principal
+        </a>
         <p>Base de datos: <strong>MARKARMA</strong></p>
         <p>⭐ **Módulo Manual:** La copia se realiza **solo** al pulsar el botón.</p>
         

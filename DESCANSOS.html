@@ -385,7 +385,7 @@
             border-color: var(--primary-color);
         }
         
-        /* Modal para permutas */
+        /* Modal para gestión de horas */
         .modal {
             display: none;
             position: fixed;
@@ -432,6 +432,83 @@
         
         .form-column-modal {
             flex: 1;
+        }
+        
+        .horas-operacion {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .btn-horas {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .btn-sumar {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .btn-sumar:hover {
+            background-color: #219653;
+        }
+        
+        .btn-restar {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .btn-restar:hover {
+            background-color: #c0392b;
+        }
+        
+        .historial-horas {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 10px;
+        }
+        
+        .item-horas {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .info-horas {
+            flex-grow: 1;
+        }
+        
+        .horas-positivas {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .horas-negativas {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .btn-editar-horas {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin-left: 10px;
+            color: var(--primary-color);
+        }
+        
+        .btn-editar-horas:hover {
+            color: var(--secondary-color);
         }
         
         .permutas-list {
@@ -522,6 +599,16 @@
             .permuta-fechas {
                 flex-direction: column;
             }
+            
+            .horas-operacion {
+                flex-direction: column;
+            }
+            
+            .item-horas {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
         }
     </style>
 </head>
@@ -556,6 +643,9 @@
                     <h3>Horas Acumuladas <span id="anio-actual-texto-3"></span></h3>
                     <div class="status-value horas-acumuladas" id="horas-acumuladas">0</div>
                     <p>Horas disponibles</p>
+                    <div class="status-buttons">
+                        <button id="btn-gestionar-horas" class="btn btn-primary btn-small">Gestionar Horas</button>
+                    </div>
                 </div>
                 <div class="status-card">
                     <h3>Días del Año Anterior</h3>
@@ -581,7 +671,8 @@
                         <h2 class="card-title-left">
                             <span>Planificación Anual</span>
                             <select id="selector-anio-config" class="selector-anio-small">
-                                </select>
+                                <!-- Opciones se llenarán con JavaScript -->
+                            </select>
                         </h2>
                         <div class="form-group">
                             <label for="dias-vacaciones">Días de Vacaciones para este año:</label>
@@ -592,7 +683,7 @@
                             <input type="number" id="dias-asuntos-propios" min="0" step="1">
                         </div>
                         <div class="form-group">
-                            <label for="horas-manuales">Horas Acumuladas Manuales:</label>
+                            <label for="horas-manuales" id="label-horas-manuales">Horas Acumuladas a 1 de Enero <span id="anio-horas-texto"></span>:</label>
                             <input type="number" id="horas-manuales" min="0" step="0.5">
                         </div>
                         <button id="btn-guardar-config" class="btn btn-primary">Guardar Configuración</button>
@@ -617,7 +708,8 @@
                         <div class="form-group">
                             <label for="computo">Año de Cómputo:</label>
                             <select id="computo">
-                                </select>
+                                <!-- Opciones se llenarán con JavaScript -->
+                            </select>
                         </div>
                         <div class="form-group" id="horas-grupo" style="display: none;">
                             <label for="horas-solicitadas">Horas Solicitadas:</label>
@@ -632,7 +724,8 @@
                 <div class="card-title-left">
                     <span>Gestión de Descansos</span>
                     <select id="selector-anio-gestion" class="selector-anio-small">
-                        </select>
+                        <!-- Opciones se llenarán con JavaScript -->
+                    </select>
                 </div>
                 
                 <div class="filtros">
@@ -658,13 +751,53 @@
                             </tr>
                         </thead>
                         <tbody id="cuerpo-tabla">
-                            </tbody>
+                            <!-- Filas se llenarán con JavaScript -->
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Modal para gestión de horas -->
+    <div id="modal-gestion-horas" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Gestión de Horas Acumuladas <span id="anio-gestion-horas-texto"></span></h2>
+            
+            <div class="form-group">
+                <label for="fecha-operacion-horas">Fecha de la operación:</label>
+                <input type="date" id="fecha-operacion-horas">
+            </div>
+            
+            <div class="form-group">
+                <label for="concepto-horas">Concepto:</label>
+                <input type="text" id="concepto-horas" placeholder="Descripción de la operación">
+            </div>
+            
+            <div class="form-group">
+                <label for="cantidad-horas">Cantidad de horas:</label>
+                <input type="number" id="cantidad-horas" min="0.5" step="0.5" value="1">
+            </div>
+            
+            <div class="horas-operacion">
+                <button id="btn-sumar-horas" class="btn-horas btn-sumar">Sumar Horas</button>
+                <button id="btn-restar-horas" class="btn-horas btn-restar">Restar Horas</button>
+            </div>
+            
+            <div class="historial-horas" id="historial-horas">
+                <h3>Historial de Operaciones</h3>
+                <div id="lista-horas">
+                    <!-- Aquí se cargarán las operaciones de horas -->
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button id="btn-cerrar-gestion-horas" class="btn btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales existentes para permutas -->
     <div id="modal-permuta" class="modal">
         <div class="modal-content">
             <h2 class="modal-title">Añadir Nueva Permuta</h2>
@@ -711,7 +844,8 @@
         <div class="modal-content">
             <h2 class="modal-title">Permutas Realizadas <span id="anio-permutas-texto"></span></h2>
             <div class="permutas-list" id="lista-permutas">
-                </div>
+                <!-- Lista de permutas se llenará con JavaScript -->
+            </div>
             <div class="modal-actions">
                 <button id="btn-cerrar-permutas" class="btn btn-secondary">Cerrar</button>
             </div>
@@ -719,9 +853,9 @@
     </div>
 
     <script>
-        // Configuración de Firebase - VERIFICA QUE ESTOS DATOS SON CORRECTOS
+        // Configuración de Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyC4w7q3Q8X9Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8",
+            apiKey: "AIzaSyC4w7q3Q8X9Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8",
             authDomain: "markarma279.firebaseapp.com",
             databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "markarma279",
@@ -776,6 +910,20 @@
         const listaPermutas = document.getElementById('lista-permutas');
         const anioPermutasTexto = document.getElementById('anio-permutas-texto');
         
+        // Nuevas referencias para gestión de horas
+        const btnGestionarHoras = document.getElementById('btn-gestionar-horas');
+        const modalGestionHoras = document.getElementById('modal-gestion-horas');
+        const btnCerrarGestionHoras = document.getElementById('btn-cerrar-gestion-horas');
+        const fechaOperacionHoras = document.getElementById('fecha-operacion-horas');
+        const conceptoHoras = document.getElementById('concepto-horas');
+        const cantidadHoras = document.getElementById('cantidad-horas');
+        const btnSumarHoras = document.getElementById('btn-sumar-horas');
+        const btnRestarHoras = document.getElementById('btn-restar-horas');
+        const listaHoras = document.getElementById('lista-horas');
+        const anioGestionHorasTexto = document.getElementById('anio-gestion-horas-texto');
+        const labelHorasManuales = document.getElementById('label-horas-manuales');
+        const anioHorasTexto = document.getElementById('anio-horas-texto');
+        
         // Variables globales
         let datosUsuario = {};
         let solicitudes = [];
@@ -794,6 +942,7 @@
             fechaDescansoInput.min = hoy;
             fechaPropiaInput.min = hoy;
             fechaAgenteInput.min = hoy;
+            fechaOperacionHoras.min = hoy;
             
             // Mostrar/ocultar campo de horas según el tipo de descanso
             tipoDescansoSelect.addEventListener('change', function() {
@@ -834,6 +983,36 @@
                     // Actualizar tabla
                     actualizarTablaSolicitudes();
                 });
+            });
+            
+            // Modal de gestión de horas
+            btnGestionarHoras.addEventListener('click', function() {
+                anioGestionHorasTexto.textContent = `(${añoGestionSeleccionado})`;
+                mostrarHistorialHoras();
+                modalGestionHoras.style.display = 'flex';
+            });
+            
+            btnCerrarGestionHoras.addEventListener('click', function() {
+                modalGestionHoras.style.display = 'none';
+            });
+            
+            btnSumarHoras.addEventListener('click', function() {
+                gestionarHoras('suma');
+            });
+            
+            btnRestarHoras.addEventListener('click', function() {
+                gestionarHoras('resta');
+            });
+            
+            // Event listener para eliminar operaciones de horas
+            listaHoras.addEventListener('click', function(event) {
+                const deleteButton = event.target.closest('.btn-eliminar-horas');
+                if (deleteButton) {
+                    const index = parseInt(deleteButton.getAttribute('data-index'));
+                    if (!isNaN(index)) {
+                        eliminarOperacionHoras(index);
+                    }
+                }
             });
             
             // Modal de permutas
@@ -890,7 +1069,8 @@
                         datosUsuario = {
                             configuraciones: {},
                             solicitudes: [],
-                            permutas: []
+                            permutas: [],
+                            horas: [] // Nuevo array para operaciones de horas
                         };
                         inicializarSelectoresAnios();
                         actualizarInterfaz();
@@ -949,16 +1129,53 @@
         
         // Cargar configuración de un año específico
         function cargarConfiguracionAnio(año) {
-            if (datosUsuario.configuraciones && datosUsuario.configuraciones[año]) {
-                const config = datosUsuario.configuraciones[año];
-                diasVacacionesInput.value = config.diasVacaciones || '';
-                diasAsuntosPropiosInput.value = config.diasAsuntosPropios || '';
-                horasManualesInput.value = config.horasManuales || '';
+            // Actualizar etiqueta de horas
+            anioHorasTexto.textContent = año;
+            
+            if (año >= 2026) {
+                // A partir de 2026, calcular automáticamente las horas del año anterior
+                const añoAnterior = año - 1;
+                const saldoAnterior = calcularSaldoHoras(añoAnterior);
+                diasVacacionesInput.value = datosUsuario.configuraciones && datosUsuario.configuraciones[año] 
+                    ? datosUsuario.configuraciones[año].diasVacaciones || '' 
+                    : '';
+                diasAsuntosPropiosInput.value = datosUsuario.configuraciones && datosUsuario.configuraciones[año] 
+                    ? datosUsuario.configuraciones[año].diasAsuntosPropios || '' 
+                    : '';
+                horasManualesInput.value = saldoAnterior;
+                horasManualesInput.disabled = true;
             } else {
-                diasVacacionesInput.value = '';
-                diasAsuntosPropiosInput.value = '';
-                horasManualesInput.value = '';
+                // Para años anteriores a 2026, permitir edición manual
+                if (datosUsuario.configuraciones && datosUsuario.configuraciones[año]) {
+                    const config = datosUsuario.configuraciones[año];
+                    diasVacacionesInput.value = config.diasVacaciones || '';
+                    diasAsuntosPropiosInput.value = config.diasAsuntosPropios || '';
+                    horasManualesInput.value = config.horasManuales || '';
+                } else {
+                    diasVacacionesInput.value = '';
+                    diasAsuntosPropiosInput.value = '';
+                    horasManualesInput.value = '';
+                }
+                horasManualesInput.disabled = false;
             }
+        }
+        
+        // Calcular saldo de horas para un año específico
+        function calcularSaldoHoras(año) {
+            if (!datosUsuario.horas || datosUsuario.horas.length === 0) return 0;
+            
+            const operacionesAño = datosUsuario.horas.filter(op => {
+                const fechaOp = new Date(op.fecha);
+                return fechaOp.getFullYear() === año;
+            });
+            
+            return operacionesAño.reduce((total, op) => {
+                if (op.tipo === 'suma') {
+                    return total + op.cantidad;
+                } else {
+                    return total - op.cantidad;
+                }
+            }, 0);
         }
         
         // Actualizar la interfaz con los datos cargados
@@ -1009,10 +1226,15 @@
                 .filter(p => p.año === añoGestionSeleccionado)
                 .length;
             
+            // Calcular horas disponibles (incluyendo operaciones manuales)
+            const horasBase = configGestion.horasManuales || 0;
+            const horasOperaciones = calcularSaldoHoras(añoGestionSeleccionado);
+            const horasTotales = horasBase + horasOperaciones;
+            
             // Actualizar saldos del año de gestión
             vacacionesDisponibles.textContent = Math.max(0, (configGestion.diasVacaciones || 0) - vacacionesUsadas);
             asuntosPropiosDisponibles.textContent = Math.max(0, (configGestion.diasAsuntosPropios || 0) - asuntosPropiosUsados);
-            horasAcumuladas.textContent = Math.max(0, (configGestion.horasManuales || 0) - horasUsadas);
+            horasAcumuladas.textContent = Math.max(0, horasTotales - horasUsadas);
             permutasRealizadas.textContent = permutasCount;
             
             // Calcular días del año anterior
@@ -1186,9 +1408,16 @@
                 return;
             }
             
-            if (tipo === 'horas' && configComputo.horasManuales < horas) {
-                mostrarError('No tienes suficientes horas acumuladas para ese año');
-                return;
+            if (tipo === 'horas') {
+                // Calcular horas totales disponibles (base + operaciones)
+                const horasBase = configComputo.horasManuales || 0;
+                const horasOperaciones = calcularSaldoHoras(computo);
+                const horasTotales = horasBase + horasOperaciones;
+                
+                if (horasTotales < horas) {
+                    mostrarError('No tienes suficientes horas acumuladas para ese año');
+                    return;
+                }
             }
             
             const usuarioId = obtenerUsuarioId();
@@ -1204,6 +1433,23 @@
             
             if (tipo === 'horas') {
                 nuevaSolicitud.horas = horas;
+                
+                // CREAR OPERACIÓN DE RESTA EN EL HISTORIAL DE HORAS
+                const operacionResta = {
+                    tipo: 'resta',
+                    fecha: fecha,
+                    concepto: `Descanso por horas sueltas`,
+                    cantidad: horas,
+                    año: computo,
+                    fechaRegistro: new Date().toISOString(),
+                    relacionadoConSolicitud: true // Marcar que está relacionado con una solicitud
+                };
+                
+                // Agregar a la lista de operaciones de horas
+                if (!datosUsuario.horas) {
+                    datosUsuario.horas = [];
+                }
+                datosUsuario.horas.push(operacionResta);
             }
             
             // Agregar a la lista de solicitudes
@@ -1254,6 +1500,24 @@
         function eliminarSolicitud(index) {
             if (confirm('¿Estás seguro de que quieres eliminar esta solicitud?')) {
                 const usuarioId = obtenerUsuarioId();
+                const solicitud = datosUsuario.solicitudes[index];
+                
+                // Si es una solicitud de horas, también eliminar la operación correspondiente
+                if (solicitud.tipo === 'horas') {
+                    // Buscar y eliminar la operación de resta relacionada
+                    if (datosUsuario.horas) {
+                        const indexOperacion = datosUsuario.horas.findIndex(op => 
+                            op.relacionadoConSolicitud && 
+                            op.fecha === solicitud.fecha && 
+                            op.cantidad === solicitud.horas &&
+                            op.año === solicitud.computo
+                        );
+                        
+                        if (indexOperacion !== -1) {
+                            datosUsuario.horas.splice(indexOperacion, 1);
+                        }
+                    }
+                }
                 
                 // Eliminar la solicitud del array
                 datosUsuario.solicitudes.splice(index, 1);
@@ -1267,6 +1531,125 @@
                     .catch(error => {
                         console.error('Error al eliminar solicitud:', error);
                         mostrarError('Error al eliminar la solicitud. Inténtalo de nuevo.');
+                    });
+            }
+        }
+        
+        // Gestión de horas (sumar o restar)
+        function gestionarHoras(tipo) {
+            const fecha = fechaOperacionHoras.value;
+            const concepto = conceptoHoras.value.trim();
+            const cantidad = parseFloat(cantidadHoras.value);
+            
+            // Validaciones
+            if (!fecha) {
+                mostrarError('Debes seleccionar una fecha');
+                return;
+            }
+            
+            if (!concepto) {
+                mostrarError('Debes introducir un concepto');
+                return;
+            }
+            
+            if (!cantidad || cantidad <= 0) {
+                mostrarError('Debes introducir una cantidad válida de horas');
+                return;
+            }
+            
+            const usuarioId = obtenerUsuarioId();
+            
+            // Crear nueva operación de horas
+            const nuevaOperacion = {
+                tipo: tipo,
+                fecha: fecha,
+                concepto: concepto,
+                cantidad: cantidad,
+                año: añoGestionSeleccionado,
+                fechaRegistro: new Date().toISOString()
+            };
+            
+            // Agregar a la lista de operaciones de horas
+            if (!datosUsuario.horas) {
+                datosUsuario.horas = [];
+            }
+            
+            datosUsuario.horas.push(nuevaOperacion);
+            
+            // Guardar en Firebase
+            database.ref('descansos/' + usuarioId).set(datosUsuario)
+                .then(() => {
+                    mostrarExito(`Horas ${tipo === 'suma' ? 'sumadas' : 'restadas'} correctamente`);
+                    mostrarHistorialHoras();
+                    actualizarInterfaz();
+                    
+                    // Limpiar formulario
+                    conceptoHoras.value = '';
+                    cantidadHoras.value = '1';
+                })
+                .catch(error => {
+                    console.error('Error al guardar operación de horas:', error);
+                    mostrarError('Error al registrar la operación. Inténtalo de nuevo.');
+                });
+        }
+        
+        // Mostrar historial de horas
+        function mostrarHistorialHoras() {
+            listaHoras.innerHTML = '';
+            
+            const operacionesHoras = datosUsuario.horas || [];
+            const operacionesFiltradas = operacionesHoras.filter(op => op.año === añoGestionSeleccionado);
+            
+            if (operacionesFiltradas.length === 0) {
+                listaHoras.innerHTML = '<p style="text-align: center; padding: 20px;">No hay operaciones de horas registradas para este año</p>';
+                return;
+            }
+            
+            // Ordenar por fecha (más recientes primero)
+            const operacionesOrdenadas = [...operacionesFiltradas].sort((a, b) => 
+                new Date(b.fecha) - new Date(a.fecha)
+            );
+            
+            operacionesOrdenadas.forEach((operacion, index) => {
+                const indexReal = datosUsuario.horas.findIndex(op => op.fechaRegistro === operacion.fechaRegistro);
+                
+                const itemHoras = document.createElement('div');
+                itemHoras.className = 'item-horas';
+                
+                const claseHoras = operacion.tipo === 'suma' ? 'horas-positivas' : 'horas-negativas';
+                const simbolo = operacion.tipo === 'suma' ? '+' : '-';
+                
+                itemHoras.innerHTML = `
+                    <div class="info-horas">
+                        <strong>${formatearFechaDDMMAAAA(operacion.fecha)}</strong> - ${operacion.concepto}
+                        <div class="${claseHoras}">${simbolo} ${operacion.cantidad} horas</div>
+                    </div>
+                    <button class="btn-action btn-eliminar btn-eliminar-horas" data-index="${indexReal}" title="Eliminar operación">🗑️</button>
+                `;
+                
+                listaHoras.appendChild(itemHoras);
+            });
+        }
+        
+        // Eliminar una operación de horas
+        function eliminarOperacionHoras(index) {
+            if (confirm('¿Estás seguro de que quieres eliminar esta operación de horas?')) {
+                const usuarioId = obtenerUsuarioId();
+                
+                // Eliminar la operación del array
+                datosUsuario.horas.splice(index, 1);
+                
+                // Guardar en Firebase
+                database.ref('descansos/' + usuarioId).set(datosUsuario)
+                    .then(() => {
+                        mostrarExito('Operación de horas eliminada correctamente');
+                        actualizarInterfaz();
+                        mostrarHistorialHoras();
+                    })
+                    .catch(error => {
+                        console.error('Error al eliminar operación de horas:', error);
+                        mostrarError('Error al eliminar la operación. Inténtalo de nuevo.');
+                        cargarDatos(); // Recargar datos para evitar inconsistencias
                     });
             }
         }

@@ -6,7 +6,7 @@
   <title>GAD - Gestión de Cursos y Pagos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
   <style>
     :root {
@@ -49,7 +49,7 @@
         gap: 15px;
     }
 
-    #btnToggleForm, #btnMainMenu { padding:12px 24px; font-size:1rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
+    #btnToggleForm, #btnMainMenu { padding:10px 20px; font-size:0.95rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
 
     #btnToggleForm {
         background-image: var(--accent-gradient); 
@@ -63,68 +63,66 @@
     }
     #btnMainMenu:hover { transform:scale(1.05); }
 
+    /* --- CORRECCIÓN DE SCROLL --- */
     #data-entry-form { 
         position: fixed;
         inset: 0;
         background: rgba(0,0,0,0.85); 
-        align-items: center;
-        justify-content: center;
         z-index: 1001; 
         display: none; 
         opacity: 0; 
-        transition: opacity .3s ease; 
-        padding: 10px 0;
+        transition: opacity .3s ease;
+        /* Scroll activado */
+        overflow-y: auto; 
+        /* Flex start para permitir scroll hacia abajo sin cortar el top */
+        align-items: flex-start; 
+        justify-content: center;
+        padding-top: 20px;
+        padding-bottom: 20px;
     }
     #data-entry-form.visible { 
         display: flex; 
         opacity: 1; 
     }
+    
     .modal-content-wrapper {
         background-color: var(--card-bg);
         border-radius: 12px;
-        padding: 20px;
+        padding: 25px 30px; /* Padding reducido */
         max-width: 95%;
-        width: 900px;
+        width: 1250px; 
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        transform: scale(0.95);
-        transition: transform .3s ease;
         position: relative; 
-        margin: auto;
-    }
-    #data-entry-form.visible .modal-content-wrapper {
-        transform: scale(1);
+        margin: auto; /* Centrado seguro */
+        margin-bottom: 50px; /* Espacio extra abajo para scroll */
     }
     
-    @media (max-width: 768px) {
+    @media (max-width: 900px) {
         .modal-content-wrapper {
             padding: 15px; 
-            width: 95%;
+            width: 98%;
         }
         .form-grid { 
-            grid-template-columns: 1fr !important;
-            gap: 15px !important;
+            grid-template-columns: repeat(2, 1fr) !important; 
+        }
+    }
+    @media (max-width: 600px) {
+        .form-grid { 
+            grid-template-columns: 1fr !important; 
         }
         .nav-actions {
             flex-direction: column;
-        }
-        .form-actions {
-            margin-top: 15px;
-            justify-content: center;
-        }
-        .nav-actions button {
-            width: 100%;
-            text-align: center;
         }
     }
 
     #statusMessageContainer {
         position: absolute; 
-        top: 80px; 
+        top: 60px; 
         left: 50%;
         transform: translateX(-50%);
         width: 85%; 
         z-index: 1010; 
-        padding: 10px; 
+        padding: 8px; 
         border-radius: 6px; 
         text-align: center; 
         font-weight: 600; 
@@ -134,11 +132,13 @@
 
     #data-entry-form h2 { 
         color:#ffd54f; 
-        margin-bottom:15px; 
+        margin-bottom: 15px; 
         cursor: pointer;
-        padding: 8px 12px;
+        padding: 5px 10px;
         border-radius: 6px;
         transition: background-color 0.2s;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+        font-size: 1.3rem; /* Título un poco más pequeño */
     }
     
     #data-entry-form h2:hover {
@@ -150,53 +150,113 @@
         border: 2px solid #ffd54f;
         border-radius: 6px;
         color: #ffd54f;
-        font-size: 1.5rem;
+        font-size: 1.3rem;
         font-weight: 700;
-        padding: 8px 12px;
+        padding: 6px 10px;
         width: 100%;
         font-family: 'Poppins', sans-serif;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
+    .course-title-input:focus { outline: none; box-shadow: 0 0 5px rgba(255, 213, 79, 0.5); }
     
-    .course-title-input:focus {
-        outline: none;
-        box-shadow: 0 0 5px rgba(255, 213, 79, 0.5);
-    }
-    
+    /* --- GRID COMPACTO --- */
     .form-grid { 
-        display:grid; 
-        grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); 
-        gap: 28px; 
-        margin-bottom: 20px;
+        display: grid; 
+        grid-template-columns: repeat(4, 1fr); 
+        column-gap: 20px; /* Gap reducido */
+        row-gap: 12px;    /* Gap vertical reducido drásticamente */
+        align-items: end; 
+        margin-bottom: 15px;
     } 
-    .form-group { 
-        display:flex; 
-        flex-direction:column; 
-        margin-bottom: 8px; 
-    }
-    .form-group label { font-weight:600; margin-bottom:6px; color:var(--text-light); }
     
-    #data-entry-form input:not([type="checkbox"]), #data-entry-form select, #data-entry-form textarea {
-      padding:10px; border-radius:6px; border:1px solid #ccc;
+    .form-group { 
+        display: flex; 
+        flex-direction: column; 
+        margin: 0;
+        position: relative;
+    }
+    
+    .form-group label { 
+        font-weight: 600; 
+        margin-bottom: 4px; /* Menos margen */
+        color: var(--text-light);
+        font-size: 0.85rem; /* Fuente más pequeña */
+        min-height: 34px; /* Altura mínima para alineación de textos largos */
+        display: flex;
+        align-items: flex-end; 
+        line-height: 1.1;
+    }
+    
+    /* --- INPUTS COMPACTOS --- */
+    #data-entry-form input:not([type="checkbox"]), 
+    #data-entry-form select, 
+    #data-entry-form textarea {
+      padding: 0 10px; 
+      border-radius: 5px; 
+      border: 1px solid #ccc;
       background-color: #fff; 
       color: #333; 
       width: 100%; 
+      height: 36px; /* REDUCIDO DE 45px A 36px */
+      line-height: 36px;
+      font-size: 0.9rem;
     }
     
-    #importeNetoCobrado, #importeHoraNeto {
+    #data-entry-form textarea {
+        height: auto !important;
+        min-height: 60px; /* Reducido */
+        padding: 8px;
+        line-height: 1.3;
+        resize: vertical;
+    }
+
+    /* ESTILOS DE CAMPOS ESPECÍFICOS */
+    #importeBase {
+        background-color: #fffde7; 
+        border: 1px solid #fbc02d;
+        font-weight: 700;
+    }
+
+    #kilometraje {
+        background-color: #e0f7fa; 
+        color: #006064;
+        border: 1px solid #00acc1;
+    }
+    
+    #importeBruto {
+        background-color: #eeeeee; 
+        color: #555;
+        font-weight: 700;
+        pointer-events: none; 
+    }
+
+    #precioHoraBruto {
+        background-color: #e8f5e9; 
+        color: #333;
+    }
+    
+    #importeNetoCobrado {
+        background-color: #d4edda; 
+        color: #155724; 
+        font-weight: 700; 
+        border: 2px solid #28a745; 
+        font-size: 1rem;
+    }
+    
+    /* --- ESTILO ESPECIAL PARA LA ETIQUETA VERDE --- */
+    .label-special-green {
+        color: #4caf50 !important; /* Verde Brillante */
+        font-weight: 800 !important;
+        font-size: 0.95rem !important;
+        text-transform: uppercase;
+        text-shadow: 0px 0px 1px rgba(0,0,0,0.5);
+    }
+    
+    #importeHoraNeto {
         background-color: #f7e096;
         color: #333;
         font-weight: 700;
         border: 2px solid #ff9800;
-    }
-    
-    #importeBruto {
-        background-color: #e6e6fa; 
-        color: #333;
-    }
-    #precioHoraBruto {
-        background-color: #e8f5e9; 
-        color: #333;
     }
 
     #data-entry-form input:focus, #data-entry-form select:focus, #data-entry-form textarea:focus {
@@ -204,28 +264,27 @@
         outline: none;
         box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
     }
-    textarea { min-height:80px; resize:vertical; }
     
     .form-actions { 
         grid-column:1/-1; 
         display:flex; 
         gap:12px; 
-        margin-top:15px; 
+        margin-top:10px; 
         justify-content: flex-end; 
     }
-    #btnSubmitCourse, #btnCancelEdit { padding:10px 20px; font-weight:600; border:none; border-radius:8px; cursor:pointer; }
+    #btnSubmitCourse, #btnCancelEdit { padding:8px 20px; font-weight:600; border:none; border-radius:6px; cursor:pointer; }
     #btnSubmitCourse { background-image: var(--accent-gradient); color:#fff; flex-grow:0; }
     #btnCancelEdit { background-color: var(--accent-red); color:#fff; }
 
     .nav-actions {
         display: flex;
         justify-content: space-between;
-        margin-top: 10px;
+        margin-top: 5px;
         padding-top: 10px;
         border-top: 1px solid rgba(255,255,255,0.1);
     }
     .nav-actions button {
-        padding: 8px 15px;
+        padding: 6px 15px;
         font-weight: 600;
         border: none;
         border-radius: 6px;
@@ -233,6 +292,7 @@
         background-color: var(--accent-blue);
         color: #fff;
         transition: background-color 0.2s;
+        font-size: 0.9rem;
     }
     .nav-actions button:hover:not(:disabled) {
         background-color: #556ee4;
@@ -330,16 +390,16 @@
         font-size: 0.95rem;
     }
     
-    /* TABLA MEJORADA - FUENTES MÁS GRANDES Y MEJOR DISTRIBUCIÓN */
+    /* TABLA */
     .courses-table { 
         width: 100%; 
         border-collapse: collapse; 
-        font-size: 0.95em; /* Aumentado el tamaño de fuente general */
+        font-size: 0.95em; 
         table-layout: fixed;
     } 
     
     .courses-table th, .courses-table td { 
-        padding: 10px 6px; /* Aumentado el padding para mejor legibilidad */
+        padding: 10px 6px; 
         border-bottom: 1px solid rgba(255,255,255,0.1); 
         vertical-align: middle; 
         white-space: nowrap;
@@ -353,14 +413,13 @@
         color: #ffd54f; 
         text-transform: uppercase; 
         font-weight: 700;
-        font-size: 0.9em; /* Tamaño aumentado para encabezados */
+        font-size: 0.9em; 
         padding: 12px 6px;
-        text-align: left; /* Alineado a la izquierda como solicitado */
+        text-align: left; 
     }
 
-    /* ANCHOS OPTIMIZADOS CON FUENTES MÁS GRANDES */
     .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 4%; }  /* # */
-    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 8%; font-size: 0.95em; }  /* Inicio - Mismo tamaño que el resto */
+    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 8%; font-size: 0.95em; }  /* Inicio */
     .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 11%; } /* Tipo Curso */
     .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 11%; } /* Pagador */
     .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 13%; } /* Lugar */
@@ -371,7 +430,6 @@
     .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; } /* Renta */
     .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 13%; min-width: 140px; } /* Acciones */
 
-    /* BOTONES DE ACCIÓN MEJORADOS CON MÁS ESPACIO */
     .action-btns { 
         display: flex; 
         gap: 6px; 
@@ -388,7 +446,7 @@
         cursor: pointer;
         transition: all 0.2s;
         line-height: 1;
-        font-size: 0.85rem; /* Tamaño aumentado para botones */
+        font-size: 0.85rem; 
         white-space: nowrap;
         min-width: 40px;
         height: 30px;
@@ -398,20 +456,9 @@
         font-weight: 600;
     }
 
-    .edit-btn { 
-        background-color: #4caf50; 
-        color: white;
-    } 
-
-    .delete-btn { 
-        background-color: #f44336; 
-        color: white;
-    }
-
-    .obs-btn { 
-        background-color: #2196f3; 
-        color: white;
-    }
+    .edit-btn { background-color: #4caf50; color: white; } 
+    .delete-btn { background-color: #f44336; color: white; }
+    .obs-btn { background-color: #2196f3; color: white; }
     
     .obs-btn.alert {
         background-color: #f44336;
@@ -424,19 +471,17 @@
         transform: scale(1.05);
     }
 
-    /* MEJORAS PARA TEXTO VISIBLE CON FUENTE MÁS GRANDE */
     .courses-table td:nth-child(3),
     .courses-table td:nth-child(4),
     .courses-table td:nth-child(5) {
         max-width: 0;
         overflow: visible;
         text-overflow: clip;
-        font-size: 0.95em; /* Tamaño consistente */
+        font-size: 0.95em; 
     }
 
-    /* FECHAS CON EL MISMO TAMAÑO QUE EL RESTO */
     .courses-table td:nth-child(2) {
-        font-size: 0.95em; /* Mismo tamaño que el resto de campos */
+        font-size: 0.95em; 
         white-space: nowrap;
     }
 
@@ -472,12 +517,11 @@
 
         <form id="courseForm">
         <input type="hidden" id="courseKey" value="">
+        
         <div class="form-grid">
             <div class="form-group"><label for="inicio">Fecha Inicio</label><input type="date" id="inicio" required></div>
             <div class="form-group"><label for="fin">Fecha Fin</label><input type="date" id="fin" required></div>
-            
             <div class="form-group"><label for="nombreCurso">Nombre del Curso</label><input type="text" id="nombreCurso"></div>
-            
             <div class="form-group">
                 <label for="tipoCurso">Tipo de Curso</label> 
                 <input type="text" id="tipoCurso" list="tipoCursosListForm">
@@ -488,34 +532,44 @@
                 <label for="pagador">Pagador</label>
                 <input type="text" id="pagador" list="pagadoresListForm" required>
                 <datalist id="pagadoresListForm"></datalist>
-            </div> 
-            
+            </div>
+            <div class="form-group"><label for="lugarCelebracion">Lugar de Celebración</label><input type="text" id="lugarCelebracion"></div>
             <div class="form-group">
                 <label for="horas">Horas</label>
                 <input type="text" inputmode="decimal" id="horas" required 
-                       onblur="formatNumericDisplay(this); calculateBrutoAndNeto();">
+                       onblur="formatNumericDisplay(this); calculateFromHours();">
+            </div>
+            <div class="form-group">
+                <label for="precioHoraBruto">Precio Hora (Sin KM)</label>
+                <input type="text" inputmode="decimal" id="precioHoraBruto" value="0,00" 
+                       onblur="formatNumericDisplay(this); calculateFromPrice();"> 
             </div>
             
             <div class="form-group">
-                <label for="precioHoraBruto">Precio Hora (Bruto €)</label>
-                <input type="text" inputmode="decimal" id="precioHoraBruto" value="0,00" 
-                       onblur="formatNumericDisplay(this); calculateBrutoAndNeto();"> 
+                <label for="importeBase" style="color:#f57f17;">Importe Curso (Base)</label>
+                <input type="text" inputmode="decimal" id="importeBase" value="0,00" 
+                       onblur="formatNumericDisplay(this); calculateFromBase();" placeholder="Importe SIN kilometraje"> 
             </div>
 
             <div class="form-group">
-                <label for="importeBruto">Importe Bruto (€)</label>
-                <input type="text" inputmode="decimal" id="importeBruto" required 
-                       onblur="formatNumericDisplay(this); calculateNetoOnly();">
+                <label for="kilometraje">Kilometraje (Exento IRPF)</label>
+                <input type="text" inputmode="decimal" id="kilometraje" value="0,00" 
+                       onblur="formatNumericDisplay(this); calculateTotals();"> 
+            </div>
+
+            <div class="form-group">
+                <label for="importeBruto">Importe Bruto TOTAL</label>
+                <input type="text" inputmode="decimal" id="importeBruto" readonly>
             </div> 
             
             <div class="form-group">
                 <label for="irpf">IRPF (%)</label>
-                <input type="text" inputmode="decimal" id="irpf" value="0" 
-                       onblur="formatNumericDisplay(this); calculateNetoOnly();">
+                <input type="text" inputmode="decimal" id="irpf" value="0,00" 
+                       onblur="formatNumericDisplay(this); calculateTotals();">
             </div> 
             
             <div class="form-group">
-                <label for="importeNetoCobrado">Total Cobrado (Neto €)</label>
+                <label for="importeNetoCobrado" class="label-special-green">Total Cobrado (Neto €)</label>
                 <input type="text" inputmode="decimal" id="importeNetoCobrado" readonly value="0,00">
             </div>
             <div class="form-group">
@@ -531,17 +585,16 @@
                 </select>
             </div>
             <div class="form-group"><label for="fechaCobro">Detalle/Fecha Cobro</label><input type="text" id="fechaCobro"></div>
+            
             <div class="form-group"><label for="renta">Año Renta</label><input type="number" id="renta"></div>
-
-            <div class="form-group"><label for="lugarCelebracion">Lugar de Celebración</label><input type="text" id="lugarCelebracion"></div>
             <div class="form-group"><label for="horario">Horario</label><input type="text" id="horario"></div>
-            <div class="form-group"><label for="asistentes">Asistentes</label><input type="text" id="asistentes"></div>
+            <div class="form-group" style="grid-column: span 2;"><label for="asistentes">Asistentes</label><input type="text" id="asistentes"></div>
             
             <div class="form-group" style="grid-column:1/-1;">
                 <label for="observaciones">Observaciones</label><textarea id="observaciones"></textarea>
                 <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
                     <input type="checkbox" id="alerta" style="width: 20px; height: 20px; flex-shrink: 0;">
-                    <label for="alerta" style="margin-bottom:0; font-weight:700;">Marcar como Alerta/Incidencia</label>
+                    <label for="alerta" style="margin-bottom:0; font-weight:700; min-height: auto;">Marcar como Alerta/Incidencia</label>
                 </div>
             </div>
         </div>
@@ -604,7 +657,7 @@
           <th>Pagador</th>
           <th>Lugar</th> 
           <th>Horas</th>
-          <th>Importe</th> 
+          <th>Importe Total</th> 
           <th>Pago</th> 
           <th>Cobrado</th>
           <th>Renta</th>
@@ -627,7 +680,6 @@
 </div>
 
 <script>
-// CORRECCIÓN: Rutas de Firebase corregidas - Los cursos están en FORMACION directamente
 const BASE = "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app";
 const tbody = document.getElementById('coursesTableBody');
 const formModal = document.getElementById('data-entry-form'); 
@@ -640,8 +692,6 @@ const courseKeyInput = document.getElementById('courseKey');
 const formTitleDisplay = document.getElementById('formTitleDisplay');
 const formTitleText = document.getElementById('formTitleText');
 const formTitleInput = document.getElementById('formTitleInput');
-
-// Campo nombreCurso para sincronización
 const nombreCursoInput = document.getElementById('nombreCurso');
 
 const filterInicioYear = document.getElementById('filterInicioYear');
@@ -664,7 +714,8 @@ const fin = document.getElementById('fin');
 const tipoCurso = document.getElementById('tipoCurso'); 
 const pagador = document.getElementById('pagador'); 
 const horas = document.getElementById('horas');
-const importeBruto = document.getElementById('importeBruto');
+const importeBase = document.getElementById('importeBase'); 
+const importeBruto = document.getElementById('importeBruto'); 
 const irpf = document.getElementById('irpf');
 const importeNetoCobrado = document.getElementById('importeNetoCobrado'); 
 const cobrado = document.getElementById('cobrado');
@@ -677,8 +728,9 @@ const asistentes = document.getElementById('asistentes');
 const precioHoraBruto = document.getElementById('precioHoraBruto'); 
 const importeHoraNeto = document.getElementById('importeHoraNeto'); 
 const alerta = document.getElementById('alerta'); 
+const kilometraje = document.getElementById('kilometraje'); 
 
-// --- Lógica de Manejo de Input Numérico (Coma/Punto) ---
+// --- Utilidades ---
 function getNumericValue(element) {
     const rawValue = element.value.toString().replace(",", ".");
     return parseFloat(rawValue) || 0;
@@ -690,51 +742,80 @@ function formatNumericDisplay(element) {
 }
 window.formatNumericDisplay = formatNumericDisplay;
 
-// --- Lógica de Cálculo de Neto, Bruto y Precio/Hora ---
-function calculateBrutoAndNeto() {
-    const h = getNumericValue(horas); 
-    const precioHBruto = getNumericValue(precioHoraBruto);
+// --- NUEVA LÓGICA DE CÁLCULO ---
 
-    let bruto = h * precioHBruto;
-    importeBruto.value = bruto.toFixed(2).replace('.', ',');
-    calculateNetoOnly();
+// Caso 1: El usuario cambia las HORAS
+function calculateFromHours() {
+    const h = getNumericValue(horas);
+    const p = getNumericValue(precioHoraBruto);
+    
+    if (h > 0 && p > 0) {
+        const newBase = h * p;
+        importeBase.value = newBase.toFixed(2).replace('.', ',');
+    }
+    calculateTotals();
 }
-window.calculateBrutoAndNeto = calculateBrutoAndNeto;
 
-function calculateNetoOnly() {
-    const bruto = getNumericValue(importeBruto);
+// Caso 2: El usuario cambia el PRECIO HORA
+function calculateFromPrice() {
+    const h = getNumericValue(horas);
+    const p = getNumericValue(precioHoraBruto);
+    
+    if (h > 0) {
+        const newBase = h * p;
+        importeBase.value = newBase.toFixed(2).replace('.', ',');
+    }
+    calculateTotals();
+}
+
+// Caso 3: El usuario cambia el IMPORTE BASE
+function calculateFromBase() {
+    const h = getNumericValue(horas);
+    const base = getNumericValue(importeBase);
+    
+    if (h > 0) {
+        const newPrice = base / h;
+        precioHoraBruto.value = newPrice.toFixed(2).replace('.', ',');
+    }
+    calculateTotals();
+}
+
+// Función central que calcula Totales y Netos
+function calculateTotals() {
+    const base = getNumericValue(importeBase);
+    const km = getNumericValue(kilometraje);
     const irpfPerc = getNumericValue(irpf);
-    const h = getNumericValue(horas); 
-    
-    let neto = 0;
-    let precioHNeto = 0;
+    const h = getNumericValue(horas);
 
-    if (bruto > 0) {
-        const retencion = bruto * (irpfPerc / 100);
-        neto = bruto - retencion;
+    // 1. Importe Bruto Total
+    const totalBruto = base + km;
+    importeBruto.value = totalBruto.toFixed(2).replace('.', ',');
+    
+    // 2. Cálculo de Neto
+    let retencion = 0;
+    if (base > 0) {
+        retencion = base * (irpfPerc / 100);
     }
     
-    let precioHBruto = 0;
-    if (h > 0 && bruto > 0) {
-        precioHBruto = bruto / h;
-        formatNumericDisplay(precioHoraBruto);
-        precioHoraBruto.value = precioHBruto.toFixed(2).replace('.', ',');
-    } else if (h > 0 && getNumericValue(precioHoraBruto) > 0) {
-        // Ya está correcto
-    } else {
-        precioHoraBruto.value = (0).toFixed(2).replace('.', ',');
-    }
+    // Neto = (Base - Retención) + Kilometraje
+    const netoTotal = (base - retencion) + km;
+    importeNetoCobrado.value = netoTotal.toFixed(2).replace('.', ',');
     
-    if (h > 0 && neto > 0) {
-        precioHNeto = neto / h;
+    // 3. Cálculo Informativo: Importe Hora Neto
+    let precioHNeto = 0;
+    if (h > 0) {
+        const netoCurso = base - retencion;
+        precioHNeto = netoCurso / h;
     }
-    
-    importeNetoCobrado.value = neto.toFixed(2).replace('.', ',');
     importeHoraNeto.value = precioHNeto.toFixed(2).replace('.', ',');
 }
-window.calculateNetoOnly = calculateNetoOnly;
 
-// --- Lógica de Título Editable - CORREGIDA: Sincronización bidireccional ---
+window.calculateFromHours = calculateFromHours;
+window.calculateFromPrice = calculateFromPrice;
+window.calculateFromBase = calculateFromBase;
+window.calculateTotals = calculateTotals;
+
+// --- Lógica de Título Editable ---
 function enableTitleEditing() {
     formTitleDisplay.style.display = 'none';
     formTitleInput.style.display = 'block';
@@ -749,13 +830,11 @@ function disableTitleEditing() {
     const newTitle = formTitleInput.value || 'Agregar Curso';
     formTitleText.textContent = newTitle;
     
-    // CORRECCIÓN: Sincronizar también con el campo nombreCurso
     if (nombreCursoInput.value !== newTitle && !newTitle.includes('Editar Curso:')) {
         nombreCursoInput.value = newTitle;
     }
 }
 
-// CORRECCIÓN: Sincronización cuando se edita el campo nombreCurso
 nombreCursoInput.addEventListener('input', function() {
     if (nombreCursoInput.value && !formTitleInput.value.includes('Editar Curso:')) {
         formTitleText.textContent = nombreCursoInput.value;
@@ -771,10 +850,9 @@ formTitleInput.addEventListener('keypress', function(e) {
     }
 });
 
-// --- Funciones principales de carga ---
+// --- Carga de Datos ---
 async function load() {
     try {
-        // CORRECCIÓN: Los cursos están en FORMACION directamente, no en FORMACION/cursos
         const coursesResponse = await fetch(`${BASE}/FORMACION.json`);
         const coursesData = await coursesResponse.json();
         
@@ -782,26 +860,28 @@ async function load() {
         if (coursesData) {
             for (const key in coursesData) {
                 const course = coursesData[key];
-                // Asegurar que importeBruto existe
-                course.importeBruto = course.importeBruto || course.importe; 
-                // Recalcular el importe neto por seguridad
-                course.importeNeto = calculateNetoValue(course.importeBruto, course.irpf);
+                
+                const brutoTotal = parseFloat((course.importeBruto || 0).toString().replace(',', '.')) || 0;
+                const km = parseFloat((course.kilometraje || 0).toString().replace(',', '.')) || 0;
+                const irpfPerc = parseFloat((course.irpf || 0).toString().replace(',', '.')) || 0;
+                
+                const baseCurso = brutoTotal - km;
+                const retencion = baseCurso * (irpfPerc / 100);
+                course.importeNeto = (baseCurso - retencion) + km;
+
                 courses.push({ key, ...course });
             }
         }
         courses.sort((a, b) => new Date(b.inicio) - new Date(a.inicio));
 
-        // Cargar empresas (pagadores)
         const companiesResponse = await fetch(`${BASE}/EMPRESAS.json`);
         const companiesData = await companiesResponse.json();
         masterCompanies = Array.isArray(companiesData) ? companiesData : [];
 
-        // Cargar tipos de curso
         const tiposCursoResponse = await fetch(`${BASE}/TIPOS_CURSO.json`);
         const tiposCursoData = await tiposCursoResponse.json();
         masterTiposCurso = Array.isArray(tiposCursoData) ? tiposCursoData : [];
 
-        // Sincronizar pagadores
         const existingPagadoresInCourses = new Set(courses.map(c => c.empresa || c.pagador).filter(e => e));
         let needsUpdatePagadores = false;
         existingPagadoresInCourses.forEach(comp => {
@@ -818,7 +898,6 @@ async function load() {
             });
         }
 
-        // Sincronizar Tipos Curso 
         const existingTiposCursoInCourses = new Set(courses.map(c => c.tipoCurso).filter(e => e));
         let needsUpdateTipos = false;
         existingTiposCursoInCourses.forEach(tipo => {
@@ -845,18 +924,9 @@ async function load() {
     }
 }
 
-// Función auxiliar para calcular neto
-function calculateNetoValue(bruto, irpfPerc) {
-    const b = parseFloat((bruto || 0).toString().replace(',', '.')) || 0;
-    const i = parseFloat((irpfPerc || 0).toString().replace(',', '.')) || 0;
-    if (b <= 0) return 0;
-    return b - (b * (i / 100));
-}
-
 function updateFilters() {
     const pagadores = masterCompanies.sort();
 
-    // 1. Años de Inicio
     const inicioYears = new Set(courses.map(c => c.inicio ? new Date(c.inicio).getFullYear() : null).filter(y => y));
     const currentYear = filterInicioYear.value;
     filterInicioYear.innerHTML = '<option value="">TODOS</option>' + 
@@ -864,17 +934,14 @@ function updateFilters() {
             `<option value="${y}"${y==currentYear ? ' selected' : ''}>${y}</option>`
         ).join('');
     
-    // 2. Pagador para el filtro
     const currentPagadorFilter = filterPagador.value;
     filterPagador.innerHTML = '<option value="">TODAS</option>' + 
         pagadores.map(e => 
             `<option value="${e}"${e==currentPagadorFilter ? ' selected' : ''}>${e}</option>`
         ).join('');
         
-    // 3. Pagadores para el Datalist del Formulario Superior
     document.getElementById('pagadoresListForm').innerHTML = pagadores.map(e => `<option value="${e}">`).join('');
     
-    // 4. Tipos Curso para el Datalist del Formulario Superior
     const tiposCurso = masterTiposCurso.sort();
     document.getElementById('tipoCursosListForm').innerHTML = tiposCurso.map(t => `<option value="${t}">`).join('');
 }
@@ -933,7 +1000,7 @@ function render() {
     }).join("");
 }
 
-// --- LÓGICA DE NAVEGACIÓN Y EDICIÓN ---
+// --- EDICIÓN Y NAVEGACIÓN ---
 window.editCourse = key => {
     const c = courses.find(x => x.key === key);
     if (!c) return;
@@ -949,7 +1016,15 @@ window.editCourse = key => {
     tipoCurso.value = c.tipoCurso || ""; 
     pagador.value = c.empresa || c.pagador || ""; 
     horas.value = (parseFloat(c.horas) || 0).toFixed(2).replace('.', ',');
-    importeBruto.value = (parseFloat(c.importeBruto) || 0).toFixed(2).replace('.', ',');
+    
+    const brutoTotal = parseFloat(c.importeBruto) || 0;
+    const km = parseFloat(c.kilometraje) || 0;
+    const baseCurso = brutoTotal - km;
+    
+    importeBruto.value = brutoTotal.toFixed(2).replace('.', ',');
+    kilometraje.value = km.toFixed(2).replace('.', ',');
+    importeBase.value = baseCurso.toFixed(2).replace('.', ','); 
+    
     irpf.value = (parseFloat(c.irpf) || 0).toFixed(2).replace('.', ',');
     cobrado.value = c.cobrado || "PENDIENTE";
     fechaCobro.value = c.fechaCobro || "";
@@ -961,19 +1036,16 @@ window.editCourse = key => {
     alerta.checked = c.alerta || false; 
 
     const h = getNumericValue(horas); 
-    const bruto = getNumericValue(importeBruto); 
-    
-    if (h > 0 && bruto > 0) {
-        precioHoraBruto.value = (bruto / h).toFixed(2).replace('.', ',');
+    if (h > 0 && baseCurso > 0) {
+        precioHoraBruto.value = (baseCurso / h).toFixed(2).replace('.', ',');
     } else {
         precioHoraBruto.value = (0).toFixed(2).replace('.', ',');
     }
 
-    calculateNetoOnly(); 
+    calculateTotals(); 
     
     initialFormData = getFormData();
 
-    // CORRECCIÓN: Usar el título del curso si existe, sino el nombre del curso
     const cursoTitulo = c.tituloCurso || c.nombreCurso || "Curso sin nombre";
     formTitleText.textContent = `Editar Curso: ${cursoTitulo}`;
     formTitleInput.value = `Editar Curso: ${cursoTitulo}`;
@@ -1005,7 +1077,8 @@ function getFormData() {
         horario: horario.value,
         asistentes: asistentes.value,
         alerta: alerta.checked,
-        tituloCurso: formTitleInput.value.replace('Editar Curso: ', '') // CORRECCIÓN: Guardar solo el título sin el prefijo
+        kilometraje: kilometraje.value,
+        tituloCurso: formTitleInput.value.replace('Editar Curso: ', '')
     };
     return currentData;
 }
@@ -1014,8 +1087,7 @@ window.navigateCourse = dir => {
     const currentKey = courseKeyInput.value;
     if (!currentKey) return;
 
-    calculateBrutoAndNeto(); 
-    calculateNetoOnly(); 
+    calculateTotals(); 
     
     const currentData = getFormData();
     
@@ -1060,12 +1132,16 @@ function showObs(key){
     if (!c) return;
 
     const h = parseFloat(c.horas || 0);
-    const bruto = parseFloat(c.importeBruto || 0);
-    const neto = parseFloat(c.importeNeto || 0);
+    const brutoTotal = parseFloat(c.importeBruto || 0);
+    const km = parseFloat(c.kilometraje || 0);
     const irpfPerc = parseFloat(c.irpf || 0);
     
-    const precioHBruto = h > 0 ? (bruto / h).toFixed(2) : "0.00";
-    const precioHNeto = h > 0 ? (neto / h).toFixed(2) : "0.00";
+    const baseCurso = brutoTotal - km;
+    const retencion = baseCurso * (irpfPerc / 100);
+    const netoTotal = (baseCurso - retencion) + km;
+    
+    const precioHBruto = h > 0 ? (baseCurso / h).toFixed(2) : "0.00";
+    const precioHNeto = h > 0 ? ((baseCurso - retencion) / h).toFixed(2) : "0.00";
 
     const alertaStatus = c.alerta ? 
         '<p style="color:var(--accent-red); font-weight:700;"><i class="fas fa-exclamation-triangle"></i> ¡ALERTA! Incidencia Marcada</p>' : 
@@ -1078,12 +1154,16 @@ function showObs(key){
         <hr style="border-top: 1px solid rgba(0,0,0,0.1); margin-top: 15px;">
         <p><strong>Nombre del Curso:</strong> ${c.nombreCurso || 'N/A'}</p>
         <p><strong>Tipo de Curso:</strong> ${c.tipoCurso || 'N/A'}</p>
-        <p><strong>Importe Bruto:</strong> ${format(bruto.toFixed(2))} €</p>
-        <p><strong>IRPF Aplicado:</strong> ${format(irpfPerc.toFixed(2))} %</p>
-        <p><strong>Total Cobrado (Neto):</strong> <strong style="color:var(--accent-green);">${format(neto.toFixed(2))} €</strong></p>
+        <div style="background:rgba(0,0,0,0.1); padding:10px; border-radius:6px; margin:10px 0;">
+            <p><strong>Importe Base Curso:</strong> ${format(baseCurso.toFixed(2))} €</p>
+            <p><strong>+ Kilometraje (Exento):</strong> ${format(km.toFixed(2))} €</p>
+            <p><strong>= Importe Bruto Total:</strong> ${format(brutoTotal.toFixed(2))} €</p>
+        </div>
+        <p><strong>IRPF Aplicado (sobre base):</strong> ${format(irpfPerc.toFixed(2))} % (-${format(retencion.toFixed(2))} €)</p>
+        <p><strong>Total Cobrado (Neto):</strong> <strong style="color:var(--accent-green);">${format(netoTotal.toFixed(2))} €</strong></p>
         <hr style="border-top: 1px solid rgba(0,0,0,0.1); margin-top: 15px;">
-        <p><strong>Precio/Hora (Bruto):</strong> ${format(precioHBruto)} €</p>
-        <p><strong>Importe/Hora (Neto):</strong> ${format(precioHNeto)} €</p>
+        <p><strong>Precio/Hora (Bruto Curso):</strong> ${format(precioHBruto)} €</p>
+        <p><strong>Importe/Hora (Neto Curso):</strong> ${format(precioHNeto)} €</p>
         <hr style="border-top: 1px solid rgba(0,0,0,0.1); margin-top: 15px;">
         <p><strong>Lugar de Celebración:</strong> ${c.lugarCelebracion || 'N/A'}</p>
         <p><strong>Horario:</strong> ${c.horario || 'N/A'}</p>
@@ -1096,7 +1176,7 @@ function showObs(key){
     const modalContent = document.getElementById('obsModal').querySelector('.modal-content');
     modalContent.innerHTML = `
         <button class="close-modal" onclick="closeObsModal()">X</button>
-        <h3>Detalles Adicionales del Curso</h3>
+        <h3>Detalles Económicos y del Curso</h3>
         ${details}
     `;
 
@@ -1107,14 +1187,17 @@ function closeObsModal(){ document.getElementById('obsModal').style.display="non
 window.showObs = showObs; window.closeObsModal = closeObsModal;
 
 function exportToExcel() {
-    const headers = ["ID", "Inicio", "Fin", "Nombre Curso", "Tipo Curso", "Pagador", "Lugar Celebración", "Horas", "Importe Bruto", "IRPF (%)", "Importe Neto Cobrado", "Precio Hora Bruto", "Importe Hora Neto", "Pago", "Detalle Cobro", "Año Renta", "Horario", "Asistentes", "Observaciones", "Alerta"];
+    const headers = ["ID", "Inicio", "Fin", "Nombre Curso", "Tipo Curso", "Pagador", "Lugar Celebración", "Horas", "Importe Base Curso", "Kilometraje", "Importe Bruto Total", "IRPF (%)", "Importe Neto Cobrado", "Pago", "Detalle Cobro", "Año Renta", "Horario", "Asistentes", "Observaciones", "Alerta"];
     
     const csvData = courses.map((c, index) => {
         const h = parseFloat(c.horas || 0);
-        const bruto = parseFloat(c.importeBruto || 0);
-        const neto = parseFloat(c.importeNeto || 0);
-        const precioHBruto = h > 0 ? (bruto / h).toFixed(2) : 0;
-        const precioHNeto = h > 0 ? (neto / h).toFixed(2) : 0;
+        const brutoTotal = parseFloat(c.importeBruto || 0);
+        const km = parseFloat(c.kilometraje || 0);
+        const irpfPerc = parseFloat(c.irpf || 0);
+        
+        const baseCurso = brutoTotal - km;
+        const retencion = baseCurso * (irpfPerc / 100);
+        const netoTotal = (baseCurso - retencion) + km;
 
         return [
             index + 1,
@@ -1125,11 +1208,11 @@ function exportToExcel() {
             `"${(c.empresa || c.pagador || '').replace(/"/g, '""')}"`, 
             `"${(c.lugarCelebracion || '').replace(/"/g, '""')}"`, 
             h,
-            bruto,
-            c.irpf || 0,
-            neto.toFixed(2), 
-            precioHBruto,
-            precioHNeto,
+            baseCurso.toFixed(2), 
+            km.toFixed(2), 
+            brutoTotal.toFixed(2), 
+            irpfPerc,
+            netoTotal.toFixed(2), 
             c.cobrado || 'PENDIENTE',
             `"${c.fechaCobro || ''}"`,
             c.renta || '',
@@ -1184,19 +1267,18 @@ window.cleanUnusedPagadores = async () => {
     render(); 
 };
 
-// CRUD (Formulario Modal - Añadir y Editar)
+// CRUD
 form.onsubmit = async e => {
     e.preventDefault();
     
-    calculateBrutoAndNeto();
-    calculateNetoOnly();
+    calculateTotals();
     
     const horasValue = getNumericValue(horas);
     const importeBrutoValue = getNumericValue(importeBruto);
     const irpfValue = getNumericValue(irpf);
     const importeNetoValue = getNumericValue(importeNetoCobrado);
+    const kilometrajeValue = getNumericValue(kilometraje);
 
-    // CORRECCIÓN: Sincronización final antes de guardar
     const tituloFinal = formTitleInput.value.replace('Editar Curso: ', '');
     if (nombreCursoInput.value !== tituloFinal) {
         nombreCursoInput.value = tituloFinal;
@@ -1205,7 +1287,7 @@ form.onsubmit = async e => {
     const obj = {
         inicio: inicio.value, 
         fin: fin.value, 
-        nombreCurso: nombreCursoInput.value, // Usar el valor sincronizado
+        nombreCurso: nombreCursoInput.value, 
         tipoCurso: tipoCurso.value, 
         empresa: pagador.value, 
         pagador: pagador.value, 
@@ -1221,7 +1303,8 @@ form.onsubmit = async e => {
         horario: horario.value,
         asistentes: asistentes.value,
         alerta: alerta.checked,
-        tituloCurso: tituloFinal // Guardar también el título por separado
+        tituloCurso: tituloFinal,
+        kilometraje: kilometrajeValue 
     };
     
     if (obj.empresa && !masterCompanies.includes(obj.empresa)) {
@@ -1244,7 +1327,6 @@ form.onsubmit = async e => {
 
     if (keyToUpdate) { 
         editingKey = keyToUpdate; 
-        // CORRECCIÓN: Guardar en FORMACION directamente
         await fetch(`${BASE}/FORMACION/${keyToUpdate}.json`, {
             method: 'PUT',
             body: JSON.stringify(obj)
@@ -1260,7 +1342,6 @@ form.onsubmit = async e => {
         if (successTimeout) clearTimeout(successTimeout); 
         successTimeout = setTimeout(closeFormModal, 2000);
     } else { 
-        // CORRECCIÓN: Guardar en FORMACION directamente
         await fetch(`${BASE}/FORMACION.json`, {
             method: 'POST',
             body: JSON.stringify(obj)
@@ -1298,6 +1379,8 @@ function closeFormModal() {
     precioHoraBruto.value = (0).toFixed(2).replace('.', ',');
     importeHoraNeto.value = (0).toFixed(2).replace('.', ','); 
     irpf.value = (0).toFixed(2).replace('.', ',');
+    kilometraje.value = (0).toFixed(2).replace('.', ',');
+    importeBase.value = (0).toFixed(2).replace('.', ','); 
     
     formTitleText.textContent = 'Agregar Curso';
     formTitleInput.value = 'Agregar Curso';
@@ -1326,8 +1409,7 @@ window.handleCancelEdit = () => {
         return;
     }
     
-    calculateBrutoAndNeto(); 
-    calculateNetoOnly();
+    calculateTotals();
     
     const currentData = getFormData();
     const changed = JSON.stringify(currentData) !== JSON.stringify(initialFormData); 
@@ -1355,7 +1437,6 @@ btnToggleForm.onclick = resetFormForAdd;
 
 window.delCourse = async key => {
     if (confirm("¿Eliminar curso?")) { 
-        // CORRECCIÓN: Eliminar de FORMACION directamente
         await fetch(`${BASE}/FORMACION/${key}.json`, {
             method: 'DELETE'
         });

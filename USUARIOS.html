@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Buscador · Sistema Seguro</title>
+  <title>Buscador · Titular-Usuario-Descripción-Resultado</title>
   <style>
     :root {
       --bg-dark: #1a1a2e;
@@ -13,8 +13,7 @@
       --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
       --accent-red: #d32f2f;
       --accent-green: #28a745;
-      --google-red: #db4437;
-      --admin-gold: #ffd700;
+      --google-red: #db4437; /* Color para botón Google */
     }
     body {
       font-family: 'Poppins', sans-serif;
@@ -102,6 +101,7 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 10px rgba(118, 75, 162, 0.5);
     }
+    /* Estilo botón Google */
     .btn-google {
       background: white;
       color: #333;
@@ -164,15 +164,6 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 10px rgba(40, 167, 69, 0.5);
       background: #1e7e34;
-    }
-    .btn-admin {
-        background: transparent;
-        border: 1px solid var(--admin-gold);
-        color: var(--admin-gold);
-    }
-    .btn-admin:hover {
-        background: rgba(255, 215, 0, 0.1);
-        box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
     }
     table { 
       width: 100%; 
@@ -277,24 +268,6 @@
         display: flex;
         align-items: center;
     }
-    /* Estilos lista usuarios */
-    .user-list-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: rgba(255,255,255,0.05);
-        padding: 10px;
-        border-radius: 6px;
-        margin-bottom: 8px;
-    }
-    .btn-small-delete {
-        background: var(--accent-red);
-        color: white;
-        border: none;
-        padding: 5px 10px;
-        font-size: 0.8rem;
-        border-radius: 4px;
-    }
     @media (max-width: 600px) {
       .wrap { margin: 16px auto; padding: 0 10px; }
       header { flex-direction: column; text-align: center; }
@@ -336,7 +309,6 @@
         <div class="title">
           <h1>Buscador de contraseñas</h1>
           <p>Puedes buscar por titular, usuario y descripción.</p>
-          <small id="userDisplay" style="color: var(--accent-blue);"></small>
         </div>
       </div>
       <a href="index.html" class="btn-menu-principal">MENÚ PRINCIPAL</a>
@@ -359,14 +331,13 @@
             <datalist id="descripcionesListBusqueda"></datalist>
           </div>
           <div class="field">
-            <label for="resultado">Contraseña</label>
+            <label for="resultado">Contraseña 1</label>
             <input id="resultado" type="text" placeholder="Resultado" readonly />
           </div>
           <div style="display: flex; flex-wrap: wrap; gap: 8px;">
             <button id="btnBuscar" class="btn-primary">Buscar</button>
             <button id="btnLimpiar" class="btn-success">Limpiar</button>
-            <button id="btnNuevo" class="btn-primary" hidden>Introduzca nuevos datos</button>
-            <button id="btnUsuarios" class="btn-admin" hidden>Gestionar Usuarios</button>
+            <button id="btnNuevo" class="btn-primary">Introduzca nuevos datos</button>
             <button id="btnLogout" class="btn-logout-red">Cerrar sesión</button>
           </div>
 
@@ -378,7 +349,7 @@
                     <th>Usuario</th>
                     <th>Descripción</th>
                     <th>Contraseña</th>
-                    <th id="thAcciones" hidden>Acciones</th>
+                    <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="tbody"></tbody>
@@ -400,7 +371,6 @@
              </svg>
              Iniciar sesión con Google
         </button>
-        <p id="loginError" style="color: var(--accent-red); margin-top: 10px;" hidden></p>
     </div>
 
   </div>
@@ -434,32 +404,11 @@
           </div>
         </div>
         <div class="modal-actions">
-          <button type="button" id="btnEliminarRegistro" class="btn-delete-red" hidden>Eliminar</button>
+          <button type="button" id="btnEliminarRegistro" class="btn-delete-red" hidden>Eliminar registro</button>
           <button type="reset" class="btn-success">Limpiar</button>
           <button type="submit" class="btn-primary">Guardar</button>
         </div>
       </form>
-    </div>
-  </div>
-
-  <div id="dlgUsuariosModal" class="modal-overlay">
-    <div class="modal">
-      <div class="modal-header">
-        <strong>Gestionar Usuarios Autorizados</strong>
-        <button id="dlgUsuariosClose" class="btn-ghost close-btn">✕</button>
-      </div>
-      <div class="modal-body">
-          <div class="field" style="margin-bottom: 20px;">
-             <label>Añadir nuevo email (Gmail)</label>
-             <div style="display: flex; gap: 10px;">
-                <input type="email" id="txtNewUserEmail" placeholder="usuario@gmail.com">
-                <button id="btnAddUser" class="btn-success">+</button>
-             </div>
-          </div>
-          <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0;">
-          <div id="usersListContainer">
-              </div>
-      </div>
     </div>
   </div>
 
@@ -497,36 +446,16 @@
     const db = firebase.database();
     const googleProvider = new firebase.auth.GoogleAuthProvider();
     
-    // --- CONFIGURACIÓN DE SEGURIDAD ---
-    // Este es el único ID que tiene permiso de todo
-    const ADMIN_UID = "euq9uxFJrAft9m1cNob0PZ1fo7q1"; 
-    // Referencia fija a los datos del admin para que se compartan
-    const SHARED_DATA_REF = db.ref('passwords/' + ADMIN_UID);
-    const ALLOWED_USERS_REF = db.ref('allowed_users');
-
     const $ = sel => document.querySelector(sel);
     const titular = $("#titular"), usuario = $("#usuario"), descripcionBusqueda = $("#descripcionBusqueda"), resultado = $("#resultado"), tbody = $("#tbody"), results = $("#results");
     const appContent = $("#app-content");
     const loginContainer = $("#login-container");
     const btnGoogleLogin = $("#btnGoogleLogin");
     const btnLogout = $("#btnLogout");
-    const btnNuevo = $("#btnNuevo");
-    const btnUsuarios = $("#btnUsuarios");
-    const userDisplay = $("#userDisplay");
-    const loginError = $("#loginError");
-    const thAcciones = $("#thAcciones");
-
-    // Gestión Usuarios Modal
-    const dlgUsuariosModal = $("#dlgUsuariosModal");
-    const dlgUsuariosClose = $("#dlgUsuariosClose");
-    const txtNewUserEmail = $("#txtNewUserEmail");
-    const btnAddUser = $("#btnAddUser");
-    const usersListContainer = $("#usersListContainer");
     
     const dlgMessage = $("#dlgMessage"), messageTitle = $("#messageTitle"), messageText = $("#messageText"), messageBody = $("#messageBody"), messageOk = $("#messageOk"), messageCancel = $("#messageCancel");
 
     let allUserPasswords = [];
-    let isAdmin = false;
 
     function normalize(s) { return (s || "").toString().trim().toLowerCase(); }
 
@@ -549,66 +478,16 @@
       });
     }
 
-    // --- LÓGICA DE AUTENTICACIÓN Y ROLES ---
+    // Este listener se dispara automáticamente si el usuario ya tiene sesión iniciada
     auth.onAuthStateChanged((user) => {
       if (user) {
-        // Verificar permisos
-        if (user.uid === ADMIN_UID) {
-            // ES EL ADMINISTRADOR
-            isAdmin = true;
-            initializeSession(user);
-        } else {
-            // ES UN USUARIO NORMAL, VERIFICAR SI ESTÁ AUTORIZADO
-            isAdmin = false;
-            checkIfAllowed(user);
-        }
-      } else {
-        // NO LOGUEADO
-        appContent.hidden = true;
-        loginContainer.hidden = false;
-        loginError.hidden = true;
-      }
-    });
-
-    function checkIfAllowed(user) {
-        ALLOWED_USERS_REF.once('value').then(snapshot => {
-            const allowed = snapshot.val();
-            let isAllowed = false;
-            if (allowed) {
-                const emails = Object.values(allowed);
-                if (emails.includes(user.email)) {
-                    isAllowed = true;
-                }
-            }
-
-            if (isAllowed) {
-                initializeSession(user);
-            } else {
-                auth.signOut();
-                loginError.textContent = "Acceso denegado. Este usuario no está autorizado.";
-                loginError.hidden = false;
-            }
-        });
-    }
-
-    function initializeSession(user) {
         appContent.hidden = false;
         loginContainer.hidden = true;
-        userDisplay.textContent = `Usuario: ${user.email} ${isAdmin ? '(ADMIN)' : '(Invitado)'}`;
+        
+        // FORZAMOS A LEER SIEMPRE LA CARPETA ANTIGUA
+const userPasswordsRef = db.ref('passwords/euq9uxFJrAft9m1cNob0PZ1fo7q1');
 
-        // Configurar UI según rol
-        if (isAdmin) {
-            btnNuevo.hidden = false;
-            btnUsuarios.hidden = false;
-            thAcciones.hidden = false;
-        } else {
-            btnNuevo.hidden = true;
-            btnUsuarios.hidden = true;
-            thAcciones.hidden = true;
-        }
-
-        // Cargar contraseñas (siempre del nodo del admin)
-        SHARED_DATA_REF.on('value', (snapshot) => {
+        userPasswordsRef.on('value', (snapshot) => {
             const data = snapshot.val();
             allUserPasswords = [];
             if (data) {
@@ -621,238 +500,229 @@
                 const titularB = b.titular || '';
                 const normalizedA = normalize(titularA);
                 const normalizedB = normalize(titularB);
+
                 if (normalizedA === 'rafa') return -1;
                 if (normalizedB === 'rafa') return 1;
+
                 return normalizedA.localeCompare(normalizedB);
             });
             doSearch();
             populateDatalists();
         });
-    }
 
-    // --- FUNCIONALIDAD GESTIÓN USUARIOS (Solo Admin) ---
-    btnUsuarios.onclick = () => {
-        loadAllowedUsers();
-        dlgUsuariosModal.classList.add("open");
-    };
-    dlgUsuariosClose.onclick = () => dlgUsuariosModal.classList.remove("open");
+        function populateDatalists() {
+            const titularesSet = new Set();
+            const descripcionesSet = new Set();
+            
+            allUserPasswords.forEach(item => {
+                if (item.titular) titularesSet.add(item.titular);
+                if (item.descripcion) descripcionesSet.add(item.descripcion);
+            });
+            
+            const titularesList = $("#titularesList");
+            const descripcionesList = $("#descripcionesList");
+            const titularesListBusqueda = $("#titularesListBusqueda");
+            const descripcionesListBusqueda = $("#descripcionesListBusqueda");
 
-    function loadAllowedUsers() {
-        usersListContainer.innerHTML = "<p>Cargando...</p>";
-        ALLOWED_USERS_REF.on('value', (snapshot) => {
-            usersListContainer.innerHTML = "";
-            const users = snapshot.val();
-            if (users) {
-                Object.keys(users).forEach(key => {
-                    const email = users[key];
-                    const div = document.createElement("div");
-                    div.className = "user-list-item";
-                    div.innerHTML = `
-                        <span>${email}</span>
-                        <button class="btn-small-delete" onclick="removeUser('${key}', '${email}')">Eliminar</button>
-                    `;
-                    usersListContainer.appendChild(div);
-                });
-            } else {
-                usersListContainer.innerHTML = "<p style='color:#aaa'>No hay usuarios extra autorizados.</p>";
-            }
-        });
-    }
+            titularesList.innerHTML = "";
+            descripcionesList.innerHTML = "";
+            titularesListBusqueda.innerHTML = "";
+            descripcionesListBusqueda.innerHTML = "";
 
-    btnAddUser.onclick = () => {
-        const email = txtNewUserEmail.value.trim();
-        if (email) {
-            ALLOWED_USERS_REF.push(email);
-            txtNewUserEmail.value = "";
+            titularesSet.forEach(titular => {
+                const option = document.createElement("option");
+                option.value = titular;
+                titularesList.appendChild(option);
+                titularesListBusqueda.appendChild(option.cloneNode(true));
+            });
+
+            descripcionesSet.forEach(descripcion => {
+                const option = document.createElement("option");
+                option.value = descripcion;
+                descripcionesList.appendChild(option);
+                descripcionesListBusqueda.appendChild(option.cloneNode(true));
+            });
         }
-    };
 
-    window.removeUser = async (key, email) => {
-        const confirm = await showMessage("Eliminar Usuario", `¿Quitar acceso a <b>${email}</b>?`, true, true);
-        if (confirm) {
-            ALLOWED_USERS_REF.child(key).remove();
+        function doSearch() {
+            const f1 = normalize(titular.value);
+            const f2 = normalize(usuario.value);
+            const f3 = normalize(descripcionBusqueda.value);
+            
+            const matches = allUserPasswords.filter(r =>
+                (f1 === "" || normalize(r.titular).includes(f1)) &&
+                (f2 === "" || normalize(r.usuario).includes(f2)) &&
+                (f3 === "" || normalize(r.descripcion).includes(f3))
+            );
+            
+            tbody.innerHTML = "";
+            matches.forEach(r => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td data-label="Titular">${r.titular}</td>
+                    <td data-label="Usuario" data-copiable="true">${r.usuario}</td>
+                    <td data-label="Descripción">${r.descripcion}</td>
+                    <td data-label="Contraseña">${r.resultado}</td>
+                    <td data-label="Acciones">
+                        <button class="btn-primary" onclick="editPassword('${r.key}')">Editar</button>
+                    </td>
+                `;
+                tr.onclick = () => { resultado.value = r.resultado; };
+                tbody.appendChild(tr);
+            });
+            results.hidden = matches.length === 0;
+            if (matches.length === 1) { resultado.value = matches[0].resultado; }
         }
-    };
 
-    // --- FUNCIONALIDAD PRINCIPAL ---
-
-    function populateDatalists() {
-        const titularesSet = new Set();
-        const descripcionesSet = new Set();
-        
-        allUserPasswords.forEach(item => {
-            if (item.titular) titularesSet.add(item.titular);
-            if (item.descripcion) descripcionesSet.add(item.descripcion);
-        });
-        
-        const titularesList = $("#titularesList");
-        const descripcionesList = $("#descripcionesList");
-        const titularesListBusqueda = $("#titularesListBusqueda");
-        const descripcionesListBusqueda = $("#descripcionesListBusqueda");
-
-        titularesList.innerHTML = "";
-        descripcionesList.innerHTML = "";
-        titularesListBusqueda.innerHTML = "";
-        descripcionesListBusqueda.innerHTML = "";
-
-        titularesSet.forEach(titular => {
-            const option = document.createElement("option");
-            option.value = titular;
-            titularesList.appendChild(option);
-            titularesListBusqueda.appendChild(option.cloneNode(true));
-        });
-
-        descripcionesSet.forEach(descripcion => {
-            const option = document.createElement("option");
-            option.value = descripcion;
-            descripcionesList.appendChild(option);
-            descripcionesListBusqueda.appendChild(option.cloneNode(true));
-        });
-    }
-
-    function doSearch() {
-        const f1 = normalize(titular.value);
-        const f2 = normalize(usuario.value);
-        const f3 = normalize(descripcionBusqueda.value);
-        
-        const matches = allUserPasswords.filter(r =>
-            (f1 === "" || normalize(r.titular).includes(f1)) &&
-            (f2 === "" || normalize(r.usuario).includes(f2)) &&
-            (f3 === "" || normalize(r.descripcion).includes(f3))
-        );
-        
-        tbody.innerHTML = "";
-        matches.forEach(r => {
-            const tr = document.createElement("tr");
-            let accionesHtml = "";
-            if (isAdmin) {
-                accionesHtml = `<td data-label="Acciones"><button class="btn-primary" onclick="editPassword('${r.key}')">Editar</button></td>`;
-            }
-
-            tr.innerHTML = `
-                <td data-label="Titular">${r.titular}</td>
-                <td data-label="Usuario" data-copiable="true">${r.usuario}</td>
-                <td data-label="Descripción">${r.descripcion}</td>
-                <td data-label="Contraseña">${r.resultado}</td>
-                ${accionesHtml}
+        function copyToClipboard(text) {
+          navigator.clipboard.writeText(text).then(() => {
+            const message = document.createElement('div');
+            message.textContent = 'Copiado al portapapeles';
+            message.style.cssText = `
+              position: fixed;
+              bottom: 20px;
+              left: 50%;
+              transform: translateX(-50%);
+              background: #333;
+              color: white;
+              padding: 10px 20px;
+              border-radius: 5px;
+              z-index: 1001;
+              opacity: 0;
+              transition: opacity 0.5s ease-in-out;
             `;
-            tr.onclick = () => { resultado.value = r.resultado; };
-            tbody.appendChild(tr);
-        });
-        results.hidden = matches.length === 0;
-        if (matches.length === 1) { resultado.value = matches[0].resultado; }
-    }
-
-    function copyToClipboard(text) {
-      navigator.clipboard.writeText(text).then(() => {
-        const message = document.createElement('div');
-        message.textContent = 'Copiado al portapapeles';
-        message.style.cssText = `
-          position: fixed;
-          bottom: 20px; left: 50%; transform: translateX(-50%);
-          background: #333; color: white; padding: 10px 20px;
-          border-radius: 5px; z-index: 1001; opacity: 0; transition: opacity 0.5s;
-        `;
-        document.body.appendChild(message);
-        setTimeout(() => message.style.opacity = 1, 10);
-        setTimeout(() => { message.style.opacity = 0; setTimeout(() => message.remove(), 500); }, 2000);
-      });
-    }
-    
-    tbody.addEventListener('contextmenu', (e) => {
-      const target = e.target.closest('td[data-copiable="true"]');
-      if (target) { e.preventDefault(); copyToClipboard(target.textContent); }
-    });
-    
-    titular.oninput = doSearch;
-    usuario.oninput = doSearch;
-    descripcionBusqueda.oninput = doSearch;
-
-    $("#btnBuscar").onclick = doSearch;
-    $("#btnLimpiar").onclick = () => {
-        titular.value = ""; usuario.value = ""; descripcionBusqueda.value = ""; resultado.value = ""; 
-        doSearch();
-    };
-
-    const dlg = $("#dlgNuevo"), formNuevo = $("#formNuevo"), dlgClose = $("#dlgClose"), modalTitle = $("#modalTitle");
-    const btnEliminarRegistro = $("#btnEliminarRegistro");
-
-    $("#btnNuevo").onclick = () => {
-      formNuevo.reset();
-      modalTitle.textContent = "Introduzca nuevos datos";
-      btnEliminarRegistro.hidden = true;
-      formNuevo.onsubmit = saveNewPassword;
-      dlg.classList.add("open");
-    };
-
-    dlgClose.onclick = () => dlg.classList.remove("open");
-
-    function saveNewPassword(e) {
-        e.preventDefault();
-        const fd = new FormData(formNuevo);
-        const nuevo = Object.fromEntries(fd.entries());
+            document.body.appendChild(message);
+            setTimeout(() => {
+              message.style.opacity = 1;
+            }, 10);
+            setTimeout(() => {
+              message.style.opacity = 0;
+              setTimeout(() => message.remove(), 500);
+            }, 2000);
+          }).catch(err => {
+            console.error('Error al copiar el texto: ', err);
+          });
+        }
         
-        SHARED_DATA_REF.push(nuevo).then(() => {
-            dlg.classList.remove("open");
-        }).catch(error => {
-            console.error("Error", error);
-            showMessage("Error", "Error al guardar.");
+        tbody.addEventListener('contextmenu', (e) => {
+          const target = e.target.closest('td[data-copiable="true"]');
+          if (target) {
+            e.preventDefault();
+            copyToClipboard(target.textContent);
+          }
         });
-    }
-    
-    function editPassword(key) {
-        if (!isAdmin) return; // Seguridad extra
+        
+        titular.oninput = doSearch;
+        usuario.oninput = doSearch;
+        descripcionBusqueda.oninput = doSearch;
 
-        const passwordRef = SHARED_DATA_REF.child(key);
-        passwordRef.once('value').then(snapshot => {
-            const data = snapshot.val();
+        $("#btnBuscar").onclick = doSearch;
+        
+        $("#btnLimpiar").onclick = () => {
+            titular.value = ""; 
+            usuario.value = ""; 
+            descripcionBusqueda.value = ""; 
+            resultado.value = ""; 
+            doSearch();
+        };
+
+        const dlg = $("#dlgNuevo"), formNuevo = $("#formNuevo"), dlgClose = $("#dlgClose"), modalTitle = $("#modalTitle");
+        const btnEliminarRegistro = $("#btnEliminarRegistro");
+
+        $("#btnNuevo").onclick = () => {
+          formNuevo.reset();
+          modalTitle.textContent = "Introduzca nuevos datos";
+          btnEliminarRegistro.hidden = true;
+          formNuevo.onsubmit = saveNewPassword;
+          dlg.classList.add("open");
+        };
+
+        dlgClose.onclick = () => dlg.classList.remove("open");
+
+        function saveNewPassword(e) {
+            e.preventDefault();
+            const fd = new FormData(formNuevo);
+            const nuevo = Object.fromEntries(fd.entries());
             
-            $("#nuevoTitular").value = data.titular;
-            $("#nuevoUsuario").value = data.usuario;
-            $("#nuevaDescripcion").value = data.descripcion;
-            $("#nuevoResultado").value = data.resultado;
-            
-            modalTitle.textContent = "Editar datos";
-            btnEliminarRegistro.hidden = false;
-            
-            formNuevo.onsubmit = (e) => {
-                e.preventDefault();
-                const fd = new FormData(formNuevo);
-                const updatedData = Object.fromEntries(fd.entries());
+            userPasswordsRef.push(nuevo).then(() => {
+                dlg.classList.remove("open");
+            }).catch(error => {
+                console.error("Error al guardar los datos: ", error);
+                showMessage("Error", "Hubo un error al guardar los datos.");
+            });
+        }
+        
+        function editPassword(key) {
+            const passwordRef = db.ref('passwords/' + user.uid + '/' + key);
+            passwordRef.once('value').then(snapshot => {
+                const data = snapshot.val();
                 
-                passwordRef.update(updatedData).then(() => {
-                    dlg.classList.remove("open");
-                    showMessage("Éxito", "Actualizado correctamente.");
-                });
-            };
-            
-            btnEliminarRegistro.onclick = async () => {
-                const confirmResult = await showMessage("Confirmar", `¿Eliminar registro de **${data.titular}**?`, true, true);
-                if (confirmResult) {
-                    passwordRef.remove().then(() => {
+                $("#nuevoTitular").value = data.titular;
+                $("#nuevoUsuario").value = data.usuario;
+                $("#nuevaDescripcion").value = data.descripcion;
+                $("#nuevoResultado").value = data.resultado;
+                
+                modalTitle.textContent = "Editar datos";
+                btnEliminarRegistro.hidden = false;
+                
+                formNuevo.onsubmit = (e) => {
+                    e.preventDefault();
+                    const fd = new FormData(formNuevo);
+                    const updatedData = Object.fromEntries(fd.entries());
+                    
+                    passwordRef.update(updatedData).then(() => {
                         dlg.classList.remove("open");
+                        showMessage("Éxito", "Los datos se han actualizado correctamente.");
+                    }).catch(error => {
+                        console.error("Error al actualizar los datos: ", error);
+                        showMessage("Error", "Hubo un error al actualizar los datos.");
                     });
-                }
-            };
-            
-            dlg.classList.add("open");
-        });
-    }
-    window.editPassword = editPassword;
+                };
+                
+                btnEliminarRegistro.onclick = async () => {
+                    const alertIcon = '<div class="alert-icon">❌</div>';
+                    const confirmResult = await showMessage("Confirmar eliminación", `${alertIcon} ¿Estás seguro de que quieres eliminar el registro para **${data.titular}**? Esta acción no se puede deshacer.`, true, true);
+                    if (confirmResult) {
+                        passwordRef.remove().then(() => {
+                            dlg.classList.remove("open");
+                            showMessage("Registro eliminado", "El registro se ha eliminado correctamente.");
+                        }).catch(error => {
+                            console.error("Error al eliminar el registro: ", error);
+                            showMessage("Error", "Hubo un error al intentar eliminar el registro.");
+                        });
+                    }
+                };
+                
+                dlg.classList.add("open");
+            });
+        }
+        window.editPassword = editPassword;
 
-    btnLogout.onclick = () => {
-      auth.signOut().then(() => {
-        console.log("Sesión cerrada.");
-        loginError.hidden = true;
-      });
-    };
 
+        btnLogout.onclick = () => {
+          auth.signOut().then(() => {
+            console.log("Sesión cerrada correctamente.");
+          }).catch((error) => {
+            console.error("Error al cerrar sesión:", error);
+            showMessage("Error", "Hubo un problema al intentar cerrar la sesión.");
+          });
+        };
+      } else {
+        appContent.hidden = true;
+        loginContainer.hidden = false;
+      }
+    });
+
+    // Nueva lógica de Login con Google
     btnGoogleLogin.onclick = () => {
         auth.signInWithPopup(googleProvider)
+            .then((result) => {
+                // El login fue exitoso, onAuthStateChanged se disparará.
+                console.log("Login exitoso con Google:", result.user);
+            })
             .catch((error) => {
-                console.error("Error login:", error);
-                loginError.textContent = error.message;
-                loginError.hidden = false;
+                console.error("Error al iniciar sesión con Google:", error);
+                showMessage("Error de Autenticación", "No se pudo iniciar sesión con Google: " + error.message);
             });
     };
   </script>

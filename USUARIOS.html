@@ -484,7 +484,8 @@
         appContent.hidden = false;
         loginContainer.hidden = true;
         
-        const userPasswordsRef = db.ref('passwords/' + user.uid);
+        // FORZAMOS A LEER SIEMPRE LA CARPETA ANTIGUA
+const userPasswordsRef = db.ref('passwords/euq9uxFJrAft9m1cNob0PZ1fo7q1');
 
         userPasswordsRef.on('value', (snapshot) => {
             const data = snapshot.val();

@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GAD - Menú Principal (Completo)</title>
+    <title>GAD - Menú Principal</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
@@ -26,7 +26,6 @@
             color: var(--text-light);
             margin: 0;
             padding: 0;
-            min-height: 100vh;
         }
         .container {
             max-width: 900px;
@@ -61,7 +60,6 @@
             height: 100%;
             object-fit: cover;
         }
-        /* Solo el admin verá el estilo de edición en el logo */
         .edit-mode .logo {
             cursor: pointer;
             border: 3px solid var(--accent-orange);
@@ -201,8 +199,8 @@
         
         .modal {
             background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 12px;
+            padding: 25px;
+            border-radius: 10px;
             color: var(--text-light);
             width: 90%;
             max-width: 400px;
@@ -210,7 +208,7 @@
             text-align: center;
         }
         .modal h2 { margin-top: 0; text-align: center; }
-        .modal input, .modal select, .modal textarea {
+        .modal input, .modal select {
             padding: 12px;
             font-size: 1em;
             border-radius: 8px;
@@ -223,7 +221,7 @@
         }
         .modal-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .modal-input-group > div { flex: 1; }
-        .modal button.standard-btn {
+        .modal button {
             padding: 10px 20px;
             font-size: 1.1em;
             border-radius: 5px;
@@ -237,7 +235,7 @@
         .modal-body { display: flex; flex-direction: column; gap: 10px; }
         .modal-close {
             position: absolute;
-            top: 15px;
+            top: 10px;
             right: 15px;
             font-size: 1.5em;
             cursor: pointer;
@@ -257,29 +255,98 @@
             border-color: var(--accent-green);
         }
 
-        .btn-logout { background: var(--accent-red); color: white; padding: 8px 16px; border-radius: 5px; cursor: pointer; border: none; }
-        .btn-admin-users { background: var(--admin-gold); color: var(--bg-dark); font-weight: 600; padding: 8px 16px; border-radius: 5px; cursor: pointer; border: none; }
+        .btn-logout {
+            padding: 8px 16px;
+            font-size: 0.9em;
+            background: none;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            color: #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #btnToggleEdit {
+            background: var(--accent-orange);
+            color: var(--bg-dark);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            display: none; 
+        }
+
+        .btn-admin-users {
+            background: transparent;
+            border: 1px solid var(--admin-gold);
+            color: var(--admin-gold);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        .btn-admin-users:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
         .session-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
 
         /* Estilo Botón Google */
-        .google-btn { background: white; color: #333; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; border: none; }
+        .google-btn {
+            background-color: #fff !important;
+            color: #333 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-image: none !important;
+        }
+        .google-btn img { width: 20px; }
 
         /* Lista Usuarios Modal */
-        .user-list-item { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; margin-bottom: 8px; }
-        .btn-small-delete { background: var(--accent-red); color: white; padding: 5px 10px; font-size: 0.8rem; border-radius: 4px; border: none; cursor: pointer; }
+        .user-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+        .btn-small-delete {
+            background: var(--accent-red) !important;
+            color: white;
+            border: none;
+            padding: 5px 10px !important;
+            font-size: 0.8rem !important;
+            border-radius: 4px;
+            width: auto !important;
+            margin-top: 0 !important;
+        }
         
-        /* Pantalla de carga */
-        #loading-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); display: flex; justify-content: center; align-items: center; z-index: 10000; color: white; font-weight: bold; }
-        
-        /* Tabla Logs */
-        #full-log-modal .modal table { width:100%; text-align:left; border-collapse: collapse; font-size: 0.85rem; margin-top: 15px; }
-        #full-log-modal .modal th, #full-log-modal .modal td { padding: 10px; border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-light); }
-        #full-log-modal .modal th { background: rgba(255, 255, 255, 0.05); }
+        /* Pantalla de carga simple */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+            font-weight: bold;
+        }
 
         @media (max-width: 600px) {
             .header { flex-direction: column; text-align: center; }
             .logo { height: 80px; width: 80px; }
             .session-controls { flex-direction: column; width: 100%; gap: 5px; }
+            #btnToggleEdit, .btn-logout, .btn-admin-users { width: 100%; }
+            .button-grid { grid-template-columns: 1fr; }
+            .button-wrapper.long { grid-column: span 1; }
         }
     </style>
 </head>
@@ -287,112 +354,111 @@
 
 <div id="loading-screen">Cargando...</div>
 
-<div class="container" id="app-content" style="display: none;">
+<div class="container" id="main-content" style="display: none;">
     <div class="card">
         <header class="header">
-            <div class="logo">
-                <img id="logoImage" src="logogad.png" alt="Logo GAD" />
+            <div class="logo" id="appLogo">
+                <img id="logoImage" src="https://placehold.co/108x108/282844/e9e9f0?text=LOGO" alt="Logo de GAD" />
             </div>
+            <input type="file" id="logoFileInput" style="display: none;" accept="image/*">
+
             <div class="header-title">
                 <h1>Menú Principal</h1>
                 <p>Selecciona una de las opciones disponibles</p>
             </div>
             <div class="session-controls">
-                <button id="btnUsuarios" class="btn-admin-users" style="display: none;">Gestionar Usuarios</button>
-                <button id="btnToggleEdit" style="display: none;">Modo Edición</button>
+                <button id="btnUsuarios" class="btn-admin-users">Gestionar Usuarios</button>
+                <button id="btnToggleEdit">Modo Edición</button>
                 <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
             </div>
         </header>
         <section class="welcome">
             <h2 id="welcome-message">Bienvenido</h2>
-            <p>Accede a las diferentes secciones de la aplicación.</p>
+            <p>Accede a las diferentes secciones de la aplicación para gestionar la información de tu interés.</p>
         </section>
         
         <div class="button-grid" id="buttonGrid">
             </div>
-        
-        <div id="btnAddButton" style="display: none; margin-top: 20px;">
-            <button id="btnNuevoBoton" class="button long" style="background-color: var(--accent-green); cursor: pointer;">
-                <i class="fas fa-plus-circle"></i> AÑADIR NUEVO BOTÓN
-            </button>
-        </div>
-    </div>
-    
-    <div class="card" id="admin-tools-card" style="display: none; margin-top: 20px;">
-        <h2>Herramientas de Administrador</h2>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 15px;">
-            <button id="btnShowLog" class="button" style="background-color: #3b82f6; width: auto; flex-grow: 1;">
-                <i class="fas fa-list-alt"></i> Ver Registro
-            </button>
-            <button onclick="window.open('COPIA SEGURIDAD FIREBASE.html', '_blank')" class="button" style="background-color: #8b5cf6; width: auto; flex-grow: 1;">
-                <i class="fas fa-cloud-download-alt"></i> Backup
-            </button>
+
+        <div id="btnAddButton" style="display: none;">
+            <i class="fas fa-plus-circle"></i> AÑADIR NUEVO BOTÓN
         </div>
     </div>
 </div>
 
-<div id="login-modal" class="modal-overlay"> 
+<div id="login-modal" class="modal-overlay" style="display: none;"> 
     <div class="modal">
-        <div class="logo" style="margin: 0 auto 15px;">
-            <img src="logogad.png" alt="Logo GAD" />
+        <header class="header" style="margin-bottom: 0; justify-content: center; flex-direction: column;">
+            <div class="logo" style="margin: 0 auto 15px;">
+                <img id="loginLogoImage" src="https://placehold.co/108x108/282844/e9e9f0?text=LOGO" alt="Logo de GAD" />
+            </div>
+            <div class="header-title" style="text-align: center;">
+                <h1>Acceso</h1>
+                <p>Inicia sesión para continuar</p>
+            </div>
+        </header>
+        <div class="modal-body">
+            <button id="btn-login-google" class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo">
+                Iniciar sesión con Google
+            </button>
         </div>
-        <h2>Acceso</h2>
-        <p>Inicia sesión con Google para continuar.</p>
-        <button id="btn-login-google" class="google-btn">
-            <i class="fab fa-google"></i> Iniciar sesión con Google
-        </button>
-        <p id="login-error" style="display: none; color: var(--accent-red); margin-top: 10px;"></p>
+        <p id="login-error" class="error-message" style="display: none; color: var(--accent-red); margin-top: 10px;"></p>
     </div>
 </div>
 
-<div id="dlgUsuariosModal" class="modal-overlay" style="display: none;">
-    <div class="modal" style="max-width: 450px;">
-        <div class="modal-header">
-            <strong>Gestionar Usuarios Autorizados</strong>
-            <button id="dlgUsuariosClose" class="modal-close">✕</button>
-        </div>
+<div id="button-modal" class="modal-overlay">
+    <div class="modal">
+        <span class="modal-close" id="close-button-modal">&times;</span>
+        <h2 id="button-modal-title">Añadir Nuevo Botón</h2>
+        
         <div class="modal-body">
-            <div style="margin-bottom: 20px;">
-                <label style="display:block; text-align:left; color:#aaa; font-size:0.9rem; margin-bottom:5px;">Añadir nuevo email (Gmail)</label>
-                <div style="display: flex; gap: 10px;">
-                    <input type="email" id="txtNewUserEmail" placeholder="usuario@gmail.com" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #444; background: #333; color: white;">
-                    <button id="btnAddUser" class="btn-admin-users" style="width:auto; background:var(--accent-green);">+</button>
+            <label for="button-name" style="text-align: left;">Nombre del Botón:</label>
+            <input type="text" id="button-name" placeholder="Ej: Reportes" maxlength="30" />
+
+            <div class="modal-input-group">
+                <div>
+                    <label for="button-type" style="text-align: left; display:block;">Tamaño:</label>
+                    <select id="button-type">
+                        <option value="short">Corto (1 columna)</option>
+                        <option value="long">Largo (2 columnas)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="button-url" style="text-align: left; display:block;">URL:</label>
+                    <input type="text" id="button-url" placeholder="Ej: reportes.html" />
                 </div>
             </div>
-            <div id="usersListContainer"></div>
+            
+            <p style="margin: 0; text-align: left;">* Opcional: Arrastra un archivo HTML.</p>
+            <div id="drop-area">
+                <i class="fas fa-upload"></i> Arrastra y suelta tu archivo HTML aquí
+                <p id="drop-message" style="font-size: 0.9rem; color: #ccc; margin-top: 5px;">(El nombre se usará como URL)</p>
+            </div>
         </div>
+        <button id="button-submit">Guardar Botón</button>
+        <p id="button-message" class="success-message" style="margin-top: 15px;"></p>
     </div>
 </div>
 
-<div id="edit-button-modal" class="modal-overlay" style="display: none;">
+<div id="dlgUsuariosModal" class="modal-overlay">
     <div class="modal">
-        <span class="modal-close" id="close-edit-button-modal">&times;</span>
-        <h2 id="edit-modal-title">Editar/Nuevo Botón</h2>
+        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <strong>Gestionar Usuarios Autorizados</strong>
+            <button id="dlgUsuariosClose" style="background:none; border:none; font-size:1.5rem; width:auto; margin:0; cursor:pointer; color:#aaa;">✕</button>
+        </div>
         <div class="modal-body">
-            <input type="hidden" id="edit-button-key">
-            <label style="text-align: left; color:#aaa;">Nombre:</label>
-            <input type="text" id="edit-button-name" placeholder="Texto del botón" />
-            <label style="text-align: left; color:#aaa;">URL/Destino:</label>
-            <input type="text" id="edit-button-url" placeholder="ejemplo.html o URL" />
-            <label style="text-align: left; color:#aaa;">Tamaño:</label>
-            <select id="edit-button-span">
-                <option value="short">Normal (1 columna)</option>
-                <option value="long">Largo (2 columnas)</option>
-            </select>
+            <div class="field" style="margin-bottom: 20px;">
+                <label style="display:block; text-align:left; color:#aaa; font-size:0.9rem; margin-bottom:5px;">Añadir nuevo email (Gmail)</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="email" id="txtNewUserEmail" placeholder="usuario@gmail.com" style="margin-bottom:0;">
+                    <button id="btnAddUser" style="width:auto; background:var(--accent-green); margin-top:0;">+</button>
+                </div>
+            </div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0; width:100%;">
+            <div id="usersListContainer" style="max-height:200px; overflow-y:auto;">
+                </div>
         </div>
-        <button id="save-button-changes" class="button standard-btn">Guardar Cambios</button>
-        <button id="delete-button" class="button btn-logout" style="margin-top: 5px;">Eliminar</button>
-    </div>
-</div>
-
-<div id="full-log-modal" class="modal-overlay" style="display: none;">
-    <div class="modal" style="max-width: 800px; max-height: 90vh;">
-        <span class="modal-close" id="close-full-log-modal">&times;</span>
-        <h2>Registro de Accesos (Últimos 100)</h2>
-        <div id="full-log-container" style="overflow-y: auto; max-height: 70vh;">
-            <table></table>
-        </div>
-        <button id="clear-global-log" class="button btn-logout" style="margin-top: 15px;">Borrar Historial Completo</button>
     </div>
 </div>
 
@@ -417,79 +483,77 @@
     const auth = firebase.auth();
     const provider = new firebase.auth.GoogleAuthProvider();
 
+    // ----------------------------------------------------
+    // IMPORTANTE: CONFIGURACIÓN DE PERSISTENCIA GLOBAL
+    // Esto asegura que al abrir la app, Firebase busque la sesión en el disco
+    // antes de hacer nada más.
+    // ----------------------------------------------------
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
     // --- CONFIGURACIÓN DE SEGURIDAD ---
     const ADMIN_EMAIL = "verdeguer279@gmail.com";
     const ALLOWED_USERS_REF = db.ref('allowed_users');
-    const BUTTONS_REF = db.ref('botones'); 
-    const LOG_REF = db.ref('visitLog');
 
     // --- Referencias UI ---
     const loadingScreen = document.getElementById('loading-screen');
-    const appContent = document.getElementById('app-content');
+    const mainContent = document.getElementById('main-content');
     const loginModal = document.getElementById('login-modal');
     const btnLoginGoogle = document.getElementById('btn-login-google');
     const loginError = document.getElementById('login-error');
     const welcomeMessage = document.getElementById('welcome-message');
     const btnLogout = document.getElementById('btn-logout');
-    const btnUsuarios = document.getElementById('btnUsuarios');
-    const btnToggleEdit = document.getElementById('btnToggleEdit');
-    const btnNuevoBoton = document.getElementById('btnNuevoBoton');
-    const btnShowLog = document.getElementById('btnShowLog');
-    const adminToolsCard = document.getElementById('admin-tools-card');
-    const buttonGrid = document.getElementById('buttonGrid');
     
-    // UI Modal Usuarios
+    // UI Admin / Botones
+    const btnToggleEdit = document.getElementById('btnToggleEdit');
+    const btnUsuarios = document.getElementById('btnUsuarios');
+    const buttonGrid = document.getElementById('buttonGrid');
+    const btnAddButton = document.getElementById('btnAddButton');
+    const appLogo = document.getElementById('appLogo');
+    const logoImage = document.getElementById('logoImage');
+    const loginLogoImage = document.getElementById('loginLogoImage');
+    const logoFileInput = document.getElementById('logoFileInput');
+    
+    // UI Modales
+    const buttonModal = document.getElementById('button-modal');
+    const buttonModalTitle = document.getElementById('button-modal-title');
+    const buttonNameInput = document.getElementById('button-name');
+    const buttonUrlInput = document.getElementById('button-url');
+    const buttonTypeSelect = document.getElementById('button-type');
+    const buttonSubmit = document.getElementById('button-submit');
+    const buttonMessage = document.getElementById('button-message');
+    const dropArea = document.getElementById('drop-area');
+    const dropMessage = document.getElementById('drop-message');
     const dlgUsuariosModal = document.getElementById('dlgUsuariosModal');
     const dlgUsuariosClose = document.getElementById('dlgUsuariosClose');
     const txtNewUserEmail = document.getElementById('txtNewUserEmail');
     const btnAddUser = document.getElementById('btnAddUser');
     const usersListContainer = document.getElementById('usersListContainer');
-    
-    // UI Modal Edición
-    const editButtonModal = document.getElementById('edit-button-modal');
-    const closeEditButtonModal = document.getElementById('close-edit-button-modal');
-    const editModalTitle = document.getElementById('edit-modal-title');
-    const editButtonKey = document.getElementById('edit-button-key');
-    const editButtonName = document.getElementById('edit-button-name');
-    const editButtonUrl = document.getElementById('edit-button-url');
-    const editButtonSpan = document.getElementById('edit-button-span');
-    const saveButtonChanges = document.getElementById('save-button-changes');
-    const deleteButton = document.getElementById('delete-button');
 
-    // UI Modal Log
-    const fullLogModal = document.getElementById('full-log-modal');
-    const closeFullLogModal = document.getElementById('close-full-log-modal');
-    const fullLogContainer = document.getElementById('full-log-container');
-    const clearGlobalLog = document.getElementById('clear-global-log');
-
-    let isAdmin = false;
+    // Estados
     let isEditMode = false;
-    let draggedItem = null;
+    let draggedButtonKey = null; 
+    let editingButtonKey = null; 
+    let isAdmin = false;
 
-    // ----------------------------------------------------
-    // 1. Configuración de Persistencia (CRÍTICO para la App)
-    // ----------------------------------------------------
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .catch(error => console.error("Error al configurar persistencia:", error));
-
-    // 2. Manejo de Login/Redirección
+    // Verificar si volvemos de un Redirect (Móvil)
     auth.getRedirectResult()
         .then((result) => {
-            if (result.user) console.log("Login exitoso tras redirect:", result.user.email);
+            if (result && result.user) {
+                console.log("Login exitoso tras redirect:", result.user.email);
+            }
         })
         .catch((error) => {
             console.error("Error en redirect:", error);
-            if (error.code !== 'auth/cancelled-popup-request') {
-                loginError.textContent = "Error al autenticar. Inténtalo de nuevo.";
-                loginError.style.display = 'block';
-            }
+            loginError.textContent = "Error: " + error.message;
+            loginError.style.display = 'block';
         });
 
-    // 3. Listener principal de autenticación
     auth.onAuthStateChanged((user) => {
+        // Ocultar pantalla de carga una vez Firebase responde
         loadingScreen.style.display = 'none';
 
         if (user) {
+            // VERIFICACIÓN POR CORREO ELECTRÓNICO
             if (user.email === ADMIN_EMAIL) {
                 isAdmin = true;
                 initializeSession(user);
@@ -499,10 +563,12 @@
             }
         } else {
             // No logueado
-            appContent.style.display = 'none';
+            mainContent.style.display = 'none';
+            // Ahora sí mostramos el login
             loginModal.style.display = 'flex';
-            btnUsuarios.style.display = 'none';
             btnToggleEdit.style.display = 'none';
+            btnUsuarios.style.display = 'none';
+            disableEditMode();
         }
     });
 
@@ -512,7 +578,9 @@
             let isAllowed = false;
             if (allowed) {
                 const emails = Object.values(allowed);
-                if (emails.includes(user.email)) isAllowed = true;
+                if (emails.includes(user.email)) {
+                    isAllowed = true;
+                }
             }
 
             if (isAllowed) {
@@ -528,249 +596,340 @@
 
     function initializeSession(user) {
         loginModal.style.display = 'none';
-        appContent.style.display = 'block';
+        mainContent.style.display = 'block';
         welcomeMessage.textContent = `Bienvenido, ${user.displayName || 'Usuario'}!`;
 
         if (isAdmin) {
-            btnUsuarios.style.display = 'block';
             btnToggleEdit.style.display = 'block';
-            adminToolsCard.style.display = 'block';
+            btnUsuarios.style.display = 'block';
         } else {
-            btnUsuarios.style.display = 'none';
             btnToggleEdit.style.display = 'none';
-            adminToolsCard.style.display = 'none';
+            btnUsuarios.style.display = 'none';
+            disableEditMode();
         }
-        
-        loadMenuButtons();
-    }
-    
-    // 4. Funcionalidad de Edición
-    btnToggleEdit.addEventListener('click', () => {
-        if (!isAdmin) return;
-        isEditMode = !isEditMode;
-        btnToggleEdit.textContent = isEditMode ? 'Finalizar Edición' : 'Modo Edición';
-        btnToggleEdit.style.background = isEditMode ? 'var(--accent-red)' : 'var(--accent-orange)';
-        btnNuevoBoton.style.display = isEditMode ? 'block' : 'none';
-        loadMenuButtons(); // Vuelve a renderizar con controles
-    });
-
-    function loadMenuButtons() {
-        BUTTONS_REF.on('value', (snapshot) => {
-            buttonGrid.innerHTML = '';
-            const buttonsData = snapshot.val() || {};
-            
-            const sortedButtons = Object.keys(buttonsData).map(key => ({ key, ...buttonsData[key] })).sort((a, b) => (a.order || 0) - (b.order || 0));
-
-            sortedButtons.forEach(button => {
-                const isLong = button.span === 'long' ? 'long' : '';
-                const wrapper = document.createElement('div');
-                wrapper.className = `button-wrapper ${isLong}`;
-                wrapper.dataset.key = button.key;
-                
-                const buttonElement = document.createElement('a');
-                buttonElement.href = isEditMode ? '#' : (button.url || '#');
-                buttonElement.className = `button ${isLong}`;
-                buttonElement.style.backgroundColor = button.color || 'var(--accent-gradient)';
-                buttonElement.textContent = button.name || 'Botón sin nombre';
-                
-                wrapper.appendChild(buttonElement);
-
-                if (isEditMode && isAdmin) {
-                    wrapper.draggable = true;
-                    addDragHandlers(wrapper);
-                    wrapper.innerHTML += `<div class="action-buttons" style="position: absolute; top: 5px; right: 5px; display: flex; gap: 5px; z-index: 10;">
-                        <button class="action-button edit" onclick="openEditModal('${button.key}')" style="background: var(--accent-orange);"><i class="fas fa-edit"></i></button>
-                    </div>`;
-                }
-                
-                buttonGrid.appendChild(wrapper);
-            });
-            
-            if (isEditMode && isAdmin) {
-                // Configurar dragzone para reordenar
-                buttonGrid.ondragover = e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; };
-                buttonGrid.ondrop = () => updateOrder();
-            }
-        });
     }
 
-    function addDragHandlers(el) {
-        el.ondragstart = e => { 
-            draggedItem = el; 
-            e.dataTransfer.effectAllowed = 'move'; 
-            e.dataTransfer.setData('text/plain', el.dataset.key); 
-            setTimeout(() => el.classList.add('ghost'), 0); 
-        };
-        el.ondragover = e => {
-            e.preventDefault();
-            const targetKey = el.dataset.key;
-            const draggedKey = draggedItem.dataset.key;
-            if (targetKey !== draggedKey) {
-                const rect = el.getBoundingClientRect();
-                const center = rect.left + rect.width / 2;
-                if (e.clientX < center) buttonGrid.insertBefore(draggedItem, el);
-                else buttonGrid.insertBefore(draggedItem, el.nextSibling);
-            }
-        };
-        el.ondragend = () => { 
-            draggedItem.classList.remove('ghost'); 
-            draggedItem = null;
-            updateOrder(); 
-        };
-    }
-
-    function updateOrder() { 
-        if (!isAdmin) return;
-        const updates = {}; 
-        document.querySelectorAll('#buttonGrid .button-wrapper').forEach((b, i) => {
-            updates[`/botones/${b.dataset.key}/order`] = i;
-        }); 
-        BUTTONS_REF.update(updates); 
-    }
-
-    // Modal de Edición CRUD
-    btnNuevoBoton.onclick = () => openEditModal(null);
-    closeEditButtonModal.onclick = () => editButtonModal.style.display = 'none';
-
-    function openEditModal(key) {
-        editButtonKey.value = key || '';
-        if (key) {
-            editModalTitle.textContent = "Editar Botón";
-            deleteButton.style.display = 'block';
-            BUTTONS_REF.child(key).once('value').then(s => {
-                const data = s.val();
-                editButtonName.value = data.name || '';
-                editButtonUrl.value = data.url || '';
-                editButtonSpan.value = data.span || 'short';
-            });
-        } else {
-            editModalTitle.textContent = "Añadir Nuevo Botón";
-            deleteButton.style.display = 'none';
-            editButtonName.value = '';
-            editButtonUrl.value = '';
-            editButtonSpan.value = 'short';
-        }
-        editButtonModal.style.display = 'flex';
-    }
-
-    saveButtonChanges.onclick = () => {
-        if (!isAdmin) return;
-        const key = editButtonKey.value;
-        const name = editButtonName.value.trim();
-        const url = editButtonUrl.value.trim();
-        const span = editButtonSpan.value;
-
-        if (!name) return alert("El nombre es obligatorio.");
-
-        const data = { name, url, span };
-
-        if (key) {
-            // Actualizar
-            BUTTONS_REF.child(key).update(data).then(() => editButtonModal.style.display = 'none');
-        } else {
-            // Nuevo
-            data.order = document.querySelectorAll('#buttonGrid .button-wrapper').length;
-            BUTTONS_REF.push(data).then(() => editButtonModal.style.display = 'none');
-        }
-    };
-
-    deleteButton.onclick = () => {
-        if (!isAdmin) return;
-        const key = editButtonKey.value;
-        if (confirm(`¿Estás seguro de que quieres eliminar el botón?`)) {
-            BUTTONS_REF.child(key).remove().then(() => editButtonModal.style.display = 'none');
-        }
-    };
-    
-    // 5. Handlers de Eventos de Sesión
+    // Iniciar Sesión con Google
     btnLoginGoogle.addEventListener('click', () => {
-        auth.signInWithRedirect(provider);
+        // Aseguramos persistencia antes de redirigir
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            .then(() => {
+                return auth.signInWithRedirect(provider);
+            })
+            .catch((error) => {
+                console.error("Error en login:", error);
+                loginError.textContent = "Error: " + error.message;
+                loginError.style.display = 'block';
+            });
     });
 
+    // Cerrar Sesión
     btnLogout.addEventListener('click', () => {
         auth.signOut();
     });
 
-    // --- Gestión de Usuarios ---
+    // --- 2. Gestión de Usuarios (Solo Admin) ---
     btnUsuarios.onclick = () => {
-        if (!isAdmin) return;
         loadAllowedUsers();
-        dlgUsuariosModal.style.display = 'flex';
+        dlgUsuariosModal.classList.add("open");
     };
-    dlgUsuariosClose.onclick = () => dlgUsuariosModal.style.display = 'none';
+    dlgUsuariosClose.onclick = () => dlgUsuariosModal.classList.remove("open");
 
     function loadAllowedUsers() {
-        usersListContainer.innerHTML = "<p style='color:#ccc;'>Cargando...</p>";
+        usersListContainer.innerHTML = "<p>Cargando...</p>";
         ALLOWED_USERS_REF.on('value', (snapshot) => {
             usersListContainer.innerHTML = "";
             const users = snapshot.val();
             if (users) {
                 Object.keys(users).forEach(key => {
                     const email = users[key];
-                    if (email !== ADMIN_EMAIL) { // No listar al admin
-                        const div = document.createElement("div");
-                        div.className = "user-list-item";
-                        div.innerHTML = `
-                            <span style="color:var(--text-light);">${email}</span>
-                            <button class="btn-small-delete" onclick="removeUser('${key}')">Revocar Acceso</button>
-                        `;
-                        usersListContainer.appendChild(div);
-                    }
+                    const div = document.createElement("div");
+                    div.className = "user-list-item";
+                    div.innerHTML = `
+                        <span>${email}</span>
+                        <button class="btn-small-delete" onclick="removeUser('${key}', '${email}')">Eliminar</button>
+                    `;
+                    usersListContainer.appendChild(div);
                 });
             } else {
-                usersListContainer.innerHTML = "<p style='color:#ccc'>No hay usuarios extra autorizados.</p>";
+                usersListContainer.innerHTML = "<p style='color:#aaa'>No hay usuarios extra autorizados.</p>";
             }
         });
     }
 
     btnAddUser.onclick = () => {
         const email = txtNewUserEmail.value.trim();
-        if (email && email !== ADMIN_EMAIL) {
+        if (email) {
             ALLOWED_USERS_REF.push(email);
             txtNewUserEmail.value = "";
-        } else if (email === ADMIN_EMAIL) {
-            alert("El administrador ya tiene acceso por defecto.");
         }
     };
 
-    window.removeUser = (key) => {
-        if (confirm(`¿Revocar acceso a este usuario?`)) {
+    window.removeUser = (key, email) => {
+        if (confirm(`¿Quitar acceso a ${email}?`)) {
             ALLOWED_USERS_REF.child(key).remove();
         }
     };
-    
-    // --- Gestión de Logs ---
-    btnShowLog.onclick = () => {
-        if (!isAdmin) return;
-        renderFullGlobalLog();
-        fullLogModal.style.display = 'flex';
-    };
-    closeFullLogModal.onclick = () => fullLogModal.style.display = 'none';
-    
-    async function renderFullGlobalLog() {
-        fullLogContainer.innerHTML = 'Cargando...';
-        const s = await LOG_REF.limitToLast(100).once('value');
-        
-        if (!s.val()) return fullLogContainer.innerHTML = '<p style="margin-top: 15px;">No hay registros de acceso.</p>';
-        
-        let h = '<table><thead><tr><th>Usuario</th><th>Fecha</th><th>IP</th></tr></thead><tbody>';
-        const entries = Object.values(s.val()).sort((a,b)=>b.timestamp-a.timestamp);
-        
-        entries.forEach(e => {
-            const nameDisplay = e.email ? e.email : (e.userName || 'Anónimo');
-            h+=`<tr><td>${nameDisplay}</td><td>${new Date(e.timestamp).toLocaleString()}</td><td>${e.ip||'-'}</td></tr>`;
+
+
+    // --- 3. Lógica del Logo ---
+    function loadLogo() {
+        db.ref('config/logo').once('value').then(snapshot => {
+            const logoData = snapshot.val();
+            if (logoData) {
+                logoImage.src = logoData;
+                loginLogoImage.src = logoData; 
+            }
         });
-        fullLogContainer.innerHTML = h+'</tbody></table>';
-    };
+    }
+
+    async function saveLogo(base64Image) {
+        if (!isAdmin) return; 
+        await db.ref('config/logo').set(base64Image);
+        loadLogo();
+    }
     
-    clearGlobalLog.onclick = () => {
-        if (confirm("¿Estás seguro de que quieres BORRAR el historial de accesos completo?")) {
-            LOG_REF.remove().then(() => {
-                alert("Historial borrado.");
-                fullLogModal.style.display = 'none';
-            });
+    appLogo.addEventListener('click', () => {
+        if (isEditMode && isAdmin) logoFileInput.click();
+    });
+
+    logoFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) { saveLogo(event.target.result); };
+            reader.readAsDataURL(file);
         }
-    };
+    });
+
+
+    // --- 4. Lógica de Botones (Render, Drag&Drop, CRUD) ---
+
+    // Toggle Modo Edición
+    function disableEditMode() {
+        isEditMode = false;
+        btnToggleEdit.textContent = 'Modo Edición';
+        btnToggleEdit.style.background = 'var(--accent-orange)';
+        btnAddButton.style.display = 'none';
+        document.body.classList.remove('edit-mode');
+        db.ref('botones').once('value').then(snap => renderButtons(snap.val()));
+    }
+
+    btnToggleEdit.addEventListener('click', () => {
+        if (!isAdmin) return;
+        isEditMode = !isEditMode;
+        btnToggleEdit.textContent = isEditMode ? 'Salir de Edición' : 'Modo Edición';
+        btnToggleEdit.style.background = isEditMode ? 'var(--accent-red)' : 'var(--accent-orange)';
+        btnAddButton.style.display = isEditMode ? 'block' : 'none';
+        
+        db.ref('botones').once('value').then(snapshot => {
+            renderButtons(snapshot.val());
+        });
+    });
+
+    // Escuchar cambios en botones
+    db.ref('botones').on('value', (snapshot) => {
+        renderButtons(snapshot.val());
+    });
+
+    function sortButtons(buttons) {
+        if (!buttons) return [];
+        return Object.keys(buttons)
+            .map(key => ({ key, ...buttons[key] }))
+            .sort((a, b) => (a.order || 999) - (b.order || 999));
+    }
+
+    function renderButtons(buttonsData) {
+        buttonGrid.innerHTML = '';
+        const sortedButtons = sortButtons(buttonsData);
+
+        sortedButtons.forEach(button => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'button-wrapper';
+            wrapper.id = 'btn-wrapper-' + button.key;
+            wrapper.setAttribute('data-key', button.key);
+            
+            if (button.span === 'long') wrapper.classList.add('long');
+
+            const btnLink = document.createElement('a');
+            btnLink.href = isEditMode ? '#' : (button.url || '#'); 
+            btnLink.className = `button ${button.class || ''}`;
+            btnLink.textContent = button.name || 'Sin Nombre';
+            
+            wrapper.appendChild(btnLink);
+
+            if (isEditMode && isAdmin) {
+                wrapper.classList.add('edit-mode');
+                wrapper.setAttribute('draggable', true);
+
+                const actions = document.createElement('div');
+                actions.className = 'action-buttons';
+
+                const dragHandle = document.createElement('button');
+                dragHandle.className = 'action-button drag-handle';
+                dragHandle.innerHTML = '<i class="fas fa-arrows-alt"></i>';
+                
+                const btnEdit = document.createElement('button');
+                btnEdit.className = 'action-button edit';
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
+                btnEdit.onclick = (e) => {
+                    e.stopPropagation();
+                    openButtonModal(button.key, button.name, button.url, button.span);
+                };
+                
+                const btnDelete = document.createElement('button');
+                btnDelete.className = 'action-button delete';
+                btnDelete.innerHTML = '<i class="fas fa-trash"></i>';
+                btnDelete.onclick = (e) => {
+                    e.stopPropagation();
+                    if (confirm(`¿Borrar "${button.name}"?`)) deleteButton(button.key);
+                };
+
+                actions.appendChild(dragHandle);
+                actions.appendChild(btnEdit);
+                actions.appendChild(btnDelete);
+                wrapper.appendChild(actions);
+
+                setupDragEvents(wrapper); 
+            } else {
+                wrapper.classList.remove('edit-mode');
+                wrapper.removeAttribute('draggable');
+            }
+            
+            buttonGrid.appendChild(wrapper);
+        });
+
+        if (isEditMode) {
+            buttonGrid.classList.add('edit-mode');
+            document.body.classList.add('edit-mode');
+        } else {
+            buttonGrid.classList.remove('edit-mode');
+            document.body.classList.remove('edit-mode');
+        }
+    }
+
+    // Funciones CRUD
+    function deleteButton(key) {
+        if (!isAdmin) return;
+        db.ref('botones/' + key).remove();
+    }
+
+    async function saveButtonOrder() {
+        if (!isAdmin) return;
+        const wrappers = Array.from(buttonGrid.querySelectorAll('.button-wrapper'));
+        const updates = {};
+        wrappers.forEach((wrapper, index) => {
+            const key = wrapper.getAttribute('data-key');
+            if (key) updates[`/botones/${key}/order`] = index;
+        });
+        if (Object.keys(updates).length) await db.ref('/').update(updates);
+    }
+
+    // Modal Botones
+    btnAddButton.addEventListener('click', () => openButtonModal());
+    document.getElementById('close-button-modal').addEventListener('click', () => buttonModal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === buttonModal) buttonModal.style.display = 'none'; });
+
+    function openButtonModal(key = null, name = '', url = '', span = 'short') {
+        editingButtonKey = key;
+        buttonModalTitle.textContent = key ? 'Editar Botón' : 'Añadir Nuevo Botón';
+        buttonNameInput.value = name;
+        buttonUrlInput.value = url;
+        buttonTypeSelect.value = span;
+        buttonMessage.textContent = '';
+        dropArea.classList.remove('drag-over-file');
+        dropMessage.textContent = '(El nombre se usará como URL)';
+        dropMessage.style.color = '#ccc';
+        buttonModal.style.display = 'flex';
+    }
+
+    buttonSubmit.addEventListener('click', async () => {
+        if (!isAdmin) {
+            buttonMessage.textContent = "No tienes permisos.";
+            return;
+        }
+
+        const name = buttonNameInput.value.trim();
+        let url = buttonUrlInput.value.trim();
+        const span = buttonTypeSelect.value;
+
+        if (!name) return alert("Nombre obligatorio");
+        if (!url) url = '#';
+
+        const buttonData = {
+            name, url, span,
+            class: 'button-' + name.toLowerCase().replace(/\s/g, '-'),
+            order: 999 
+        };
+
+        buttonMessage.style.color = 'var(--accent-green)';
+        buttonMessage.textContent = 'Guardando...';
+
+        try {
+            if (editingButtonKey) {
+                await db.ref('botones/' + editingButtonKey).update(buttonData);
+            } else {
+                const snap = await db.ref('botones').once('value');
+                buttonData.order = snap.numChildren(); 
+                await db.ref('botones').push(buttonData);
+            }
+            setTimeout(() => buttonModal.style.display = 'none', 500);
+        } catch (e) {
+            buttonMessage.textContent = e.message;
+            buttonMessage.style.color = 'var(--accent-red)';
+        }
+    });
+
+    // Drag events
+    function setupDragEvents(wrapper) {
+        wrapper.addEventListener('dragstart', (e) => {
+            draggedButtonKey = wrapper.getAttribute('data-key');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedButtonKey);
+            setTimeout(() => wrapper.classList.add('ghost'), 0);
+        });
+        wrapper.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const targetKey = wrapper.getAttribute('data-key');
+            if (targetKey !== draggedButtonKey) {
+                const draggedEl = document.getElementById('btn-wrapper-' + draggedButtonKey);
+                const rect = wrapper.getBoundingClientRect();
+                const center = rect.left + rect.width / 2;
+                if (e.clientX < center) buttonGrid.insertBefore(draggedEl, wrapper);
+                else buttonGrid.insertBefore(draggedEl, wrapper.nextSibling);
+            }
+        });
+        wrapper.addEventListener('dragend', () => {
+            const draggedEl = document.getElementById('btn-wrapper-' + draggedButtonKey);
+            if(draggedEl) draggedEl.classList.remove('ghost');
+            saveButtonOrder();
+        });
+    }
+
+    setupModalDropArea();
+    function setupModalDropArea() {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => dropArea.classList.add('drag-over-file'));
+        ['dragleave', 'drop'].forEach(eventName => dropArea.classList.remove('drag-over-file'));
+
+        dropArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            if (file && (file.type === 'text/html' || file.name.toLowerCase().endsWith('.html'))) {
+                buttonUrlInput.value = file.name;
+                dropMessage.textContent = `Archivo "${file.name}" asignado.`;
+                dropMessage.style.color = 'var(--accent-green)';
+            } else {
+                dropMessage.textContent = 'Solo archivos HTML.';
+                dropMessage.style.color = 'var(--accent-red)';
+            }
+        });
+    }
+
+    loadLogo();
 </script>
 </body>
 </html>

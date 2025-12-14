@@ -483,6 +483,13 @@
     const auth = firebase.auth();
     const provider = new firebase.auth.GoogleAuthProvider();
 
+    // ----------------------------------------------------
+    // IMPORTANTE: CONFIGURACIÓN DE PERSISTENCIA GLOBAL
+    // Esto asegura que al abrir la app, Firebase busque la sesión en el disco
+    // antes de hacer nada más.
+    // ----------------------------------------------------
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
     // --- CONFIGURACIÓN DE SEGURIDAD ---
     const ADMIN_EMAIL = "verdeguer279@gmail.com";
     const ALLOWED_USERS_REF = db.ref('allowed_users');
@@ -527,14 +534,6 @@
     let draggedButtonKey = null; 
     let editingButtonKey = null; 
     let isAdmin = false;
-
-    // 1. FORZAR PERSISTENCIA LOCAL AL INICIAR
-    // Esto es crítico para que la App no pierda la sesión al cerrar
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-        .then(() => {
-             // Persistencia configurada, ahora esperamos a que el listener actúe
-        })
-        .catch(error => console.error("Error setting persistence:", error));
 
     // Verificar si volvemos de un Redirect (Móvil)
     auth.getRedirectResult()

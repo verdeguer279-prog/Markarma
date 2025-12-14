@@ -469,8 +469,9 @@
     const auth = firebase.auth();
     const provider = new firebase.auth.GoogleAuthProvider();
 
-    // ID DEL ADMINISTRADOR SUPREMO (Debe coincidir con tu ID de Google)
-    const ADMIN_UID = "euq9uxFJrAft9m1cNob0PZ1fo7q1";
+    // --- CONFIGURACIÓN DE SEGURIDAD ---
+    // AQUÍ DEFINIMOS TU EMAIL COMO EL ADMINISTRADOR SUPREMO
+    const ADMIN_EMAIL = "verdeguer279@gmail.com";
     const ALLOWED_USERS_REF = db.ref('allowed_users');
 
     // --- Referencias UI ---
@@ -519,12 +520,12 @@
 
     auth.onAuthStateChanged((user) => {
         if (user) {
-            // Verificar si es Admin por UID
-            if (user.uid === ADMIN_UID) {
+            // VERIFICACIÓN POR CORREO ELECTRÓNICO (SOLUCIÓN AL ERROR)
+            if (user.email === ADMIN_EMAIL) {
                 isAdmin = true;
                 initializeSession(user);
             } else {
-                // Si no es admin, verificar si está autorizado
+                // Si no es admin por email, verificar si está en lista blanca
                 isAdmin = false;
                 checkIfAllowed(user);
             }
@@ -544,6 +545,7 @@
             let isAllowed = false;
             if (allowed) {
                 const emails = Object.values(allowed);
+                // Verificamos si el email del usuario está en la lista de permitidos
                 if (emails.includes(user.email)) {
                     isAllowed = true;
                 }

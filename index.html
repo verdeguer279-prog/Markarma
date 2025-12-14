@@ -1,436 +1,459 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Buscador · Titular-Usuario-Descripción-Resultado</title>
-  <style>
-    :root {
-      --bg-dark: #1a1a2e;
-      --card-bg: #282844;
-      --text-light: #e9e9f0;
-      --accent-blue: #007BFF;
-      --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
-      --accent-red: #d32f2f;
-      --accent-green: #28a745;
-      --google-red: #db4437; /* Color para botón Google */
-    }
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: var(--bg-dark);
-      color: var(--text-light);
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    .wrap {
-      max-width: 940px;
-      margin: 32px auto;
-      padding: 0 16px;
-      box-sizing: border-box;
-    }
-    header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      text-align: center;
-    }
-    .header-left {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-        width: 100%;
-    }
-    .logo-box {
-      height: 108px;
-      width: 108px;
-      background: transparent;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-    }
-    .logo-box img { max-height: 96px; max-width: 96px; }
-    .title h1 { margin: 0; font-size: clamp(1.4rem, 4vw, 2rem); }
-    .title p { margin: 4px 0 0; font-size: clamp(.85rem, 2vw, .95rem); color: #ccc; }
-    .card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-      box-sizing: border-box;
-    }
-    .grid { display: grid; gap: 16px; }
-    .field { display: grid; gap: 8px; }
-    label { font-size: 0.9rem; color: #aaa; }
-    input[type="text"], input[type="password"], textarea, input[type="email"] {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-light);
-      padding: 12px;
-      border-radius: 8px;
-      box-sizing: border-box;
-      transition: all 0.3s ease;
-    }
-    input[type="text"]:focus, input[type="password"]:focus, textarea:focus, input[type="email"]:focus {
-      outline: none;
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
-    }
-    button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-sizing: border-box;
-    }
-    .btn-primary {
-      background: var(--accent-gradient);
-      color: #fff;
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(118, 75, 162, 0.5);
-    }
-    /* Estilo botón Google */
-    .btn-google {
-      background: white;
-      color: #333;
-      border: 1px solid #ddd;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-    }
-    .btn-google:hover {
-      background: #f1f1f1;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: var(--text-light);
-    }
-    .btn-ghost:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    .btn-menu-principal {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: transform 0.2s, box-shadow 0.2s;
-        background: var(--card-bg);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: var(--text-light);
-        text-decoration: none;
-        display: inline-block;
-        white-space: nowrap;
-        box-sizing: border-box;
-    }
-    .btn-menu-principal:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        background: rgba(255, 255, 255, 0.1);
-    }
-    .btn-logout-red, .btn-delete-red {
-      background: var(--accent-red);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .btn-logout-red:hover, .btn-delete-red:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(211, 47, 47, 0.5);
-      background: #b71c1c;
-    }
-    .btn-success {
-      background: var(--accent-green);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-    .btn-success:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(40, 167, 69, 0.5);
-      background: #1e7e34;
-    }
-    table { 
-      width: 100%; 
-      border-collapse: collapse; 
-      margin-top: 1.5rem;
-      box-sizing: border-box;
-    }
-    th, td {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 12px;
-      text-align: left;
-      box-sizing: border-box;
-    }
-    th {
-      background: rgba(255, 255, 255, 0.05);
-      white-space: nowrap;
-    }
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s, visibility 0.3s;
-      z-index: 1000;
-    }
-    .modal-overlay.open { visibility: visible; opacity: 1; }
-    .modal {
-      background: var(--card-bg);
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      width: 90%;
-      max-width: 450px;
-      transform: scale(0.95);
-      transition: transform 0.3s ease-out;
-    }
-    .modal-overlay.open .modal { transform: scale(1); }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px 12px 0 0;
-    }
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      color: #aaa;
-      cursor: pointer;
-    }
-    .modal-body { padding: 1.5rem; }
-    .form-fields {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
-    .password-fields {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      padding: 1rem 1.5rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 0 0 12px 12px;
-    }
-    .login-container {
-      text-align: center;
-      margin-top: 50px;
-      padding: 24px;
-      border-radius: 12px;
-      background: var(--card-bg);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-      max-width: 350px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .login-field {
-      display: grid;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-    .alert-icon {
-        font-size: 2rem;
-        color: var(--accent-red);
-        margin-right: 1rem;
-    }
-    .modal-body.alert-content {
-        display: flex;
-        align-items: center;
-    }
-    @media (max-width: 600px) {
-      .wrap { margin: 16px auto; padding: 0 10px; }
-      header { flex-direction: column; text-align: center; }
-      .title { margin-top: 10px; }
-      .grid { grid-template-columns: 1fr; }
-      button { width: 100%; margin-bottom: 8px; }
-      .login-container { margin: 2rem auto; }
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-      thead tr { position: absolute; top: -9999px; left: -9999px; }
-      td {
-        border: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        position: relative;
-        padding-left: 50%;
-        text-align: right;
-      }
-      td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 0;
-        width: 50%;
-        padding-left: 10px;
-        font-weight: bold;
-        text-align: left;
-      }
-      .password-fields {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GAD - Menú Principal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
+    <style>
+        :root {
+            --bg-dark: #1a1a2e;
+            --card-bg: #282844;
+            --text-light: #e9e9f0;
+            --text-dark: #4a4a5a;
+            --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
+            --accent-red: #dc3545;
+            --accent-green: #28a745;
+            --accent-orange: #ff9800;
+            --admin-gold: #ffd700;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 16px;
+        }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Logo */
+        .logo {
+            height: 108px;
+            width: 108px;
+            border-radius: 50%;
+            overflow: hidden;
+            background-color: #3e3e5c;
+            position: relative;
+        }
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* Solo el admin verá el estilo de edición en el logo */
+        .edit-mode .logo {
+            cursor: pointer;
+            border: 3px solid var(--accent-orange);
+        }
+        .edit-mode .logo::after {
+            content: 'Cambiar Logo';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.6);
+            color: var(--text-light);
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .edit-mode .logo:hover::after {
+            opacity: 1;
+        }
+
+        .header-title { flex-grow: 1; }
+        .header-title h1 { margin: 0; font-size: 2rem; line-height: 1.2; }
+        .header-title p { margin: 0; font-size: 0.9rem; color: #ccc; }
+        
+        .welcome {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .welcome h2 { font-size: 1.5rem; margin-bottom: 10px; }
+        .welcome p { font-size: 0.9rem; color: #ccc; }
+        
+        /* Grid de Botones */
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px;
+            min-height: 100px; 
+        }
+        .button-wrapper {
+            position: relative;
+            cursor: grab; 
+            min-height: 80px;
+        }
+        .button-wrapper.long { grid-column: span 2; }
+        .button-wrapper.ghost { opacity: 0.5; transform: scale(0.95); }
+        
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            border-radius: 10px;
+            background-image: var(--accent-gradient);
+            color: var(--text-light);
+            font-weight: 600;
+            text-decoration: none;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        .button:hover:not(.edit-mode .button) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Estilos Edit Mode */
+        .edit-mode .button { cursor: pointer; pointer-events: none; }
+        .edit-mode .button-wrapper {
+            border: 2px dashed var(--accent-orange);
+            background: rgba(255, 152, 0, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        .button-wrapper.drag-over {
+            border: 3px solid var(--accent-green);
+            background: rgba(40, 167, 69, 0.2);
+        }
+
+        .action-buttons {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+            z-index: 10;
+        }
+        .action-button {
+            background: rgba(0, 0, 0, 0.7);
+            border: none;
+            color: var(--text-light);
+            padding: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+            pointer-events: auto;
+            transition: background 0.2s;
+        }
+        .action-button:hover { background: var(--accent-red); }
+        .action-button.edit:hover { background: var(--accent-orange); }
+        .action-button.drag-handle { background: rgba(0, 0, 0, 0.7); cursor: grab; padding: 5px 8px; }
+        .action-button.drag-handle:active { cursor: grabbing; }
+
+        #btnAddButton {
+            background-color: var(--accent-green);
+            color: var(--text-light);
+            padding: 15px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        #btnAddButton:hover { background-color: #1e7e34; }
+
+        /* Modales */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .modal-overlay.open { display: flex; }
+        
+        .modal {
+            background-color: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            color: var(--text-light);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+            text-align: center;
+        }
+        .modal h2 { margin-top: 0; text-align: center; }
+        .modal input, .modal select {
+            padding: 12px;
+            font-size: 1em;
+            border-radius: 8px;
+            border: 1px solid #555;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        .modal-input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .modal-input-group > div { flex: 1; }
+        .modal button {
+            padding: 10px 20px;
+            font-size: 1.1em;
+            border-radius: 5px;
+            border: none;
+            background-image: var(--accent-gradient);
+            color: var(--text-light);
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+        .modal-body { display: flex; flex-direction: column; gap: 10px; }
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+        
+        #drop-area {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            background-color: rgba(102, 126, 234, 0.1);
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        #drop-area.drag-over-file {
+            background-color: rgba(40, 167, 69, 0.2);
+            border-color: var(--accent-green);
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            font-size: 0.9em;
+            background: none;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            color: #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        #btnToggleEdit {
+            background: var(--accent-orange);
+            color: var(--bg-dark);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            display: none; 
+        }
+
+        .btn-admin-users {
+            background: transparent;
+            border: 1px solid var(--admin-gold);
+            color: var(--admin-gold);
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+        .btn-admin-users:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .session-controls { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+        /* Estilo Botón Google */
+        .google-btn {
+            background-color: #fff !important;
+            color: #333 !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-image: none !important;
+        }
+        .google-btn img { width: 20px; }
+
+        /* Lista Usuarios Modal */
+        .user-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+        .btn-small-delete {
+            background: var(--accent-red) !important;
+            color: white;
+            border: none;
+            padding: 5px 10px !important;
+            font-size: 0.8rem !important;
+            border-radius: 4px;
+            width: auto !important;
+            margin-top: 0 !important;
+        }
+        
+        @media (max-width: 600px) {
+            .header { flex-direction: column; text-align: center; }
+            .logo { height: 80px; width: 80px; }
+            .session-controls { flex-direction: column; width: 100%; gap: 5px; }
+            #btnToggleEdit, .btn-logout, .btn-admin-users { width: 100%; }
+            .button-grid { grid-template-columns: 1fr; }
+            .button-wrapper.long { grid-column: span 1; }
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="header-left">
-        <div class="logo-box"><img id="logo" alt="Mi logo de Gad" src="logogad.png" /></div>
-        <div class="title">
-          <h1>Buscador de contraseñas</h1>
-          <p>Puedes buscar por titular, usuario y descripción.</p>
-        </div>
-      </div>
-      <a href="index.html" class="btn-menu-principal">MENÚ PRINCIPAL</a>
-    </header>
 
-    <div id="app-content" hidden>
-        <section class="card grid">
-          <div class="field">
-            <label for="titular">Titular (buscar)</label>
-            <input id="titular" type="text" placeholder="Escriba para filtrar por Titular" list="titularesListBusqueda" />
-            <datalist id="titularesListBusqueda"></datalist>
-          </div>
-          <div class="field">
-            <label for="usuario">Usuario (buscar)</label>
-            <input id="usuario" type="text" placeholder="Escriba para filtrar por Usuario" />
-          </div>
-          <div class="field">
-            <label for="descripcionBusqueda">Descripción (buscar)</label>
-            <input id="descripcionBusqueda" type="text" placeholder="Escriba para filtrar por Descripción" list="descripcionesListBusqueda" />
-            <datalist id="descripcionesListBusqueda"></datalist>
-          </div>
-          <div class="field">
-            <label for="resultado">Contraseña 1</label>
-            <input id="resultado" type="text" placeholder="Resultado" readonly />
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <button id="btnBuscar" class="btn-primary">Buscar</button>
-            <button id="btnLimpiar" class="btn-success">Limpiar</button>
-            <button id="btnNuevo" class="btn-primary">Introduzca nuevos datos</button>
-            <button id="btnLogout" class="btn-logout-red">Cerrar sesión</button>
-          </div>
-
-          <div id="results" hidden>
-            <table>
-              <thead>
-                <tr>
-                    <th>Titular</th>
-                    <th>Usuario</th>
-                    <th>Descripción</th>
-                    <th>Contraseña</th>
-                    <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="tbody"></tbody>
-            </table>
-          </div>
-        </section>
-    </div>
-
-    <div id="login-container">
-        <h2>Inicie sesión para continuar</h2>
-        <p style="color: #aaa; margin-bottom: 20px;">Utilice su cuenta de Google para acceder.</p>
-        
-        <button id="btnGoogleLogin" class="btn-google">
-             <svg width="18" height="18" viewBox="0 0 18 18">
-                <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"></path>
-                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18L12.048 13.562c-.806.54-1.836.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"></path>
-                <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"></path>
-                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"></path>
-             </svg>
-             Iniciar sesión con Google
-        </button>
-    </div>
-
-  </div>
-
-  <div id="dlgNuevo" class="modal-overlay">
-    <div class="modal">
-      <div class="modal-header">
-        <strong id="modalTitle">Introduzca nuevos datos</strong>
-        <button id="dlgClose" class="btn-ghost close-btn">✕</button>
-      </div>
-      <form id="formNuevo">
-        <div class="modal-body">
-          <div class="form-fields">
-            <label for="nuevoTitular">Titular</label>
-            <input id="nuevoTitular" name="titular" type="text" required list="titularesList" />
-            <datalist id="titularesList"></datalist>
-
-            <label for="nuevoUsuario">Usuario</label>
-            <input id="nuevoUsuario" name="usuario" type="text" required />
-            
-            <label for="nuevaDescripcion">Descripción</label>
-            <input id="nuevaDescripcion" name="descripcion" type="text" required list="descripcionesList" />
-            <datalist id="descripcionesList"></datalist>
-
-            <div class="password-fields">
-              <div class="field">
-                <label for="nuevoResultado">Contraseña</label>
-                <input id="nuevoResultado" name="resultado" type="text" required />
-              </div>
+<div class="container" id="main-content" style="display: none;">
+    <div class="card">
+        <header class="header">
+            <div class="logo" id="appLogo">
+                <img id="logoImage" src="https://placehold.co/108x108/282844/e9e9f0?text=LOGO" alt="Logo de GAD" />
             </div>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" id="btnEliminarRegistro" class="btn-delete-red" hidden>Eliminar registro</button>
-          <button type="reset" class="btn-success">Limpiar</button>
-          <button type="submit" class="btn-primary">Guardar</button>
-        </div>
-      </form>
-    </div>
-  </div>
+            <input type="file" id="logoFileInput" style="display: none;" accept="image/*">
 
-  <div id="dlgMessage" class="modal-overlay">
+            <div class="header-title">
+                <h1>Menú Principal</h1>
+                <p>Selecciona una de las opciones disponibles</p>
+            </div>
+            <div class="session-controls">
+                <button id="btnUsuarios" class="btn-admin-users">Gestionar Usuarios</button>
+                <button id="btnToggleEdit">Modo Edición</button>
+                <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
+            </div>
+        </header>
+        <section class="welcome">
+            <h2 id="welcome-message">Bienvenido</h2>
+            <p>Accede a las diferentes secciones de la aplicación para gestionar la información de tu interés.</p>
+        </section>
+        
+        <div class="button-grid" id="buttonGrid">
+            </div>
+
+        <div id="btnAddButton" style="display: none;">
+            <i class="fas fa-plus-circle"></i> AÑADIR NUEVO BOTÓN
+        </div>
+    </div>
+</div>
+
+<div id="login-modal" class="modal-overlay" style="display: flex;"> 
     <div class="modal">
-      <div class="modal-header">
-        <strong id="messageTitle"></strong>
-      </div>
-      <div id="messageBody" class="modal-body">
-        <p id="messageText"></p>
-      </div>
-      <div class="modal-actions">
-        <button id="messageOk" class="btn-primary">Aceptar</button>
-        <button id="messageCancel" class="btn-ghost" hidden>Cancelar</button>
-      </div>
+        <header class="header" style="margin-bottom: 0; justify-content: center; flex-direction: column;">
+            <div class="logo" style="margin: 0 auto 15px;">
+                <img id="loginLogoImage" src="https://placehold.co/108x108/282844/e9e9f0?text=LOGO" alt="Logo de GAD" />
+            </div>
+            <div class="header-title" style="text-align: center;">
+                <h1>Acceso</h1>
+                <p>Inicia sesión para continuar</p>
+            </div>
+        </header>
+        <div class="modal-body">
+            <button id="btn-login-google" class="google-btn">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google Logo">
+                Iniciar sesión con Google
+            </button>
+        </div>
+        <p id="login-error" class="error-message" style="display: none; color: var(--accent-red); margin-top: 10px;"></p>
     </div>
-  </div>
+</div>
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script>
+<div id="button-modal" class="modal-overlay">
+    <div class="modal">
+        <span class="modal-close" id="close-button-modal">&times;</span>
+        <h2 id="button-modal-title">Añadir Nuevo Botón</h2>
+        
+        <div class="modal-body">
+            <label for="button-name" style="text-align: left;">Nombre del Botón:</label>
+            <input type="text" id="button-name" placeholder="Ej: Reportes" maxlength="30" />
+
+            <div class="modal-input-group">
+                <div>
+                    <label for="button-type" style="text-align: left; display:block;">Tamaño:</label>
+                    <select id="button-type">
+                        <option value="short">Corto (1 columna)</option>
+                        <option value="long">Largo (2 columnas)</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="button-url" style="text-align: left; display:block;">URL:</label>
+                    <input type="text" id="button-url" placeholder="Ej: reportes.html" />
+                </div>
+            </div>
+            
+            <p style="margin: 0; text-align: left;">* Opcional: Arrastra un archivo HTML.</p>
+            <div id="drop-area">
+                <i class="fas fa-upload"></i> Arrastra y suelta tu archivo HTML aquí
+                <p id="drop-message" style="font-size: 0.9rem; color: #ccc; margin-top: 5px;">(El nombre se usará como URL)</p>
+            </div>
+        </div>
+        <button id="button-submit">Guardar Botón</button>
+        <p id="button-message" class="success-message" style="margin-top: 15px;"></p>
+    </div>
+</div>
+
+<div id="dlgUsuariosModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <strong>Gestionar Usuarios Autorizados</strong>
+            <button id="dlgUsuariosClose" style="background:none; border:none; font-size:1.5rem; width:auto; margin:0; cursor:pointer; color:#aaa;">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="field" style="margin-bottom: 20px;">
+                <label style="display:block; text-align:left; color:#aaa; font-size:0.9rem; margin-bottom:5px;">Añadir nuevo email (Gmail)</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="email" id="txtNewUserEmail" placeholder="usuario@gmail.com" style="margin-bottom:0;">
+                    <button id="btnAddUser" style="width:auto; background:var(--accent-green); margin-top:0;">+</button>
+                </div>
+            </div>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0; width:100%;">
+            <div id="usersListContainer" style="max-height:200px; overflow-y:auto;">
+                </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+<script>
+    // Configuración Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
       authDomain: "markarma279.firebaseapp.com",
@@ -442,288 +465,432 @@
     };
 
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.database();
-    const googleProvider = new firebase.auth.GoogleAuthProvider();
+    const auth = firebase.auth();
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    // ID DEL ADMINISTRADOR SUPREMO (Debe coincidir con tu ID de Google)
+    const ADMIN_UID = "euq9uxFJrAft9m1cNob0PZ1fo7q1";
+    const ALLOWED_USERS_REF = db.ref('allowed_users');
+
+    // --- Referencias UI ---
+    const mainContent = document.getElementById('main-content');
+    const loginModal = document.getElementById('login-modal');
+    const btnLoginGoogle = document.getElementById('btn-login-google');
+    const loginError = document.getElementById('login-error');
+    const welcomeMessage = document.getElementById('welcome-message');
+    const btnLogout = document.getElementById('btn-logout');
     
-    const $ = sel => document.querySelector(sel);
-    const titular = $("#titular"), usuario = $("#usuario"), descripcionBusqueda = $("#descripcionBusqueda"), resultado = $("#resultado"), tbody = $("#tbody"), results = $("#results");
-    const appContent = $("#app-content");
-    const loginContainer = $("#login-container");
-    const btnGoogleLogin = $("#btnGoogleLogin");
-    const btnLogout = $("#btnLogout");
+    // UI Admin / Botones
+    const btnToggleEdit = document.getElementById('btnToggleEdit');
+    const btnUsuarios = document.getElementById('btnUsuarios');
+    const buttonGrid = document.getElementById('buttonGrid');
+    const btnAddButton = document.getElementById('btnAddButton');
+    const appLogo = document.getElementById('appLogo');
+    const logoImage = document.getElementById('logoImage');
+    const loginLogoImage = document.getElementById('loginLogoImage');
+    const logoFileInput = document.getElementById('logoFileInput');
     
-    const dlgMessage = $("#dlgMessage"), messageTitle = $("#messageTitle"), messageText = $("#messageText"), messageBody = $("#messageBody"), messageOk = $("#messageOk"), messageCancel = $("#messageCancel");
+    // UI Modal Botones
+    const buttonModal = document.getElementById('button-modal');
+    const buttonModalTitle = document.getElementById('button-modal-title');
+    const buttonNameInput = document.getElementById('button-name');
+    const buttonUrlInput = document.getElementById('button-url');
+    const buttonTypeSelect = document.getElementById('button-type');
+    const buttonSubmit = document.getElementById('button-submit');
+    const buttonMessage = document.getElementById('button-message');
+    const dropArea = document.getElementById('drop-area');
+    const dropMessage = document.getElementById('drop-message');
+    
+    // UI Modal Usuarios
+    const dlgUsuariosModal = document.getElementById('dlgUsuariosModal');
+    const dlgUsuariosClose = document.getElementById('dlgUsuariosClose');
+    const txtNewUserEmail = document.getElementById('txtNewUserEmail');
+    const btnAddUser = document.getElementById('btnAddUser');
+    const usersListContainer = document.getElementById('usersListContainer');
 
-    let allUserPasswords = [];
+    // Estados
+    let isEditMode = false;
+    let draggedButtonKey = null; 
+    let editingButtonKey = null; 
+    let isAdmin = false;
 
-    function normalize(s) { return (s || "").toString().trim().toLowerCase(); }
+    // --- 1. Autenticación y Permisos ---
 
-    function showMessage(title, text, isConfirm = false, isAlert = false) {
-      return new Promise((resolve) => {
-        messageTitle.textContent = title;
-        messageText.innerHTML = text;
-        messageBody.classList.toggle('alert-content', isAlert);
-        messageCancel.hidden = !isConfirm;
-        dlgMessage.classList.add("open");
-
-        messageOk.onclick = () => {
-          dlgMessage.classList.remove("open");
-          resolve(true);
-        };
-        messageCancel.onclick = () => {
-          dlgMessage.classList.remove("open");
-          resolve(false);
-        };
-      });
-    }
-
-    // Este listener se dispara automáticamente si el usuario ya tiene sesión iniciada
     auth.onAuthStateChanged((user) => {
-      if (user) {
-        appContent.hidden = false;
-        loginContainer.hidden = true;
-        
-        const userPasswordsRef = db.ref('passwords/' + user.uid);
-
-        userPasswordsRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            allUserPasswords = [];
-            if (data) {
-                Object.keys(data).forEach(key => {
-                    allUserPasswords.push({ key: key, ...data[key] });
-                });
+        if (user) {
+            // Verificar si es Admin por UID
+            if (user.uid === ADMIN_UID) {
+                isAdmin = true;
+                initializeSession(user);
+            } else {
+                // Si no es admin, verificar si está autorizado
+                isAdmin = false;
+                checkIfAllowed(user);
             }
-            allUserPasswords.sort((a, b) => {
-                const titularA = a.titular || '';
-                const titularB = b.titular || '';
-                const normalizedA = normalize(titularA);
-                const normalizedB = normalize(titularB);
-
-                if (normalizedA === 'rafa') return -1;
-                if (normalizedB === 'rafa') return 1;
-
-                return normalizedA.localeCompare(normalizedB);
-            });
-            doSearch();
-            populateDatalists();
-        });
-
-        function populateDatalists() {
-            const titularesSet = new Set();
-            const descripcionesSet = new Set();
-            
-            allUserPasswords.forEach(item => {
-                if (item.titular) titularesSet.add(item.titular);
-                if (item.descripcion) descripcionesSet.add(item.descripcion);
-            });
-            
-            const titularesList = $("#titularesList");
-            const descripcionesList = $("#descripcionesList");
-            const titularesListBusqueda = $("#titularesListBusqueda");
-            const descripcionesListBusqueda = $("#descripcionesListBusqueda");
-
-            titularesList.innerHTML = "";
-            descripcionesList.innerHTML = "";
-            titularesListBusqueda.innerHTML = "";
-            descripcionesListBusqueda.innerHTML = "";
-
-            titularesSet.forEach(titular => {
-                const option = document.createElement("option");
-                option.value = titular;
-                titularesList.appendChild(option);
-                titularesListBusqueda.appendChild(option.cloneNode(true));
-            });
-
-            descripcionesSet.forEach(descripcion => {
-                const option = document.createElement("option");
-                option.value = descripcion;
-                descripcionesList.appendChild(option);
-                descripcionesListBusqueda.appendChild(option.cloneNode(true));
-            });
+        } else {
+            // No logueado
+            mainContent.style.display = 'none';
+            loginModal.style.display = 'flex';
+            btnToggleEdit.style.display = 'none';
+            btnUsuarios.style.display = 'none';
+            disableEditMode();
         }
-
-        function doSearch() {
-            const f1 = normalize(titular.value);
-            const f2 = normalize(usuario.value);
-            const f3 = normalize(descripcionBusqueda.value);
-            
-            const matches = allUserPasswords.filter(r =>
-                (f1 === "" || normalize(r.titular).includes(f1)) &&
-                (f2 === "" || normalize(r.usuario).includes(f2)) &&
-                (f3 === "" || normalize(r.descripcion).includes(f3))
-            );
-            
-            tbody.innerHTML = "";
-            matches.forEach(r => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td data-label="Titular">${r.titular}</td>
-                    <td data-label="Usuario" data-copiable="true">${r.usuario}</td>
-                    <td data-label="Descripción">${r.descripcion}</td>
-                    <td data-label="Contraseña">${r.resultado}</td>
-                    <td data-label="Acciones">
-                        <button class="btn-primary" onclick="editPassword('${r.key}')">Editar</button>
-                    </td>
-                `;
-                tr.onclick = () => { resultado.value = r.resultado; };
-                tbody.appendChild(tr);
-            });
-            results.hidden = matches.length === 0;
-            if (matches.length === 1) { resultado.value = matches[0].resultado; }
-        }
-
-        function copyToClipboard(text) {
-          navigator.clipboard.writeText(text).then(() => {
-            const message = document.createElement('div');
-            message.textContent = 'Copiado al portapapeles';
-            message.style.cssText = `
-              position: fixed;
-              bottom: 20px;
-              left: 50%;
-              transform: translateX(-50%);
-              background: #333;
-              color: white;
-              padding: 10px 20px;
-              border-radius: 5px;
-              z-index: 1001;
-              opacity: 0;
-              transition: opacity 0.5s ease-in-out;
-            `;
-            document.body.appendChild(message);
-            setTimeout(() => {
-              message.style.opacity = 1;
-            }, 10);
-            setTimeout(() => {
-              message.style.opacity = 0;
-              setTimeout(() => message.remove(), 500);
-            }, 2000);
-          }).catch(err => {
-            console.error('Error al copiar el texto: ', err);
-          });
-        }
-        
-        tbody.addEventListener('contextmenu', (e) => {
-          const target = e.target.closest('td[data-copiable="true"]');
-          if (target) {
-            e.preventDefault();
-            copyToClipboard(target.textContent);
-          }
-        });
-        
-        titular.oninput = doSearch;
-        usuario.oninput = doSearch;
-        descripcionBusqueda.oninput = doSearch;
-
-        $("#btnBuscar").onclick = doSearch;
-        
-        $("#btnLimpiar").onclick = () => {
-            titular.value = ""; 
-            usuario.value = ""; 
-            descripcionBusqueda.value = ""; 
-            resultado.value = ""; 
-            doSearch();
-        };
-
-        const dlg = $("#dlgNuevo"), formNuevo = $("#formNuevo"), dlgClose = $("#dlgClose"), modalTitle = $("#modalTitle");
-        const btnEliminarRegistro = $("#btnEliminarRegistro");
-
-        $("#btnNuevo").onclick = () => {
-          formNuevo.reset();
-          modalTitle.textContent = "Introduzca nuevos datos";
-          btnEliminarRegistro.hidden = true;
-          formNuevo.onsubmit = saveNewPassword;
-          dlg.classList.add("open");
-        };
-
-        dlgClose.onclick = () => dlg.classList.remove("open");
-
-        function saveNewPassword(e) {
-            e.preventDefault();
-            const fd = new FormData(formNuevo);
-            const nuevo = Object.fromEntries(fd.entries());
-            
-            userPasswordsRef.push(nuevo).then(() => {
-                dlg.classList.remove("open");
-            }).catch(error => {
-                console.error("Error al guardar los datos: ", error);
-                showMessage("Error", "Hubo un error al guardar los datos.");
-            });
-        }
-        
-        function editPassword(key) {
-            const passwordRef = db.ref('passwords/' + user.uid + '/' + key);
-            passwordRef.once('value').then(snapshot => {
-                const data = snapshot.val();
-                
-                $("#nuevoTitular").value = data.titular;
-                $("#nuevoUsuario").value = data.usuario;
-                $("#nuevaDescripcion").value = data.descripcion;
-                $("#nuevoResultado").value = data.resultado;
-                
-                modalTitle.textContent = "Editar datos";
-                btnEliminarRegistro.hidden = false;
-                
-                formNuevo.onsubmit = (e) => {
-                    e.preventDefault();
-                    const fd = new FormData(formNuevo);
-                    const updatedData = Object.fromEntries(fd.entries());
-                    
-                    passwordRef.update(updatedData).then(() => {
-                        dlg.classList.remove("open");
-                        showMessage("Éxito", "Los datos se han actualizado correctamente.");
-                    }).catch(error => {
-                        console.error("Error al actualizar los datos: ", error);
-                        showMessage("Error", "Hubo un error al actualizar los datos.");
-                    });
-                };
-                
-                btnEliminarRegistro.onclick = async () => {
-                    const alertIcon = '<div class="alert-icon">❌</div>';
-                    const confirmResult = await showMessage("Confirmar eliminación", `${alertIcon} ¿Estás seguro de que quieres eliminar el registro para **${data.titular}**? Esta acción no se puede deshacer.`, true, true);
-                    if (confirmResult) {
-                        passwordRef.remove().then(() => {
-                            dlg.classList.remove("open");
-                            showMessage("Registro eliminado", "El registro se ha eliminado correctamente.");
-                        }).catch(error => {
-                            console.error("Error al eliminar el registro: ", error);
-                            showMessage("Error", "Hubo un error al intentar eliminar el registro.");
-                        });
-                    }
-                };
-                
-                dlg.classList.add("open");
-            });
-        }
-        window.editPassword = editPassword;
-
-
-        btnLogout.onclick = () => {
-          auth.signOut().then(() => {
-            console.log("Sesión cerrada correctamente.");
-          }).catch((error) => {
-            console.error("Error al cerrar sesión:", error);
-            showMessage("Error", "Hubo un problema al intentar cerrar la sesión.");
-          });
-        };
-      } else {
-        appContent.hidden = true;
-        loginContainer.hidden = false;
-      }
     });
 
-    // Nueva lógica de Login con Google
-    btnGoogleLogin.onclick = () => {
-        auth.signInWithPopup(googleProvider)
-            .then((result) => {
-                // El login fue exitoso, onAuthStateChanged se disparará.
-                console.log("Login exitoso con Google:", result.user);
-            })
+    function checkIfAllowed(user) {
+        ALLOWED_USERS_REF.once('value').then(snapshot => {
+            const allowed = snapshot.val();
+            let isAllowed = false;
+            if (allowed) {
+                const emails = Object.values(allowed);
+                if (emails.includes(user.email)) {
+                    isAllowed = true;
+                }
+            }
+
+            if (isAllowed) {
+                initializeSession(user);
+            } else {
+                auth.signOut();
+                loginError.textContent = "Acceso denegado. Usuario no autorizado.";
+                loginError.style.display = 'block';
+            }
+        });
+    }
+
+    function initializeSession(user) {
+        loginModal.style.display = 'none';
+        mainContent.style.display = 'block';
+        welcomeMessage.textContent = `Bienvenido, ${user.displayName || 'Usuario'}!`;
+
+        if (isAdmin) {
+            btnToggleEdit.style.display = 'block';
+            btnUsuarios.style.display = 'block';
+        } else {
+            btnToggleEdit.style.display = 'none';
+            btnUsuarios.style.display = 'none';
+            disableEditMode();
+        }
+    }
+
+    // Iniciar Sesión con Google
+    btnLoginGoogle.addEventListener('click', () => {
+        auth.signInWithPopup(provider)
             .catch((error) => {
-                console.error("Error al iniciar sesión con Google:", error);
-                showMessage("Error de Autenticación", "No se pudo iniciar sesión con Google: " + error.message);
+                console.error(error);
+                loginError.textContent = "Error: " + error.message;
+                loginError.style.display = 'block';
             });
+    });
+
+    // Cerrar Sesión
+    btnLogout.addEventListener('click', () => {
+        auth.signOut();
+    });
+
+    // --- 2. Gestión de Usuarios (Solo Admin) ---
+    btnUsuarios.onclick = () => {
+        loadAllowedUsers();
+        dlgUsuariosModal.classList.add("open");
     };
-  </script>
+    dlgUsuariosClose.onclick = () => dlgUsuariosModal.classList.remove("open");
+
+    function loadAllowedUsers() {
+        usersListContainer.innerHTML = "<p>Cargando...</p>";
+        ALLOWED_USERS_REF.on('value', (snapshot) => {
+            usersListContainer.innerHTML = "";
+            const users = snapshot.val();
+            if (users) {
+                Object.keys(users).forEach(key => {
+                    const email = users[key];
+                    const div = document.createElement("div");
+                    div.className = "user-list-item";
+                    div.innerHTML = `
+                        <span>${email}</span>
+                        <button class="btn-small-delete" onclick="removeUser('${key}', '${email}')">Eliminar</button>
+                    `;
+                    usersListContainer.appendChild(div);
+                });
+            } else {
+                usersListContainer.innerHTML = "<p style='color:#aaa'>No hay usuarios extra autorizados.</p>";
+            }
+        });
+    }
+
+    btnAddUser.onclick = () => {
+        const email = txtNewUserEmail.value.trim();
+        if (email) {
+            ALLOWED_USERS_REF.push(email);
+            txtNewUserEmail.value = "";
+        }
+    };
+
+    window.removeUser = (key, email) => {
+        if (confirm(`¿Quitar acceso a ${email}?`)) {
+            ALLOWED_USERS_REF.child(key).remove();
+        }
+    };
+
+
+    // --- 3. Lógica del Logo ---
+    function loadLogo() {
+        db.ref('config/logo').once('value').then(snapshot => {
+            const logoData = snapshot.val();
+            if (logoData) {
+                logoImage.src = logoData;
+                loginLogoImage.src = logoData; 
+            }
+        });
+    }
+
+    async function saveLogo(base64Image) {
+        if (!isAdmin) return; 
+        await db.ref('config/logo').set(base64Image);
+        loadLogo();
+    }
+    
+    appLogo.addEventListener('click', () => {
+        if (isEditMode && isAdmin) logoFileInput.click();
+    });
+
+    logoFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) { saveLogo(event.target.result); };
+            reader.readAsDataURL(file);
+        }
+    });
+
+
+    // --- 4. Lógica de Botones (Render, Drag&Drop, CRUD) ---
+
+    // Toggle Modo Edición
+    function disableEditMode() {
+        isEditMode = false;
+        btnToggleEdit.textContent = 'Modo Edición';
+        btnToggleEdit.style.background = 'var(--accent-orange)';
+        btnAddButton.style.display = 'none';
+        document.body.classList.remove('edit-mode');
+        db.ref('botones').once('value').then(snap => renderButtons(snap.val()));
+    }
+
+    btnToggleEdit.addEventListener('click', () => {
+        if (!isAdmin) return;
+        isEditMode = !isEditMode;
+        btnToggleEdit.textContent = isEditMode ? 'Salir de Edición' : 'Modo Edición';
+        btnToggleEdit.style.background = isEditMode ? 'var(--accent-red)' : 'var(--accent-orange)';
+        btnAddButton.style.display = isEditMode ? 'block' : 'none';
+        
+        db.ref('botones').once('value').then(snapshot => {
+            renderButtons(snapshot.val());
+        });
+    });
+
+    // Escuchar cambios en botones
+    db.ref('botones').on('value', (snapshot) => {
+        renderButtons(snapshot.val());
+    });
+
+    function sortButtons(buttons) {
+        if (!buttons) return [];
+        return Object.keys(buttons)
+            .map(key => ({ key, ...buttons[key] }))
+            .sort((a, b) => (a.order || 999) - (b.order || 999));
+    }
+
+    function renderButtons(buttonsData) {
+        buttonGrid.innerHTML = '';
+        const sortedButtons = sortButtons(buttonsData);
+
+        sortedButtons.forEach(button => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'button-wrapper';
+            wrapper.id = 'btn-wrapper-' + button.key;
+            wrapper.setAttribute('data-key', button.key);
+            
+            if (button.span === 'long') wrapper.classList.add('long');
+
+            const btnLink = document.createElement('a');
+            btnLink.href = isEditMode ? '#' : (button.url || '#'); 
+            btnLink.className = `button ${button.class || ''}`;
+            btnLink.textContent = button.name || 'Sin Nombre';
+            
+            wrapper.appendChild(btnLink);
+
+            if (isEditMode && isAdmin) {
+                wrapper.classList.add('edit-mode');
+                wrapper.setAttribute('draggable', true);
+
+                const actions = document.createElement('div');
+                actions.className = 'action-buttons';
+
+                const dragHandle = document.createElement('button');
+                dragHandle.className = 'action-button drag-handle';
+                dragHandle.innerHTML = '<i class="fas fa-arrows-alt"></i>';
+                
+                const btnEdit = document.createElement('button');
+                btnEdit.className = 'action-button edit';
+                btnEdit.innerHTML = '<i class="fas fa-edit"></i>';
+                btnEdit.onclick = (e) => {
+                    e.stopPropagation();
+                    openButtonModal(button.key, button.name, button.url, button.span);
+                };
+                
+                const btnDelete = document.createElement('button');
+                btnDelete.className = 'action-button delete';
+                btnDelete.innerHTML = '<i class="fas fa-trash"></i>';
+                btnDelete.onclick = (e) => {
+                    e.stopPropagation();
+                    if (confirm(`¿Borrar "${button.name}"?`)) deleteButton(button.key);
+                };
+
+                actions.appendChild(dragHandle);
+                actions.appendChild(btnEdit);
+                actions.appendChild(btnDelete);
+                wrapper.appendChild(actions);
+
+                setupDragEvents(wrapper); 
+            } else {
+                wrapper.classList.remove('edit-mode');
+                wrapper.removeAttribute('draggable');
+            }
+            
+            buttonGrid.appendChild(wrapper);
+        });
+
+        if (isEditMode) {
+            buttonGrid.classList.add('edit-mode');
+            document.body.classList.add('edit-mode');
+        } else {
+            buttonGrid.classList.remove('edit-mode');
+            document.body.classList.remove('edit-mode');
+        }
+    }
+
+    // Funciones CRUD
+    function deleteButton(key) {
+        if (!isAdmin) return;
+        db.ref('botones/' + key).remove();
+    }
+
+    async function saveButtonOrder() {
+        if (!isAdmin) return;
+        const wrappers = Array.from(buttonGrid.querySelectorAll('.button-wrapper'));
+        const updates = {};
+        wrappers.forEach((wrapper, index) => {
+            const key = wrapper.getAttribute('data-key');
+            if (key) updates[`/botones/${key}/order`] = index;
+        });
+        if (Object.keys(updates).length) await db.ref('/').update(updates);
+    }
+
+    // Modal Botones
+    btnAddButton.addEventListener('click', () => openButtonModal());
+    document.getElementById('close-button-modal').addEventListener('click', () => buttonModal.style.display = 'none');
+    window.addEventListener('click', (e) => { if (e.target === buttonModal) buttonModal.style.display = 'none'; });
+
+    function openButtonModal(key = null, name = '', url = '', span = 'short') {
+        editingButtonKey = key;
+        buttonModalTitle.textContent = key ? 'Editar Botón' : 'Añadir Nuevo Botón';
+        buttonNameInput.value = name;
+        buttonUrlInput.value = url;
+        buttonTypeSelect.value = span;
+        buttonMessage.textContent = '';
+        dropArea.classList.remove('drag-over-file');
+        dropMessage.textContent = '(El nombre se usará como URL)';
+        dropMessage.style.color = '#ccc';
+        buttonModal.style.display = 'flex';
+    }
+
+    buttonSubmit.addEventListener('click', async () => {
+        if (!isAdmin) {
+            buttonMessage.textContent = "No tienes permisos.";
+            return;
+        }
+
+        const name = buttonNameInput.value.trim();
+        let url = buttonUrlInput.value.trim();
+        const span = buttonTypeSelect.value;
+
+        if (!name) return alert("Nombre obligatorio");
+        if (!url) url = '#';
+
+        const buttonData = {
+            name, url, span,
+            class: 'button-' + name.toLowerCase().replace(/\s/g, '-'),
+            order: 999 
+        };
+
+        buttonMessage.style.color = 'var(--accent-green)';
+        buttonMessage.textContent = 'Guardando...';
+
+        try {
+            if (editingButtonKey) {
+                await db.ref('botones/' + editingButtonKey).update(buttonData);
+            } else {
+                const snap = await db.ref('botones').once('value');
+                buttonData.order = snap.numChildren(); 
+                await db.ref('botones').push(buttonData);
+            }
+            setTimeout(() => buttonModal.style.display = 'none', 500);
+        } catch (e) {
+            buttonMessage.textContent = e.message;
+            buttonMessage.style.color = 'var(--accent-red)';
+        }
+    });
+
+    // Drag events
+    function setupDragEvents(wrapper) {
+        wrapper.addEventListener('dragstart', (e) => {
+            draggedButtonKey = wrapper.getAttribute('data-key');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', draggedButtonKey);
+            setTimeout(() => wrapper.classList.add('ghost'), 0);
+        });
+        wrapper.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            const targetKey = wrapper.getAttribute('data-key');
+            if (targetKey !== draggedButtonKey) {
+                const draggedEl = document.getElementById('btn-wrapper-' + draggedButtonKey);
+                const rect = wrapper.getBoundingClientRect();
+                const center = rect.left + rect.width / 2;
+                if (e.clientX < center) buttonGrid.insertBefore(draggedEl, wrapper);
+                else buttonGrid.insertBefore(draggedEl, wrapper.nextSibling);
+            }
+        });
+        wrapper.addEventListener('dragend', () => {
+            const draggedEl = document.getElementById('btn-wrapper-' + draggedButtonKey);
+            if(draggedEl) draggedEl.classList.remove('ghost');
+            saveButtonOrder();
+        });
+    }
+
+    setupModalDropArea();
+    function setupModalDropArea() {
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+        });
+        ['dragenter', 'dragover'].forEach(eventName => dropArea.classList.add('drag-over-file'));
+        ['dragleave', 'drop'].forEach(eventName => dropArea.classList.remove('drag-over-file'));
+
+        dropArea.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            if (file && (file.type === 'text/html' || file.name.toLowerCase().endsWith('.html'))) {
+                buttonUrlInput.value = file.name;
+                dropMessage.textContent = `Archivo "${file.name}" asignado.`;
+                dropMessage.style.color = 'var(--accent-green)';
+            } else {
+                dropMessage.textContent = 'Solo archivos HTML.';
+                dropMessage.style.color = 'var(--accent-red)';
+            }
+        });
+    }
+
+    loadLogo();
+</script>
 </body>
 </html>

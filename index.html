@@ -470,7 +470,6 @@
     const provider = new firebase.auth.GoogleAuthProvider();
 
     // --- CONFIGURACIÓN DE SEGURIDAD ---
-    // AQUÍ DEFINIMOS TU EMAIL COMO EL ADMINISTRADOR SUPREMO
     const ADMIN_EMAIL = "verdeguer279@gmail.com";
     const ALLOWED_USERS_REF = db.ref('allowed_users');
 
@@ -518,14 +517,26 @@
 
     // --- 1. Autenticación y Permisos ---
 
+    // Verificar si volvemos de un Redirect (Móvil)
+    auth.getRedirectResult()
+        .then((result) => {
+            if (result && result.user) {
+                console.log("Login exitoso tras redirect:", result.user.email);
+            }
+        })
+        .catch((error) => {
+            console.error("Error en redirect:", error);
+            loginError.textContent = "Error: " + error.message;
+            loginError.style.display = 'block';
+        });
+
     auth.onAuthStateChanged((user) => {
         if (user) {
-            // VERIFICACIÓN POR CORREO ELECTRÓNICO (SOLUCIÓN AL ERROR)
+            // VERIFICACIÓN POR CORREO ELECTRÓNICO
             if (user.email === ADMIN_EMAIL) {
                 isAdmin = true;
                 initializeSession(user);
             } else {
-                // Si no es admin por email, verificar si está en lista blanca
                 isAdmin = false;
                 checkIfAllowed(user);
             }
@@ -545,7 +556,6 @@
             let isAllowed = false;
             if (allowed) {
                 const emails = Object.values(allowed);
-                // Verificamos si el email del usuario está en la lista de permitidos
                 if (emails.includes(user.email)) {
                     isAllowed = true;
                 }
@@ -576,14 +586,10 @@
         }
     }
 
-    // Iniciar Sesión con Google
+    // Iniciar Sesión con Google (USANDO REDIRECT PARA MÓVIL)
     btnLoginGoogle.addEventListener('click', () => {
-        auth.signInWithPopup(provider)
-            .catch((error) => {
-                console.error(error);
-                loginError.textContent = "Error: " + error.message;
-                loginError.style.display = 'block';
-            });
+        // Usamos Redirect en lugar de Popup para compatibilidad móvil
+        auth.signInWithRedirect(provider);
     });
 
     // Cerrar Sesión

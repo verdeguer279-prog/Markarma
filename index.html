@@ -609,17 +609,25 @@
         }
     }
 
-    // Iniciar Sesión con Google
+// Iniciar Sesión con Google (Versión Popup para GitHub Pages)
     btnLoginGoogle.addEventListener('click', () => {
-        // Aseguramos persistencia antes de redirigir
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             .then(() => {
-                return auth.signInWithRedirect(provider);
+                // Usamos Popup en lugar de Redirect para mayor compatibilidad
+                return auth.signInWithPopup(provider);
+            })
+            .then((result) => {
+                console.log("Login exitoso:", result.user.email);
             })
             .catch((error) => {
                 console.error("Error en login:", error);
                 loginError.textContent = "Error: " + error.message;
                 loginError.style.display = 'block';
+                
+                // Aviso por si el navegador bloquea la ventana emergente
+                if (error.code === 'auth/popup-blocked') {
+                    alert("Por favor, permite las ventanas emergentes en tu navegador para poder iniciar sesión.");
+                }
             });
     });
 

@@ -9,7 +9,7 @@
     
     <style>
         /* =========================================
-           ESTILOS (DISEÑO AJUSTADO)
+           ESTILOS (DISEÑO ESCRITORIO + MÓVIL)
            ========================================= */
         :root {
             --primary-color: #3498db;
@@ -23,7 +23,7 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; line-height: 1.5; font-size: 14px; }
+        body { background-color: #f4f6f9; color: #333; line-height: 1.5; font-size: 14px; -webkit-tap-highlight-color: transparent; }
         .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
         
         /* Header */
@@ -43,7 +43,7 @@
         .card { background-color: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 20px; height: 100%; border: 1px solid var(--gray-border); display: flex; flex-direction: column; }
         .card-title-left { font-size: 1.3rem; margin-bottom: 20px; color: var(--dark-color); border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
         
-        /* Grid Superior */
+        /* Grid Superior (5 columnas ancho completo) */
         .status-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 25px; width: 100%; }
         .status-card { background-color: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 15px; text-align: center; border: 1px solid var(--gray-border); display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; }
         .status-value { font-size: 2.2rem; font-weight: 700; margin: 10px 0; line-height: 1; }
@@ -53,7 +53,7 @@
         .anio-anterior { color: #9b59b6; }
         .permutas { color: #8e44ad; }
         
-        /* Grid Central */
+        /* Grid Central (Mitad y mitad) */
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; margin-bottom: 25px; }
         
         /* Formularios */
@@ -69,53 +69,22 @@
         th, td { padding: 12px 15px; border-bottom: 1px solid #eee; text-align: left; vertical-align: middle; }
         th { background-color: #f8f9fa; font-weight: 600; color: #444; }
         
-        /* ESTADOS Y BADGES (COLORES MEJORADOS) */
-        .estado-badge { 
-            padding: 6px 12px; 
-            border-radius: 4px; 
-            font-weight: 700; 
-            font-size: 0.85rem; 
-            display: inline-block; 
-            text-align: center; 
-            width: 120px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-        }
-        
-        /* Colores exactos a los botones pero en versión clara */
-        /* Amarillo Trámite */
-        .EnTrámite, .tramite { 
-            background-color: #FFF59D; /* Amarillo claro */
-            color: #F57F17; /* Amarillo oscuro/naranja texto */
-            border: 1px solid #FBC02D;
-        }
-        
-        /* Rojo Denegado */
-        .Denegado, .denegado { 
-            background-color: #EF9A9A; /* Rojo claro */
-            color: #B71C1C; /* Rojo oscuro texto */
-            border: 1px solid #E53935;
-        }
-        
-        /* Verde Disfrutado */
-        .Disfrutado, .disfrutado { 
-            background-color: #A5D6A7; /* Verde claro */
-            color: #1B5E20; /* Verde oscuro texto */
-            border: 1px solid #43A047;
-        }
-        
+        /* ESTADOS Y BADGES */
+        .estado-badge { padding: 5px 10px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; display: inline-block; text-align: center; width: 100px; }
+        /* Clases CSS corregidas para coincidir con JS (EnTrámite sin espacio) */
+        .EnTrámite, .tramite { background-color: #FFF59D; color: #F57F17; border: 1px solid #FBC02D; }
+        .Denegado, .denegado { background-color: #EF9A9A; color: #B71C1C; border: 1px solid #E53935; }
+        .Disfrutado, .disfrutado { background-color: #A5D6A7; color: #1B5E20; border: 1px solid #43A047; }
         .Pendiente, .pendiente { background-color: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
         
         /* Botonera Acciones */
         .actions { display: flex; gap: 5px; justify-content: flex-end; align-items: center; }
         .btn-action { padding: 6px 12px; font-size: 0.85rem; border: none; border-radius: 4px; cursor: pointer; color: #333; font-weight: 600; white-space: nowrap; }
         
-        /* Botones Sólidos */
-        .btn-tramite { background-color: #FFEB3B; border: 1px solid #e6db55; color: #333; }
+        .btn-tramite { background-color: #FFEB3B; border: 1px solid #e6db55; }
         .btn-tramite:hover { background-color: #fdd835; }
-        
         .btn-denegado { background-color: #F44336; color: white; border: 1px solid #d32f2f; }
         .btn-denegado:hover { background-color: #d32f2f; }
-        
         .btn-disfrutado { background-color: #4CAF50; color: white; border: 1px solid #388e3c; }
         .btn-disfrutado:hover { background-color: #388e3c; }
         
@@ -139,7 +108,7 @@
         .item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid #eee; background: #fff; }
         .item-row:nth-child(even) { background-color: #f9f9f9; }
         
-        /* Estilos específicos Permutas */
+        /* Permutas (Diseño corregido) */
         .permuta-display { display: flex; flex-direction: column; width: 100%; }
         .permuta-header { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; }
         .permuta-details { display: flex; gap: 20px; margin-top: 5px; flex-wrap: wrap; }
@@ -147,6 +116,13 @@
         
         .horas-pos { color: var(--success-color); font-weight: bold; }
         .horas-neg { color: var(--danger-color); font-weight: bold; }
+
+        /* Filas Desplegables (Móvil) */
+        tr.detail-row { display: none; } /* Oculto por defecto en escritorio */
+        .mobile-detail-content { padding: 15px; background: #f9f9f9; border-bottom: 2px solid #ddd; }
+        .mobile-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; }
+        .mobile-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+        .mobile-actions-grid button { width: 100%; }
 
         /* Utils */
         .hidden { display: none !important; }
@@ -156,10 +132,29 @@
         .notif-error { background-color: var(--danger-color); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* Responsive */
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+        @media (min-width: 769px) {
+            tr.detail-row { display: none !important; } /* Seguridad: Nunca mostrar filas detalle en PC */
+        }
+
         @media (max-width: 1200px) { .status-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 900px) { .form-row { grid-template-columns: 1fr; } .status-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 600px) { .status-grid { grid-template-columns: 1fr; } .header-content { flex-direction: column; text-align: center; gap: 10px; } .actions { flex-wrap: wrap; } }
+        
+        @media (max-width: 768px) {
+            .status-grid { grid-template-columns: 1fr; }
+            .header-content { flex-direction: column; text-align: center; gap: 10px; }
+            
+            /* Tabla Móvil */
+            .table-container { border: none; }
+            table { width: 100%; min-width: 100%; }
+            th.hide-mobile, td.hide-mobile { display: none; } /* Ocultar columnas secundarias */
+            
+            /* Indicador de desplegable */
+            td:nth-child(2)::after { content: ' ▼'; font-size: 0.8em; color: #999; float: right; }
+            tr.main-row { cursor: pointer; border-bottom: 1px solid #ddd; }
+            tr.main-row.active { background-color: #eef2f7; }
+            tr.detail-row.open { display: table-row; } /* Mostrar detalle solo si tiene clase open */
+        }
     </style>
 </head>
 <body>
@@ -271,11 +266,11 @@
                     <table id="tabla-solicitudes">
                         <thead>
                             <tr>
-                                <th style="width:12%">Fecha</th>
-                                <th style="width:15%">Tipo</th>
-                                <th style="width:8%">Cómputo</th>
-                                <th style="width:10%">Estado</th>
-                                <th style="width:55%; text-align:right;">Acciones</th>
+                                <th style="width:15%">Fecha</th>
+                                <th style="width:20%">Tipo</th>
+                                <th class="hide-mobile" style="width:10%">Cómputo</th>
+                                <th class="hide-mobile" style="width:15%">Estado</th>
+                                <th class="hide-mobile" style="width:40%; text-align:right;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="cuerpo-tabla"></tbody>
@@ -540,6 +535,9 @@
             list.forEach(s => {
                 const idx = datos.solicitudes.indexOf(s);
                 const tr = document.createElement('tr');
+                tr.className = 'main-row';
+                
+                // Botones Desktop
                 const btns = `
                     <button onclick="cambiarEstado(${idx},'En Trámite')" class="btn-action btn-tramite">Trámite</button>
                     <button onclick="cambiarEstado(${idx},'Denegado')" class="btn-action btn-denegado">Denegado</button>
@@ -547,8 +545,45 @@
                     <button onclick="abrirEdicion(${idx})" class="btn-action btn-editar btn-icon" title="Editar">✏️</button>
                     <button onclick="eliminarSol(${idx})" class="btn-action btn-eliminar btn-icon" title="Borrar">🗑️</button>
                 `;
-                tr.innerHTML = `<td>${fmtDate(s.fecha)}</td><td>${fmtType(s.tipo)}${s.tipo==='horas'? ` (${s.horas}h)` : ''}</td><td>${s.computo}</td><td><span class="estado-badge ${s.estado.replace(/\s/g,'')}">${s.estado}</span></td><td class="actions">${btns}</td>`;
+
+                // Badge de estado (sin espacios para clase CSS)
+                const estadoClass = s.estado.replace(/\s+/g, '');
+
+                tr.innerHTML = `
+                    <td>${fmtDate(s.fecha)}</td>
+                    <td class="mobile-trigger">${fmtType(s.tipo)}${s.tipo==='horas'? ` (${s.horas}h)` : ''}</td>
+                    <td class="hide-mobile">${s.computo}</td>
+                    <td class="hide-mobile"><span class="estado-badge ${estadoClass}">${s.estado}</span></td>
+                    <td class="hide-mobile actions">${btns}</td>
+                `;
+                
+                // Lógica de despliegue en móvil
+                tr.onclick = (e) => {
+                    if(window.innerWidth <= 768 && !e.target.closest('button')) {
+                        const detail = document.getElementById(`detail-${idx}`);
+                        tr.classList.toggle('active');
+                        detail.classList.toggle('open');
+                    }
+                };
+                
                 dom.tbody.appendChild(tr);
+                
+                // Fila detalle móvil
+                const trDetail = document.createElement('tr');
+                trDetail.className = 'detail-row';
+                trDetail.id = `detail-${idx}`;
+                trDetail.innerHTML = `
+                    <td colspan="5" style="padding:0;">
+                        <div class="mobile-detail-content">
+                            <div class="mobile-info-grid">
+                                <div><strong>Año:</strong> ${s.computo}</div>
+                                <div><strong>Estado:</strong> <span class="estado-badge ${estadoClass}">${s.estado}</span></div>
+                            </div>
+                            <div class="mobile-actions-grid">${btns}</div>
+                        </div>
+                    </td>
+                `;
+                dom.tbody.appendChild(trDetail);
             });
         }
 
@@ -611,7 +646,7 @@
             guardarEnBD("Configuración guardada");
         }
 
-        // --- CAMBIO CLAVE EN SOLICITUD: ESTADO POR DEFECTO ---
+        // SOLICITUD DIRECTA EN TRÁMITE
         function procesarSolicitud() {
             const t = dom.selTipo.value; const f = dom.inpFecha.value; const c = parseInt(dom.selComputo.value); const h = parseFloat(dom.inpHoraSol.value);
             if(!f) return notificar("Fecha requerida", "error");
@@ -621,7 +656,7 @@
                 if(t==='vacaciones' && hoy > limV) return notificar("Plazo vacaciones caducado", "error");
                 if(t==='asuntos-propios' && hoy > limA) return notificar("Plazo asuntos caducado", "error");
             }
-            // AQUÍ ESTÁ EL CAMBIO: 'En Trámite' por defecto
+            // ESTADO INICIAL 'En Trámite' (Color Amarillo)
             const sol = { tipo:t, fecha:f, computo:c, estado:'En Trámite', fechaReg:new Date().toISOString() };
             if(t==='horas') { sol.horas = h; datos.horas.push({ tipo:'resta', fecha:f, concepto:'Día Solicitado', cantidad:h, relacionado:true, fechaReg:new Date().toISOString() }); }
             datos.solicitudes.push(sol); guardarEnBD("Solicitud creada");
@@ -649,17 +684,13 @@
             const list = [...datos.permutas].sort((a,b) => new Date(b.fechaReg) - new Date(a.fechaReg)); 
             list.forEach(p => { 
                 const idx = datos.permutas.indexOf(p); 
-                // Compatibilidad con datos antiguos (fechaYo vs fechaPropia)
-                const fYo = p.fechaPropia || p.fechaYo;
-                const tYo = p.turnoPropio || p.turnoYo;
-                const fEl = p.fechaAgente || p.fechaEl;
-                const tEl = p.turnoAgente || p.turnoEl;
+                // CORRECCIÓN: Leer fechaYo O fechaPropia para datos viejos
+                const fYo = p.fechaPropia || p.fechaYo; const tYo = p.turnoPropio || p.turnoYo;
+                const fEl = p.fechaAgente || p.fechaEl; const tEl = p.turnoAgente || p.turnoEl;
 
                 dom.listPermutas.innerHTML += `
                     <div class="permuta-display" style="border-bottom:1px solid #eee; padding:15px 0;">
-                        <div class="permuta-header">
-                            Agente: ${p.agente} <span style="font-size:0.85rem; font-weight:normal; color:#888;">(${p.año})</span>
-                        </div>
+                        <div class="permuta-header">Agente: ${p.agente} <span style="font-size:0.85rem; font-weight:normal; color:#888;">(${p.año})</span></div>
                         <div class="permuta-details">
                             <div class="permuta-chip"><strong>279:</strong> ${fmtDate(fYo)} (${fmtTurno(tYo)})</div>
                             <div class="permuta-chip"><strong>${p.agente}:</strong> ${fmtDate(fEl)} (${fmtTurno(tEl)})</div>

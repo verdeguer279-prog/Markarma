@@ -8,6 +8,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
+  
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
   <style>
     :root {
       --bg-dark: #1a1a2e;
@@ -22,13 +27,8 @@
       --header-bg: #3e3e5c;
     }
     
-    html {
-        box-sizing: border-box;
-        overflow-x: hidden;
-    }
-    *, *::before, *::after {
-        box-sizing: inherit;
-    }
+    html { box-sizing: border-box; overflow-x: hidden; }
+    *, *::before, *::after { box-sizing: inherit; }
     
     body { 
       font-family: 'Poppins', sans-serif; 
@@ -50,440 +50,125 @@
     }
 
     #btnToggleForm, #btnMainMenu { padding:10px 20px; font-size:0.95rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
-
-    #btnToggleForm {
-        background-image: var(--accent-gradient); 
-        color: var(--text-light);
-    }
+    #btnToggleForm { background-image: var(--accent-gradient); color: var(--text-light); }
     #btnToggleForm:hover { transform:scale(1.05); }
-
-    #btnMainMenu {
-        background-color: var(--accent-orange); 
-        color: #333; 
-    }
+    #btnMainMenu { background-color: var(--accent-orange); color: #333; }
     #btnMainMenu:hover { transform:scale(1.05); }
 
-    /* --- CORRECCIÓN DE SCROLL --- */
     #data-entry-form { 
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.85); 
-        z-index: 1001; 
-        display: none; 
-        opacity: 0; 
-        transition: opacity .3s ease;
-        /* Scroll activado */
-        overflow-y: auto; 
-        /* Flex start para permitir scroll hacia abajo sin cortar el top */
-        align-items: flex-start; 
-        justify-content: center;
-        padding-top: 20px;
-        padding-bottom: 20px;
+        position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1001; 
+        display: none; opacity: 0; transition: opacity .3s ease;
+        overflow-y: auto; align-items: flex-start; justify-content: center;
+        padding-top: 20px; padding-bottom: 20px;
     }
-    #data-entry-form.visible { 
-        display: flex; 
-        opacity: 1; 
-    }
+    #data-entry-form.visible { display: flex; opacity: 1; }
     
     .modal-content-wrapper {
-        background-color: var(--card-bg);
-        border-radius: 12px;
-        padding: 25px 30px; /* Padding reducido */
-        max-width: 95%;
-        width: 1250px; 
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        position: relative; 
-        margin: auto; /* Centrado seguro */
-        margin-bottom: 50px; /* Espacio extra abajo para scroll */
+        background-color: var(--card-bg); border-radius: 12px; padding: 25px 30px;
+        max-width: 95%; width: 1250px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        position: relative; margin: auto; margin-bottom: 50px;
     }
     
-    @media (max-width: 900px) {
-        .modal-content-wrapper {
-            padding: 15px; 
-            width: 98%;
-        }
-        .form-grid { 
-            grid-template-columns: repeat(2, 1fr) !important; 
-        }
-    }
-    @media (max-width: 600px) {
-        .form-grid { 
-            grid-template-columns: 1fr !important; 
-        }
-        .nav-actions {
-            flex-direction: column;
-        }
-    }
+    @media (max-width: 900px) { .modal-content-wrapper { padding: 15px; width: 98%; } .form-grid { grid-template-columns: repeat(2, 1fr) !important; } }
+    @media (max-width: 600px) { .form-grid { grid-template-columns: 1fr !important; } .nav-actions { flex-direction: column; } }
 
     #statusMessageContainer {
-        position: absolute; 
-        top: 60px; 
-        left: 50%;
-        transform: translateX(-50%);
-        width: 85%; 
-        z-index: 1010; 
-        padding: 8px; 
-        border-radius: 6px; 
-        text-align: center; 
-        font-weight: 600; 
-        display: none; 
-        transition: opacity 0.3s ease;
+        position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+        width: 85%; z-index: 1010; padding: 8px; border-radius: 6px; 
+        text-align: center; font-weight: 600; display: none; transition: opacity 0.3s ease;
     }
 
     #data-entry-form h2 { 
-        color:#ffd54f; 
-        margin-bottom: 15px; 
-        cursor: pointer;
-        padding: 5px 10px;
-        border-radius: 6px;
-        transition: background-color 0.2s;
-        border-bottom: 1px solid rgba(255,255,255,0.1);
-        font-size: 1.3rem; /* Título un poco más pequeño */
+        color:#ffd54f; margin-bottom: 15px; cursor: pointer; padding: 5px 10px;
+        border-radius: 6px; transition: background-color 0.2s; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 1.3rem; 
     }
-    
-    #data-entry-form h2:hover {
-        background-color: rgba(255, 213, 79, 0.1);
-    }
+    #data-entry-form h2:hover { background-color: rgba(255, 213, 79, 0.1); }
     
     .course-title-input {
-        background: transparent;
-        border: 2px solid #ffd54f;
-        border-radius: 6px;
-        color: #ffd54f;
-        font-size: 1.3rem;
-        font-weight: 700;
-        padding: 6px 10px;
-        width: 100%;
-        font-family: 'Poppins', sans-serif;
-        margin-bottom: 10px;
+        background: transparent; border: 2px solid #ffd54f; border-radius: 6px; color: #ffd54f;
+        font-size: 1.3rem; font-weight: 700; padding: 6px 10px; width: 100%; font-family: 'Poppins', sans-serif; margin-bottom: 10px;
     }
     .course-title-input:focus { outline: none; box-shadow: 0 0 5px rgba(255, 213, 79, 0.5); }
     
-    /* --- GRID COMPACTO --- */
-    .form-grid { 
-        display: grid; 
-        grid-template-columns: repeat(4, 1fr); 
-        column-gap: 20px; /* Gap reducido */
-        row-gap: 12px;    /* Gap vertical reducido drásticamente */
-        align-items: end; 
-        margin-bottom: 15px;
-    } 
+    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); column-gap: 20px; row-gap: 12px; align-items: end; margin-bottom: 15px; } 
+    .form-group { display: flex; flex-direction: column; margin: 0; position: relative; }
+    .form-group label { font-weight: 600; margin-bottom: 4px; color: var(--text-light); font-size: 0.85rem; min-height: 34px; display: flex; align-items: flex-end; line-height: 1.1; }
     
-    .form-group { 
-        display: flex; 
-        flex-direction: column; 
-        margin: 0;
-        position: relative;
+    #data-entry-form input:not([type="checkbox"]), #data-entry-form select, #data-entry-form textarea {
+      padding: 0 10px; border-radius: 5px; border: 1px solid #ccc; background-color: #fff; 
+      color: #333; width: 100%; height: 36px; line-height: 36px; font-size: 0.9rem;
     }
-    
-    .form-group label { 
-        font-weight: 600; 
-        margin-bottom: 4px; /* Menos margen */
-        color: var(--text-light);
-        font-size: 0.85rem; /* Fuente más pequeña */
-        min-height: 34px; /* Altura mínima para alineación de textos largos */
-        display: flex;
-        align-items: flex-end; 
-        line-height: 1.1;
-    }
-    
-    /* --- INPUTS COMPACTOS --- */
-    #data-entry-form input:not([type="checkbox"]), 
-    #data-entry-form select, 
-    #data-entry-form textarea {
-      padding: 0 10px; 
-      border-radius: 5px; 
-      border: 1px solid #ccc;
-      background-color: #fff; 
-      color: #333; 
-      width: 100%; 
-      height: 36px; /* REDUCIDO DE 45px A 36px */
-      line-height: 36px;
-      font-size: 0.9rem;
-    }
-    
-    #data-entry-form textarea {
-        height: auto !important;
-        min-height: 60px; /* Reducido */
-        padding: 8px;
-        line-height: 1.3;
-        resize: vertical;
-    }
+    #data-entry-form textarea { height: auto !important; min-height: 60px; padding: 8px; line-height: 1.3; resize: vertical; }
 
-    /* ESTILOS DE CAMPOS ESPECÍFICOS */
-    #importeBase {
-        background-color: #fffde7; 
-        border: 1px solid #fbc02d;
-        font-weight: 700;
-    }
+    #importeBase { background-color: #fffde7; border: 1px solid #fbc02d; font-weight: 700; }
+    #kilometraje { background-color: #e0f7fa; color: #006064; border: 1px solid #00acc1; }
+    #importeBruto { background-color: #eeeeee; color: #555; font-weight: 700; pointer-events: none; }
+    #precioHoraBruto { background-color: #e8f5e9; color: #333; }
+    #importeNetoCobrado { background-color: #d4edda; color: #155724; font-weight: 700; border: 2px solid #28a745; font-size: 1rem; }
+    .label-special-green { color: #4caf50 !important; font-weight: 800 !important; font-size: 0.95rem !important; text-transform: uppercase; text-shadow: 0px 0px 1px rgba(0,0,0,0.5); }
+    #importeHoraNeto { background-color: #f7e096; color: #333; font-weight: 700; border: 2px solid #ff9800; }
 
-    #kilometraje {
-        background-color: #e0f7fa; 
-        color: #006064;
-        border: 1px solid #00acc1;
-    }
+    #data-entry-form input:focus, #data-entry-form select:focus, #data-entry-form textarea:focus { border-color: var(--accent-blue); outline: none; box-shadow: 0 0 5px rgba(102, 126, 234, 0.5); }
     
-    #importeBruto {
-        background-color: #eeeeee; 
-        color: #555;
-        font-weight: 700;
-        pointer-events: none; 
-    }
-
-    #precioHoraBruto {
-        background-color: #e8f5e9; 
-        color: #333;
-    }
-    
-    #importeNetoCobrado {
-        background-color: #d4edda; 
-        color: #155724; 
-        font-weight: 700; 
-        border: 2px solid #28a745; 
-        font-size: 1rem;
-    }
-    
-    /* --- ESTILO ESPECIAL PARA LA ETIQUETA VERDE --- */
-    .label-special-green {
-        color: #4caf50 !important; /* Verde Brillante */
-        font-weight: 800 !important;
-        font-size: 0.95rem !important;
-        text-transform: uppercase;
-        text-shadow: 0px 0px 1px rgba(0,0,0,0.5);
-    }
-    
-    #importeHoraNeto {
-        background-color: #f7e096;
-        color: #333;
-        font-weight: 700;
-        border: 2px solid #ff9800;
-    }
-
-    #data-entry-form input:focus, #data-entry-form select:focus, #data-entry-form textarea:focus {
-        border-color: var(--accent-blue);
-        outline: none;
-        box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
-    }
-    
-    .form-actions { 
-        grid-column:1/-1; 
-        display:flex; 
-        gap:12px; 
-        margin-top:10px; 
-        justify-content: flex-end; 
-    }
+    .form-actions { grid-column:1/-1; display:flex; gap:12px; margin-top:10px; justify-content: flex-end; }
     #btnSubmitCourse, #btnCancelEdit { padding:8px 20px; font-weight:600; border:none; border-radius:6px; cursor:pointer; }
     #btnSubmitCourse { background-image: var(--accent-gradient); color:#fff; flex-grow:0; }
     #btnCancelEdit { background-color: var(--accent-red); color:#fff; }
 
-    .nav-actions {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 5px;
-        padding-top: 10px;
-        border-top: 1px solid rgba(255,255,255,0.1);
-    }
-    .nav-actions button {
-        padding: 6px 15px;
-        font-weight: 600;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        background-color: var(--accent-blue);
-        color: #fff;
-        transition: background-color 0.2s;
-        font-size: 0.9rem;
-    }
-    .nav-actions button:hover:not(:disabled) {
-        background-color: #556ee4;
-    }
-    .nav-actions button:disabled {
-        background-color: #4e4e6d;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
+    .nav-actions { display: flex; justify-content: space-between; margin-top: 5px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .nav-actions button { padding: 6px 15px; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; background-color: var(--accent-blue); color: #fff; transition: background-color 0.2s; font-size: 0.9rem; }
+    .nav-actions button:hover:not(:disabled) { background-color: #556ee4; }
+    .nav-actions button:disabled { background-color: #4e4e6d; cursor: not-allowed; opacity: 0.6; }
     
-    #stats-card { 
-        background-color: var(--header-bg); 
-        padding: 20px 25px; 
-        border: 1px solid rgba(255,255,255,0.1); 
-    }
+    #stats-card { background-color: var(--header-bg); padding: 20px 25px; border: 1px solid rgba(255,255,255,0.1); }
     #stats-card h2 { color: #fff; margin-bottom: 15px; }
+    .stats-controls { display: flex; gap: 30px; margin-bottom: 20px; flex-wrap: wrap; }
+    .stats-controls .form-group { min-width: 350px; flex-grow: 1; }
+    .stats-controls select { width: 100%; min-width: 150px; padding: 8px; border-radius: 6px; background-color: #fff; color: #333; height: 38px; }
     
-    .stats-controls { 
-        display: flex; 
-        gap: 30px; 
-        margin-bottom: 20px; 
-        flex-wrap: wrap;
-    }
-    .stats-controls .form-group { 
-        min-width: 350px; 
-        flex-grow: 1; 
-    }
-    
-    .stats-controls select {
-        width: 100%;
-        min-width: 150px; 
-        padding: 8px;
-        border-radius: 6px;
-        background-color: #fff;
-        color: #333;
-        height: 38px;
-    }
-    
-    #btnCleanPagadores {
-        background-color: var(--accent-orange); 
-        color: #333;
-        padding: 6px 10px;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-        transition: background-color 0.2s;
-        font-size: 0.9rem;
-        line-height: 1.2;
-        height: 38px;
-    }
-    #btnCleanPagadores:hover {
-        background-color: #e68900;
-    }
+    #btnCleanPagadores { background-color: var(--accent-orange); color: #333; padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: background-color 0.2s; font-size: 0.9rem; line-height: 1.2; height: 38px; }
+    #btnCleanPagadores:hover { background-color: #e68900; }
 
-    .pagador-filter-row {
-        display: flex;
-        align-items: flex-end;
-        gap: 10px;
-    }
-    .pagador-filter-row select {
-        flex-grow: 1; 
-    }
+    .pagador-filter-row { display: flex; align-items: flex-end; gap: 10px; }
+    .pagador-filter-row select { flex-grow: 1; }
 
-    .stats-results { 
-        display: flex; 
-        gap: 50px; 
-        padding-top: 15px; 
-        border-top: 1px solid rgba(255,255,255,0.1);
-        flex-wrap: wrap;
-    }
+    .stats-results { display: flex; gap: 50px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; }
     .stats-results p { margin: 0; font-size: 1.1rem; }
     .stats-results strong { color: #ffd54f; font-weight: 700; }
     #totalImporte, #totalHoras { font-weight: 700; }
     
-    .listado-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-    }
-    .listado-header h2 {
-        margin: 0;
-        font-size: 1.4rem;
-    }
+    .listado-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+    .listado-header h2 { margin: 0; font-size: 1.4rem; }
 
-    #btnExportExcel {
-        background-color: var(--accent-green); 
-        color: white; 
-        padding: 10px 20px; 
-        border: none; 
-        border-radius: 8px; 
-        cursor: pointer; 
-        font-weight: 600;
-        font-size: 0.95rem;
-    }
+    #btnExportExcel { background-color: var(--accent-green); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.95rem; }
     
-    /* TABLA */
-    .courses-table { 
-        width: 100%; 
-        border-collapse: collapse; 
-        font-size: 0.95em; 
-        table-layout: fixed;
-    } 
-    
-    .courses-table th, .courses-table td { 
-        padding: 10px 6px; 
-        border-bottom: 1px solid rgba(255,255,255,0.1); 
-        vertical-align: middle; 
-        white-space: nowrap;
-        overflow: visible;
-        text-overflow: clip;
-        line-height: 1.3;
-    }
-    
-    .courses-table th { 
-        background-color: var(--header-bg); 
-        color: #ffd54f; 
-        text-transform: uppercase; 
-        font-weight: 700;
-        font-size: 0.9em; 
-        padding: 12px 6px;
-        text-align: left; 
-    }
+    .courses-table { width: 100%; border-collapse: collapse; font-size: 0.95em; table-layout: fixed; } 
+    .courses-table th, .courses-table td { padding: 10px 6px; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: middle; white-space: nowrap; overflow: visible; text-overflow: clip; line-height: 1.3; }
+    .courses-table th { background-color: var(--header-bg); color: #ffd54f; text-transform: uppercase; font-weight: 700; font-size: 0.9em; padding: 12px 6px; text-align: left; }
 
-    .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 4%; }  /* # */
-    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 8%; font-size: 0.95em; }  /* Inicio */
-    .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 11%; } /* Tipo Curso */
-    .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 11%; } /* Pagador */
-    .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 13%; } /* Lugar */
-    .courses-table th:nth-child(6), .courses-table td:nth-child(6) { width: 6%; }  /* Horas */
-    .courses-table th:nth-child(7), .courses-table td:nth-child(7) { width: 8%; }  /* Importe */
-    .courses-table th:nth-child(8), .courses-table td:nth-child(8) { width: 8%; }  /* Pago */
-    .courses-table th:nth-child(9), .courses-table td:nth-child(9) { width: 8%; }  /* Cobrado */
-    .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; } /* Renta */
-    .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 13%; min-width: 140px; } /* Acciones */
+    .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 4%; }
+    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 8%; font-size: 0.95em; }
+    .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 11%; }
+    .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 11%; }
+    .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 13%; }
+    .courses-table th:nth-child(6), .courses-table td:nth-child(6) { width: 6%; }
+    .courses-table th:nth-child(7), .courses-table td:nth-child(7) { width: 8%; }
+    .courses-table th:nth-child(8), .courses-table td:nth-child(8) { width: 8%; }
+    .courses-table th:nth-child(9), .courses-table td:nth-child(9) { width: 8%; }
+    .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; }
+    .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 13%; min-width: 140px; }
 
-    .action-btns { 
-        display: flex; 
-        gap: 6px; 
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-items: center;
-        min-width: 130px;
-    }
-    
-    .action-btns button {
-        border: none;
-        padding: 7px 10px;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: all 0.2s;
-        line-height: 1;
-        font-size: 0.85rem; 
-        white-space: nowrap;
-        min-width: 40px;
-        height: 30px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: 600;
-    }
+    .action-btns { display: flex; gap: 6px; flex-wrap: nowrap; justify-content: center; align-items: center; min-width: 130px; }
+    .action-btns button { border: none; padding: 7px 10px; border-radius: 5px; cursor: pointer; transition: all 0.2s; line-height: 1; font-size: 0.85rem; white-space: nowrap; min-width: 40px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
 
     .edit-btn { background-color: #4caf50; color: white; } 
     .delete-btn { background-color: #f44336; color: white; }
     .obs-btn { background-color: #2196f3; color: white; }
-    
-    .obs-btn.alert {
-        background-color: #f44336;
-        color: white;
-        border: 1px solid #ff9800;
-    }
-    
-    .action-btns button:hover {
-        opacity: 0.9;
-        transform: scale(1.05);
-    }
+    .obs-btn.alert { background-color: #f44336; color: white; border: 1px solid #ff9800; }
+    .action-btns button:hover { opacity: 0.9; transform: scale(1.05); }
 
-    .courses-table td:nth-child(3),
-    .courses-table td:nth-child(4),
-    .courses-table td:nth-child(5) {
-        max-width: 0;
-        overflow: visible;
-        text-overflow: clip;
-        font-size: 0.95em; 
-    }
-
-    .courses-table td:nth-child(2) {
-        font-size: 0.95em; 
-        white-space: nowrap;
-    }
+    .courses-table td:nth-child(3), .courses-table td:nth-child(4), .courses-table td:nth-child(5) { max-width: 0; overflow: visible; text-overflow: clip; font-size: 0.95em; }
+    .courses-table td:nth-child(2) { font-size: 0.95em; white-space: nowrap; }
 
     .status-cobrado { color: var(--accent-green); font-weight:700; }
     .status-pendiente { color: var(--accent-red); font-weight:700; }
@@ -491,11 +176,16 @@
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:1000; }
     .modal-content { background:#fff; color:#333; padding:20px; border-radius:10px; max-width:500px; width:90%; }
     .close-modal { float:right; background:var(--accent-red); color:#fff; border:none; border-radius:4px; padding:4px 10px; cursor:pointer; }
-
-</style>
+    
+    #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 1.2rem; flex-direction: column; gap: 15px; }
+    #app-container { display: none; }
+  </style>
 </head>
 <body>
-<div class="container">
+
+<div id="loading-overlay">Conectando con base de datos segura...</div>
+
+<div class="container" id="app-container">
   <h1><i class="fas fa-graduation-cap"></i> Control de Cursos</h1>
 
   <div class="toggle-form-container">
@@ -507,89 +197,32 @@
 
   <div id="data-entry-form">
     <div class="modal-content-wrapper">
-        <h2 id="formTitleDisplay">
-            <i class="fas fa-edit"></i> <span id="formTitleText">Agregar Curso</span>
-        </h2>
-        <input type="text" id="formTitleInput" class="course-title-input" style="display: none;" 
-               placeholder="Nombre del curso..." maxlength="100">
-        
+        <h2 id="formTitleDisplay"><i class="fas fa-edit"></i> <span id="formTitleText">Agregar Curso</span></h2>
+        <input type="text" id="formTitleInput" class="course-title-input" style="display: none;" placeholder="Nombre del curso..." maxlength="100">
         <div id="statusMessageContainer"></div>
 
         <form id="courseForm">
         <input type="hidden" id="courseKey" value="">
-        
         <div class="form-grid">
             <div class="form-group"><label for="inicio">Fecha Inicio</label><input type="date" id="inicio" required></div>
             <div class="form-group"><label for="fin">Fecha Fin</label><input type="date" id="fin" required></div>
             <div class="form-group"><label for="nombreCurso">Nombre del Curso</label><input type="text" id="nombreCurso"></div>
-            <div class="form-group">
-                <label for="tipoCurso">Tipo de Curso</label> 
-                <input type="text" id="tipoCurso" list="tipoCursosListForm">
-                <datalist id="tipoCursosListForm"></datalist>
-            </div>
-            
-            <div class="form-group">
-                <label for="pagador">Pagador</label>
-                <input type="text" id="pagador" list="pagadoresListForm" required>
-                <datalist id="pagadoresListForm"></datalist>
-            </div>
+            <div class="form-group"><label for="tipoCurso">Tipo de Curso</label><input type="text" id="tipoCurso" list="tipoCursosListForm"><datalist id="tipoCursosListForm"></datalist></div>
+            <div class="form-group"><label for="pagador">Pagador</label><input type="text" id="pagador" list="pagadoresListForm" required><datalist id="pagadoresListForm"></datalist></div>
             <div class="form-group"><label for="lugarCelebracion">Lugar de Celebración</label><input type="text" id="lugarCelebracion"></div>
-            <div class="form-group">
-                <label for="horas">Horas</label>
-                <input type="text" inputmode="decimal" id="horas" required 
-                       onblur="formatNumericDisplay(this); calculateFromHours();">
-            </div>
-            <div class="form-group">
-                <label for="precioHoraBruto">Precio Hora (Sin KM)</label>
-                <input type="text" inputmode="decimal" id="precioHoraBruto" value="0,00" 
-                       onblur="formatNumericDisplay(this); calculateFromPrice();"> 
-            </div>
-            
-            <div class="form-group">
-                <label for="importeBase" style="color:#f57f17;">Importe Curso (Base)</label>
-                <input type="text" inputmode="decimal" id="importeBase" value="0,00" 
-                       onblur="formatNumericDisplay(this); calculateFromBase();" placeholder="Importe SIN kilometraje"> 
-            </div>
-
-            <div class="form-group">
-                <label for="kilometraje">Kilometraje (Exento IRPF)</label>
-                <input type="text" inputmode="decimal" id="kilometraje" value="0,00" 
-                       onblur="formatNumericDisplay(this); calculateTotals();"> 
-            </div>
-
-            <div class="form-group">
-                <label for="importeBruto">Importe Bruto TOTAL</label>
-                <input type="text" inputmode="decimal" id="importeBruto" readonly>
-            </div> 
-            
-            <div class="form-group">
-                <label for="irpf">IRPF (%)</label>
-                <input type="text" inputmode="decimal" id="irpf" value="0,00" 
-                       onblur="formatNumericDisplay(this); calculateTotals();">
-            </div> 
-            
-            <div class="form-group">
-                <label for="importeNetoCobrado" class="label-special-green">Total Cobrado (Neto €)</label>
-                <input type="text" inputmode="decimal" id="importeNetoCobrado" readonly value="0,00">
-            </div>
-            <div class="form-group">
-                <label for="importeHoraNeto">Importe Hora (Neto €)</label>
-                <input type="text" inputmode="decimal" id="importeHoraNeto" readonly value="0,00">
-            </div>
-            
-            <div class="form-group">
-                <label for="cobrado">Pago</label>
-                <select id="cobrado">
-                <option value="PENDIENTE">PENDIENTE</option>
-                <option value="COBRADO">COBRADO</option>
-                </select>
-            </div>
+            <div class="form-group"><label for="horas">Horas</label><input type="text" inputmode="decimal" id="horas" required onblur="formatNumericDisplay(this); calculateFromHours();"></div>
+            <div class="form-group"><label for="precioHoraBruto">Precio Hora (Sin KM)</label><input type="text" inputmode="decimal" id="precioHoraBruto" value="0,00" onblur="formatNumericDisplay(this); calculateFromPrice();"></div>
+            <div class="form-group"><label for="importeBase" style="color:#f57f17;">Importe Curso (Base)</label><input type="text" inputmode="decimal" id="importeBase" value="0,00" onblur="formatNumericDisplay(this); calculateFromBase();" placeholder="Importe SIN kilometraje"></div>
+            <div class="form-group"><label for="kilometraje">Kilometraje (Exento IRPF)</label><input type="text" inputmode="decimal" id="kilometraje" value="0,00" onblur="formatNumericDisplay(this); calculateTotals();"></div>
+            <div class="form-group"><label for="importeBruto">Importe Bruto TOTAL</label><input type="text" inputmode="decimal" id="importeBruto" readonly></div> 
+            <div class="form-group"><label for="irpf">IRPF (%)</label><input type="text" inputmode="decimal" id="irpf" value="0,00" onblur="formatNumericDisplay(this); calculateTotals();"></div> 
+            <div class="form-group"><label for="importeNetoCobrado" class="label-special-green">Total Cobrado (Neto €)</label><input type="text" inputmode="decimal" id="importeNetoCobrado" readonly value="0,00"></div>
+            <div class="form-group"><label for="importeHoraNeto">Importe Hora (Neto €)</label><input type="text" inputmode="decimal" id="importeHoraNeto" readonly value="0,00"></div>
+            <div class="form-group"><label for="cobrado">Pago</label><select id="cobrado"><option value="PENDIENTE">PENDIENTE</option><option value="COBRADO">COBRADO</option></select></div>
             <div class="form-group"><label for="fechaCobro">Detalle/Fecha Cobro</label><input type="text" id="fechaCobro"></div>
-            
             <div class="form-group"><label for="renta">Año Renta</label><input type="number" id="renta"></div>
             <div class="form-group"><label for="horario">Horario</label><input type="text" id="horario"></div>
             <div class="form-group" style="grid-column: span 2;"><label for="asistentes">Asistentes</label><input type="text" id="asistentes"></div>
-            
             <div class="form-group" style="grid-column:1/-1;">
                 <label for="observaciones">Observaciones</label><textarea id="observaciones"></textarea>
                 <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
@@ -598,7 +231,6 @@
                 </div>
             </div>
         </div>
-        
         <div class="nav-actions">
             <button type="button" id="btnPrevCourse" onclick="navigateCourse(-1)" disabled><i class="fas fa-chevron-left"></i> Anterior</button>
             <div class="form-actions">
@@ -607,7 +239,6 @@
             </div>
             <button type="button" id="btnNextCourse" onclick="navigateCourse(1)" disabled>Siguiente <i class="fas fa-chevron-right"></i></button>
         </div>
-
         </form>
     </div>
   </div>
@@ -617,20 +248,13 @@
     <div class="stats-controls">
         <div class="form-group">
             <label for="filterInicioYear">Filtrar por Año Inicio:</label>
-            <select id="filterInicioYear" onchange="renderStats()">
-                <option value="">TODOS</option>
-            </select>
+            <select id="filterInicioYear" onchange="renderStats()"><option value="">TODOS</option></select>
         </div>
-        
         <div class="form-group pagador-filter-group">
             <label for="filterPagador">Filtrar por Pagador:</label>
             <div class="pagador-filter-row">
-                <select id="filterPagador" onchange="renderStats()">
-                    <option value="">TODAS</option>
-                </select>
-                <button type="button" id="btnCleanPagadores" onclick="cleanUnusedPagadores()" title="Eliminar pagadores que no están asignados a ningún curso actual">
-                    <i class="fas fa-broom"></i> Eliminar No Usados
-                </button>
+                <select id="filterPagador" onchange="renderStats()"><option value="">TODAS</option></select>
+                <button type="button" id="btnCleanPagadores" onclick="cleanUnusedPagadores()" title="Eliminar pagadores que no están asignados a ningún curso actual"><i class="fas fa-broom"></i> Eliminar No Usados</button>
             </div>
         </div>
     </div>
@@ -643,30 +267,13 @@
   <div class="card">
     <div class="listado-header">
         <h2><i class="fas fa-list"></i> Listado</h2>
-        <button id="btnExportExcel" onclick="exportToExcel()">
-            <i class="fas fa-file-excel"></i> Exportar a Excel
-        </button>
+        <button id="btnExportExcel" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Exportar a Excel</button>
     </div>
-    
     <table class="courses-table">
       <thead>
-        <tr>
-          <th>#</th>
-          <th>Inicio</th>
-          <th>Tipo Curso</th> 
-          <th>Pagador</th>
-          <th>Lugar</th> 
-          <th>Horas</th>
-          <th>Importe Total</th> 
-          <th>Pago</th> 
-          <th>Cobrado</th>
-          <th>Renta</th>
-          <th>Acciones</th>
-        </tr>
+        <tr><th>#</th><th>Inicio</th><th>Tipo Curso</th><th>Pagador</th><th>Lugar</th><th>Horas</th><th>Importe Total</th><th>Pago</th><th>Cobrado</th><th>Renta</th><th>Acciones</th></tr>
       </thead>
-      <tbody id="coursesTableBody">
-        <tr><td colspan="11" style="text-align:center;">Cargando...</td></tr>
-      </tbody>
+      <tbody id="coursesTableBody"><tr><td colspan="11" style="text-align:center;">Cargando...</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -680,7 +287,88 @@
 </div>
 
 <script>
-const BASE = "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app";
+// ==========================================
+// 1. CONFIGURACIÓN FIREBASE Y SEGURIDAD
+// ==========================================
+const firebaseConfig = {
+    apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
+    authDomain: "markarma279.firebaseapp.com",
+    databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "markarma279",
+    messagingSenderId: "280620278315",
+    appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const auth = firebase.auth();
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+let USER_ID = null;
+let userDataRef = null;
+
+// ==========================================
+// 2. LÓGICA DE LOGIN Y MIGRACIÓN
+// ==========================================
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        USER_ID = user.email.replace(/\./g, ',');
+        console.log("Usuario:", USER_ID);
+        // La ruta base para este usuario será: formacion/EMAIL_USUARIO
+        userDataRef = db.ref('formacion/' + USER_ID);
+        cargarDatosConMigracion();
+    } else {
+        window.location.href = "index.html";
+    }
+});
+
+function cargarDatosConMigracion() {
+    userDataRef.child('cursos').once('value').then(snapshot => {
+        if (snapshot.exists()) {
+            // Usuario ya tiene datos
+            document.getElementById('loading-overlay').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            load();
+        } else {
+            // Usuario nuevo -> intentar migrar datos antiguos
+            console.log("Cuenta nueva, buscando datos antiguos...");
+            // Intentar leer de la raíz antigua (FORMACION)
+            db.ref('FORMACION').once('value').then(oldSnap => {
+                if (oldSnap.exists()) {
+                    // Migrar Cursos
+                    userDataRef.child('cursos').set(oldSnap.val());
+                    // Migrar Empresas
+                    db.ref('EMPRESAS').once('value').then(s => { if(s.exists()) userDataRef.child('empresas').set(s.val()); });
+                    // Migrar Tipos
+                    db.ref('TIPOS_CURSO').once('value').then(s => { 
+                        if(s.exists()) userDataRef.child('tipos').set(s.val());
+                        alert("Tus datos antiguos han sido importados a tu cuenta segura.");
+                        setTimeout(() => location.reload(), 1000);
+                    });
+                } else {
+                    // Si no hay en raíz, intentar en usuario-demo
+                    db.ref('formacion/usuario-demo').once('value').then(demoSnap => {
+                        if(demoSnap.exists()) {
+                            userDataRef.set(demoSnap.val()).then(() => {
+                                alert("Datos recuperados de demo.");
+                                location.reload();
+                            });
+                        } else {
+                            document.getElementById('loading-overlay').style.display = 'none';
+                            document.getElementById('app-container').style.display = 'block';
+                            load();
+                        }
+                    });
+                }
+            });
+        }
+    });
+}
+
+// ==========================================
+// 3. LÓGICA DE LA APLICACIÓN
+// ==========================================
+
 const tbody = document.getElementById('coursesTableBody');
 const formModal = document.getElementById('data-entry-form'); 
 const btnToggleForm = document.getElementById('btnToggleForm');
@@ -688,7 +376,6 @@ const form = document.getElementById('courseForm');
 const statusMessageContainer = document.getElementById('statusMessageContainer');
 const courseKeyInput = document.getElementById('courseKey'); 
 
-// Elementos para el título editable
 const formTitleDisplay = document.getElementById('formTitleDisplay');
 const formTitleText = document.getElementById('formTitleText');
 const formTitleInput = document.getElementById('formTitleInput');
@@ -696,7 +383,6 @@ const nombreCursoInput = document.getElementById('nombreCurso');
 
 const filterInicioYear = document.getElementById('filterInicioYear');
 const filterPagador = document.getElementById('filterPagador');
-const btnExportExcel = document.getElementById('btnExportExcel');
 const btnPrevCourse = document.getElementById('btnPrevCourse'); 
 const btnNextCourse = document.getElementById('btnNextCourse'); 
 
@@ -708,7 +394,7 @@ let initialFormData = {};
 let isSaveSuccess = false; 
 let successTimeout = null; 
 
-// Elementos del formulario
+// Campos
 const inicio = document.getElementById('inicio');
 const fin = document.getElementById('fin');
 const tipoCurso = document.getElementById('tipoCurso'); 
@@ -730,7 +416,6 @@ const importeHoraNeto = document.getElementById('importeHoraNeto');
 const alerta = document.getElementById('alerta'); 
 const kilometraje = document.getElementById('kilometraje'); 
 
-// --- Utilidades ---
 function getNumericValue(element) {
     const rawValue = element.value.toString().replace(",", ".");
     return parseFloat(rawValue) || 0;
@@ -742,13 +427,9 @@ function formatNumericDisplay(element) {
 }
 window.formatNumericDisplay = formatNumericDisplay;
 
-// --- NUEVA LÓGICA DE CÁLCULO ---
-
-// Caso 1: El usuario cambia las HORAS
 function calculateFromHours() {
     const h = getNumericValue(horas);
     const p = getNumericValue(precioHoraBruto);
-    
     if (h > 0 && p > 0) {
         const newBase = h * p;
         importeBase.value = newBase.toFixed(2).replace('.', ',');
@@ -756,11 +437,9 @@ function calculateFromHours() {
     calculateTotals();
 }
 
-// Caso 2: El usuario cambia el PRECIO HORA
 function calculateFromPrice() {
     const h = getNumericValue(horas);
     const p = getNumericValue(precioHoraBruto);
-    
     if (h > 0) {
         const newBase = h * p;
         importeBase.value = newBase.toFixed(2).replace('.', ',');
@@ -768,11 +447,9 @@ function calculateFromPrice() {
     calculateTotals();
 }
 
-// Caso 3: El usuario cambia el IMPORTE BASE
 function calculateFromBase() {
     const h = getNumericValue(horas);
     const base = getNumericValue(importeBase);
-    
     if (h > 0) {
         const newPrice = base / h;
         precioHoraBruto.value = newPrice.toFixed(2).replace('.', ',');
@@ -780,28 +457,23 @@ function calculateFromBase() {
     calculateTotals();
 }
 
-// Función central que calcula Totales y Netos
 function calculateTotals() {
     const base = getNumericValue(importeBase);
     const km = getNumericValue(kilometraje);
     const irpfPerc = getNumericValue(irpf);
     const h = getNumericValue(horas);
 
-    // 1. Importe Bruto Total
     const totalBruto = base + km;
     importeBruto.value = totalBruto.toFixed(2).replace('.', ',');
     
-    // 2. Cálculo de Neto
     let retencion = 0;
     if (base > 0) {
         retencion = base * (irpfPerc / 100);
     }
     
-    // Neto = (Base - Retención) + Kilometraje
     const netoTotal = (base - retencion) + km;
     importeNetoCobrado.value = netoTotal.toFixed(2).replace('.', ',');
     
-    // 3. Cálculo Informativo: Importe Hora Neto
     let precioHNeto = 0;
     if (h > 0) {
         const netoCurso = base - retencion;
@@ -815,7 +487,7 @@ window.calculateFromPrice = calculateFromPrice;
 window.calculateFromBase = calculateFromBase;
 window.calculateTotals = calculateTotals;
 
-// --- Lógica de Título Editable ---
+// Título editable
 function enableTitleEditing() {
     formTitleDisplay.style.display = 'none';
     formTitleInput.style.display = 'block';
@@ -829,7 +501,6 @@ function disableTitleEditing() {
     formTitleInput.style.display = 'none';
     const newTitle = formTitleInput.value || 'Agregar Curso';
     formTitleText.textContent = newTitle;
-    
     if (nombreCursoInput.value !== newTitle && !newTitle.includes('Editar Curso:')) {
         nombreCursoInput.value = newTitle;
     }
@@ -844,44 +515,40 @@ nombreCursoInput.addEventListener('input', function() {
 
 formTitleDisplay.addEventListener('click', enableTitleEditing);
 formTitleInput.addEventListener('blur', disableTitleEditing);
-formTitleInput.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        disableTitleEditing();
-    }
-});
+formTitleInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') disableTitleEditing(); });
 
-// --- Carga de Datos ---
+// CARGA DE DATOS
 async function load() {
+    if (!USER_ID) return;
     try {
-        const coursesResponse = await fetch(`${BASE}/FORMACION.json`);
-        const coursesData = await coursesResponse.json();
+        // Cargar Cursos
+        const coursesSnap = await userDataRef.child('cursos').once('value');
+        const coursesData = coursesSnap.val();
         
         courses = [];
         if (coursesData) {
             for (const key in coursesData) {
                 const course = coursesData[key];
-                
                 const brutoTotal = parseFloat((course.importeBruto || 0).toString().replace(',', '.')) || 0;
                 const km = parseFloat((course.kilometraje || 0).toString().replace(',', '.')) || 0;
                 const irpfPerc = parseFloat((course.irpf || 0).toString().replace(',', '.')) || 0;
-                
                 const baseCurso = brutoTotal - km;
                 const retencion = baseCurso * (irpfPerc / 100);
                 course.importeNeto = (baseCurso - retencion) + km;
-
                 courses.push({ key, ...course });
             }
         }
         courses.sort((a, b) => new Date(b.inicio) - new Date(a.inicio));
 
-        const companiesResponse = await fetch(`${BASE}/EMPRESAS.json`);
-        const companiesData = await companiesResponse.json();
-        masterCompanies = Array.isArray(companiesData) ? companiesData : [];
+        // Cargar Empresas
+        const companiesSnap = await userDataRef.child('empresas').once('value');
+        masterCompanies = companiesSnap.val() || [];
 
-        const tiposCursoResponse = await fetch(`${BASE}/TIPOS_CURSO.json`);
-        const tiposCursoData = await tiposCursoResponse.json();
-        masterTiposCurso = Array.isArray(tiposCursoData) ? tiposCursoData : [];
+        // Cargar Tipos
+        const tiposSnap = await userDataRef.child('tipos').once('value');
+        masterTiposCurso = tiposSnap.val() || [];
 
+        // Sincronizar listas
         const existingPagadoresInCourses = new Set(courses.map(c => c.empresa || c.pagador).filter(e => e));
         let needsUpdatePagadores = false;
         existingPagadoresInCourses.forEach(comp => {
@@ -890,566 +557,188 @@ async function load() {
                 needsUpdatePagadores = true;
             }
         });
+        if (needsUpdatePagadores) userDataRef.child('empresas').set(masterCompanies.sort());
 
-        if (needsUpdatePagadores) {
-            await fetch(`${BASE}/EMPRESAS.json`, {
-                method: 'PUT',
-                body: JSON.stringify(masterCompanies.sort())
-            });
-        }
-
-        const existingTiposCursoInCourses = new Set(courses.map(c => c.tipoCurso).filter(e => e));
+        const existingTipos = new Set(courses.map(c => c.tipoCurso).filter(e => e));
         let needsUpdateTipos = false;
-        existingTiposCursoInCourses.forEach(tipo => {
+        existingTipos.forEach(tipo => {
             if (tipo && !masterTiposCurso.includes(tipo)) {
                 masterTiposCurso.push(tipo);
                 needsUpdateTipos = true;
             }
         });
-
-        if (needsUpdateTipos) {
-            await fetch(`${BASE}/TIPOS_CURSO.json`, {
-                method: 'PUT',
-                body: JSON.stringify(masterTiposCurso.sort())
-            });
-        }
+        if (needsUpdateTipos) userDataRef.child('tipos').set(masterTiposCurso.sort());
 
         updateFilters();
         renderStats();
         render();
 
     } catch (error) {
-        console.error("Error cargando datos:", error);
+        console.error("Error:", error);
         tbody.innerHTML = "<tr><td colspan='11' style='text-align:center;color:var(--accent-red);'>Error cargando datos</td></tr>";
     }
 }
 
 function updateFilters() {
     const pagadores = masterCompanies.sort();
-
     const inicioYears = new Set(courses.map(c => c.inicio ? new Date(c.inicio).getFullYear() : null).filter(y => y));
     const currentYear = filterInicioYear.value;
-    filterInicioYear.innerHTML = '<option value="">TODOS</option>' + 
-        Array.from(inicioYears).sort((a,b)=>b-a).map(y => 
-            `<option value="${y}"${y==currentYear ? ' selected' : ''}>${y}</option>`
-        ).join('');
+    filterInicioYear.innerHTML = '<option value="">TODOS</option>' + Array.from(inicioYears).sort((a,b)=>b-a).map(y => `<option value="${y}"${y==currentYear ? ' selected' : ''}>${y}</option>`).join('');
     
     const currentPagadorFilter = filterPagador.value;
-    filterPagador.innerHTML = '<option value="">TODAS</option>' + 
-        pagadores.map(e => 
-            `<option value="${e}"${e==currentPagadorFilter ? ' selected' : ''}>${e}</option>`
-        ).join('');
-        
-    document.getElementById('pagadoresListForm').innerHTML = pagadores.map(e => `<option value="${e}">`).join('');
+    filterPagador.innerHTML = '<option value="">TODAS</option>' + pagadores.map(e => `<option value="${e}"${e==currentPagadorFilter ? ' selected' : ''}>${e}</option>`).join('');
     
-    const tiposCurso = masterTiposCurso.sort();
-    document.getElementById('tipoCursosListForm').innerHTML = tiposCurso.map(t => `<option value="${t}">`).join('');
+    document.getElementById('pagadoresListForm').innerHTML = pagadores.map(e => `<option value="${e}">`).join('');
+    document.getElementById('tipoCursosListForm').innerHTML = masterTiposCurso.sort().map(t => `<option value="${t}">`).join('');
 }
 
 function renderStats() {
     const selectedYear = filterInicioYear.value; 
     const selectedPagador = filterPagador.value;
-
-    const filteredCourses = courses.filter(c => 
-        c.cobrado === "COBRADO" && 
-        (selectedYear === "" || (c.inicio && new Date(c.inicio).getFullYear() == selectedYear)) && 
-        (selectedPagador === "" || (c.empresa || c.pagador) === selectedPagador) 
-    );
-
+    const filteredCourses = courses.filter(c => c.cobrado === "COBRADO" && (selectedYear === "" || (c.inicio && new Date(c.inicio).getFullYear() == selectedYear)) && (selectedPagador === "" || (c.empresa || c.pagador) === selectedPagador));
     const totalImporte = filteredCourses.reduce((sum, c) => sum + (parseFloat(c.importeNeto) || 0), 0);
     const totalHoras = filteredCourses.reduce((sum, c) => sum + (parseFloat(c.horas) || 0), 0);
-
     document.getElementById('totalImporte').textContent = `${totalImporte.toFixed(2).replace('.', ',')} €`;
     document.getElementById('totalHoras').textContent = `${totalHoras.toFixed(2).replace('.', ',')} h`;
 }
 
 function render() {
-    if (courses.length === 0) { 
-        tbody.innerHTML = "<tr><td colspan='11' style='text-align:center;'>No hay cursos</td></tr>"; 
-        return; 
-    }
-    
+    if (courses.length === 0) { tbody.innerHTML = "<tr><td colspan='11' style='text-align:center;'>No hay cursos</td></tr>"; return; }
     tbody.innerHTML = courses.map((c, i) => {
-        const statusSpan = c.cobrado === "COBRADO" ? 
-            "<span class='status-cobrado'>COBRADO</span>" : 
-            "<span class='status-pendiente'>PENDIENTE</span>";
-        const pagadorName = c.empresa || c.pagador || "";
-        const lugar = c.lugarCelebracion || ""; 
+        const statusSpan = c.cobrado === "COBRADO" ? "<span class='status-cobrado'>COBRADO</span>" : "<span class='status-pendiente'>PENDIENTE</span>";
         const importeDisplay = (parseFloat(c.importeNeto) || 0).toFixed(2).replace('.', ','); 
         const isAlert = c.alerta ? ' alert' : ''; 
-        const tipoCursoDisplay = c.tipoCurso || ""; 
-
-        return `
-            <tr>
-                <td>${i+1}</td>
-                <td>${c.inicio||""}</td>
-                <td>${tipoCursoDisplay}</td> 
-                <td>${pagadorName}</td> 
-                <td>${lugar}</td> 
-                <td>${c.horas||""}</td>
-                <td>${importeDisplay} €</td> 
-                <td>${statusSpan}</td> 
-                <td>${c.fechaCobro||""}</td>
-                <td>${c.renta||""}</td>
-                <td class="action-btns">
-                    <button class="obs-btn${isAlert}" onclick="showObs('${c.key}')" title="Ver Detalles Adicionales">👁</button>
-                    <button class="edit-btn" onclick="editCourse('${c.key}')" title="Editar Curso Completo"><i class="fas fa-edit"></i></button>
-                    <button class="delete-btn" onclick="delCourse('${c.key}')" title="Eliminar"><i class="fas fa-trash"></i></button>
-                </td>
-            </tr>`;
+        return `<tr><td>${i+1}</td><td>${c.inicio||""}</td><td>${c.tipoCurso||""}</td><td>${c.empresa||c.pagador||""}</td><td>${c.lugarCelebracion||""}</td><td>${c.horas||""}</td><td>${importeDisplay} €</td><td>${statusSpan}</td><td>${c.fechaCobro||""}</td><td>${c.renta||""}</td><td class="action-btns"><button class="obs-btn${isAlert}" onclick="showObs('${c.key}')" title="Ver Detalles">👁</button><button class="edit-btn" onclick="editCourse('${c.key}')" title="Editar"><i class="fas fa-edit"></i></button><button class="delete-btn" onclick="delCourse('${c.key}')" title="Eliminar"><i class="fas fa-trash"></i></button></td></tr>`;
     }).join("");
 }
 
-// --- EDICIÓN Y NAVEGACIÓN ---
+// CRUD
 window.editCourse = key => {
     const c = courses.find(x => x.key === key);
     if (!c) return;
-    
     closeFormModal(); 
+    editingKey = key; courseKeyInput.value = key; 
     
-    editingKey = key; 
-    courseKeyInput.value = key; 
+    inicio.value = c.inicio || ""; fin.value = c.fin || ""; nombreCurso.value = c.nombreCurso || ""; tipoCurso.value = c.tipoCurso || ""; 
+    pagador.value = c.empresa || c.pagador || ""; horas.value = (parseFloat(c.horas) || 0).toFixed(2).replace('.', ',');
     
-    inicio.value = c.inicio || "";
-    fin.value = c.fin || "";
-    nombreCurso.value = c.nombreCurso || "";
-    tipoCurso.value = c.tipoCurso || ""; 
-    pagador.value = c.empresa || c.pagador || ""; 
-    horas.value = (parseFloat(c.horas) || 0).toFixed(2).replace('.', ',');
-    
-    const brutoTotal = parseFloat(c.importeBruto) || 0;
-    const km = parseFloat(c.kilometraje) || 0;
-    const baseCurso = brutoTotal - km;
-    
-    importeBruto.value = brutoTotal.toFixed(2).replace('.', ',');
-    kilometraje.value = km.toFixed(2).replace('.', ',');
-    importeBase.value = baseCurso.toFixed(2).replace('.', ','); 
-    
-    irpf.value = (parseFloat(c.irpf) || 0).toFixed(2).replace('.', ',');
-    cobrado.value = c.cobrado || "PENDIENTE";
-    fechaCobro.value = c.fechaCobro || "";
-    renta.value = c.renta || "";
-    observaciones.value = c.observaciones || "";
-    lugarCelebracion.value = c.lugarCelebracion || "";
-    horario.value = c.horario || "";
-    asistentes.value = c.asistentes || "";
-    alerta.checked = c.alerta || false; 
+    const brutoTotal = parseFloat(c.importeBruto) || 0; const km = parseFloat(c.kilometraje) || 0; const baseCurso = brutoTotal - km;
+    importeBruto.value = brutoTotal.toFixed(2).replace('.', ','); kilometraje.value = km.toFixed(2).replace('.', ','); importeBase.value = baseCurso.toFixed(2).replace('.', ','); 
+    irpf.value = (parseFloat(c.irpf) || 0).toFixed(2).replace('.', ','); cobrado.value = c.cobrado || "PENDIENTE";
+    fechaCobro.value = c.fechaCobro || ""; renta.value = c.renta || ""; observaciones.value = c.observaciones || "";
+    lugarCelebracion.value = c.lugarCelebracion || ""; horario.value = c.horario || ""; asistentes.value = c.asistentes || ""; alerta.checked = c.alerta || false; 
 
     const h = getNumericValue(horas); 
-    if (h > 0 && baseCurso > 0) {
-        precioHoraBruto.value = (baseCurso / h).toFixed(2).replace('.', ',');
-    } else {
-        precioHoraBruto.value = (0).toFixed(2).replace('.', ',');
-    }
-
+    precioHoraBruto.value = (h > 0 && baseCurso > 0) ? (baseCurso / h).toFixed(2).replace('.', ',') : (0).toFixed(2).replace('.', ',');
     calculateTotals(); 
-    
     initialFormData = getFormData();
-
+    
     const cursoTitulo = c.tituloCurso || c.nombreCurso || "Curso sin nombre";
-    formTitleText.textContent = `Editar Curso: ${cursoTitulo}`;
-    formTitleInput.value = `Editar Curso: ${cursoTitulo}`;
-    
+    formTitleText.textContent = `Editar Curso: ${cursoTitulo}`; formTitleInput.value = `Editar Curso: ${cursoTitulo}`;
     document.getElementById('btnSubmitCourse').textContent = 'Guardar Cambios';
-    
     updateNavigationButtons(key);
-
     formModal.classList.add('visible');
 };
 
 function getFormData() {
-    const currentData = {
-        inicio: inicio.value,
-        fin: fin.value,
-        nombreCurso: nombreCurso.value,
-        tipoCurso: tipoCurso.value, 
-        pagador: pagador.value, 
-        horas: horas.value, 
-        precioHoraBruto: precioHoraBruto.value,
-        importeBruto: importeBruto.value, 
-        irpf: irpf.value, 
-        importeNeto: importeNetoCobrado.value, 
-        cobrado: cobrado.value, 
-        fechaCobro: fechaCobro.value,
-        renta: renta.value, 
-        observaciones: observaciones.value,
-        lugarCelebracion: lugarCelebracion.value,
-        horario: horario.value,
-        asistentes: asistentes.value,
-        alerta: alerta.checked,
-        kilometraje: kilometraje.value,
-        tituloCurso: formTitleInput.value.replace('Editar Curso: ', '')
+    return {
+        inicio: inicio.value, fin: fin.value, nombreCurso: nombreCurso.value, tipoCurso: tipoCurso.value, 
+        pagador: pagador.value, horas: horas.value, precioHoraBruto: precioHoraBruto.value, importeBruto: importeBruto.value, 
+        irpf: irpf.value, importeNeto: importeNetoCobrado.value, cobrado: cobrado.value, fechaCobro: fechaCobro.value,
+        renta: renta.value, observaciones: observaciones.value, lugarCelebracion: lugarCelebracion.value, horario: horario.value,
+        asistentes: asistentes.value, alerta: alerta.checked, kilometraje: kilometraje.value, tituloCurso: formTitleInput.value.replace('Editar Curso: ', '')
     };
-    return currentData;
 }
 
 window.navigateCourse = dir => {
     const currentKey = courseKeyInput.value;
     if (!currentKey) return;
-
-    calculateTotals(); 
-    
-    const currentData = getFormData();
-    
-    if (isSaveSuccess) {
-        closeFormModal(); 
-        const currentIndex = courses.findIndex(c => c.key === currentKey);
-        const newIndex = currentIndex + dir;
-        if (newIndex >= 0 && newIndex < courses.length) {
-            const newCourseKey = courses[newIndex].key;
-            editCourse(newCourseKey);
-        }
-        return; 
-    }
-    
-    const changed = JSON.stringify(currentData) !== JSON.stringify(initialFormData);
-    if (changed) {
-         if (!confirm("Hay cambios sin guardar. ¿Moverse a otro curso y perder los cambios?")) {
-            return;
-        }
-    }
-
-    const currentIndex = courses.findIndex(c => c.key === currentKey);
-    const newIndex = currentIndex + dir;
-
-    if (newIndex >= 0 && newIndex < courses.length) {
-        const newCourseKey = courses[newIndex].key;
-        editCourse(newCourseKey);
-    }
+    calculateTotals();
+    if (isSaveSuccess) { closeFormModal(); editCourse(courses[courses.findIndex(c => c.key === currentKey) + dir].key); return; }
+    if (JSON.stringify(getFormData()) !== JSON.stringify(initialFormData) && !confirm("¿Perder cambios?")) return;
+    editCourse(courses[courses.findIndex(c => c.key === currentKey) + dir].key);
 };
 
 function updateNavigationButtons(currentKey) {
-    const currentIndex = courses.findIndex(c => c.key === currentKey);
-    btnPrevCourse.style.display = 'inline-block';
-    btnNextCourse.style.display = 'inline-block';
-    btnPrevCourse.disabled = currentIndex === 0;
-    btnNextCourse.disabled = currentIndex === courses.length - 1;
+    const idx = courses.findIndex(c => c.key === currentKey);
+    btnPrevCourse.disabled = idx === 0; btnNextCourse.disabled = idx === courses.length - 1;
+    btnPrevCourse.style.display = 'inline-block'; btnNextCourse.style.display = 'inline-block';
 }
 
-// --- MODALES Y EXPORTACIÓN ---
 function showObs(key){ 
-    const c = courses.find(x => x.key === key);
-    if (!c) return;
-
-    const h = parseFloat(c.horas || 0);
-    const brutoTotal = parseFloat(c.importeBruto || 0);
-    const km = parseFloat(c.kilometraje || 0);
-    const irpfPerc = parseFloat(c.irpf || 0);
-    
-    const baseCurso = brutoTotal - km;
-    const retencion = baseCurso * (irpfPerc / 100);
-    const netoTotal = (baseCurso - retencion) + km;
-    
-    const precioHBruto = h > 0 ? (baseCurso / h).toFixed(2) : "0.00";
-    const precioHNeto = h > 0 ? ((baseCurso - retencion) / h).toFixed(2) : "0.00";
-
-    const alertaStatus = c.alerta ? 
-        '<p style="color:var(--accent-red); font-weight:700;"><i class="fas fa-exclamation-triangle"></i> ¡ALERTA! Incidencia Marcada</p>' : 
-        '<p style="color:var(--accent-green);">Sin incidencias marcadas.</p>';
-
-    const format = (value) => (value || 0).toString().replace('.', ',');
-
-    const details = `
-        ${alertaStatus}
-        <hr style="border-top: 1px solid rgba(0,0,0,0.1); margin-top: 15px;">
-        <p><strong>Nombre del Curso:</strong> ${c.nombreCurso || 'N/A'}</p>
-        <p><strong>Tipo de Curso:</strong> ${c.tipoCurso || 'N/A'}</p>
-        <div style="background:rgba(0,0,0,0.1); padding:10px; border-radius:6px; margin:10px 0;">
-            <p><strong>Importe Base Curso:</strong> ${format(baseCurso.toFixed(2))} €</p>
-            <p><strong>+ Kilometraje (Exento):</strong> ${format(km.toFixed(2))} €</p>
-            <p><strong>= Importe Bruto Total:</strong> ${format(brutoTotal.toFixed(2))} €</p>
-        </div>
-        <p><strong>IRPF Aplicado (sobre base):</strong> ${format(irpfPerc.toFixed(2))} % (-${format(retencion.toFixed(2))} €)</p>
-        <p><strong>Total Cobrado (Neto):</strong> <strong style="color:var(--accent-green);">${format(netoTotal.toFixed(2))} €</strong></p>
-        <hr style="border-top: 1px solid rgba(0,0,0,0.1); margin-top: 15px;">
-        <p><strong>Precio/Hora (Bruto Curso):</strong> ${format(precioHBruto)} €</p>
-        <p><strong>Importe/Hora (Neto Curso):</strong> ${format(precioHNeto)} €</p>
-        <hr style="border-top: 1px solid rgba(0,0,0,0.1); margin-top: 15px;">
-        <p><strong>Lugar de Celebración:</strong> ${c.lugarCelebracion || 'N/A'}</p>
-        <p><strong>Horario:</strong> ${c.horario || 'N/A'}</p>
-        <p><strong>Asistentes:</strong> ${c.asistentes || 'N/A'}</p>
-        <hr style="border-top: 1px solid rgba(0,0,0,0.1);">
-        <p><strong>Observaciones:</strong></p>
-        <p style="white-space: pre-wrap; color: #333;">${c.observaciones || 'No hay observaciones.'}</p>
-    `;
-
-    const modalContent = document.getElementById('obsModal').querySelector('.modal-content');
-    modalContent.innerHTML = `
-        <button class="close-modal" onclick="closeObsModal()">X</button>
-        <h3>Detalles Económicos y del Curso</h3>
-        ${details}
-    `;
-
+    const c = courses.find(x => x.key === key); if (!c) return;
+    const format = v => (v || 0).toString().replace('.', ',');
+    const details = `<p><strong>Nombre:</strong> ${c.nombreCurso}</p><p><strong>Pagador:</strong> ${c.empresa||c.pagador}</p><p><strong>Obs:</strong> ${c.observaciones}</p>`;
+    document.getElementById('obsModal').querySelector('.modal-content').innerHTML = `<button class="close-modal" onclick="closeObsModal()">X</button><h3>Detalles</h3>${details}`;
     document.getElementById('obsModal').style.display="flex"; 
 }
+window.closeObsModal = () => document.getElementById('obsModal').style.display="none";
+window.showObs = showObs;
 
-function closeObsModal(){ document.getElementById('obsModal').style.display="none"; }
-window.showObs = showObs; window.closeObsModal = closeObsModal;
-
-function exportToExcel() {
-    const headers = ["ID", "Inicio", "Fin", "Nombre Curso", "Tipo Curso", "Pagador", "Lugar Celebración", "Horas", "Importe Base Curso", "Kilometraje", "Importe Bruto Total", "IRPF (%)", "Importe Neto Cobrado", "Pago", "Detalle Cobro", "Año Renta", "Horario", "Asistentes", "Observaciones", "Alerta"];
-    
-    const csvData = courses.map((c, index) => {
-        const h = parseFloat(c.horas || 0);
-        const brutoTotal = parseFloat(c.importeBruto || 0);
-        const km = parseFloat(c.kilometraje || 0);
-        const irpfPerc = parseFloat(c.irpf || 0);
-        
-        const baseCurso = brutoTotal - km;
-        const retencion = baseCurso * (irpfPerc / 100);
-        const netoTotal = (baseCurso - retencion) + km;
-
-        return [
-            index + 1,
-            `"${c.inicio || ''}"`,
-            `"${c.fin || ''}"`,
-            `"${(c.nombreCurso || '').replace(/"/g, '""')}"`,
-            `"${(c.tipoCurso || '').replace(/"/g, '""')}"`, 
-            `"${(c.empresa || c.pagador || '').replace(/"/g, '""')}"`, 
-            `"${(c.lugarCelebracion || '').replace(/"/g, '""')}"`, 
-            h,
-            baseCurso.toFixed(2), 
-            km.toFixed(2), 
-            brutoTotal.toFixed(2), 
-            irpfPerc,
-            netoTotal.toFixed(2), 
-            c.cobrado || 'PENDIENTE',
-            `"${c.fechaCobro || ''}"`,
-            c.renta || '',
-            `"${(c.horario || '').replace(/"/g, '""')}"`,
-            `"${(c.asistentes || '').replace(/"/g, '""')}"`,
-            `"${(c.observaciones || '').replace(/"/g, '""')}"`,
-            c.alerta ? 'SI' : 'NO'
-        ];
-    });
-
-    let csvContent = headers.join(";") + "\n";
-    csvData.forEach(row => {
-        csvContent += row.join(";") + "\n";
-    });
-
-    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', `Cursos_${new Date().toISOString().slice(0, 10)}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-window.exportToExcel = exportToExcel;
+window.exportToExcel = () => {
+    let csv = "ID;Nombre;Pagador;Importe Neto;Estado\n";
+    courses.forEach((c, i) => csv += `${i+1};"${c.nombreCurso}";"${c.empresa||c.pagador}";${c.importeNeto};${c.cobrado}\n`);
+    const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob(["\ufeff"+csv], {type: 'text/csv;charset=utf-8;'}));
+    link.download = `Cursos_${new Date().toISOString().slice(0,10)}.csv`; link.click();
+};
 
 window.cleanUnusedPagadores = async () => {
-    if (!confirm("¿Está seguro de que desea eliminar todos los pagadores que NO están asignados a ningún curso en la tabla?")) {
-        return;
-    }
-    
-    const pagadoresUsados = new Set(courses.map(c => c.empresa || c.pagador).filter(e => e));
-    const pagadoresUsadosArray = Array.from(pagadoresUsados).filter(Boolean); 
-    const pagadoresAntiguos = masterCompanies.filter(p => !pagadoresUsadosArray.includes(p));
-    
-    if (pagadoresAntiguos.length === 0) {
-        alert("No se encontraron pagadores en la lista maestra que no estén asignados a ningún curso.");
-        return;
-    }
-    
-    masterCompanies = pagadoresUsadosArray.sort();
-    await fetch(`${BASE}/EMPRESAS.json`, {
-        method: 'PUT',
-        body: JSON.stringify(masterCompanies)
-    });
-    
-    alert(`Se han eliminado ${pagadoresAntiguos.length} pagadores antiguos: ${pagadoresAntiguos.join(', ')}.`);
-    
-    updateFilters(); 
-    renderStats(); 
-    render(); 
+    if (!confirm("¿Eliminar pagadores no usados?")) return;
+    const usados = Array.from(new Set(courses.map(c => c.empresa || c.pagador).filter(Boolean)));
+    masterCompanies = usados.sort();
+    await userDataRef.child('empresas').set(masterCompanies);
+    alert("Lista de pagadores limpiada.");
+    updateFilters();
 };
 
-// CRUD
 form.onsubmit = async e => {
     e.preventDefault();
-    
     calculateTotals();
-    
-    const horasValue = getNumericValue(horas);
-    const importeBrutoValue = getNumericValue(importeBruto);
-    const irpfValue = getNumericValue(irpf);
-    const importeNetoValue = getNumericValue(importeNetoCobrado);
-    const kilometrajeValue = getNumericValue(kilometraje);
-
     const tituloFinal = formTitleInput.value.replace('Editar Curso: ', '');
-    if (nombreCursoInput.value !== tituloFinal) {
-        nombreCursoInput.value = tituloFinal;
-    }
+    if (nombreCursoInput.value !== tituloFinal) nombreCursoInput.value = tituloFinal;
 
     const obj = {
-        inicio: inicio.value, 
-        fin: fin.value, 
-        nombreCurso: nombreCursoInput.value, 
-        tipoCurso: tipoCurso.value, 
-        empresa: pagador.value, 
-        pagador: pagador.value, 
-        horas: horasValue,
-        importeBruto: importeBrutoValue,
-        irpf: irpfValue,
-        importeNeto: importeNetoValue.toFixed(2),
-        cobrado: cobrado.value, 
-        fechaCobro: fechaCobro.value,
-        renta: renta.value, 
-        observaciones: observaciones.value,
-        lugarCelebracion: lugarCelebracion.value,
-        horario: horario.value,
-        asistentes: asistentes.value,
-        alerta: alerta.checked,
-        tituloCurso: tituloFinal,
-        kilometraje: kilometrajeValue 
+        inicio: inicio.value, fin: fin.value, nombreCurso: nombreCursoInput.value, tipoCurso: tipoCurso.value, 
+        empresa: pagador.value, pagador: pagador.value, horas: getNumericValue(horas), importeBruto: getNumericValue(importeBruto),
+        irpf: getNumericValue(irpf), importeNeto: getNumericValue(importeNetoCobrado).toFixed(2), cobrado: cobrado.value, 
+        fechaCobro: fechaCobro.value, renta: renta.value, observaciones: observaciones.value, lugarCelebracion: lugarCelebracion.value,
+        horario: horario.value, asistentes: asistentes.value, alerta: alerta.checked, tituloCurso: tituloFinal, kilometraje: getNumericValue(kilometraje) 
     };
     
-    if (obj.empresa && !masterCompanies.includes(obj.empresa)) {
-        masterCompanies.push(obj.empresa);
-        await fetch(`${BASE}/EMPRESAS.json`, {
-            method: 'PUT',
-            body: JSON.stringify(masterCompanies.sort())
-        });
-    }
+    if (obj.empresa && !masterCompanies.includes(obj.empresa)) { masterCompanies.push(obj.empresa); userDataRef.child('empresas').set(masterCompanies.sort()); }
+    if (obj.tipoCurso && !masterTiposCurso.includes(obj.tipoCurso)) { masterTiposCurso.push(obj.tipoCurso); userDataRef.child('tipos').set(masterTiposCurso.sort()); }
     
-    if (obj.tipoCurso && !masterTiposCurso.includes(obj.tipoCurso)) {
-        masterTiposCurso.push(obj.tipoCurso);
-        await fetch(`${BASE}/TIPOS_CURSO.json`, {
-            method: 'PUT',
-            body: JSON.stringify(masterTiposCurso.sort())
-        });
-    }
-    
-    const keyToUpdate = courseKeyInput.value;
-
-    if (keyToUpdate) { 
-        editingKey = keyToUpdate; 
-        await fetch(`${BASE}/FORMACION/${keyToUpdate}.json`, {
-            method: 'PUT',
-            body: JSON.stringify(obj)
-        });
-        
-        displayStatus("¡Se han realizado los cambios con éxito!", "success");
-        isSaveSuccess = true; 
-        
-        await new Promise(r => setTimeout(r, 50)); 
-        await load(); 
-        initialFormData = getFormData();
-        
-        if (successTimeout) clearTimeout(successTimeout); 
-        successTimeout = setTimeout(closeFormModal, 2000);
+    if (editingKey) { 
+        await userDataRef.child('cursos').child(editingKey).update(obj);
+        displayStatus("Guardado con éxito", "success"); isSaveSuccess = true;
+        setTimeout(() => { load(); closeFormModal(); }, 1000);
     } else { 
-        await fetch(`${BASE}/FORMACION.json`, {
-            method: 'POST',
-            body: JSON.stringify(obj)
-        });
-        closeFormModal(); 
-        await load(); 
+        await userDataRef.child('cursos').push(obj);
+        closeFormModal(); load(); 
     }
 };
 
-function displayStatus(message, type) {
-    statusMessageContainer.textContent = message;
-    if (type === "success") {
-        statusMessageContainer.style.backgroundColor = '#d4edda'; 
-        statusMessageContainer.style.color = '#155724'; 
-        statusMessageContainer.style.border = '1px solid #c3e6cb';
-    } else if (type === "warning") {
-        statusMessageContainer.style.backgroundColor = '#f8d7da'; 
-        statusMessageContainer.style.color = '#721c24'; 
-        statusMessageContainer.style.border = '1px solid #f5c6cb';
-    }
-    statusMessageContainer.style.display = 'block';
+function displayStatus(msg, type) {
+    statusMessageContainer.textContent = msg; statusMessageContainer.style.display = 'block';
+    statusMessageContainer.style.backgroundColor = type === "success" ? '#d4edda' : '#f8d7da';
 }
-
-function clearStatus() {
-    statusMessageContainer.style.display = 'none';
-    statusMessageContainer.textContent = '';
-}
+function clearStatus() { statusMessageContainer.style.display = 'none'; }
 
 function closeFormModal() {
-    editingKey = null;
-    courseKeyInput.value = '';
-    form.reset();
-    importeNetoCobrado.value = (0).toFixed(2).replace('.', ',');
-    importeBruto.value = (0).toFixed(2).replace('.', ',');
-    precioHoraBruto.value = (0).toFixed(2).replace('.', ',');
-    importeHoraNeto.value = (0).toFixed(2).replace('.', ','); 
-    irpf.value = (0).toFixed(2).replace('.', ',');
-    kilometraje.value = (0).toFixed(2).replace('.', ',');
-    importeBase.value = (0).toFixed(2).replace('.', ','); 
-    
-    formTitleText.textContent = 'Agregar Curso';
-    formTitleInput.value = 'Agregar Curso';
-    
-    formModal.classList.remove('visible'); 
-    clearStatus(); 
-    
-    if (successTimeout) { 
-        clearTimeout(successTimeout);
-        successTimeout = null;
-    }
-    isSaveSuccess = false;
+    editingKey = null; courseKeyInput.value = ''; form.reset();
+    formModal.classList.remove('visible'); clearStatus(); isSaveSuccess = false;
 }
 window.closeFormModal = closeFormModal; 
 
-window.handleCancelEdit = () => {
-    const currentKey = courseKeyInput.value; 
-
-    if (!currentKey) {
-        closeFormModal();
-        return;
-    }
-
-    if (isSaveSuccess) {
-        closeFormModal(); 
-        return;
-    }
-    
-    calculateTotals();
-    
-    const currentData = getFormData();
-    const changed = JSON.stringify(currentData) !== JSON.stringify(initialFormData); 
-
-    if (changed) {
-        if (confirm("Hay cambios sin guardar. ¿Cerrar de todos modos?")) {
-            closeFormModal();
-        }
-    } else {
-        displayStatus("No se efectuó ningún cambio.", "warning");
-        setTimeout(closeFormModal, 1500); 
-    }
-};
-
-function resetFormForAdd() {
-    closeFormModal();
-    document.getElementById('btnSubmitCourse').textContent = 'Guardar';
-    document.getElementById('btnCancelEdit').style.display = 'inline-block';
-    btnPrevCourse.style.display = 'none';
-    btnNextCourse.style.display = 'none';
-    formModal.classList.add('visible');
-}
-
-btnToggleForm.onclick = resetFormForAdd;
+window.handleCancelEdit = () => { if (!isSaveSuccess && JSON.stringify(getFormData()) !== JSON.stringify(initialFormData) && !confirm("¿Cerrar sin guardar?")) return; closeFormModal(); };
+btnToggleForm.onclick = () => { closeFormModal(); document.getElementById('btnSubmitCourse').textContent = 'Guardar'; document.getElementById('btnCancelEdit').style.display = 'inline-block'; btnPrevCourse.style.display = 'none'; btnNextCourse.style.display = 'none'; formModal.classList.add('visible'); };
 
 window.delCourse = async key => {
-    if (confirm("¿Eliminar curso?")) { 
-        await fetch(`${BASE}/FORMACION/${key}.json`, {
-            method: 'DELETE'
-        });
-        load(); 
-    }
+    if (confirm("¿Eliminar curso?")) { await userDataRef.child('cursos').child(key).remove(); load(); }
 };
-
 window.delCourse = delCourse;
 window.renderStats = renderStats;
 window.editCourse = editCourse;
-
-// Inicializar la aplicación
-load();
 </script>
 </body>
 </html>

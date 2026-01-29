@@ -4,13 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Vacaciones y Asuntos Propios</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script> <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     
     <style>
         /* =========================================
-           ESTILOS (DISEÑO ESCRITORIO + MÓVIL)
+           ESTILOS (DISEÑO FINAL)
            ========================================= */
         :root {
             --primary-color: #3498db;
@@ -24,7 +23,7 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; line-height: 1.5; font-size: 14px; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #f4f6f9; color: #333; line-height: 1.5; font-size: 14px; }
         .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
         
         /* Header */
@@ -70,9 +69,8 @@
         th, td { padding: 12px 15px; border-bottom: 1px solid #eee; text-align: left; vertical-align: middle; }
         th { background-color: #f8f9fa; font-weight: 600; color: #444; }
         
-        /* ESTADOS Y BADGES */
+        /* Estados */
         .estado-badge { padding: 5px 10px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; display: inline-block; text-align: center; width: 100px; }
-        /* Clases CSS corregidas para coincidir con JS (EnTrámite sin espacio) */
         .EnTrámite, .tramite { background-color: #FFF59D; color: #F57F17; border: 1px solid #FBC02D; }
         .Denegado, .denegado { background-color: #EF9A9A; color: #B71C1C; border: 1px solid #E53935; }
         .Disfrutado, .disfrutado { background-color: #A5D6A7; color: #1B5E20; border: 1px solid #43A047; }
@@ -109,7 +107,7 @@
         .item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid #eee; background: #fff; }
         .item-row:nth-child(even) { background-color: #f9f9f9; }
         
-        /* Permutas (Diseño corregido) */
+        /* Permutas Visualización */
         .permuta-display { display: flex; flex-direction: column; width: 100%; }
         .permuta-header { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; }
         .permuta-details { display: flex; gap: 20px; margin-top: 5px; flex-wrap: wrap; }
@@ -117,13 +115,6 @@
         
         .horas-pos { color: var(--success-color); font-weight: bold; }
         .horas-neg { color: var(--danger-color); font-weight: bold; }
-
-        /* Filas Desplegables (Móvil) */
-        tr.detail-row { display: none; } /* Oculto por defecto en escritorio */
-        .mobile-detail-content { padding: 15px; background: #f9f9f9; border-bottom: 2px solid #ddd; }
-        .mobile-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; }
-        .mobile-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-        .mobile-actions-grid button { width: 100%; }
 
         /* Utils */
         .hidden { display: none !important; }
@@ -133,29 +124,10 @@
         .notif-error { background-color: var(--danger-color); }
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        /* --- RESPONSIVE MEDIA QUERIES --- */
-        @media (min-width: 769px) {
-            tr.detail-row { display: none !important; } /* Seguridad: Nunca mostrar filas detalle en PC */
-        }
-
+        /* Responsive */
         @media (max-width: 1200px) { .status-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (max-width: 900px) { .form-row { grid-template-columns: 1fr; } .status-grid { grid-template-columns: repeat(2, 1fr); } }
-        
-        @media (max-width: 768px) {
-            .status-grid { grid-template-columns: 1fr; }
-            .header-content { flex-direction: column; text-align: center; gap: 10px; }
-            
-            /* Tabla Móvil */
-            .table-container { border: none; }
-            table { width: 100%; min-width: 100%; }
-            th.hide-mobile, td.hide-mobile { display: none; } /* Ocultar columnas secundarias */
-            
-            /* Indicador de desplegable */
-            td:nth-child(2)::after { content: ' ▼'; font-size: 0.8em; color: #999; float: right; }
-            tr.main-row { cursor: pointer; border-bottom: 1px solid #ddd; }
-            tr.main-row.active { background-color: #eef2f7; }
-            tr.detail-row.open { display: table-row; } /* Mostrar detalle solo si tiene clase open */
-        }
+        @media (max-width: 600px) { .status-grid { grid-template-columns: 1fr; } .header-content { flex-direction: column; text-align: center; gap: 10px; } .actions { flex-wrap: wrap; } }
     </style>
 </head>
 <body>
@@ -168,7 +140,7 @@
     
     <div class="container">
         <div id="notification-area"></div>
-        <div id="loading"><div class="loading">Cargando datos...</div></div>
+        <div id="loading"><div class="loading">Verificando sesión...</div></div>
         
         <div id="app" class="hidden">
             <div class="status-grid">
@@ -269,9 +241,9 @@
                             <tr>
                                 <th style="width:15%">Fecha</th>
                                 <th style="width:20%">Tipo</th>
-                                <th class="hide-mobile" style="width:10%">Cómputo</th>
-                                <th class="hide-mobile" style="width:15%">Estado</th>
-                                <th class="hide-mobile" style="width:40%; text-align:right;">Acciones</th>
+                                <th style="width:10%">Cómputo</th>
+                                <th style="width:15%">Estado</th>
+                                <th style="width:40%; text-align:right;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="cuerpo-tabla"></tbody>
@@ -332,27 +304,28 @@
     </div></div>
 
     <script>
+        // CONFIG FIREBASE
         const firebaseConfig = {
-            apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
+            apiKey: "AIzaSyC4w7q3Q8X9Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8", // ASEGURA TU API KEY
             authDomain: "markarma279.firebaseapp.com",
             databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "markarma279",
-            storageBucket: "markarma279.firebasestorage.app",
-            messagingSenderId: "280620278315",
-            appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
+            storageBucket: "markarma279.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef123456"
         };
-        
-        firebase.initializeApp(firebaseConfig);
+        // Inicializar Auth
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
-        
-        let USER_ID = null; // Se rellenará al detectar login
+        const USER_ID = 'usuario-demo'; 
 
         let datos = { configuraciones: {}, solicitudes: [], horas: [], permutas: [] };
         const anioActual = new Date().getFullYear();
         let anioGestion = anioActual;
         let anioConfig = anioActual;
         let filtroActual = 'todos';
+        let currentUser = null;
 
         const dom = {
             loading: document.getElementById('loading'),
@@ -392,22 +365,23 @@
             listPermutas: document.getElementById('lista-permutas')
         };
 
-        // LÓGICA PRINCIPAL: Esperar a la autenticación
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // Usuario logueado: usamos su email (saneado) como ID
-                USER_ID = user.email.replace(/\./g, ',');
-                
-                // Iniciar la app
-                const today = new Date().toISOString().split('T')[0];
-                dom.inpFecha.value = today;
-                dom.inpFechaOp.value = today;
-                cargarDatos();
-                setupListeners();
-            } else {
-                // No hay usuario: volver al login
-                window.location.href = "index.html";
-            }
+        // --- SISTEMA DE AUTENTICACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Esperar a que Firebase Auth determine el estado
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // Usuario logueado, cargar app
+                    currentUser = user;
+                    const today = new Date().toISOString().split('T')[0];
+                    dom.inpFecha.value = today;
+                    dom.inpFechaOp.value = today;
+                    cargarDatos();
+                    setupListeners();
+                } else {
+                    // No logueado, volver a index
+                    window.location.href = 'index.html';
+                }
+            });
         });
 
         function setupListeners() {
@@ -437,11 +411,11 @@
             document.getElementById('btn-view-permuta').addEventListener('click', () => { renderListaPermutas(); dom.modalVerPerm.style.display = 'flex'; });
             document.getElementById('btn-cerrar-permutas').addEventListener('click', () => dom.modalVerPerm.style.display = 'none');
             
-            // Editores
             document.getElementById('edit-tipo').addEventListener('change', e => document.getElementById('edit-group-horas').classList.toggle('hidden', e.target.value !== 'horas'));
         }
 
         function cargarDatos() {
+            // Solo carga si hay auth (ya verificado arriba)
             db.ref('descansos/' + USER_ID).once('value').then(snap => {
                 if(snap.exists()) {
                     datos = snap.val();
@@ -456,6 +430,9 @@
                 dom.app.classList.remove('hidden');
                 renderConfig(anioConfig);
                 renderUI();
+            }).catch(err => {
+                console.error("Error lectura:", err);
+                notificar("Error de conexión con la base de datos", "error");
             });
         }
 
@@ -549,9 +526,6 @@
             list.forEach(s => {
                 const idx = datos.solicitudes.indexOf(s);
                 const tr = document.createElement('tr');
-                tr.className = 'main-row';
-                
-                // Botones Desktop
                 const btns = `
                     <button onclick="cambiarEstado(${idx},'En Trámite')" class="btn-action btn-tramite">Trámite</button>
                     <button onclick="cambiarEstado(${idx},'Denegado')" class="btn-action btn-denegado">Denegado</button>
@@ -559,49 +533,13 @@
                     <button onclick="abrirEdicion(${idx})" class="btn-action btn-editar btn-icon" title="Editar">✏️</button>
                     <button onclick="eliminarSol(${idx})" class="btn-action btn-eliminar btn-icon" title="Borrar">🗑️</button>
                 `;
-
-                // Badge de estado (sin espacios para clase CSS)
                 const estadoClass = s.estado.replace(/\s+/g, '');
-
-                tr.innerHTML = `
-                    <td>${fmtDate(s.fecha)}</td>
-                    <td class="mobile-trigger">${fmtType(s.tipo)}${s.tipo==='horas'? ` (${s.horas}h)` : ''}</td>
-                    <td class="hide-mobile">${s.computo}</td>
-                    <td class="hide-mobile"><span class="estado-badge ${estadoClass}">${s.estado}</span></td>
-                    <td class="hide-mobile actions">${btns}</td>
-                `;
-                
-                // Lógica de despliegue en móvil
-                tr.onclick = (e) => {
-                    if(window.innerWidth <= 768 && !e.target.closest('button')) {
-                        const detail = document.getElementById(`detail-${idx}`);
-                        tr.classList.toggle('active');
-                        detail.classList.toggle('open');
-                    }
-                };
-                
+                tr.innerHTML = `<td>${fmtDate(s.fecha)}</td><td>${fmtType(s.tipo)}${s.tipo==='horas'? ` (${s.horas}h)` : ''}</td><td>${s.computo}</td><td><span class="estado-badge ${estadoClass}">${s.estado}</span></td><td class="actions">${btns}</td>`;
                 dom.tbody.appendChild(tr);
-                
-                // Fila detalle móvil
-                const trDetail = document.createElement('tr');
-                trDetail.className = 'detail-row';
-                trDetail.id = `detail-${idx}`;
-                trDetail.innerHTML = `
-                    <td colspan="5" style="padding:0;">
-                        <div class="mobile-detail-content">
-                            <div class="mobile-info-grid">
-                                <div><strong>Año:</strong> ${s.computo}</div>
-                                <div><strong>Estado:</strong> <span class="estado-badge ${estadoClass}">${s.estado}</span></div>
-                            </div>
-                            <div class="mobile-actions-grid">${btns}</div>
-                        </div>
-                    </td>
-                `;
-                dom.tbody.appendChild(trDetail);
             });
         }
 
-        // EDICIÓN HORAS
+        // --- EDITORES ---
         function abrirEditarHora(idx) {
             const h = datos.horas[idx];
             document.getElementById('edit-hora-index').value = idx;
@@ -660,7 +598,6 @@
             guardarEnBD("Configuración guardada");
         }
 
-        // SOLICITUD DIRECTA EN TRÁMITE
         function procesarSolicitud() {
             const t = dom.selTipo.value; const f = dom.inpFecha.value; const c = parseInt(dom.selComputo.value); const h = parseFloat(dom.inpHoraSol.value);
             if(!f) return notificar("Fecha requerida", "error");
@@ -670,7 +607,6 @@
                 if(t==='vacaciones' && hoy > limV) return notificar("Plazo vacaciones caducado", "error");
                 if(t==='asuntos-propios' && hoy > limA) return notificar("Plazo asuntos caducado", "error");
             }
-            // ESTADO INICIAL 'En Trámite' (Color Amarillo)
             const sol = { tipo:t, fecha:f, computo:c, estado:'En Trámite', fechaReg:new Date().toISOString() };
             if(t==='horas') { sol.horas = h; datos.horas.push({ tipo:'resta', fecha:f, concepto:'Día Solicitado', cantidad:h, relacionado:true, fechaReg:new Date().toISOString() }); }
             datos.solicitudes.push(sol); guardarEnBD("Solicitud creada");
@@ -698,10 +634,8 @@
             const list = [...datos.permutas].sort((a,b) => new Date(b.fechaReg) - new Date(a.fechaReg)); 
             list.forEach(p => { 
                 const idx = datos.permutas.indexOf(p); 
-                // CORRECCIÓN: Leer fechaYo O fechaPropia para datos viejos
                 const fYo = p.fechaPropia || p.fechaYo; const tYo = p.turnoPropio || p.turnoYo;
                 const fEl = p.fechaAgente || p.fechaEl; const tEl = p.turnoAgente || p.turnoEl;
-
                 dom.listPermutas.innerHTML += `
                     <div class="permuta-display" style="border-bottom:1px solid #eee; padding:15px 0;">
                         <div class="permuta-header">Agente: ${p.agente} <span style="font-size:0.85rem; font-weight:normal; color:#888;">(${p.año})</span></div>
@@ -719,7 +653,16 @@
         window.eliminarHora = (idx) => { if(confirm("¿Borrar?")) { datos.horas.splice(idx,1); guardarEnBD("Hora borrada"); renderListaHoras(); } };
         window.eliminarPermuta = (idx) => { if(confirm("¿Borrar?")) { datos.permutas.splice(idx,1); guardarEnBD("Permuta borrada"); renderListaPermutas(); } };
 
-        function guardarEnBD(msg) { renderUI(); db.ref('descansos/' + USER_ID).set(datos).then(() => { notificar(msg, 'success'); renderUI(); }); }
+        function guardarEnBD(msg) {
+            renderUI(); 
+            // Control de permisos lado cliente (aunque las reglas del servidor mandan)
+            if(currentUser && currentUser.email !== 'verdeguer279@gmail.com') {
+                return notificar("Solo el administrador puede guardar", "error");
+            }
+            db.ref('descansos/' + USER_ID).set(datos).then(() => { notificar(msg, 'success'); renderUI(); })
+            .catch(e => notificar("Error al guardar: Permiso denegado", "error"));
+        }
+        
         function notificar(msg, type) { const d = document.createElement('div'); d.className = `notification ${type==='success'?'notif-success':'notif-error'}`; d.textContent = msg; document.getElementById('notification-area').appendChild(d); setTimeout(() => d.remove(), 3000); }
         function fmtDate(f) { if(!f)return''; const p=f.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
         function fmtType(t) { return t.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()); }

@@ -1,4 +1,4 @@
-<!doctype html>
+c:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.htmlc:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.html<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -17,13 +17,11 @@
       --accent-green: #28a745;
       --accent-red: #dc3545;
       --accent-yellow: #ffc107;
-      --accent-purple: #d63384; /* Nuevo color para Horas */
+      --accent-purple: #d63384;
       --accent-grey: #adb5bd;
       --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
     }
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Poppins', sans-serif;
       background: var(--bg-dark);
@@ -32,7 +30,7 @@
       padding: 0;
     }
     .wrap {
-      max-width: 1400px;
+      max-width: 1500px; /* ANCHO DE ESCRITORIO */
       margin: 20px auto;
       padding: 0 20px;
     }
@@ -44,397 +42,286 @@
       margin-bottom: 2rem;
       flex-wrap: wrap;
     }
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
     .logo-box {
-      height: 72px;
-      width: 72px;
-      background: transparent;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      height: 72px; width: 72px;
+      background: transparent; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       overflow: hidden;
     }
     .logo-box img { max-height: 64px; max-width: 64px; }
     .title h1 { margin: 0; font-size: clamp(1.4rem, 4vw, 2rem); }
     .title p { margin: 4px 0 0; font-size: clamp(.85rem, 2vw, .95rem); color: #ccc; }
+    
     .btn-menu-principal {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: transform 0.2s, box-shadow 0.2s;
-        background: var(--card-bg);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: var(--text-light);
-        text-decoration: none;
-        display: inline-block;
-        white-space: nowrap;
+        padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer;
+        font-weight: bold; transition: transform 0.2s, box-shadow 0.2s;
+        background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.2);
+        color: var(--text-light); text-decoration: none; display: inline-block; white-space: nowrap;
     }
     .btn-menu-principal:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         background: rgba(255, 255, 255, 0.1);
     }
     .card {
-      background: var(--card-bg);
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-      width: 100%;
+      background: var(--card-bg); border-radius: 12px; padding: 24px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); width: 100%;
     }
     .actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 20px;
+        display: flex; justify-content: space-between; align-items: center;
+        flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
     }
-    .filter-buttons {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .filter-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
     .field { display: grid; gap: 8px; }
     
-    /* Checkbox personalizado */
-    .field-checkbox {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: rgba(255, 255, 255, 0.05);
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+    .row-2-cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
     }
-    .field-checkbox input[type="checkbox"] {
-        width: 20px;
-        height: 20px;
-        accent-color: var(--accent-blue);
-        cursor: pointer;
+
+    /* CHECKBOX PERITO */
+    .checkbox-container {
+        display: flex; align-items: center; gap: 12px;
+        background: rgba(255, 255, 255, 0.1); padding: 12px;
+        border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.2);
+        cursor: pointer; transition: background 0.2s; height: 48px;
+        margin-top: auto;
     }
-    .field-checkbox label {
-        margin: 0;
-        cursor: pointer;
-        color: var(--text-light);
-        font-weight: 500;
-    }
+    .checkbox-container:hover { background: rgba(255, 255, 255, 0.15); }
+    .checkbox-container input[type="checkbox"] { width: 20px; height: 20px; margin: 0; cursor: pointer; accent-color: var(--accent-blue); }
+    .checkbox-text { font-weight: bold; color: #fff; font-size: 0.9rem; white-space: nowrap; }
 
     label { font-size: 0.9rem; color: #aaa; }
-    input[type="text"], input[type="date"], input[type="time"], select, textarea {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-light);
-      padding: 12px;
-      border-radius: 8px;
-      transition: all 0.3s ease;
+    input, select, textarea {
+      width: 100%; background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-light);
+      padding: 12px; border-radius: 8px; transition: all 0.3s ease;
     }
-    input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus, select:focus, textarea:focus {
-      outline: none;
-      border-color: var(--accent-blue);
+    input:focus, select:focus {
+      outline: none; border-color: var(--accent-blue);
       box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
     }
-    select {
-        color: var(--text-dark);
-        background-color: var(--text-light);
-    }
+    select { color: var(--text-dark); background-color: var(--text-light); }
+    
     .button, button {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: transform 0.2s, box-shadow 0.2s;
+      padding: 10px 15px; border: none; border-radius: 8px; cursor: pointer;
+      font-weight: bold; transition: transform 0.2s, box-shadow 0.2s;
     }
-    .btn-primary {
-      background: var(--accent-gradient);
-      color: #fff;
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(118, 75, 162, 0.5);
-    }
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: var(--text-light);
-    }
-    .btn-ghost:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    .btn-ghost.active {
-      background: rgba(255, 255, 255, 0.15);
-      border-color: var(--accent-blue);
-    }
-    .btn-danger {
-      background-color: var(--accent-red);
-      color: #fff;
-    }
-    .btn-success {
-      background-color: var(--accent-green);
-      color: #fff;
-    }
-    .btn-warning {
-      background-color: var(--accent-yellow);
-      color: #000;
-    }
-
-    /* TABLA MEJORADA */
-    .table-container {
-      width: 100%;
-      overflow-x: auto;
-      margin-top: 1.5rem;
-    }
-    table { 
-      width: 100%; 
-      border-collapse: collapse;
-      min-width: 1000px;
-    }
+    .btn-primary { background: var(--accent-gradient); color: #fff; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(118, 75, 162, 0.5); }
+    
+    .btn-ghost { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); }
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.1); }
+    .btn-ghost.active { background: rgba(255, 255, 255, 0.15); border-color: var(--accent-blue); }
+    .btn-danger { background-color: var(--accent-red); color: #fff; }
+    
+    /* ESTILOS DE TABLA BASE (ESCRITORIO) */
+    .table-container { width: 100%; overflow-x: auto; margin-top: 1.5rem; }
+    table { width: 100%; border-collapse: collapse; min-width: 1000px; }
     th, td {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 12px 8px;
-      text-align: left;
-      white-space: nowrap;
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      border: 1px solid rgba(255, 255, 255, 0.1); padding: 12px 8px;
+      text-align: left; white-space: nowrap; max-width: 200px;
+      overflow: hidden; text-overflow: ellipsis;
     }
-    th {
-      background: rgba(255, 255, 255, 0.05);
-      font-weight: 600;
-      position: sticky;
-      top: 0;
-    }
+    th { background: rgba(255, 255, 255, 0.05); font-weight: 600; position: sticky; top: 0; }
+    
+    /* Anchos Escritorio */
+    th:nth-child(1), td:nth-child(1) { width: 110px; min-width: 110px; }
+    th:nth-child(2), td:nth-child(2) { width: 80px; min-width: 80px; }
+    th:nth-child(3), td:nth-child(3) { width: 160px; min-width: 160px; }
+    th:nth-child(4), td:nth-child(4) { width: 140px; min-width: 140px; }
+    th:nth-child(5), td:nth-child(5) { width: 130px; min-width: 130px; }
+    th:nth-child(6), td:nth-child(6) { width: 110px; min-width: 110px; }
+    th:nth-child(7), td:nth-child(7) { width: 320px; min-width: 320px; }
 
-    /* ANCHOS OPTIMIZADOS PARA COLUMNAS */
-    th:nth-child(1), td:nth-child(1) { width: 110px; min-width: 110px; } /* Fecha */
-    th:nth-child(2), td:nth-child(2) { width: 80px; min-width: 80px; } /* Hora */
-    th:nth-child(3), td:nth-child(3) { width: 160px; min-width: 160px; } /* Juzgado (Un poco más ancho para el tag Perito) */
-    th:nth-child(4), td:nth-child(4) { width: 140px; min-width: 140px; } /* Entrega */
-    th:nth-child(5), td:nth-child(5) { width: 130px; min-width: 130px; } /* Mes Cobro */
-    th:nth-child(6), td:nth-child(6) { width: 110px; min-width: 110px; } /* Estado */
-    th:nth-child(7), td:nth-child(7) { width: 280px; min-width: 280px; } /* Acciones */
-
-    /* ESTADOS MEJORADOS */
+    /* ESTADOS */
     .status-pendiente { color: var(--accent-red); font-weight: bold; }
     .status-celebrado { color: var(--accent-green); font-weight: bold; }
     .status-suspendido { color: var(--accent-blue); font-weight: bold; }
     .status-webex { color: var(--accent-yellow); font-weight: bold; }
     .status-cancelado { color: var(--accent-grey); font-weight: bold; }
-
-    /* ESTILOS DE COBRO */
     .cobro-horas { color: var(--accent-purple); font-weight: bold; }
     .status-nocobrado { color: var(--accent-red); font-weight: bold; font-size: 0.85rem; }
     .status-noentregada { color: var(--accent-red); font-weight: bold; font-size: 0.85rem; }
-
-    /* INDICADOR DE PERITO */
+    
     .badge-perito {
-        display: inline-block;
-        background: var(--accent-blue);
-        color: white;
-        font-size: 0.7rem;
-        padding: 1px 5px;
-        border-radius: 4px;
-        margin-left: 5px;
-        vertical-align: middle;
+        display: inline-block; background: var(--accent-blue); color: white;
+        font-size: 0.8rem; padding: 2px 6px; border-radius: 4px;
+        margin-left: 8px; font-weight: bold; vertical-align: middle;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
+    tr.is-cancelled { text-decoration: line-through; opacity: 0.6; }
+    tr.is-cancelled .action-item { text-decoration: none; }
 
-    /* JUICIOS CANCELADOS */
-    tr.is-cancelled {
-        text-decoration: line-through;
-        opacity: 0.6;
-    }
-    tr.is-cancelled .action-item {
-        text-decoration: none;
-    }
-
-    /* BOTONES DE ACCIÓN MEJORADOS */
-    .action-buttons {
-      display: flex;
-      gap: 6px;
-      flex-wrap: nowrap;
-      align-items: center;
-      justify-content: flex-start;
-    }
+    .action-buttons { display: flex; gap: 6px; align-items: center; flex-wrap: nowrap; }
     .action-item {
-        padding: 8px 12px;
-        border-radius: 6px;
-        font-weight: bold;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 70px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: var(--text-light);
-        background-color: transparent;
-        transition: all 0.2s ease;
-        cursor: pointer;
-        font-size: 0.8rem;
-        white-space: nowrap;
+        padding: 8px 12px; border-radius: 6px; font-weight: bold;
+        text-decoration: none; display: inline-flex; align-items: center;
+        justify-content: center; min-width: 70px;
+        border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light);
+        background-color: transparent; transition: all 0.2s ease;
+        cursor: pointer; font-size: 0.8rem;
     }
-    .action-item.danger {
-        background-color: var(--accent-red);
-        color: #fff;
-        border: none;
-    }
-    .action-item:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        transform: translateY(-1px);
-    }
-    .action-item.danger:hover {
-        background-color: #bd2130;
-    }
-    .action-item.has-link {
-        color: var(--accent-blue);
-        text-decoration: none;
-    }
-    .action-item.has-link:hover {
-        background-color: rgba(0, 123, 255, 0.1);
-    }
-
+    .action-item.danger { background-color: var(--accent-red); border: none; }
+    .action-item:hover { background-color: rgba(255, 255, 255, 0.1); transform: translateY(-1px); }
+    .action-item.has-link { color: var(--accent-blue); }
+    
     /* MODALES */
     .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s, visibility 0.3s;
-      z-index: 1000;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center;
+      align-items: center; visibility: hidden; opacity: 0;
+      transition: opacity 0.3s, visibility 0.3s; z-index: 1000;
     }
     .modal-overlay.open { visibility: visible; opacity: 1; }
     .modal {
-      background: var(--card-bg);
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      width: 90%;
-      max-width: 800px;
-      transform: scale(0.95);
-      transition: transform 0.3s ease-out;
-      max-height: 90vh;
-      overflow-y: auto;
+      background: var(--card-bg); border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); width: 90%; max-width: 800px;
+      transform: scale(0.95); transition: transform 0.3s ease-out;
+      max-height: 90vh; overflow-y: auto;
     }
     .modal-overlay.open .modal { transform: scale(1); }
     .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 1rem 1.5rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px 12px 0 0;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 1.5rem; background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px 12px 0 0;
     }
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      color: #aaa;
-      cursor: pointer;
-    }
+    .close-btn { background: none; border: none; font-size: 1.5rem; color: #aaa; cursor: pointer; }
     .modal-body { padding: 1.5rem; }
-    .form-fields {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
+    .form-fields { display: grid; grid-template-columns: 1fr; gap: 15px; }
     .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      padding: 1rem 1.5rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 0 0 12px 12px;
+      display: flex; justify-content: flex-end; gap: 10px;
+      padding: 1rem 1.5rem; background: rgba(255, 255, 255, 0.05);
+      border-top: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0 0 12px 12px;
     }
+    .form-actions-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 20px; }
+    .file-inputs { flex: 1; min-width: 0; }
 
-    .form-actions-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 20px;
-        gap: 20px;
-    }
-    .form-actions-top .btn-primary {
-        margin-left: 10px;
-        white-space: nowrap;
-    }
-    .file-inputs {
-        flex: 1;
-        min-width: 0;
-    }
-
-    /* RESPONSIVE */
+    /* --- RESPONSIVE / MÓVIL (LA MAGIA) --- */
     @media (max-width: 768px) {
-      .wrap {
-        max-width: 100%;
-        margin: 10px auto;
-        padding: 0 15px;
-      }
-      
-      .form-actions-top {
-        flex-direction: column;
-      }
-      .form-actions-top .btn-primary {
-        margin-left: 0;
-        margin-top: 10px;
-        align-self: flex-end;
-      }
-      
-      .actions {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .filter-buttons {
-        width: 100%;
-        justify-content: stretch;
-      }
-      .filter-buttons button {
-        flex-grow: 1;
-      }
-    }
+      .wrap { max-width: 100%; margin: 10px auto; padding: 0 15px; }
+      .form-actions-top { flex-direction: column; }
+      .form-actions-top .btn-primary { margin-left: 0; margin-top: 10px; align-self: flex-end; }
+      .actions { flex-direction: column; align-items: stretch; }
+      .filter-buttons { width: 100%; justify-content: center; }
+      .row-2-cols { grid-template-columns: 1fr; }
 
-    @media (max-width: 600px) {
-      header { 
-        flex-direction: column; 
-        text-align: center; 
-      }
-      .header-left { 
-        flex-direction: column; 
-        text-align: center; 
-        gap: 10px; 
-      }
-      .title { margin-top: 10px; }
+      /* TRANSFORMACIÓN DE TABLA A TARJETAS */
+      .table-container { overflow-x: visible; }
+      table, tbody { display: block; width: 100%; min-width: 0; }
+      thead { display: none; } /* Ocultar cabeceras */
       
-      .table-container {
-        font-size: 0.8rem;
+      tr {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        margin-bottom: 12px;
+        padding: 16px;
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Dos columnas arriba: Fecha | Hora */
+        grid-template-areas: 
+            "fecha hora"
+            "juzgado juzgado"
+            "detalles detalles";
+        gap: 8px;
+        position: relative;
+        cursor: pointer; /* Indicar que es clickeable */
+        transition: background 0.2s;
       }
+      tr:active { background: rgba(255,255,255,0.08); }
+
+      /* Flechita indicadora */
+      tr::after {
+          content: '▼';
+          position: absolute;
+          bottom: 10px;
+          right: 15px;
+          color: rgba(255,255,255,0.3);
+          font-size: 0.8rem;
+          transition: transform 0.3s;
+      }
+      tr.expanded::after { transform: rotate(180deg); }
+
+      /* ESTILOS DE LAS CELDAS EN MÓVIL */
+      td {
+        display: block;
+        border: none;
+        padding: 0;
+        white-space: normal;
+        max-width: none;
+        width: auto !important;
+        min-width: 0 !important;
+      }
+
+      /* 1. FECHA */
+      td:nth-child(1) { 
+          grid-area: fecha; 
+          font-weight: bold; 
+          font-size: 1.1rem;
+          color: var(--accent-blue);
+      }
+      /* 2. HORA */
+      td:nth-child(2) { 
+          grid-area: hora; 
+          text-align: right; 
+          font-weight: bold;
+          font-size: 1.1rem;
+      }
+      /* 3. JUZGADO */
+      td:nth-child(3) { 
+          grid-area: juzgado; 
+          font-size: 1.2rem;
+          font-weight: 600;
+          margin-bottom: 5px;
+          padding-bottom: 5px;
+          border-bottom: 1px solid rgba(255,255,255,0.05);
+      }
+
+      /* 4, 5, 6, 7 (DETALLES OCULTOS) */
+      td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7) {
+          grid-area: detalles;
+          display: none; /* Ocultos por defecto */
+          font-size: 0.95rem;
+          color: #ccc;
+          margin-top: 5px;
+      }
+
+      /* Etiquetas para saber qué es cada cosa */
+      td:nth-child(4)::before { content: "Entrega: "; color: #888; }
+      td:nth-child(5)::before { content: "Cobro: "; color: #888; }
+      td:nth-child(6)::before { content: "Estado: "; color: #888; }
+      
+      /* CUANDO ESTÁ EXPANDIDO */
+      tr.expanded td:nth-child(4),
+      tr.expanded td:nth-child(5),
+      tr.expanded td:nth-child(6),
+      tr.expanded td:nth-child(7) {
+          display: block;
+          animation: fadeIn 0.3s ease;
+      }
+      
+      /* Botones (Acciones) */
+      td:nth-child(7) {
+          margin-top: 15px;
+          padding-top: 10px;
+          border-top: 1px solid rgba(255,255,255,0.1);
+      }
+      td:nth-child(7)::before { content: ""; } /* Quitar etiqueta en acciones */
       
       .action-buttons {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 5px;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+          gap: 8px;
       }
       .action-item {
-        min-width: 60px;
-        padding: 6px 8px;
-        font-size: 0.75rem;
+          flex: 1; /* Botones grandes en móvil */
+          min-width: 45%;
       }
     }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
@@ -456,7 +343,7 @@
             <div class="filter-buttons">
                 <button id="show-all" class="btn-ghost active button">Todos</button>
                 <button id="show-pending" class="btn-ghost button">Pendientes</button>
-                <button id="show-peritos" class="btn-ghost button">Peritos</button>
+                <button id="show-peritos" class="btn-ghost button">Perito</button>
             </div>
             <button id="btnExport" class="btn-ghost button">Exportar a Excel</button>
         </div>
@@ -474,8 +361,7 @@
                   <th>Acciones</th>
                 </tr>
               </thead>
-              <tbody id="juicios-body">
-                </tbody>
+              <tbody id="juicios-body"></tbody>
             </table>
         </div>
     </div>
@@ -491,57 +377,64 @@
         <div class="modal-body">
           <input type="hidden" id="juicioId" name="juicioId" />
           <div class="form-fields">
-            <div class="field">
-              <label for="fecha">Fecha del Juicio</label>
-              <input id="fecha" name="fecha" type="date" required tabindex="1" />
+            <div class="row-2-cols">
+                <div class="field">
+                  <label for="fecha">Fecha del Juicio</label>
+                  <input id="fecha" name="fecha" type="date" required tabindex="1" />
+                </div>
+                <div class="field">
+                  <label for="hora">Hora del Juicio</label>
+                  <input id="hora" name="hora" type="time" required tabindex="2" />
+                </div>
             </div>
-            <div class="field">
-              <label for="hora">Hora del Juicio</label>
-              <input id="hora" name="hora" type="time" required tabindex="2" />
+            <div class="row-2-cols" style="grid-template-columns: 2fr 1fr;">
+                <div class="field">
+                  <label for="juzgado">Juzgado</label>
+                  <input id="juzgado" name="juzgado" type="text" placeholder="Ej: 7 PENAL" required list="juzgado-list" tabindex="3" />
+                  <datalist id="juzgado-list"></datalist>
+                </div>
+                <div class="field">
+                    <label>&nbsp;</label>
+                    <label class="checkbox-container" for="esPerito">
+                        <input type="checkbox" id="esPerito" name="esPerito" tabindex="4">
+                        <span class="checkbox-text">Citado como Perito</span>
+                    </label>
+                </div>
             </div>
-            <div class="field">
-              <label for="juzgado">Juzgado</label>
-              <input id="juzgado" name="juzgado" type="text" placeholder="Ej: 7 PENAL" required list="juzgado-list" tabindex="3" />
-              <datalist id="juzgado-list"></datalist>
-            </div>
-            
-            <div class="field-checkbox">
-                <input type="checkbox" id="esPerito" name="esPerito" tabindex="4">
-                <label for="esPerito">Asistencia como Perito</label>
-            </div>
-
             <div class="field">
               <label for="fechaEntrega">Fecha de Entrega de Citación</label>
               <input id="fechaEntrega" name="fechaEntrega" type="date" tabindex="5" />
             </div>
-            <div class="field">
-              <label for="mesCobro">Mes de Cobro / Compensación</label>
-              <select id="mesCobro" name="mesCobro" tabindex="6">
-                <option value="">-- SELECCIONAR --</option>
-                <option value="DEVUELVEN HORAS">DEVUELVEN HORAS (+3h)</option>
-                <option value="ENERO">ENERO</option>
-                <option value="FEBRERO">FEBRERO</option>
-                <option value="MARZO">MARZO</option>
-                <option value="ABRIL">ABRIL</option>
-                <option value="MAYO">MAYO</option>
-                <option value="JUNIO">JUNIO</option>
-                <option value="JULIO">JULIO</option>
-                <option value="AGOSTO">AGOSTO</option>
-                <option value="SEPTIEMBRE">SEPTIEMBRE</option>
-                <option value="OCTUBRE">OCTUBRE</option>
-                <option value="NOVIEMBRE">NOVIEMBRE</option>
-                <option value="DICIEMBRE">DICIEMBRE</option>
-              </select>
-            </div>
-            <div class="field">
-                <label for="estado">Estado</label>
-                <select id="estado" name="estado" tabindex="7">
-                    <option value="pendiente">Pendiente</option>
-                    <option value="celebrado">Celebrado</option>
-                    <option value="suspendido">Suspendido (En Sala)</option>
-                    <option value="cancelado">Cancelado (Tachado)</option>
-                    <option value="webex">Webex</option>
-                </select>
+            <div class="row-2-cols">
+                <div class="field">
+                  <label for="mesCobro">Mes de Cobro / Compensación</label>
+                  <select id="mesCobro" name="mesCobro" tabindex="6">
+                    <option value="">-- SELECCIONAR --</option>
+                    <option value="DEVUELVEN HORAS">DEVUELVEN HORAS (+3h)</option>
+                    <option value="ENERO">ENERO</option>
+                    <option value="FEBRERO">FEBRERO</option>
+                    <option value="MARZO">MARZO</option>
+                    <option value="ABRIL">ABRIL</option>
+                    <option value="MAYO">MAYO</option>
+                    <option value="JUNIO">JUNIO</option>
+                    <option value="JULIO">JULIO</option>
+                    <option value="AGOSTO">AGOSTO</option>
+                    <option value="SEPTIEMBRE">SEPTIEMBRE</option>
+                    <option value="OCTUBRE">OCTUBRE</option>
+                    <option value="NOVIEMBRE">NOVIEMBRE</option>
+                    <option value="DICIEMBRE">DICIEMBRE</option>
+                  </select>
+                </div>
+                <div class="field">
+                    <label for="estado">Estado</label>
+                    <select id="estado" name="estado" tabindex="7">
+                        <option value="pendiente">Pendiente</option>
+                        <option value="celebrado">Celebrado</option>
+                        <option value="suspendido">Suspendido (En Sala)</option>
+                        <option value="cancelado">Cancelado (Tachado)</option>
+                        <option value="webex">Webex</option>
+                    </select>
+                </div>
             </div>
             <div class="form-actions-top">
                 <div class="file-inputs">
@@ -568,9 +461,7 @@
         <strong id="messageTitle"></strong>
         <button id="dlgMsgClose" class="btn-ghost close-btn button">✕</button>
       </div>
-      <div class="modal-body">
-        <p id="messageText"></p>
-      </div>
+      <div class="modal-body"><p id="messageText"></p></div>
       <div class="modal-actions">
         <button id="messageOk" class="btn-primary button">Aceptar</button>
         <button id="messageCancel" class="btn-ghost button" hidden>Cancelar</button>
@@ -601,20 +492,18 @@
     const formNuevo = $("#formNuevo");
     const modalTitle = $("#modal-title");
     const juicioIdInput = $("#juicioId");
-    const juzgadoInput = $("#juzgado");
-    const juzgadoList = $("#juzgado-list");
     const citacionUrlInput = $("#citacionUrl");
     const diligenciasUrlInput = $("#diligenciasUrl");
     const esPeritoCheckbox = $("#esPerito");
     
+    let currentFilter = 'all';
+
     const dlgMessage = $("#dlgMessage");
     const messageTitle = $("#messageTitle");
     const messageText = $("#messageText");
     const messageOk = $("#messageOk");
     const messageCancel = $("#messageCancel");
     const dlgMsgClose = $("#dlgMsgClose");
-
-    let currentFilter = 'all';
 
     function showMessage(title, text, isConfirm = false) {
       return new Promise((resolve) => {
@@ -640,124 +529,71 @@
     
     function renderJuicios(juicios) {
       juiciosBody.innerHTML = '';
-      
       const filteredJuicios = juicios.filter(j => {
-          if (currentFilter === 'pending') {
-              return j.estado === 'pendiente';
-          }
-          if (currentFilter === 'perito') {
-              return j.esPerito === true;
-          }
+          if (currentFilter === 'pending') return j.estado === 'pendiente';
+          if (currentFilter === 'perito') return j.esPerito === true;
           return true;
       });
 
       filteredJuicios.forEach(juicio => {
         const tr = document.createElement("tr");
-        let statusClass, statusText;
-        let rowClass = '';
+        
+        // INTERACCIÓN MÓVIL: CLIC EN FILA
+        tr.onclick = function(e) {
+            // Si el ancho es móvil, alternar clase expanded
+            if (window.innerWidth <= 768) {
+                this.classList.toggle('expanded');
+            }
+        };
+
+        let statusClass, statusText, rowClass = '';
         
         switch (juicio.estado) {
-            case 'celebrado':
-                statusClass = 'status-celebrado';
-                statusText = 'Celebrado';
-                break;
-            case 'suspendido':
-                statusClass = 'status-suspendido';
-                statusText = 'Suspendido';
-                break;
-            case 'cancelado': 
-                statusClass = 'status-cancelado';
-                statusText = 'Cancelado';
-                rowClass = 'is-cancelled';
-                break;
-            case 'webex':
-                statusClass = 'status-webex';
-                statusText = 'Webex';
-                break;
-            default:
-                statusClass = 'status-pendiente';
-                statusText = 'Pendiente';
+            case 'celebrado': statusClass = 'status-celebrado'; statusText = 'Celebrado'; break;
+            case 'suspendido': statusClass = 'status-suspendido'; statusText = 'Suspendido'; break;
+            case 'cancelado': statusClass = 'status-cancelado'; statusText = 'Cancelado'; rowClass = 'is-cancelled'; break;
+            case 'webex': statusClass = 'status-webex'; statusText = 'Webex'; break;
+            default: statusClass = 'status-pendiente'; statusText = 'Pendiente';
         }
-        
         tr.className = rowClass;
 
-        // Lógica para mostrar cobro o devolución de horas
         let mesCobroContent;
-        if (juicio.mesCobro === 'DEVUELVEN HORAS') {
-            mesCobroContent = '<span class="cobro-horas">DEVUELVEN HORAS (+3h)</span>';
-        } else if (juicio.mesCobro && juicio.mesCobro !== "") {
-            mesCobroContent = juicio.mesCobro;
-        } else {
-            mesCobroContent = '<span class="status-nocobrado">NO COBRADO</span>';
-        }
+        if (juicio.mesCobro === 'DEVUELVEN HORAS') mesCobroContent = '<span class="cobro-horas">DEVUELVEN HORAS (+3h)</span>';
+        else if (juicio.mesCobro && juicio.mesCobro !== "") mesCobroContent = juicio.mesCobro;
+        else mesCobroContent = '<span class="status-nocobrado">NO COBRADO</span>';
 
-        const fechaEntregaContent = juicio.fechaEntrega && juicio.fechaEntrega !== "" ? juicio.fechaEntrega : '<span class="status-noentregada">NO ENTREGADA</span>';
-
-        // Indicador visual discreto de Perito
+        const fechaEntregaContent = juicio.fechaEntrega ? juicio.fechaEntrega : '<span class="status-noentregada">NO ENTREGADA</span>';
+        
         const juzgadoDisplay = juicio.esPerito 
-            ? `${juicio.juzgado} <span class="badge-perito" title="Asistencia como Perito">P</span>` 
+            ? `${juicio.juzgado} <span class="badge-perito" title="Citado como Perito">P</span>` 
             : juicio.juzgado;
 
-        let citacionButtonHtml;
-        if (juicio.citacionUrl) {
-          citacionButtonHtml = `<a href="${juicio.citacionUrl}" target="_blank" class="action-item has-link button">Citación</a>`;
-        } else {
-          citacionButtonHtml = `<button class="action-item button" onclick="editJuicio('${juicio.id}')">Citación</button>`;
-        }
-        
-        let diligenciasButtonHtml;
-        if (juicio.diligenciasUrl) {
-          diligenciasButtonHtml = `<a href="${juicio.diligenciasUrl}" target="_blank" class="action-item has-link button">Diligencias</a>`;
-        } else {
-          diligenciasButtonHtml = `<button class="action-item button" onclick="editJuicio('${juicio.id}')">Diligencias</button>`;
-        }
+        // IMPORTANTE: stopPropagation para que al pulsar botones no se cierre/abra la tarjeta
+        let citacionBtn = juicio.citacionUrl ? `<a href="${juicio.citacionUrl}" target="_blank" class="action-item has-link button" onclick="event.stopPropagation()">Citación</a>` : `<button class="action-item button" onclick="event.stopPropagation(); editJuicio('${juicio.id}')">Citación</button>`;
+        let diligenciasBtn = juicio.diligenciasUrl ? `<a href="${juicio.diligenciasUrl}" target="_blank" class="action-item has-link button" onclick="event.stopPropagation()">Diligencias</a>` : `<button class="action-item button" onclick="event.stopPropagation(); editJuicio('${juicio.id}')">Diligencias</button>`;
 
-        tr.innerHTML = `
-          <td>${juicio.fecha}</td>
-          <td>${juicio.hora}</td>
-          <td>${juzgadoDisplay}</td>
-          <td>${fechaEntregaContent}</td>
-          <td>${mesCobroContent}</td>
-          <td class="${statusClass}">${statusText}</td>
-          <td>
-            <div class="action-buttons">
-              <button class="action-item button" onclick="editJuicio('${juicio.id}')">Editar</button>
-              <button class="action-item danger button" onclick="deleteJuicio('${juicio.id}')">Borrar</button>
-              ${citacionButtonHtml}
-              ${diligenciasButtonHtml}
-            </div>
-          </td>
-        `;
+        tr.innerHTML = `<td>${juicio.fecha}</td><td>${juicio.hora}</td><td>${juzgadoDisplay}</td><td>${fechaEntregaContent}</td><td>${mesCobroContent}</td><td class="${statusClass}">${statusText}</td>
+          <td><div class="action-buttons"><button class="action-item button" onclick="event.stopPropagation(); editJuicio('${juicio.id}')">Editar</button><button class="action-item danger button" onclick="event.stopPropagation(); deleteJuicio('${juicio.id}')">Borrar</button>${citacionBtn}${diligenciasBtn}</div></td>`;
         juiciosBody.appendChild(tr);
       });
     }
 
     function populateJuzgadoDatalist(juicios) {
         const uniqueJuzgados = new Set();
-        juicios.forEach(j => {
-            if (j.juzgado) {
-                uniqueJuzgados.add(j.juzgado);
-            }
-        });
-        juzgadoList.innerHTML = '';
-        uniqueJuzgados.forEach(juzgado => {
-            const option = document.createElement('option');
-            option.value = juzgado;
-            juzgadoList.appendChild(option);
-        });
+        juicios.forEach(j => { if (j.juzgado) uniqueJuzgados.add(j.juzgado); });
+        const list = $("#juzgado-list"); list.innerHTML = '';
+        uniqueJuzgados.forEach(j => { const op = document.createElement('option'); op.value = j; list.appendChild(op); });
     }
 
     function fetchJuicios() {
       db.ref('juicios').on('value', (snapshot) => {
         const data = snapshot.val();
         const juicios = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
-        
         juicios.sort((a, b) => {
-            const dateA = new Date(a.fecha + 'T' + (a.hora || '00:00'));
-            const dateB = new Date(b.fecha + 'T' + (b.hora || '00:00'));
-            return dateB - dateA;
+            const da = new Date(a.fecha + 'T' + (a.hora || '00:00'));
+            const db = new Date(b.fecha + 'T' + (b.hora || '00:00'));
+            return db - da;
         });
-
         renderJuicios(juicios);
         populateJuzgadoDatalist(juicios);
         window.allJuiciosData = juicios;
@@ -767,138 +603,64 @@
     window.exportToExcel = () => {
         const headers = ['Fecha', 'Hora', 'Juzgado', 'Es Perito', 'Entrega Citación', 'Mes Cobro', 'Estado', 'Citación', 'Diligencias'];
         let csv = headers.join(';') + '\n';
-        
-        window.allJuiciosData.forEach(juicio => {
-            const row = [
-                juicio.fecha,
-                juicio.hora,
-                `"${juicio.juzgado}"`,
-                juicio.esPerito ? "SÍ" : "NO",
-                juicio.fechaEntrega,
-                juicio.mesCobro,
-                juicio.estado,
-                `"${juicio.citacionUrl || ''}"`,
-                `"${juicio.diligenciasUrl || ''}"`
-            ];
+        window.allJuiciosData.forEach(j => {
+            const row = [j.fecha, j.hora, `"${j.juzgado}"`, j.esPerito?"SÍ":"NO", j.fechaEntrega, j.mesCobro, j.estado, `"${j.citacionUrl||''}"`, `"${j.diligenciasUrl||''}"`];
             csv += row.join(';') + '\n';
         });
-
         const blob = new Blob([`\ufeff${csv}`], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'juicios.csv';
-        link.click();
-        URL.revokeObjectURL(link.href);
+        link.href = URL.createObjectURL(blob); link.download = 'juicios.csv'; link.click();
     };
     
     window.editJuicio = (id) => {
-      db.ref('juicios/' + id).once('value', (snapshot) => {
-        const juicio = snapshot.val();
-        if (juicio) {
+      db.ref('juicios/' + id).once('value', (s) => {
+        const j = s.val();
+        if (j) {
           modalTitle.textContent = 'Editar Juicio';
           juicioIdInput.value = id;
-          $('#fecha').value = juicio.fecha;
-          $('#hora').value = juicio.hora;
-          $('#juzgado').value = juicio.juzgado;
-          $('#fechaEntrega').value = juicio.fechaEntrega;
-          $('#mesCobro').value = juicio.mesCobro;
-          $('#estado').value = juicio.estado || 'pendiente';
-          citacionUrlInput.value = juicio.citacionUrl || '';
-          diligenciasUrlInput.value = juicio.diligenciasUrl || '';
-          
-          // Cargar estado del checkbox
-          esPeritoCheckbox.checked = juicio.esPerito === true;
-          
+          $('#fecha').value = j.fecha; $('#hora').value = j.hora;
+          $('#juzgado').value = j.juzgado; $('#fechaEntrega').value = j.fechaEntrega;
+          $('#mesCobro').value = j.mesCobro; $('#estado').value = j.estado || 'pendiente';
+          citacionUrlInput.value = j.citacionUrl || ''; diligenciasUrlInput.value = j.diligenciasUrl || '';
+          esPeritoCheckbox.checked = j.esPerito === true;
           dlgNuevo.classList.add('open');
         }
       });
     };
     
     window.deleteJuicio = async (id) => {
-        const confirmed = await showMessage('Confirmar Borrado', '¿Estás seguro de que quieres borrar este juicio?', true);
-        if (confirmed) {
-            db.ref('juicios/' + id).remove()
-                .then(() => {})
-                .catch(error => showMessage('Error', 'Hubo un error al borrar el juicio.'));
+        if (await showMessage('Confirmar', '¿Borrar este juicio?', true)) {
+            db.ref('juicios/' + id).remove();
         }
     };
     
     $("#btnNuevo").onclick = () => {
-      formNuevo.reset();
-      juicioIdInput.value = '';
-      citacionUrlInput.value = '';
-      diligenciasUrlInput.value = '';
-      esPeritoCheckbox.checked = false; // Resetear checkbox
-      modalTitle.textContent = 'Añadir Nuevo Juicio';
-      dlgNuevo.classList.add("open");
+      formNuevo.reset(); juicioIdInput.value = ''; esPeritoCheckbox.checked = false;
+      modalTitle.textContent = 'Añadir Nuevo Juicio'; dlgNuevo.classList.add("open");
     };
-    
-    $("#dlgClose").onclick = () => {
-      dlgNuevo.classList.remove("open");
-    };
-
-    dlgNuevo.onclick = (e) => {
-      if (e.target.id === 'dlgNuevo') {
-        dlgNuevo.classList.remove("open");
-      }
-    };
+    $("#dlgClose").onclick = () => dlgNuevo.classList.remove("open");
+    dlgNuevo.onclick = (e) => { if (e.target.id === 'dlgNuevo') dlgNuevo.classList.remove("open"); };
 
     formNuevo.onsubmit = async e => {
       e.preventDefault();
       const fd = new FormData(formNuevo);
-      const juicio = Object.fromEntries(fd.entries());
-      const juicioId = juicioIdInput.value;
+      const j = Object.fromEntries(fd.entries());
+      j.esPerito = esPeritoCheckbox.checked;
+      if (!j.citacionUrl) delete j.citacionUrl;
+      if (!j.diligenciasUrl) delete j.diligenciasUrl;
       
-      // Guardar el valor del checkbox manualmente porque FormData a veces lo ignora si no está marcado
-      juicio.esPerito = esPeritoCheckbox.checked;
-
-      if (juicio.citacionUrl === "") {
-          delete juicio.citacionUrl;
-      }
-      if (juicio.diligenciasUrl === "") {
-          delete juicio.diligenciasUrl;
-      }
-      
-      try {
-          if (juicioId) {
-              await db.ref('juicios/' + juicioId).update(juicio);
-          } else {
-              const newJuicioRef = db.ref('juicios').push();
-              await newJuicioRef.set(juicio);
-          }
-          dlgNuevo.classList.remove('open');
-      } catch (error) {
-          showMessage('Error', 'Hubo un error al guardar los datos.');
-          console.error(error);
-      }
+      const id = juicioIdInput.value;
+      if (id) await db.ref('juicios/' + id).update(j);
+      else await db.ref('juicios').push().set(j);
+      dlgNuevo.classList.remove('open');
     };
     
-    // FILTROS
-    $("#show-all").onclick = () => {
-        currentFilter = 'all';
-        $$('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
-        $("#show-all").classList.add('active');
-        fetchJuicios();
-    };
-
-    $("#show-pending").onclick = () => {
-        currentFilter = 'pending';
-        $$('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
-        $("#show-pending").classList.add('active');
-        fetchJuicios();
-    };
-
-    $("#show-peritos").onclick = () => {
-        currentFilter = 'perito';
-        $$('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
-        $("#show-peritos").classList.add('active');
-        fetchJuicios();
-    };
-
+    $("#show-all").onclick = () => { currentFilter='all'; $$('.filter-buttons button').forEach(b=>b.classList.remove('active')); $("#show-all").classList.add('active'); fetchJuicios(); };
+    $("#show-pending").onclick = () => { currentFilter='pending'; $$('.filter-buttons button').forEach(b=>b.classList.remove('active')); $("#show-pending").classList.add('active'); fetchJuicios(); };
+    $("#show-peritos").onclick = () => { currentFilter='perito'; $$('.filter-buttons button').forEach(b=>b.classList.remove('active')); $("#show-peritos").classList.add('active'); fetchJuicios(); };
     $("#btnExport").onclick = window.exportToExcel;
 
     fetchJuicios();
-
   </script>
 </body>
 </html>

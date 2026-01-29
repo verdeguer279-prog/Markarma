@@ -14,9 +14,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
   <style>
-    /* =========================================
-       ESTILOS ORIGINALES (MANTENIDOS AL 100%)
-       ========================================= */
     :root {
       --bg-dark: #1a1a2e;
       --card-bg: #282844;
@@ -45,11 +42,7 @@
     .card { background-color: rgba(0,0,0,0.55); border-radius:12px; padding:25px; margin-bottom:25px; box-shadow:0 6px 16px rgba(0,0,0,0.3); }
 
     .toggle-form-container { 
-        text-align:center; 
-        margin-bottom:15px; 
-        display: flex; 
-        justify-content: center; 
-        gap: 15px;
+        text-align:center; margin-bottom:15px; display: flex; justify-content: center; gap: 15px;
     }
 
     #btnToggleForm, #btnMainMenu { padding:10px 20px; font-size:0.95rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
@@ -149,17 +142,18 @@
     .courses-table th, .courses-table td { padding: 10px 6px; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: middle; white-space: nowrap; overflow: visible; text-overflow: clip; line-height: 1.3; }
     .courses-table th { background-color: var(--header-bg); color: #ffd54f; text-transform: uppercase; font-weight: 700; font-size: 0.9em; padding: 12px 6px; text-align: left; }
 
-    .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 4%; }
-    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 8%; font-size: 0.95em; }
-    .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 11%; }
-    .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 11%; }
-    .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 13%; }
-    .courses-table th:nth-child(6), .courses-table td:nth-child(6) { width: 6%; }
-    .courses-table th:nth-child(7), .courses-table td:nth-child(7) { width: 8%; }
-    .courses-table th:nth-child(8), .courses-table td:nth-child(8) { width: 8%; }
-    .courses-table th:nth-child(9), .courses-table td:nth-child(9) { width: 8%; }
-    .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; }
-    .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 13%; min-width: 140px; }
+    /* Anchos de columna (PC) */
+    .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 4%; } /* ID */
+    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 8%; font-size: 0.95em; } /* Inicio */
+    .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 11%; } /* Tipo */
+    .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 11%; } /* Pagador */
+    .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 13%; } /* Lugar */
+    .courses-table th:nth-child(6), .courses-table td:nth-child(6) { width: 6%; } /* Horas */
+    .courses-table th:nth-child(7), .courses-table td:nth-child(7) { width: 8%; } /* Importe */
+    .courses-table th:nth-child(8), .courses-table td:nth-child(8) { width: 8%; } /* Pago */
+    .courses-table th:nth-child(9), .courses-table td:nth-child(9) { width: 8%; } /* Cobro */
+    .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; } /* Renta */
+    .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 13%; min-width: 140px; } /* Acciones */
 
     .action-btns { display: flex; gap: 6px; flex-wrap: nowrap; justify-content: center; align-items: center; min-width: 130px; }
     .action-btns button { border: none; padding: 7px 10px; border-radius: 5px; cursor: pointer; transition: all 0.2s; line-height: 1; font-size: 0.85rem; white-space: nowrap; min-width: 40px; height: 30px; display: flex; align-items: center; justify-content: center; font-weight: 600; }
@@ -182,11 +176,132 @@
     
     #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 1.2rem; flex-direction: column; gap: 15px; }
     #app-container { display: none; }
+
+    /* --- ESTILOS MÓVIL (TARJETAS DESPLEGABLES) --- */
+    @media (max-width: 768px) {
+        .container { padding: 0 10px; margin-top: 15px; }
+        .table-container { border: none; }
+        table, tbody { display: block; width: 100%; }
+        thead { display: none; }
+        
+        /* Fila convertida en tarjeta */
+        tr {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            margin-bottom: 12px;
+            padding: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        tr:active { background: rgba(255,255,255,0.1); }
+
+        /* Flecha indicadora */
+        tr::after {
+            content: '▼';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9rem;
+            transition: transform 0.3s;
+        }
+        tr.expanded::after { transform: rotate(180deg); }
+
+        td {
+            display: block;
+            border: none;
+            padding: 2px 0;
+            width: 100% !important;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+
+        /* --- Celdas Visibles Siempre --- */
+        /* 2: Inicio */
+        td:nth-child(2) {
+            order: 1;
+            width: 60% !important;
+            font-weight: bold;
+            color: var(--accent-blue);
+            font-size: 1rem;
+        }
+        /* 3: Tipo Curso */
+        td:nth-child(3) {
+            order: 3;
+            width: 100% !important;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+        /* 7: Importe */
+        td:nth-child(7) {
+            order: 2;
+            width: 30% !important; /* Ajuste para que quepa la flecha */
+            text-align: right;
+            font-weight: bold;
+            color: #ffd54f;
+            margin-right: 20px; /* Espacio para flecha */
+        }
+        /* 8: Estado (Cobrado/Pendiente) */
+        td:nth-child(8) {
+            order: 4;
+            width: 50% !important;
+        }
+        /* 11: Acciones */
+        td:nth-child(11) {
+            order: 5;
+            width: 50% !important;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* --- Celdas Ocultas (Desplegables) --- */
+        td:nth-child(1), /* # */
+        td:nth-child(4), /* Pagador */
+        td:nth-child(5), /* Lugar */
+        td:nth-child(6), /* Horas */
+        td:nth-child(9), /* Fecha Cobro */
+        td:nth-child(10) /* Renta */
+        {
+            display: none;
+            order: 6;
+            color: #ccc;
+            font-size: 0.9rem;
+            padding-left: 10px;
+            border-left: 2px solid rgba(255,255,255,0.1);
+            margin-top: 2px;
+        }
+
+        /* Etiquetas para celdas ocultas */
+        td:nth-child(4)::before { content: "Pagador: "; color: #888; font-weight: 600; }
+        td:nth-child(5)::before { content: "Lugar: "; color: #888; font-weight: 600; }
+        td:nth-child(6)::before { content: "Horas: "; color: #888; font-weight: 600; }
+        td:nth-child(9)::before { content: "Detalle: "; color: #888; font-weight: 600; }
+        td:nth-child(10)::before { content: "Renta: "; color: #888; font-weight: 600; }
+
+        /* Mostrar al expandir */
+        tr.expanded td:nth-child(4),
+        tr.expanded td:nth-child(5),
+        tr.expanded td:nth-child(6),
+        tr.expanded td:nth-child(9),
+        tr.expanded td:nth-child(10) {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
 
-<div id="loading-overlay">Conectando con tu base de datos segura...</div>
+<div id="loading-overlay">Conectando con base de datos segura...</div>
 
 <div class="container" id="app-container">
   <h1><i class="fas fa-graduation-cap"></i> Control de Cursos</h1>
@@ -251,12 +366,12 @@
     <div class="stats-controls">
         <div class="form-group">
             <label for="filterInicioYear">Filtrar por Año Inicio:</label>
-            <select id="filterInicioYear" onchange="renderStats()"><option value="">TODOS</option></select>
+            <select id="filterInicioYear" onchange="renderStats(); render()"><option value="">TODOS</option></select>
         </div>
         <div class="form-group pagador-filter-group">
             <label for="filterPagador">Filtrar por Pagador:</label>
             <div class="pagador-filter-row">
-                <select id="filterPagador" onchange="renderStats()"><option value="">TODAS</option></select>
+                <select id="filterPagador" onchange="renderStats(); render()"><option value="">TODAS</option></select>
                 <button type="button" id="btnCleanPagadores" onclick="cleanUnusedPagadores()" title="Eliminar pagadores que no están asignados a ningún curso actual"><i class="fas fa-broom"></i> Eliminar No Usados</button>
             </div>
         </div>
@@ -317,56 +432,37 @@ let userDataRef = null;
 // ==========================================
 auth.onAuthStateChanged((user) => {
     if (user) {
-        // ID seguro basado en email
         USER_ID = user.email.replace(/\./g, ',');
         console.log("Usuario detectado:", USER_ID);
-        // Ruta personal: formacion/EMAIL_USUARIO
         userDataRef = db.ref('formacion/' + USER_ID);
-        
         cargarDatosConMigracion();
     } else {
-        // Si no hay sesión, volver al menú principal
         window.location.href = "index.html";
     }
 });
 
 function cargarDatosConMigracion() {
-    // 1. Verificar si ya tengo datos en mi carpeta personal
     userDataRef.child('cursos').once('value').then(snapshot => {
         if (snapshot.exists()) {
-            // Ya existen datos -> Cargar normal
             document.getElementById('loading-overlay').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
             load();
         } else {
-            // No existen datos -> Intentar migración desde ubicación antigua
             console.log("Cuenta nueva, buscando datos antiguos...");
-            
-            // Buscar en la raíz antigua (FORMACION) donde guardaba la versión insegura
             db.ref('FORMACION').once('value').then(oldSnap => {
                 if (oldSnap.exists()) {
-                    // Encontrados datos viejos: COPIARLOS a la carpeta segura
                     const updates = {};
                     updates['cursos'] = oldSnap.val();
+                    db.ref('EMPRESAS').once('value').then(s => { if(s.exists()) userDataRef.child('empresas').set(s.val()); });
+                    db.ref('TIPOS_CURSO').once('value').then(s => { if(s.exists()) userDataRef.child('tipos').set(s.val()); });
                     
-                    // Copiar empresas y tipos si existen
-                    db.ref('EMPRESAS').once('value').then(s => { 
-                        if(s.exists()) userDataRef.child('empresas').set(s.val()); 
-                    });
-                    
-                    db.ref('TIPOS_CURSO').once('value').then(s => { 
-                        if(s.exists()) userDataRef.child('tipos').set(s.val());
-                    });
-
-                    // Guardar cursos
                     userDataRef.update(updates).then(() => {
-                        alert("¡Tus datos antiguos han sido importados a tu cuenta segura!");
+                        alert("¡Datos antiguos recuperados!");
                         document.getElementById('loading-overlay').style.display = 'none';
                         document.getElementById('app-container').style.display = 'block';
                         load();
                     });
                 } else {
-                    // Si no hay en raíz, intentar en usuario-demo (por si acaso)
                     db.ref('formacion/usuario-demo').once('value').then(demoSnap => {
                         if(demoSnap.exists()) {
                             userDataRef.set(demoSnap.val()).then(() => {
@@ -374,7 +470,6 @@ function cargarDatosConMigracion() {
                                 location.reload();
                             });
                         } else {
-                            // Nada encontrado, cuenta nueva limpia
                             document.getElementById('loading-overlay').style.display = 'none';
                             document.getElementById('app-container').style.display = 'block';
                             load();
@@ -387,7 +482,7 @@ function cargarDatosConMigracion() {
 }
 
 // ==========================================
-// 3. LÓGICA DE LA APLICACIÓN (MANTENIDA)
+// 3. LÓGICA DE LA APLICACIÓN
 // ==========================================
 
 const tbody = document.getElementById('coursesTableBody');
@@ -542,7 +637,6 @@ formTitleInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') disa
 async function load() {
     if (!USER_ID) return;
     try {
-        // Cargar Cursos desde carpeta personal
         const coursesSnap = await userDataRef.child('cursos').once('value');
         const coursesData = coursesSnap.val();
         
@@ -550,7 +644,6 @@ async function load() {
         if (coursesData) {
             for (const key in coursesData) {
                 const course = coursesData[key];
-                // Recálculo de seguridad al cargar
                 const brutoTotal = parseFloat((course.importeBruto || 0).toString().replace(',', '.')) || 0;
                 const km = parseFloat((course.kilometraje || 0).toString().replace(',', '.')) || 0;
                 const irpfPerc = parseFloat((course.irpf || 0).toString().replace(',', '.')) || 0;
@@ -562,15 +655,12 @@ async function load() {
         }
         courses.sort((a, b) => new Date(b.inicio) - new Date(a.inicio));
 
-        // Cargar Empresas
         const companiesSnap = await userDataRef.child('empresas').once('value');
         masterCompanies = companiesSnap.val() || [];
 
-        // Cargar Tipos
         const tiposSnap = await userDataRef.child('tipos').once('value');
         masterTiposCurso = tiposSnap.val() || [];
 
-        // Sincronizar listas
         const existingPagadoresInCourses = new Set(courses.map(c => c.empresa || c.pagador).filter(e => e));
         let needsUpdatePagadores = false;
         existingPagadoresInCourses.forEach(comp => {
@@ -603,7 +693,7 @@ async function load() {
 
 function updateFilters() {
     const pagadores = masterCompanies.sort();
-    const inicioYears = new Set(courses.map(c => c.inicio ? new Date(c.inicio).getFullYear() : null).filter(y => y));
+    const inicioYears = new Set(courses.map(c => c.inicio ? c.inicio.split('-')[0] : null).filter(y => y));
     const currentYear = filterInicioYear.value;
     filterInicioYear.innerHTML = '<option value="">TODOS</option>' + Array.from(inicioYears).sort((a,b)=>b-a).map(y => `<option value="${y}"${y==currentYear ? ' selected' : ''}>${y}</option>`).join('');
     
@@ -617,20 +707,56 @@ function updateFilters() {
 function renderStats() {
     const selectedYear = filterInicioYear.value; 
     const selectedPagador = filterPagador.value;
-    const filteredCourses = courses.filter(c => c.cobrado === "COBRADO" && (selectedYear === "" || (c.inicio && new Date(c.inicio).getFullYear() == selectedYear)) && (selectedPagador === "" || (c.empresa || c.pagador) === selectedPagador));
+    const filteredCourses = courses.filter(c => 
+        c.cobrado === "COBRADO" && 
+        (selectedYear === "" || (c.inicio && c.inicio.split('-')[0] == selectedYear)) && 
+        (selectedPagador === "" || (c.empresa || c.pagador) === selectedPagador)
+    );
     const totalImporte = filteredCourses.reduce((sum, c) => sum + (parseFloat(c.importeNeto) || 0), 0);
     const totalHoras = filteredCourses.reduce((sum, c) => sum + (parseFloat(c.horas) || 0), 0);
     document.getElementById('totalImporte').textContent = `${totalImporte.toFixed(2).replace('.', ',')} €`;
     document.getElementById('totalHoras').textContent = `${totalHoras.toFixed(2).replace('.', ',')} h`;
 }
 
+// RENDER CORREGIDO CON FILTROS Y DESPLEGABLE MÓVIL
 function render() {
-    if (courses.length === 0) { tbody.innerHTML = "<tr><td colspan='11' style='text-align:center;'>No hay cursos</td></tr>"; return; }
-    tbody.innerHTML = courses.map((c, i) => {
+    const selectedYear = filterInicioYear.value;
+    const selectedPagador = filterPagador.value;
+
+    const filtered = courses.filter(c => {
+        const yearMatch = selectedYear === "" || (c.inicio && c.inicio.split('-')[0] == selectedYear);
+        const pagadorMatch = selectedPagador === "" || (c.empresa || c.pagador) === selectedPagador;
+        return yearMatch && pagadorMatch;
+    });
+
+    if (filtered.length === 0) { 
+        tbody.innerHTML = "<tr><td colspan='11' style='text-align:center;'>No hay cursos que coincidan</td></tr>"; 
+        return; 
+    }
+
+    tbody.innerHTML = filtered.map((c, i) => {
         const statusSpan = c.cobrado === "COBRADO" ? "<span class='status-cobrado'>COBRADO</span>" : "<span class='status-pendiente'>PENDIENTE</span>";
         const importeDisplay = (parseFloat(c.importeNeto) || 0).toFixed(2).replace('.', ','); 
         const isAlert = c.alerta ? ' alert' : ''; 
-        return `<tr><td>${i+1}</td><td>${c.inicio||""}</td><td>${c.tipoCurso||""}</td><td>${c.empresa||c.pagador||""}</td><td>${c.lugarCelebracion||""}</td><td>${c.horas||""}</td><td>${importeDisplay} €</td><td>${statusSpan}</td><td>${c.fechaCobro||""}</td><td>${c.renta||""}</td><td class="action-btns"><button class="obs-btn${isAlert}" onclick="showObs('${c.key}')" title="Ver Detalles">👁</button><button class="edit-btn" onclick="editCourse('${c.key}')" title="Editar"><i class="fas fa-edit"></i></button><button class="delete-btn" onclick="delCourse('${c.key}')" title="Eliminar"><i class="fas fa-trash"></i></button></td></tr>`;
+        
+        // AÑADIDO: onclick="this.classList.toggle('expanded')" para desplegar en móvil
+        return `<tr onclick="this.classList.toggle('expanded')">
+            <td>${i+1}</td>
+            <td>${c.inicio||""}</td>
+            <td>${c.tipoCurso||""}</td>
+            <td>${c.empresa||c.pagador||""}</td>
+            <td>${c.lugarCelebracion||""}</td>
+            <td>${c.horas||""}</td>
+            <td>${importeDisplay} €</td>
+            <td>${statusSpan}</td>
+            <td>${c.fechaCobro||""}</td>
+            <td>${c.renta||""}</td>
+            <td class="action-btns">
+                <button class="obs-btn${isAlert}" onclick="event.stopPropagation(); showObs('${c.key}')" title="Ver Detalles">👁</button>
+                <button class="edit-btn" onclick="event.stopPropagation(); editCourse('${c.key}')" title="Editar"><i class="fas fa-edit"></i></button>
+                <button class="delete-btn" onclick="event.stopPropagation(); delCourse('${c.key}')" title="Eliminar"><i class="fas fa-trash"></i></button>
+            </td>
+        </tr>`;
     }).join("");
 }
 
@@ -691,7 +817,6 @@ function showObs(key){
     const c = courses.find(x => x.key === key); if (!c) return;
     const format = v => (v || 0).toString().replace('.', ',');
     
-    // Cálculos para mostrar en detalle
     const h = parseFloat(c.horas || 0);
     const brutoTotal = parseFloat(c.importeBruto || 0);
     const km = parseFloat(c.kilometraje || 0);
@@ -781,6 +906,7 @@ window.delCourse = async key => {
 window.delCourse = delCourse;
 window.renderStats = renderStats;
 window.editCourse = editCourse;
+window.render = render;
 </script>
 </body>
 </html>

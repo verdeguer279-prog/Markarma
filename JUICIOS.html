@@ -17,7 +17,8 @@
       --accent-green: #28a745;
       --accent-red: #dc3545;
       --accent-yellow: #ffc107;
-      --accent-grey: #adb5bd; /* Nuevo color para cancelados */
+      --accent-purple: #d63384; /* Nuevo color para Horas */
+      --accent-grey: #adb5bd;
       --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
     }
     * {
@@ -99,8 +100,33 @@
     .filter-buttons {
       display: flex;
       gap: 8px;
+      flex-wrap: wrap;
     }
     .field { display: grid; gap: 8px; }
+    
+    /* Checkbox personalizado */
+    .field-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .field-checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        accent-color: var(--accent-blue);
+        cursor: pointer;
+    }
+    .field-checkbox label {
+        margin: 0;
+        cursor: pointer;
+        color: var(--text-light);
+        font-weight: 500;
+    }
+
     label { font-size: 0.9rem; color: #aaa; }
     input[type="text"], input[type="date"], input[type="time"], select, textarea {
       width: 100%;
@@ -191,9 +217,9 @@
     /* ANCHOS OPTIMIZADOS PARA COLUMNAS */
     th:nth-child(1), td:nth-child(1) { width: 110px; min-width: 110px; } /* Fecha */
     th:nth-child(2), td:nth-child(2) { width: 80px; min-width: 80px; } /* Hora */
-    th:nth-child(3), td:nth-child(3) { width: 150px; min-width: 150px; } /* Juzgado */
+    th:nth-child(3), td:nth-child(3) { width: 160px; min-width: 160px; } /* Juzgado (Un poco más ancho para el tag Perito) */
     th:nth-child(4), td:nth-child(4) { width: 140px; min-width: 140px; } /* Entrega */
-    th:nth-child(5), td:nth-child(5) { width: 120px; min-width: 120px; } /* Mes Cobro */
+    th:nth-child(5), td:nth-child(5) { width: 130px; min-width: 130px; } /* Mes Cobro */
     th:nth-child(6), td:nth-child(6) { width: 110px; min-width: 110px; } /* Estado */
     th:nth-child(7), td:nth-child(7) { width: 280px; min-width: 280px; } /* Acciones */
 
@@ -202,9 +228,26 @@
     .status-celebrado { color: var(--accent-green); font-weight: bold; }
     .status-suspendido { color: var(--accent-blue); font-weight: bold; }
     .status-webex { color: var(--accent-yellow); font-weight: bold; }
-    .status-cancelado { color: var(--accent-grey); font-weight: bold; } /* Nuevo estilo para cancelado */
+    .status-cancelado { color: var(--accent-grey); font-weight: bold; }
 
-    /* JUICIOS CANCELADOS (Antes suspendidos tachados) */
+    /* ESTILOS DE COBRO */
+    .cobro-horas { color: var(--accent-purple); font-weight: bold; }
+    .status-nocobrado { color: var(--accent-red); font-weight: bold; font-size: 0.85rem; }
+    .status-noentregada { color: var(--accent-red); font-weight: bold; font-size: 0.85rem; }
+
+    /* INDICADOR DE PERITO */
+    .badge-perito {
+        display: inline-block;
+        background: var(--accent-blue);
+        color: white;
+        font-size: 0.7rem;
+        padding: 1px 5px;
+        border-radius: 4px;
+        margin-left: 5px;
+        vertical-align: middle;
+    }
+
+    /* JUICIOS CANCELADOS */
     tr.is-cancelled {
         text-decoration: line-through;
         opacity: 0.6;
@@ -256,18 +299,6 @@
     }
     .action-item.has-link:hover {
         background-color: rgba(0, 123, 255, 0.1);
-    }
-
-    /* ESTILOS ESPECIALES */
-    .status-nocobrado {
-        color: var(--accent-red);
-        font-weight: bold;
-        font-size: 0.85rem;
-    }
-    .status-noentregada {
-        color: var(--accent-red);
-        font-weight: bold;
-        font-size: 0.85rem;
     }
 
     /* MODALES */
@@ -425,6 +456,7 @@
             <div class="filter-buttons">
                 <button id="show-all" class="btn-ghost active button">Todos</button>
                 <button id="show-pending" class="btn-ghost button">Pendientes</button>
+                <button id="show-peritos" class="btn-ghost button">Peritos</button>
             </div>
             <button id="btnExport" class="btn-ghost button">Exportar a Excel</button>
         </div>
@@ -472,14 +504,21 @@
               <input id="juzgado" name="juzgado" type="text" placeholder="Ej: 7 PENAL" required list="juzgado-list" tabindex="3" />
               <datalist id="juzgado-list"></datalist>
             </div>
+            
+            <div class="field-checkbox">
+                <input type="checkbox" id="esPerito" name="esPerito" tabindex="4">
+                <label for="esPerito">Asistencia como Perito</label>
+            </div>
+
             <div class="field">
               <label for="fechaEntrega">Fecha de Entrega de Citación</label>
-              <input id="fechaEntrega" name="fechaEntrega" type="date" tabindex="4" />
+              <input id="fechaEntrega" name="fechaEntrega" type="date" tabindex="5" />
             </div>
             <div class="field">
-              <label for="mesCobro">Mes de Cobro</label>
-              <select id="mesCobro" name="mesCobro" tabindex="5">
+              <label for="mesCobro">Mes de Cobro / Compensación</label>
+              <select id="mesCobro" name="mesCobro" tabindex="6">
                 <option value="">-- SELECCIONAR --</option>
+                <option value="DEVUELVEN HORAS">DEVUELVEN HORAS (+3h)</option>
                 <option value="ENERO">ENERO</option>
                 <option value="FEBRERO">FEBRERO</option>
                 <option value="MARZO">MARZO</option>
@@ -496,7 +535,7 @@
             </div>
             <div class="field">
                 <label for="estado">Estado</label>
-                <select id="estado" name="estado" tabindex="6">
+                <select id="estado" name="estado" tabindex="7">
                     <option value="pendiente">Pendiente</option>
                     <option value="celebrado">Celebrado</option>
                     <option value="suspendido">Suspendido (En Sala)</option>
@@ -508,14 +547,14 @@
                 <div class="file-inputs">
                     <div class="field">
                         <label for="citacionUrl">Citación (URL)</label>
-                        <input id="citacionUrl" name="citacionUrl" type="text" placeholder="Pega aquí la URL de Google Drive" tabindex="7" />
+                        <input id="citacionUrl" name="citacionUrl" type="text" placeholder="Pega aquí la URL de Google Drive" tabindex="8" />
                     </div>
                     <div class="field">
                         <label for="diligenciasUrl">Diligencias (URL)</label>
-                        <input id="diligenciasUrl" name="diligenciasUrl" type="text" placeholder="Pega aquí la URL de Google Drive" tabindex="8" />
+                        <input id="diligenciasUrl" name="diligenciasUrl" type="text" placeholder="Pega aquí la URL de Google Drive" tabindex="9" />
                     </div>
                 </div>
-                <button type="submit" class="btn-primary button" tabindex="9">Guardar</button>
+                <button type="submit" class="btn-primary button" tabindex="10">Guardar</button>
             </div>
           </div>
         </div>
@@ -566,6 +605,7 @@
     const juzgadoList = $("#juzgado-list");
     const citacionUrlInput = $("#citacionUrl");
     const diligenciasUrlInput = $("#diligenciasUrl");
+    const esPeritoCheckbox = $("#esPerito");
     
     const dlgMessage = $("#dlgMessage");
     const messageTitle = $("#messageTitle");
@@ -605,6 +645,9 @@
           if (currentFilter === 'pending') {
               return j.estado === 'pendiente';
           }
+          if (currentFilter === 'perito') {
+              return j.esPerito === true;
+          }
           return true;
       });
 
@@ -621,12 +664,11 @@
             case 'suspendido':
                 statusClass = 'status-suspendido';
                 statusText = 'Suspendido';
-                // YA NO AÑADIMOS la clase is-suspended aquí para que no se tache
                 break;
-            case 'cancelado': // NUEVO CASO
+            case 'cancelado': 
                 statusClass = 'status-cancelado';
                 statusText = 'Cancelado';
-                rowClass = 'is-cancelled'; // Clase para tachar
+                rowClass = 'is-cancelled';
                 break;
             case 'webex':
                 statusClass = 'status-webex';
@@ -639,8 +681,22 @@
         
         tr.className = rowClass;
 
-        const mesCobroContent = juicio.mesCobro && juicio.mesCobro !== "" ? juicio.mesCobro : '<span class="status-nocobrado">NO COBRADO</span>';
+        // Lógica para mostrar cobro o devolución de horas
+        let mesCobroContent;
+        if (juicio.mesCobro === 'DEVUELVEN HORAS') {
+            mesCobroContent = '<span class="cobro-horas">DEVUELVEN HORAS (+3h)</span>';
+        } else if (juicio.mesCobro && juicio.mesCobro !== "") {
+            mesCobroContent = juicio.mesCobro;
+        } else {
+            mesCobroContent = '<span class="status-nocobrado">NO COBRADO</span>';
+        }
+
         const fechaEntregaContent = juicio.fechaEntrega && juicio.fechaEntrega !== "" ? juicio.fechaEntrega : '<span class="status-noentregada">NO ENTREGADA</span>';
+
+        // Indicador visual discreto de Perito
+        const juzgadoDisplay = juicio.esPerito 
+            ? `${juicio.juzgado} <span class="badge-perito" title="Asistencia como Perito">P</span>` 
+            : juicio.juzgado;
 
         let citacionButtonHtml;
         if (juicio.citacionUrl) {
@@ -659,7 +715,7 @@
         tr.innerHTML = `
           <td>${juicio.fecha}</td>
           <td>${juicio.hora}</td>
-          <td>${juicio.juzgado}</td>
+          <td>${juzgadoDisplay}</td>
           <td>${fechaEntregaContent}</td>
           <td>${mesCobroContent}</td>
           <td class="${statusClass}">${statusText}</td>
@@ -696,7 +752,6 @@
         const data = snapshot.val();
         const juicios = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
         
-        // MODIFICADO: Ordenar por Fecha (descendente) y luego por Hora (descendente)
         juicios.sort((a, b) => {
             const dateA = new Date(a.fecha + 'T' + (a.hora || '00:00'));
             const dateB = new Date(b.fecha + 'T' + (b.hora || '00:00'));
@@ -710,7 +765,7 @@
     }
 
     window.exportToExcel = () => {
-        const headers = ['Fecha', 'Hora', 'Juzgado', 'Entrega Citación', 'Mes Cobro', 'Estado', 'Citación', 'Diligencias'];
+        const headers = ['Fecha', 'Hora', 'Juzgado', 'Es Perito', 'Entrega Citación', 'Mes Cobro', 'Estado', 'Citación', 'Diligencias'];
         let csv = headers.join(';') + '\n';
         
         window.allJuiciosData.forEach(juicio => {
@@ -718,6 +773,7 @@
                 juicio.fecha,
                 juicio.hora,
                 `"${juicio.juzgado}"`,
+                juicio.esPerito ? "SÍ" : "NO",
                 juicio.fechaEntrega,
                 juicio.mesCobro,
                 juicio.estado,
@@ -749,6 +805,10 @@
           $('#estado').value = juicio.estado || 'pendiente';
           citacionUrlInput.value = juicio.citacionUrl || '';
           diligenciasUrlInput.value = juicio.diligenciasUrl || '';
+          
+          // Cargar estado del checkbox
+          esPeritoCheckbox.checked = juicio.esPerito === true;
+          
           dlgNuevo.classList.add('open');
         }
       });
@@ -768,6 +828,7 @@
       juicioIdInput.value = '';
       citacionUrlInput.value = '';
       diligenciasUrlInput.value = '';
+      esPeritoCheckbox.checked = false; // Resetear checkbox
       modalTitle.textContent = 'Añadir Nuevo Juicio';
       dlgNuevo.classList.add("open");
     };
@@ -788,6 +849,9 @@
       const juicio = Object.fromEntries(fd.entries());
       const juicioId = juicioIdInput.value;
       
+      // Guardar el valor del checkbox manualmente porque FormData a veces lo ignora si no está marcado
+      juicio.esPerito = esPeritoCheckbox.checked;
+
       if (juicio.citacionUrl === "") {
           delete juicio.citacionUrl;
       }
@@ -809,6 +873,7 @@
       }
     };
     
+    // FILTROS
     $("#show-all").onclick = () => {
         currentFilter = 'all';
         $$('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
@@ -820,6 +885,13 @@
         currentFilter = 'pending';
         $$('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
         $("#show-pending").classList.add('active');
+        fetchJuicios();
+    };
+
+    $("#show-peritos").onclick = () => {
+        currentFilter = 'perito';
+        $$('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
+        $("#show-peritos").classList.add('active');
         fetchJuicios();
     };
 

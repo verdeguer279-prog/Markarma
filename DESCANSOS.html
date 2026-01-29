@@ -9,7 +9,7 @@
     
     <style>
         /* =========================================
-           ESTILOS (DISEÑO ARREGLADO Y LIMPIO)
+           ESTILOS (DISEÑO AJUSTADO)
            ========================================= */
         :root {
             --primary-color: #3498db;
@@ -23,15 +23,15 @@
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; line-height: 1.5; font-size: 14px; } /* Fuente base ligeramente más pequeña para compactar */
-        .container { max-width: 1400px; margin: 0 auto; padding: 15px; }
+        body { background-color: #f4f6f9; color: #333; line-height: 1.5; font-size: 14px; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
         
         /* Header */
-        header { background-color: var(--primary-color); color: white; padding: 12px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        header { background-color: var(--primary-color); color: white; padding: 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 25px; }
         .header-content { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
-        h1 { font-size: 1.5rem; font-weight: 600; margin: 0; }
+        h1 { font-size: 1.6rem; font-weight: 600; margin: 0; }
         
-        /* Botones Generales */
+        /* Botones */
         .btn { display: inline-block; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; text-decoration: none; transition: all 0.2s; color: white; font-size: 0.9rem; }
         .btn-primary { background-color: var(--primary-color); }
         .btn-primary:hover { background-color: var(--secondary-color); }
@@ -39,13 +39,13 @@
         .btn-secondary:hover { background-color: #dcdcdc; }
         .btn-small { padding: 4px 10px; font-size: 0.8rem; }
         
-        /* Cards */
-        .card { background-color: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 20px; height: 100%; border: 1px solid var(--gray-border); }
-        .card-title-left { font-size: 1.2rem; margin-bottom: 15px; color: var(--dark-color); border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
+        /* Cards & Layout */
+        .card { background-color: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 20px; height: 100%; border: 1px solid var(--gray-border); display: flex; flex-direction: column; }
+        .card-title-left { font-size: 1.3rem; margin-bottom: 20px; color: var(--dark-color); border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
         
-        /* Grid Estado (Top Dashboard) */
-        .status-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .status-card { background-color: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 15px; text-align: center; border: 1px solid var(--gray-border); }
+        /* Grid Superior */
+        .status-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 25px; width: 100%; }
+        .status-card { background-color: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 15px; text-align: center; border: 1px solid var(--gray-border); display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; }
         .status-value { font-size: 2.2rem; font-weight: 700; margin: 10px 0; line-height: 1; }
         .vacaciones { color: var(--primary-color); }
         .asuntos-propios { color: var(--warning-color); }
@@ -53,105 +53,102 @@
         .anio-anterior { color: #9b59b6; }
         .permutas { color: #8e44ad; }
         
-        /* Layout columnas */
-        .form-row { display: flex; gap: 20px; align-items: flex-start; }
-        .form-column { flex: 1; display: flex; flex-direction: column; }
+        /* Grid Central */
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; margin-bottom: 25px; }
         
-        /* Formularios alineados */
+        /* Formularios */
         .form-group { margin-bottom: 15px; width: 100%; }
         label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; font-size: 0.9rem; }
-        input, select { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; background-color: #fff; }
-        input:disabled { background-color: #f0f0f0; color: #777; }
-        
-        /* Tabla - EL CAMBIO IMPORTANTE */
-        .table-container { overflow-x: auto; margin-top: 15px; border: 1px solid var(--gray-border); border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; min-width: 800px; } /* Mínimo ancho para evitar aplastamiento */
-        
-        /* Anchos de columnas definidos para dar espacio a los botones */
-        th:nth-child(1) { width: 12%; } /* Fecha */
-        th:nth-child(2) { width: 15%; } /* Tipo */
-        th:nth-child(3) { width: 8%; }  /* Año */
-        th:nth-child(4) { width: 10%; } /* Estado */
-        th:nth-child(5) { width: 55%; } /* Acciones (La más ancha) */
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; background-color: #fff; height: 40px;}
+        input:disabled { background-color: #f9f9f9; color: #777; }
+        .selector-anio-small { width: auto; display: inline-block; margin-left: 10px; height: 30px; padding: 2px 5px; font-size: 1rem;}
 
-        th, td { padding: 10px 12px; border-bottom: 1px solid #eee; text-align: left; vertical-align: middle; }
+        /* Tabla */
+        .table-container { overflow-x: auto; margin-top: 15px; border: 1px solid var(--gray-border); border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; } 
+        th, td { padding: 12px 15px; border-bottom: 1px solid #eee; text-align: left; vertical-align: middle; }
         th { background-color: #f8f9fa; font-weight: 600; color: #444; }
-        td { font-size: 0.95rem; }
         
-        /* Badges de Estado */
-        .estado-badge { padding: 3px 8px; border-radius: 12px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; text-align: center; min-width: 80px;}
-        .En.Trámite, .tramite { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-        .Denegado, .denegado { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .Disfrutado, .disfrutado { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        /* ESTADOS Y BADGES (COLORES MEJORADOS) */
+        .estado-badge { 
+            padding: 6px 12px; 
+            border-radius: 4px; 
+            font-weight: 700; 
+            font-size: 0.85rem; 
+            display: inline-block; 
+            text-align: center; 
+            width: 120px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        /* Colores exactos a los botones pero en versión clara */
+        /* Amarillo Trámite */
+        .EnTrámite, .tramite { 
+            background-color: #FFF59D; /* Amarillo claro */
+            color: #F57F17; /* Amarillo oscuro/naranja texto */
+            border: 1px solid #FBC02D;
+        }
+        
+        /* Rojo Denegado */
+        .Denegado, .denegado { 
+            background-color: #EF9A9A; /* Rojo claro */
+            color: #B71C1C; /* Rojo oscuro texto */
+            border: 1px solid #E53935;
+        }
+        
+        /* Verde Disfrutado */
+        .Disfrutado, .disfrutado { 
+            background-color: #A5D6A7; /* Verde claro */
+            color: #1B5E20; /* Verde oscuro texto */
+            border: 1px solid #43A047;
+        }
+        
         .Pendiente, .pendiente { background-color: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
         
-        /* BOTONES DE ACCIÓN - DISEÑO COMPACTO Y LIMPIO */
-        .actions { 
-            display: flex; 
-            gap: 4px; /* Espacio pequeño entre botones */
-            justify-content: flex-end; 
-            align-items: center; 
-            flex-wrap: nowrap; /* Intentar no saltar de línea si es posible */
-        }
+        /* Botonera Acciones */
+        .actions { display: flex; gap: 5px; justify-content: flex-end; align-items: center; }
+        .btn-action { padding: 6px 12px; font-size: 0.85rem; border: none; border-radius: 4px; cursor: pointer; color: #333; font-weight: 600; white-space: nowrap; }
         
-        .btn-action { 
-            padding: 5px 10px; 
-            font-size: 0.8rem; 
-            border: none; 
-            border-radius: 3px; 
-            cursor: pointer; 
-            color: white; /* Texto blanco para mejor contraste */
-            font-weight: 600;
-            white-space: nowrap; /* Evitar que el texto del botón salte */
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            height: 28px;
-        }
+        /* Botones Sólidos */
+        .btn-tramite { background-color: #FFEB3B; border: 1px solid #e6db55; color: #333; }
+        .btn-tramite:hover { background-color: #fdd835; }
         
-        /* Colores sólidos para los botones de acción (más moderno) */
-        .btn-tramite { background-color: #f39c12; } 
-        .btn-tramite:hover { background-color: #e67e22; }
+        .btn-denegado { background-color: #F44336; color: white; border: 1px solid #d32f2f; }
+        .btn-denegado:hover { background-color: #d32f2f; }
         
-        .btn-denegado { background-color: #e74c3c; } 
-        .btn-denegado:hover { background-color: #c0392b; }
+        .btn-disfrutado { background-color: #4CAF50; color: white; border: 1px solid #388e3c; }
+        .btn-disfrutado:hover { background-color: #388e3c; }
         
-        .btn-disfrutado { background-color: #27ae60; } 
-        .btn-disfrutado:hover { background-color: #219150; }
-        
-        /* Botones iconos (Editar / Borrar) */
-        .btn-icon {
-            width: 28px;
-            padding: 0;
-            font-size: 1rem;
-        }
-        .btn-eliminar { background-color: #7f8c8d; }
-        .btn-eliminar:hover { background-color: #636e72; }
-        
-        .btn-editar { background-color: #3498db; }
-        .btn-editar:hover { background-color: #2980b9; }
+        .btn-icon { padding: 6px 10px; color: white; min-width: 35px; text-align: center;}
+        .btn-editar { background-color: var(--primary-color); border: 1px solid #2980b9; }
+        .btn-eliminar { background-color: #7f8c8d; border: 1px solid #636e72; }
         
         /* Filtros */
         .filtros { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .btn-filtro { background: white; border: 1px solid #ddd; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; color: #555; transition: all 0.2s; }
-        .btn-filtro:hover { background-color: #f0f0f0; }
+        .btn-filtro { background: white; border: 1px solid #ddd; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; color: #555; transition: all 0.2s; }
         .btn-filtro.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
         
         /* Modales */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background-color: white; padding: 25px; border-radius: 8px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-content { background-color: white; padding: 25px; border-radius: 8px; width: 95%; max-width: 650px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-title { font-size: 1.4rem; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; color: var(--dark-color); }
         .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
         
-        /* Historiales */
-        .historial-list { max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 0; border-radius: 4px; margin-top: 10px; }
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; background: #fff; }
-        .item-row:last-child { border-bottom: none; }
+        /* Listas Historial */
+        .historial-list { max-height: 350px; overflow-y: auto; border: 1px solid #eee; padding: 0; border-radius: 4px; margin-top: 10px; }
+        .item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid #eee; background: #fff; }
         .item-row:nth-child(even) { background-color: #f9f9f9; }
+        
+        /* Estilos específicos Permutas */
+        .permuta-display { display: flex; flex-direction: column; width: 100%; }
+        .permuta-header { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; }
+        .permuta-details { display: flex; gap: 20px; margin-top: 5px; flex-wrap: wrap; }
+        .permuta-chip { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 5px 10px; font-size: 0.9rem; color: #495057; }
+        
         .horas-pos { color: var(--success-color); font-weight: bold; }
         .horas-neg { color: var(--danger-color); font-weight: bold; }
-        
-        /* Utilidades */
+
+        /* Utils */
         .hidden { display: none !important; }
         .loading { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:3000; display:flex; justify-content:center; align-items:center; font-size:1.2rem; color:var(--primary-color); }
         .notification { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 4px; color: white; z-index: 4000; animation: slideIn 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; }
@@ -160,17 +157,9 @@
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
         /* Responsive */
-        @media (max-width: 900px) {
-            .form-row { flex-direction: column; }
-            .status-grid { grid-template-columns: repeat(2, 1fr); }
-            /* En móvil, permitimos que la tabla haga scroll horizontal */
-            .actions { flex-wrap: wrap; justify-content: flex-start; } 
-            .btn-action { margin-bottom: 3px; }
-        }
-        @media (max-width: 600px) {
-            .status-grid { grid-template-columns: 1fr; }
-            .header-content { flex-direction: column; text-align: center; gap: 10px; }
-        }
+        @media (max-width: 1200px) { .status-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 900px) { .form-row { grid-template-columns: 1fr; } .status-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .status-grid { grid-template-columns: 1fr; } .header-content { flex-direction: column; text-align: center; gap: 10px; } .actions { flex-wrap: wrap; } }
     </style>
 </head>
 <body>
@@ -183,45 +172,45 @@
     
     <div class="container">
         <div id="notification-area"></div>
-
-        <div id="loading">
-            <div>Cargando sistema...</div>
-        </div>
+        <div id="loading"><div class="loading">Cargando datos...</div></div>
         
         <div id="app" class="hidden">
-            
             <div class="status-grid">
                 <div class="status-card">
                     <h3>Vacaciones <span class="anio-display"></span></h3>
                     <div class="status-value vacaciones" id="vacaciones-disponibles">--</div>
-                    <p style="font-size:0.85rem; color:#777;">Días restantes</p>
+                    <p style="font-size:0.8rem; color:#777;">Días restantes</p>
                 </div>
                 
                 <div class="status-card">
                     <h3>Asuntos Propios <span class="anio-display"></span></h3>
                     <div class="status-value asuntos-propios" id="asuntos-propios-disponibles">--</div>
-                    <p style="font-size:0.85rem; color:#777;">Días restantes</p>
+                    <p style="font-size:0.8rem; color:#777;">Días restantes</p>
                 </div>
                 
                 <div class="status-card">
                     <h3>Bolsa de Horas</h3>
                     <div class="status-value horas-acumuladas" id="horas-acumuladas">--</div>
-                    <p style="font-size:0.85rem; color:#777;">Acumulado Total Histórico</p>
-                    <button id="btn-gestionar-horas" class="btn btn-primary btn-small" style="margin-top:5px;">Gestionar Horas</button>
+                    <p style="font-size:0.8rem; color:#777;">Total Histórico</p>
+                    <button id="btn-gestionar-horas" class="btn btn-primary btn-small" style="margin-top:auto;">Gestionar</button>
                 </div>
                 
                 <div class="status-card">
                     <h3>Año Anterior</h3>
-                    <div class="status-value anio-anterior" id="vacaciones-anio-anterior">--</div>
-                    <p style="font-size:0.85rem; color:#777;">Vacaciones (Límite 31 Ene)</p>
-                    <div class="status-value anio-anterior" id="asuntos-anio-anterior" style="font-size:1.5rem; margin-top:5px;">--</div>
-                    <p style="font-size:0.85rem; color:#777;">Asuntos (Límite 15 Feb)</p>
+                    <div>
+                        <span class="anio-anterior" style="font-weight:bold; font-size:1.2rem;" id="vacaciones-anio-anterior">--</span> 
+                        <span style="font-size:0.8rem">Vac (31 Ene)</span>
+                    </div>
+                    <div style="margin-top:5px;">
+                        <span class="anio-anterior" style="font-weight:bold; font-size:1.2rem;" id="asuntos-anio-anterior">--</span>
+                        <span style="font-size:0.8rem">AP (15 Feb)</span>
+                    </div>
                 </div>
                 
                 <div class="status-card">
                     <h3>Permutas <span class="anio-display"></span></h3>
                     <div class="status-value permutas" id="permutas-realizadas">0</div>
-                    <div class="status-buttons">
+                    <div class="status-buttons" style="margin-top:auto;">
                         <button id="btn-add-permuta" class="btn btn-primary btn-small">Añadir</button>
                         <button id="btn-view-permuta" class="btn btn-secondary btn-small">Ver</button>
                     </div>
@@ -229,61 +218,35 @@
             </div>
             
             <div class="form-row">
-                <div class="form-column">
-                    <div class="card">
-                        <div class="card-title-left">
-                            <span>Planificación Anual</span>
-                            <select id="selector-anio-config" class="selector-anio-small"></select>
-                        </div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <div class="form-group">
-                                <label>Días Vacaciones:</label>
-                                <input type="number" id="dias-vacaciones" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label>Días Asuntos Propios:</label>
-                                <input type="number" id="dias-asuntos-propios" min="0">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Saldo Inicial Horas (1 Ene):</label>
-                            <div style="display:flex; gap:5px;">
-                                <input type="number" id="horas-manuales" step="0.5">
-                                <button id="btn-unlock" type="button" title="Editar manualmente" style="border:1px solid #ccc; background:#fff; cursor:pointer; padding:0 8px;">🔓</button>
-                            </div>
-                            <small id="msg-horas-auto" style="color:#27ae60; font-size:0.8rem; display:none;">* Calculado automáticamente desde el año anterior</small>
-                        </div>
-                        <button id="btn-guardar-config" class="btn btn-primary" style="width:100%; margin-top:10px;">Guardar Configuración</button>
+                <div class="card">
+                    <div class="card-title-left">
+                        <span>Planificación Anual</span>
+                        <select id="selector-anio-config" class="selector-anio-small"></select>
                     </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="form-group"><label>Días Vacaciones:</label><input type="number" id="dias-vacaciones" min="0"></div>
+                        <div class="form-group"><label>Días Asuntos Propios:</label><input type="number" id="dias-asuntos-propios" min="0"></div>
+                    </div>
+                    <div class="form-group" style="margin-top:10px;">
+                        <label>Saldo Inicial Horas (1 Ene):</label>
+                        <div style="display:flex; gap:5px;">
+                            <input type="number" id="horas-manuales" step="0.5">
+                            <button id="btn-unlock" type="button" title="Editar manual" style="border:1px solid #ccc; background:#fff; cursor:pointer; width:40px;">🔓</button>
+                        </div>
+                        <small id="msg-horas-auto" style="color:#27ae60; font-size:0.8rem; display:none;">* Calculado automáticamente</small>
+                    </div>
+                    <button id="btn-guardar-config" class="btn btn-primary" style="margin-top:auto; width:100%;">Guardar Configuración</button>
                 </div>
                 
-                <div class="form-column">
-                    <div class="card">
-                        <h2 class="card-title-left" style="color:var(--success-color)">Solicitar Descanso</h2>
-                        <div class="form-group">
-                            <label>Tipo:</label>
-                            <select id="tipo-descanso">
-                                <option value="vacaciones">Vacaciones</option>
-                                <option value="asuntos-propios">Asuntos Propios</option>
-                                <option value="horas">Horas Sueltas</option>
-                            </select>
-                        </div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                            <div class="form-group">
-                                <label>Fecha:</label>
-                                <input type="date" id="fecha-descanso">
-                            </div>
-                            <div class="form-group">
-                                <label>Cómputo (Año):</label>
-                                <select id="computo"></select>
-                            </div>
-                        </div>
-                        <div class="form-group hidden" id="group-horas-cantidad">
-                            <label>Cantidad Horas:</label>
-                            <input type="number" id="horas-solicitadas" value="8" step="0.5">
-                        </div>
-                        <button id="btn-solicitar" class="btn btn-primary" style="width:100%; margin-top:10px;">Registrar Solicitud</button>
+                <div class="card">
+                    <h2 class="card-title-left" style="color:var(--success-color); border-bottom-color:var(--success-color);">Solicitar Descanso</h2>
+                    <div class="form-group"><label>Tipo:</label><select id="tipo-descanso"><option value="vacaciones">Vacaciones</option><option value="asuntos-propios">Asuntos Propios</option><option value="horas">Horas Sueltas</option></select></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                        <div class="form-group"><label>Fecha:</label><input type="date" id="fecha-descanso"></div>
+                        <div class="form-group"><label>Cómputo (Año):</label><select id="computo"></select></div>
                     </div>
+                    <div class="form-group hidden" id="group-horas-cantidad"><label>Cantidad Horas:</label><input type="number" id="horas-solicitadas" value="8" step="0.5"></div>
+                    <button id="btn-solicitar" class="btn btn-primary" style="margin-top:auto; width:100%; background-color:var(--success-color);">Registrar Solicitud</button>
                 </div>
             </div>
             
@@ -300,6 +263,7 @@
                     <button class="btn-filtro" data-filtro="horas">Horas</button>
                     <button class="btn-filtro" data-filtro="pendiente">Pendientes</button>
                     <button class="btn-filtro" data-filtro="tramite">Trámite</button>
+                    <button class="btn-filtro" data-filtro="denegado">Denegados</button>
                     <button class="btn-filtro" data-filtro="disfrutado">Disfrutados</button>
                 </div>
                 
@@ -307,11 +271,11 @@
                     <table id="tabla-solicitudes">
                         <thead>
                             <tr>
-                                <th>Fecha</th>
-                                <th>Tipo</th>
-                                <th>Cómputo</th>
-                                <th>Estado</th>
-                                <th style="text-align:right">Acciones</th>
+                                <th style="width:12%">Fecha</th>
+                                <th style="width:15%">Tipo</th>
+                                <th style="width:8%">Cómputo</th>
+                                <th style="width:10%">Estado</th>
+                                <th style="width:55%; text-align:right;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="cuerpo-tabla"></tbody>
@@ -321,95 +285,59 @@
         </div>
     </div>
 
-    <div id="modal-editar-solicitud" class="modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Editar Solicitud</h2>
-            <input type="hidden" id="edit-index">
-            <div class="form-group">
-                <label>Tipo:</label>
-                <select id="edit-tipo">
-                    <option value="vacaciones">Vacaciones</option>
-                    <option value="asuntos-propios">Asuntos Propios</option>
-                    <option value="horas">Horas Sueltas</option>
-                </select>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div class="form-group">
-                    <label>Fecha:</label>
-                    <input type="date" id="edit-fecha">
-                </div>
-                <div class="form-group">
-                    <label>Año Cómputo:</label>
-                    <select id="edit-computo"></select>
-                </div>
-            </div>
-            <div class="form-group hidden" id="edit-group-horas">
-                <label>Horas:</label>
-                <input type="number" id="edit-horas" step="0.5">
-            </div>
-            <div class="modal-actions">
-                <button onclick="document.getElementById('modal-editar-solicitud').style.display='none'" class="btn btn-secondary">Cancelar</button>
-                <button onclick="guardarEdicionSolicitud()" class="btn btn-primary">Guardar Cambios</button>
-            </div>
+    <div id="modal-editar-solicitud" class="modal"><div class="modal-content">
+        <h2 class="modal-title">Editar Solicitud</h2>
+        <input type="hidden" id="edit-index">
+        <div class="form-group"><label>Tipo:</label><select id="edit-tipo"><option value="vacaciones">Vacaciones</option><option value="asuntos-propios">Asuntos P.</option><option value="horas">Horas</option></select></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="form-group"><label>Fecha:</label><input type="date" id="edit-fecha"></div>
+            <div class="form-group"><label>Año:</label><select id="edit-computo"></select></div>
         </div>
-    </div>
+        <div class="form-group hidden" id="edit-group-horas"><label>Horas:</label><input type="number" id="edit-horas" step="0.5"></div>
+        <div class="modal-actions"><button onclick="document.getElementById('modal-editar-solicitud').style.display='none'" class="btn btn-secondary">Cancelar</button><button onclick="guardarEdicionSolicitud()" class="btn btn-primary">Guardar</button></div>
+    </div></div>
 
-    <div id="modal-horas" class="modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Gestión de Bolsa de Horas (Histórico)</h2>
-            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
-                <div class="form-group"><label>Fecha:</label><input type="date" id="fecha-op-horas"></div>
-                <div class="form-group"><label>Horas:</label><input type="number" id="cantidad-op-horas" value="1" step="0.5"></div>
-            </div>
-            <div class="form-group">
-                <label>Concepto:</label>
-                <input type="text" id="concepto-op-horas" placeholder="Ej: Juicio, Compensación...">
-            </div>
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <button id="btn-sumar" class="btn btn-primary" style="flex:1; background-color:var(--success-color)">+ Añadir (Haber)</button>
-                <button id="btn-restar" class="btn btn-primary" style="flex:1; background-color:var(--danger-color)">- Restar (Debe)</button>
-            </div>
-            <h4>Historial de Movimientos</h4>
-            <div class="historial-list" id="lista-horas"></div>
-            <div class="modal-actions">
-                <button onclick="document.getElementById('modal-horas').style.display='none'" class="btn btn-secondary">Cerrar</button>
-            </div>
+    <div id="modal-gestion-horas" class="modal"><div class="modal-content">
+        <h2 class="modal-title">Gestión de Horas</h2>
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
+            <div class="form-group"><label>Fecha:</label><input type="date" id="fecha-op-horas"></div>
+            <div class="form-group"><label>Horas:</label><input type="number" id="cantidad-op-horas" value="1" step="0.5"></div>
         </div>
-    </div>
+        <div class="form-group"><label>Concepto:</label><input type="text" id="concepto-op-horas"></div>
+        <div style="display:flex; gap:10px;"><button id="btn-sumar" class="btn btn-primary" style="flex:1; background:var(--success-color)">Sumar (+)</button><button id="btn-restar" class="btn btn-primary" style="flex:1; background:var(--danger-color)">Restar (-)</button></div>
+        <h4>Historial Completo</h4><div class="historial-list" id="lista-horas"></div>
+        <div class="modal-actions"><button id="btn-cerrar-gestion-horas" class="btn btn-secondary">Cerrar</button></div>
+    </div></div>
 
-    <div id="modal-permuta" class="modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Añadir Permuta</h2>
-            <div class="form-group"><label>Agente:</label><input type="text" id="p-agente"></div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div class="form-group"><label>Mi Fecha:</label><input type="date" id="p-fecha-yo"></div>
-                <div class="form-group"><label>Mi Turno:</label><select id="p-turno-yo"><option>Mañana</option><option>Tarde</option><option>Noche</option></select></div>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div class="form-group"><label>Fecha Agente:</label><input type="date" id="p-fecha-el"></div>
-                <div class="form-group"><label>Turno Agente:</label><select id="p-turno-el"><option>Mañana</option><option>Tarde</option><option>Noche</option></select></div>
-            </div>
-            <div class="modal-actions">
-                <button onclick="document.getElementById('modal-permuta').style.display='none'" class="btn btn-secondary">Cancelar</button>
-                <button id="btn-save-permuta" class="btn btn-primary">Guardar</button>
-            </div>
+    <div id="modal-editar-hora" class="modal"><div class="modal-content">
+        <h2 class="modal-title">Editar Operación de Horas</h2>
+        <input type="hidden" id="edit-hora-index">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="form-group"><label>Fecha:</label><input type="date" id="edit-hora-fecha"></div>
+            <div class="form-group"><label>Horas:</label><input type="number" id="edit-hora-cantidad" step="0.5"></div>
         </div>
-    </div>
+        <div class="form-group"><label>Concepto:</label><input type="text" id="edit-hora-concepto"></div>
+        <div class="form-group"><label>Tipo:</label><select id="edit-hora-tipo"><option value="suma">Suma (+)</option><option value="resta">Resta (-)</option></select></div>
+        <div class="modal-actions"><button onclick="document.getElementById('modal-editar-hora').style.display='none'" class="btn btn-secondary">Cancelar</button><button onclick="guardarEdicionHora()" class="btn btn-primary">Guardar Cambios</button></div>
+    </div></div>
 
-    <div id="modal-ver-permutas" class="modal">
-        <div class="modal-content">
-            <h2 class="modal-title">Permutas del Año</h2>
-            <div class="historial-list" id="lista-permutas"></div>
-            <div class="modal-actions">
-                <button onclick="document.getElementById('modal-ver-permutas').style.display='none'" class="btn btn-secondary">Cerrar</button>
-            </div>
-        </div>
-    </div>
+    <div id="modal-permuta" class="modal"><div class="modal-content">
+        <h2 class="modal-title">Añadir Permuta</h2>
+        <div class="form-group"><label>Agente:</label><input type="text" id="p-agente"></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Mi Fecha:</label><input type="date" id="p-fecha-yo"></div><div class="form-group"><label>Turno:</label><select id="p-turno-yo"><option value="primero">Turno Primero</option><option value="segundo">Turno Segundo</option><option value="tercero">Turno Tercero</option></select></div></div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Su Fecha:</label><input type="date" id="p-fecha-el"></div><div class="form-group"><label>Turno:</label><select id="p-turno-el"><option value="primero">Turno Primero</option><option value="segundo">Turno Segundo</option><option value="tercero">Turno Tercero</option></select></div></div>
+        <div class="modal-actions"><button id="btn-cancelar-permuta" class="btn btn-secondary">Cancelar</button><button id="btn-save-permuta" class="btn btn-primary">Guardar</button></div>
+    </div></div>
+
+    <div id="modal-ver-permutas" class="modal"><div class="modal-content">
+        <h2 class="modal-title">Historial Completo Permutas</h2>
+        <div class="historial-list" id="lista-permutas"></div>
+        <div class="modal-actions"><button id="btn-cerrar-permutas" class="btn btn-secondary">Cerrar</button></div>
+    </div></div>
 
     <script>
-        // --- FIREBASE CONFIG (MANTENER TU CONFIGURACIÓN) ---
         const firebaseConfig = {
-            apiKey: "AIzaSyC4w7q3Q8X9Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8", // PON TU API KEY REAL AQUI
+            apiKey: "AIzaSyC4w7q3Q8X9Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8", 
             authDomain: "markarma279.firebaseapp.com",
             databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "markarma279",
@@ -417,63 +345,54 @@
             messagingSenderId: "123456789",
             appId: "1:123456789:web:abcdef123456"
         };
-
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        const USER_ID = 'usuario-demo'; // RESTAURADO ID ORIGINAL
+        const USER_ID = 'usuario-demo'; 
 
-        // --- VARIABLES GLOBALES ---
         let datos = { configuraciones: {}, solicitudes: [], horas: [], permutas: [] };
         const anioActual = new Date().getFullYear();
         let anioGestion = anioActual;
         let anioConfig = anioActual;
         let filtroActual = 'todos';
 
-        // --- REFERENCIAS DOM ---
         const dom = {
             loading: document.getElementById('loading'),
             app: document.getElementById('app'),
             txtAnio: document.querySelectorAll('.anio-display'),
-            // Selectores
             selConfig: document.getElementById('selector-anio-config'),
             selGestion: document.getElementById('selector-anio-gestion'),
             selComputo: document.getElementById('computo'),
             selComputoEdit: document.getElementById('edit-computo'),
-            // Contadores
             vacDisp: document.getElementById('vacaciones-disponibles'),
             apDisp: document.getElementById('asuntos-propios-disponibles'),
             horasAcum: document.getElementById('horas-acumuladas'),
             vacAnt: document.getElementById('vacaciones-anio-anterior'),
             apAnt: document.getElementById('asuntos-anio-anterior'),
             permDisp: document.getElementById('permutas-realizadas'),
-            // Config Inputs
             inpVac: document.getElementById('dias-vacaciones'),
             inpAp: document.getElementById('dias-asuntos-propios'),
             inpHoras: document.getElementById('horas-manuales'),
             btnUnlock: document.getElementById('btn-unlock'),
             msgHoras: document.getElementById('msg-horas-auto'),
-            // Solicitud
             selTipo: document.getElementById('tipo-descanso'),
             inpFecha: document.getElementById('fecha-descanso'),
             groupHoras: document.getElementById('group-horas-cantidad'),
             inpHoraSol: document.getElementById('horas-solicitadas'),
             btnSol: document.getElementById('btn-solicitar'),
-            // Tabla
             tbody: document.getElementById('cuerpo-tabla'),
             filtros: document.querySelectorAll('.btn-filtro'),
-            // Modales
-            modalHoras: document.getElementById('modal-horas'),
+            modalHoras: document.getElementById('modal-gestion-horas'),
             modalPerm: document.getElementById('modal-permuta'),
             modalVerPerm: document.getElementById('modal-ver-permutas'),
             modalEdit: document.getElementById('modal-editar-solicitud'),
-            // Inputs Horas
+            modalEditHora: document.getElementById('modal-editar-hora'),
             inpFechaOp: document.getElementById('fecha-op-horas'),
             inpConcOp: document.getElementById('concepto-op-horas'),
             inpCantOp: document.getElementById('cantidad-op-horas'),
-            listHoras: document.getElementById('lista-horas')
+            listHoras: document.getElementById('lista-horas'),
+            listPermutas: document.getElementById('lista-permutas')
         };
 
-        // --- INICIO ---
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
             dom.inpFecha.value = today;
@@ -483,48 +402,36 @@
         });
 
         function setupListeners() {
-            // Cambios de Año
             dom.selConfig.addEventListener('change', e => { anioConfig = parseInt(e.target.value); renderConfig(anioConfig); });
             dom.selGestion.addEventListener('change', e => { anioGestion = parseInt(e.target.value); renderUI(); });
             document.getElementById('btn-guardar-config').addEventListener('click', guardarConfig);
-
-            // Solicitud
             dom.selTipo.addEventListener('change', e => dom.groupHoras.classList.toggle('hidden', e.target.value !== 'horas'));
             dom.btnSol.addEventListener('click', procesarSolicitud);
-
-            // Filtros
             dom.filtros.forEach(b => b.addEventListener('click', e => {
                 dom.filtros.forEach(f => f.classList.remove('active'));
                 e.target.classList.add('active');
                 filtroActual = e.target.dataset.filtro;
                 renderTabla();
             }));
-
-            // Gestión Horas
+            
+            // Horas
             document.getElementById('btn-gestionar-horas').addEventListener('click', () => { renderListaHoras(); dom.modalHoras.style.display = 'flex'; });
+            document.getElementById('btn-cerrar-gestion-horas').addEventListener('click', () => dom.modalHoras.style.display = 'none');
             document.getElementById('btn-sumar').addEventListener('click', () => opHoras('suma'));
             document.getElementById('btn-restar').addEventListener('click', () => opHoras('resta'));
+            dom.btnUnlock.addEventListener('click', () => { if(confirm("¿Editar manual?")) { dom.inpHoras.disabled = false; dom.inpHoras.focus(); } });
             
-            // Unlock manual
-            dom.btnUnlock.addEventListener('click', () => {
-                if(confirm("¿Editar manualmente el saldo inicial?")) {
-                    dom.inpHoras.disabled = false;
-                    dom.inpHoras.focus();
-                }
-            });
-
             // Permutas
             document.getElementById('btn-add-permuta').addEventListener('click', () => dom.modalPerm.style.display = 'flex');
+            document.getElementById('btn-cancelar-permuta').addEventListener('click', () => dom.modalPerm.style.display = 'none');
             document.getElementById('btn-save-permuta').addEventListener('click', guardarPermuta);
             document.getElementById('btn-view-permuta').addEventListener('click', () => { renderListaPermutas(); dom.modalVerPerm.style.display = 'flex'; });
-
-            // Edición Solicitud
-            document.getElementById('edit-tipo').addEventListener('change', e => {
-                document.getElementById('edit-group-horas').classList.toggle('hidden', e.target.value !== 'horas');
-            });
+            document.getElementById('btn-cerrar-permutas').addEventListener('click', () => dom.modalVerPerm.style.display = 'none');
+            
+            // Editores
+            document.getElementById('edit-tipo').addEventListener('change', e => document.getElementById('edit-group-horas').classList.toggle('hidden', e.target.value !== 'horas'));
         }
 
-        // --- CARGA DATOS ---
         function cargarDatos() {
             db.ref('descansos/' + USER_ID).once('value').then(snap => {
                 if(snap.exists()) {
@@ -533,15 +440,11 @@
                     if(!datos.horas) datos.horas = [];
                     if(!datos.permutas) datos.permutas = [];
                     if(!datos.configuraciones) datos.configuraciones = {};
-                    
-                    // IMPORTANTE: Convertir 'computo' a número siempre para evitar errores de filtro
                     datos.solicitudes.forEach(s => s.computo = parseInt(s.computo));
                 }
-                
                 initSelectores();
                 dom.loading.classList.add('hidden');
                 dom.app.classList.remove('hidden');
-                
                 renderConfig(anioConfig);
                 renderUI();
             });
@@ -552,32 +455,27 @@
             [dom.selConfig, dom.selGestion, dom.selComputo, dom.selComputoEdit].forEach(sel => {
                 sel.innerHTML = '';
                 arr.forEach(y => {
-                    const o = document.createElement('option');
-                    o.value = y; o.textContent = y;
+                    const o = document.createElement('option'); o.value = y; o.textContent = y;
                     if(y===anioActual) o.selected = true;
                     sel.appendChild(o);
                 });
             });
         }
 
-        // --- RENDERIZADO UI (Cálculos Blindados) ---
         function renderUI() {
             dom.txtAnio.forEach(e => e.textContent = `(${anioGestion})`);
             const conf = datos.configuraciones[anioGestion] || {diasVacaciones:0, diasAsuntosPropios:0};
             
-            // 1. Contadores del AÑO SELECCIONADO (Filtro Estricto)
             const vacU = datos.solicitudes.filter(s => s.tipo==='vacaciones' && s.estado!=='denegado' && s.computo===anioGestion).length;
             const apU = datos.solicitudes.filter(s => s.tipo==='asuntos-propios' && s.estado!=='denegado' && s.computo===anioGestion).length;
             
             dom.vacDisp.textContent = Math.max(0, (conf.diasVacaciones||0) - vacU);
             dom.apDisp.textContent = Math.max(0, (conf.diasAsuntosPropios||0) - apU);
             
-            // 2. Horas Acumuladas (Total Global)
             const saldoH = getSaldoHorasGlobal();
             dom.horasAcum.textContent = saldoH.toFixed(2);
             dom.horasAcum.style.color = saldoH < 0 ? 'var(--danger-color)' : 'var(--success-color)';
             
-            // 3. Año Anterior & Caducidad
             const prev = anioGestion - 1;
             const confPrev = datos.configuraciones[prev] || {diasVacaciones:0, diasAsuntosPropios:0};
             const vacPrevU = datos.solicitudes.filter(s => s.tipo==='vacaciones' && s.estado!=='denegado' && s.computo===prev).length;
@@ -586,12 +484,10 @@
             let vPend = Math.max(0, (confPrev.diasVacaciones||0) - vacPrevU);
             let aPend = Math.max(0, (confPrev.diasAsuntosPropios||0) - apPrevU);
             
-            // Lógica fechas límite
             const hoy = new Date();
             const esAnioEnCurso = (anioGestion === new Date().getFullYear());
-            // Limites en el año actual de gestión
-            const limV = new Date(anioGestion, 0, 31); // 31 Ene
-            const limA = new Date(anioGestion, 1, 15); // 15 Feb
+            const limV = new Date(anioGestion, 0, 31);
+            const limA = new Date(anioGestion, 1, 15);
             
             if(esAnioEnCurso && hoy > limV && vPend > 0) dom.vacAnt.innerHTML = `<s style="color:#999">${vPend}</s> <span style="font-size:0.7em;color:red">Caducado</span>`;
             else dom.vacAnt.textContent = vPend;
@@ -599,24 +495,16 @@
             if(esAnioEnCurso && hoy > limA && aPend > 0) dom.apAnt.innerHTML = `<s style="color:#999">${aPend}</s> <span style="font-size:0.7em;color:red">Caducado</span>`;
             else dom.apAnt.textContent = aPend;
             
-            // Permutas
             dom.permDisp.textContent = datos.permutas.filter(p => parseInt(p.año) === anioGestion).length;
-            
             renderTabla();
         }
 
         function getSaldoHorasGlobal() {
             let saldo = 0;
-            // Base inicial del primer año
             const years = Object.keys(datos.configuraciones).map(Number).sort((a,b)=>a-b);
             const baseYear = years[0] || anioActual;
             if(datos.configuraciones[baseYear]) saldo += parseFloat(datos.configuraciones[baseYear].horasManuales || 0);
-            
-            // Todas las operaciones históricas
-            datos.horas.forEach(op => {
-                if(op.tipo==='suma') saldo += parseFloat(op.cantidad);
-                else saldo -= parseFloat(op.cantidad);
-            });
+            datos.horas.forEach(op => { if(op.tipo==='suma') saldo += parseFloat(op.cantidad); else saldo -= parseFloat(op.cantidad); });
             return saldo;
         }
 
@@ -624,14 +512,9 @@
             const c = datos.configuraciones[y] || {};
             dom.inpVac.value = c.diasVacaciones || '';
             dom.inpAp.value = c.diasAsuntosPropios || '';
-            
             const years = Object.keys(datos.configuraciones).map(Number).sort((a,b)=>a-b);
             const base = years[0] || anioActual;
-            
-            // Si no es el año base, es automático
             if(y > base) {
-                // Calcular saldo arrastrado hasta el final del año anterior
-                // (Simplificación: usamos saldo global para visualización)
                 dom.inpHoras.value = getSaldoHorasGlobal().toFixed(2);
                 dom.inpHoras.disabled = true;
                 dom.msgHoras.style.display = 'inline';
@@ -642,27 +525,21 @@
             }
         }
 
-        // --- TABLA Y EDICIÓN ---
         function renderTabla() {
             dom.tbody.innerHTML = '';
-            // Solo items del año seleccionado
             let list = datos.solicitudes.filter(s => s.computo === anioGestion);
             list.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-            
             if(filtroActual !== 'todos') {
                 list = list.filter(s => {
                     if(['vacaciones','asuntos-propios','horas'].includes(filtroActual)) return s.tipo === filtroActual;
                     return s.estado.toLowerCase() === filtroActual.toLowerCase() || (filtroActual==='tramite' && s.estado==='En Trámite');
                 });
             }
-            
             if(list.length === 0) return dom.tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">Sin registros</td></tr>';
             
             list.forEach(s => {
                 const idx = datos.solicitudes.indexOf(s);
                 const tr = document.createElement('tr');
-                
-                // Botones Compactos
                 const btns = `
                     <button onclick="cambiarEstado(${idx},'En Trámite')" class="btn-action btn-tramite">Trámite</button>
                     <button onclick="cambiarEstado(${idx},'Denegado')" class="btn-action btn-denegado">Denegado</button>
@@ -670,31 +547,44 @@
                     <button onclick="abrirEdicion(${idx})" class="btn-action btn-editar btn-icon" title="Editar">✏️</button>
                     <button onclick="eliminarSol(${idx})" class="btn-action btn-eliminar btn-icon" title="Borrar">🗑️</button>
                 `;
-                
-                tr.innerHTML = `
-                    <td>${fmtDate(s.fecha)}</td>
-                    <td>${fmtType(s.tipo)}${s.tipo==='horas'? ` (${s.horas}h)` : ''}</td>
-                    <td>${s.computo}</td>
-                    <td><span class="estado-badge ${s.estado.replace(/\s/g,'')}">${s.estado}</span></td>
-                    <td class="actions">${btns}</td>
-                `;
+                tr.innerHTML = `<td>${fmtDate(s.fecha)}</td><td>${fmtType(s.tipo)}${s.tipo==='horas'? ` (${s.horas}h)` : ''}</td><td>${s.computo}</td><td><span class="estado-badge ${s.estado.replace(/\s/g,'')}">${s.estado}</span></td><td class="actions">${btns}</td>`;
                 dom.tbody.appendChild(tr);
             });
         }
 
-        // --- EDICIÓN ---
+        // EDICIÓN HORAS
+        function abrirEditarHora(idx) {
+            const h = datos.horas[idx];
+            document.getElementById('edit-hora-index').value = idx;
+            document.getElementById('edit-hora-fecha').value = h.fecha;
+            document.getElementById('edit-hora-cantidad').value = h.cantidad;
+            document.getElementById('edit-hora-concepto').value = h.concepto;
+            document.getElementById('edit-hora-tipo').value = h.tipo;
+            dom.modalEditHora.style.display = 'flex';
+        }
+
+        function guardarEdicionHora() {
+            const idx = parseInt(document.getElementById('edit-hora-index').value);
+            const fecha = document.getElementById('edit-hora-fecha').value;
+            const cant = parseFloat(document.getElementById('edit-hora-cantidad').value);
+            const conc = document.getElementById('edit-hora-concepto').value;
+            const tipo = document.getElementById('edit-hora-tipo').value;
+            if(!fecha || !cant) return notificar("Datos incompletos", "error");
+            datos.horas[idx] = { ...datos.horas[idx], fecha, cantidad:cant, concepto:conc, tipo };
+            dom.modalEditHora.style.display='none';
+            guardarEnBD("Hora editada");
+            renderListaHoras();
+        }
+
         window.abrirEdicion = (idx) => {
             const s = datos.solicitudes[idx];
             document.getElementById('edit-index').value = idx;
             document.getElementById('edit-tipo').value = s.tipo;
             document.getElementById('edit-fecha').value = s.fecha;
             document.getElementById('edit-computo').value = s.computo;
-            
             const gh = document.getElementById('edit-group-horas');
             const ih = document.getElementById('edit-horas');
-            if(s.tipo==='horas') { gh.classList.remove('hidden'); ih.value = s.horas; }
-            else { gh.classList.add('hidden'); ih.value = ''; }
-            
+            if(s.tipo==='horas') { gh.classList.remove('hidden'); ih.value = s.horas; } else { gh.classList.add('hidden'); ih.value = ''; }
             dom.modalEdit.style.display = 'flex';
         };
 
@@ -705,29 +595,14 @@
             const fecha = document.getElementById('edit-fecha').value;
             const comp = parseInt(document.getElementById('edit-computo').value);
             const horas = parseFloat(document.getElementById('edit-horas').value);
-            
             if(!fecha) return notificar("Falta fecha", "error");
-            
-            // Si era horas, borrar operación vieja
-            if(solOld.tipo==='horas') {
-                const opIdx = datos.horas.findIndex(h => h.relacionado && h.fecha===solOld.fecha && h.cantidad===solOld.horas);
-                if(opIdx > -1) datos.horas.splice(opIdx,1);
-            }
-            
-            // Actualizar
+            if(solOld.tipo==='horas') { const opIdx = datos.horas.findIndex(h => h.relacionado && h.fecha===solOld.fecha); if(opIdx>-1) datos.horas.splice(opIdx,1); }
             solOld.tipo = tipo; solOld.fecha = fecha; solOld.computo = comp;
-            if(tipo==='horas') {
-                solOld.horas = horas;
-                datos.horas.push({ tipo:'resta', fecha, concepto:'Día (Editado)', cantidad:horas, relacionado:true, fechaReg:new Date().toISOString() });
-            } else {
-                delete solOld.horas;
-            }
-            
-            dom.modalEdit.style.display='none';
-            guardarEnBD("Editado correctamente");
+            if(tipo==='horas') { solOld.horas = horas; datos.horas.push({ tipo:'resta', fecha, concepto:'Día (Editado)', cantidad:horas, relacionado:true, fechaReg:new Date().toISOString() }); }
+            else { delete solOld.horas; }
+            dom.modalEdit.style.display='none'; guardarEnBD("Editado correctamente");
         };
 
-        // --- LOGICA ACCIONES ---
         function guardarConfig() {
             if(!datos.configuraciones[anioConfig]) datos.configuraciones[anioConfig] = {};
             datos.configuraciones[anioConfig].diasVacaciones = parseInt(dom.inpVac.value)||0;
@@ -736,121 +611,74 @@
             guardarEnBD("Configuración guardada");
         }
 
+        // --- CAMBIO CLAVE EN SOLICITUD: ESTADO POR DEFECTO ---
         function procesarSolicitud() {
-            const t = dom.selTipo.value;
-            const f = dom.inpFecha.value;
-            const c = parseInt(dom.selComputo.value);
-            const h = parseFloat(dom.inpHoraSol.value);
-            
+            const t = dom.selTipo.value; const f = dom.inpFecha.value; const c = parseInt(dom.selComputo.value); const h = parseFloat(dom.inpHoraSol.value);
             if(!f) return notificar("Fecha requerida", "error");
-            
-            // Validación Caducidad Año Anterior
             const hoy = new Date();
             if(c < hoy.getFullYear()) {
-                const limitV = new Date(c+1, 0, 31);
-                const limitA = new Date(c+1, 1, 15);
-                if(t==='vacaciones' && hoy > limitV) return notificar("Plazo vacaciones caducado", "error");
-                if(t==='asuntos-propios' && hoy > limitA) return notificar("Plazo asuntos caducado", "error");
+                const limV = new Date(c+1, 0, 31); const limA = new Date(c+1, 1, 15);
+                if(t==='vacaciones' && hoy > limV) return notificar("Plazo vacaciones caducado", "error");
+                if(t==='asuntos-propios' && hoy > limA) return notificar("Plazo asuntos caducado", "error");
             }
-
-            const sol = { tipo:t, fecha:f, computo:c, estado:'Pendiente', fechaReg:new Date().toISOString() };
-            if(t==='horas') {
-                sol.horas = h;
-                datos.horas.push({ tipo:'resta', fecha:f, concepto:'Día Solicitado', cantidad:h, relacionado:true, fechaReg:new Date().toISOString() });
-            }
-            
-            datos.solicitudes.push(sol);
-            guardarEnBD("Solicitud creada");
+            // AQUÍ ESTÁ EL CAMBIO: 'En Trámite' por defecto
+            const sol = { tipo:t, fecha:f, computo:c, estado:'En Trámite', fechaReg:new Date().toISOString() };
+            if(t==='horas') { sol.horas = h; datos.horas.push({ tipo:'resta', fecha:f, concepto:'Día Solicitado', cantidad:h, relacionado:true, fechaReg:new Date().toISOString() }); }
+            datos.solicitudes.push(sol); guardarEnBD("Solicitud creada");
         }
 
         function opHoras(tipo) {
-            const f = dom.inpFechaOp.value;
-            const c = dom.inpConcOp.value;
-            const h = parseFloat(dom.inpCantOp.value);
+            const f = dom.inpFechaOp.value; const c = dom.inpConcOp.value; const h = parseFloat(dom.inpCantOp.value);
             if(!f || !c || !h) return notificar("Datos incompletos", "error");
-            
             datos.horas.push({ tipo, fecha:f, concepto:c, cantidad:h, fechaReg:new Date().toISOString() });
-            document.getElementById('concepto-op-horas').value='';
-            guardarEnBD("Operación registrada");
-            renderListaHoras();
+            document.getElementById('concepto-op-horas').value=''; guardarEnBD("Operación registrada"); renderListaHoras();
         }
 
         function guardarPermuta() {
-            datos.permutas.push({
-                agente: document.getElementById('p-agente').value,
-                fechaYo: document.getElementById('p-fecha-yo').value,
-                turnoYo: document.getElementById('p-turno-yo').value,
-                fechaEl: document.getElementById('p-fecha-el').value,
-                turnoEl: document.getElementById('p-turno-el').value,
-                año: anioGestion,
-                fechaReg: new Date().toISOString()
-            });
-            dom.modalPerm.style.display='none';
-            guardarEnBD("Permuta guardada");
+            datos.permutas.push({ agente: document.getElementById('p-agente').value, fechaPropia: document.getElementById('p-fecha-yo').value, turnoPropio: document.getElementById('p-turno-yo').value, fechaAgente: document.getElementById('p-fecha-el').value, turnoAgente: document.getElementById('p-turno-el').value, año: anioGestion, fechaReg: new Date().toISOString() });
+            dom.modalPerm.style.display='none'; guardarEnBD("Permuta guardada");
         }
 
-        // --- GLOBALES & LISTAS ---
-        window.cambiarEstado = (idx, st) => { datos.solicitudes[idx].estado = st; guardarEnBD("Estado actualizado"); };
-        window.eliminarSol = (idx) => {
-            if(!confirm("¿Borrar?")) return;
-            const s = datos.solicitudes[idx];
-            if(s.tipo==='horas') {
-                const opIdx = datos.horas.findIndex(h => h.relacionado && h.fecha===s.fecha && h.cantidad===s.horas);
-                if(opIdx > -1) datos.horas.splice(opIdx,1);
-            }
-            datos.solicitudes.splice(idx,1);
-            guardarEnBD("Eliminado");
-        };
-        window.eliminarHora = (idx) => { if(confirm("¿Borrar?")) { datos.horas.splice(idx,1); guardarEnBD("Hora borrada"); renderListaHoras(); } };
-        window.eliminarPermuta = (idx) => { if(confirm("¿Borrar?")) { datos.permutas.splice(idx,1); guardarEnBD("Permuta borrada"); renderListaPermutas(); } };
-
         function renderListaHoras() {
-            dom.listHoras.innerHTML = '';
-            // Mostrar TODO el historial
-            const list = [...datos.horas].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-            list.forEach(h => {
-                const idx = datos.horas.indexOf(h);
-                dom.listHoras.innerHTML += `
-                    <div class="item-row">
-                        <div><strong>${fmtDate(h.fecha)}</strong>: ${h.concepto}</div>
-                        <div style="display:flex;align-items:center;gap:5px;">
-                            <span class="${h.tipo==='suma'?'horas-pos':'horas-neg'}">${h.tipo==='suma'?'+':'-'} ${h.cantidad}h</span>
-                            <button onclick="eliminarHora(${idx})" class="btn-action btn-eliminar btn-icon">🗑️</button>
-                        </div>
-                    </div>`;
-            });
+            dom.listHoras.innerHTML = ''; const list = [...datos.horas].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+            list.forEach(h => { const idx = datos.horas.indexOf(h); dom.listHoras.innerHTML += `<div class="item-row"><div><strong>${fmtDate(h.fecha)}</strong>: ${h.concepto}</div><div style="display:flex;align-items:center;gap:5px;"><span class="${h.tipo==='suma'?'horas-pos':'horas-neg'}">${h.tipo==='suma'?'+':'-'} ${h.cantidad}h</span><button onclick="abrirEditarHora(${idx})" class="btn-action btn-editar btn-icon">✏️</button><button onclick="eliminarHora(${idx})" class="btn-action btn-eliminar btn-icon">🗑️</button></div></div>`; });
         }
 
         function renderListaPermutas() {
-            document.getElementById('lista-permutas').innerHTML = '';
-            datos.permutas.filter(p=>parseInt(p.año)===anioGestion).forEach(p => {
-                const idx = datos.permutas.indexOf(p);
-                document.getElementById('lista-permutas').innerHTML += `
-                    <div class="item-row">
-                        <div><strong>${p.agente}</strong> <small>${fmtDate(p.fechaYo)} ↔ ${fmtDate(p.fechaEl)}</small></div>
-                        <button onclick="eliminarPermuta(${idx})" class="btn-action btn-eliminar btn-icon">🗑️</button>
-                    </div>`;
+            dom.listPermutas.innerHTML = ''; 
+            const list = [...datos.permutas].sort((a,b) => new Date(b.fechaReg) - new Date(a.fechaReg)); 
+            list.forEach(p => { 
+                const idx = datos.permutas.indexOf(p); 
+                // Compatibilidad con datos antiguos (fechaYo vs fechaPropia)
+                const fYo = p.fechaPropia || p.fechaYo;
+                const tYo = p.turnoPropio || p.turnoYo;
+                const fEl = p.fechaAgente || p.fechaEl;
+                const tEl = p.turnoAgente || p.turnoEl;
+
+                dom.listPermutas.innerHTML += `
+                    <div class="permuta-display" style="border-bottom:1px solid #eee; padding:15px 0;">
+                        <div class="permuta-header">
+                            Agente: ${p.agente} <span style="font-size:0.85rem; font-weight:normal; color:#888;">(${p.año})</span>
+                        </div>
+                        <div class="permuta-details">
+                            <div class="permuta-chip"><strong>279:</strong> ${fmtDate(fYo)} (${fmtTurno(tYo)})</div>
+                            <div class="permuta-chip"><strong>${p.agente}:</strong> ${fmtDate(fEl)} (${fmtTurno(tEl)})</div>
+                            <button onclick="eliminarPermuta(${idx})" class="btn-action btn-eliminar btn-icon" style="margin-left:auto;">🗑️</button>
+                        </div>
+                    </div>`; 
             });
         }
 
-        // --- UTILS & DB ---
-        function guardarEnBD(msg) {
-            renderUI(); // Update optimista
-            db.ref('descansos/' + USER_ID).set(datos).then(() => {
-                notificar(msg, 'success');
-                renderUI(); // Sync final
-            });
-        }
+        window.cambiarEstado = (idx, st) => { datos.solicitudes[idx].estado = st; guardarEnBD("Estado actualizado"); };
+        window.eliminarSol = (idx) => { if(!confirm("¿Borrar?")) return; const s = datos.solicitudes[idx]; if(s.tipo==='horas') { const opIdx = datos.horas.findIndex(h => h.relacionado && h.fecha===s.fecha); if(opIdx>-1) datos.horas.splice(opIdx,1); } datos.solicitudes.splice(idx,1); guardarEnBD("Eliminado"); };
+        window.eliminarHora = (idx) => { if(confirm("¿Borrar?")) { datos.horas.splice(idx,1); guardarEnBD("Hora borrada"); renderListaHoras(); } };
+        window.eliminarPermuta = (idx) => { if(confirm("¿Borrar?")) { datos.permutas.splice(idx,1); guardarEnBD("Permuta borrada"); renderListaPermutas(); } };
 
-        function notificar(msg, type) {
-            const d = document.createElement('div'); d.className = `notification ${type==='success'?'notif-success':'notif-error'}`;
-            d.textContent = msg; document.getElementById('notification-area').appendChild(d);
-            setTimeout(() => d.remove(), 3000);
-        }
-
+        function guardarEnBD(msg) { renderUI(); db.ref('descansos/' + USER_ID).set(datos).then(() => { notificar(msg, 'success'); renderUI(); }); }
+        function notificar(msg, type) { const d = document.createElement('div'); d.className = `notification ${type==='success'?'notif-success':'notif-error'}`; d.textContent = msg; document.getElementById('notification-area').appendChild(d); setTimeout(() => d.remove(), 3000); }
         function fmtDate(f) { if(!f)return''; const p=f.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
         function fmtType(t) { return t.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()); }
-
+        function fmtTurno(t) { if(!t) return ''; return t.charAt(0).toUpperCase() + t.slice(1); }
     </script>
 </body>
 </html>

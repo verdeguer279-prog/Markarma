@@ -6,7 +6,11 @@
     <title>Gestión de Vacaciones y Asuntos Propios</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
     <style>
+        /* =========================================
+           ESTILOS (DISEÑO ARREGLADO Y LIMPIO)
+           ========================================= */
         :root {
             --primary-color: #3498db;
             --secondary-color: #2980b9;
@@ -14,653 +18,212 @@
             --warning-color: #f39c12;
             --danger-color: #e74c3c;
             --light-color: #ecf0f1;
-            --dark-color: #34495e;
+            --dark-color: #2c3e50;
+            --gray-border: #e0e0e0;
         }
         
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f6f9; color: #333; line-height: 1.5; font-size: 14px; } /* Fuente base ligeramente más pequeña para compactar */
+        .container { max-width: 1400px; margin: 0 auto; padding: 15px; }
         
-        body {
-            background-color: #f5f7fa;
-            color: #333;
-            line-height: 1.6;
-        }
+        /* Header */
+        header { background-color: var(--primary-color); color: white; padding: 12px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; }
+        h1 { font-size: 1.5rem; font-weight: 600; margin: 0; }
         
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+        /* Botones Generales */
+        .btn { display: inline-block; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; text-decoration: none; transition: all 0.2s; color: white; font-size: 0.9rem; }
+        .btn-primary { background-color: var(--primary-color); }
+        .btn-primary:hover { background-color: var(--secondary-color); }
+        .btn-secondary { background-color: #ecf0f1; color: #333; border: 1px solid #ccc; }
+        .btn-secondary:hover { background-color: #dcdcdc; }
+        .btn-small { padding: 4px 10px; font-size: 0.8rem; }
         
-        header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 15px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
+        /* Cards */
+        .card { background-color: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 20px; height: 100%; border: 1px solid var(--gray-border); }
+        .card-title-left { font-size: 1.2rem; margin-bottom: 15px; color: var(--dark-color); border-bottom: 1px solid #eee; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
         
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+        /* Grid Estado (Top Dashboard) */
+        .status-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .status-card { background-color: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 15px; text-align: center; border: 1px solid var(--gray-border); }
+        .status-value { font-size: 2.2rem; font-weight: 700; margin: 10px 0; line-height: 1; }
+        .vacaciones { color: var(--primary-color); }
+        .asuntos-propios { color: var(--warning-color); }
+        .horas-acumuladas { color: var(--success-color); }
+        .anio-anterior { color: #9b59b6; }
+        .permutas { color: #8e44ad; }
         
-        h1 {
-            font-size: 1.8rem;
-        }
+        /* Layout columnas */
+        .form-row { display: flex; gap: 20px; align-items: flex-start; }
+        .form-column { flex: 1; display: flex; flex-direction: column; }
         
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
+        /* Formularios alineados */
+        .form-group { margin-bottom: 15px; width: 100%; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; font-size: 0.9rem; }
+        input, select { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.95rem; background-color: #fff; }
+        input:disabled { background-color: #f0f0f0; color: #777; }
         
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
+        /* Tabla - EL CAMBIO IMPORTANTE */
+        .table-container { overflow-x: auto; margin-top: 15px; border: 1px solid var(--gray-border); border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; } /* Mínimo ancho para evitar aplastamiento */
         
-        .btn-primary:hover {
-            background-color: var(--secondary-color);
-        }
-        
-        .btn-secondary {
-            background-color: var(--light-color);
-            color: var(--dark-color);
-        }
-        
-        .btn-secondary:hover {
-            background-color: #d5dbdb;
-        }
-        
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 0.8rem;
-            margin: 2px;
-        }
-        
-        .card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-            height: 100%;
-        }
-        
-        .card-title {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: var(--dark-color);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .card-title-left {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: var(--dark-color);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .card-title-config {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .selector-anio-small {
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-            width: auto;
-            min-width: 80px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-        
-        .status-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-        
-        .status-card {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 15px;
-            text-align: center;
-        }
-        
-        .status-value {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 10px 0;
-        }
-        
-        .vacaciones {
-            color: var(--primary-color);
-        }
-        
-        .asuntos-propios {
-            color: var(--warning-color);
-        }
-        
-        .horas-acumuladas {
-            color: var(--success-color);
-        }
-        
-        .anio-anterior {
-            color: #9b59b6;
-        }
-        
-        .permutas {
-            color: #8e44ad;
-        }
-        
-        .status-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        
-        .table-container {
-            overflow-x: auto;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-        
-        th, td {
-            padding: 8px 10px;
-            border-bottom: 1px solid #e1e1e1;
-            vertical-align: middle;
-            text-align: left;
-        }
-        
-        th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-        }
+        /* Anchos de columnas definidos para dar espacio a los botones */
+        th:nth-child(1) { width: 12%; } /* Fecha */
+        th:nth-child(2) { width: 15%; } /* Tipo */
+        th:nth-child(3) { width: 8%; }  /* Año */
+        th:nth-child(4) { width: 10%; } /* Estado */
+        th:nth-child(5) { width: 55%; } /* Acciones (La más ancha) */
 
-        th:last-child {
-            text-align: right;
+        th, td { padding: 10px 12px; border-bottom: 1px solid #eee; text-align: left; vertical-align: middle; }
+        th { background-color: #f8f9fa; font-weight: 600; color: #444; }
+        td { font-size: 0.95rem; }
+        
+        /* Badges de Estado */
+        .estado-badge { padding: 3px 8px; border-radius: 12px; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block; text-align: center; min-width: 80px;}
+        .En.Trámite, .tramite { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .Denegado, .denegado { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .Disfrutado, .disfrutado { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .Pendiente, .pendiente { background-color: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
+        
+        /* BOTONES DE ACCIÓN - DISEÑO COMPACTO Y LIMPIO */
+        .actions { 
+            display: flex; 
+            gap: 4px; /* Espacio pequeño entre botones */
+            justify-content: flex-end; 
+            align-items: center; 
+            flex-wrap: nowrap; /* Intentar no saltar de línea si es posible */
         }
         
-        /* Estados con colores brillantes e intensos y márgenes */
-        .tramite {
-            background-color: #FFEB3B;
-            color: #333;
+        .btn-action { 
+            padding: 5px 10px; 
+            font-size: 0.8rem; 
+            border: none; 
+            border-radius: 3px; 
+            cursor: pointer; 
+            color: white; /* Texto blanco para mejor contraste */
             font-weight: 600;
-            border-radius: 4px;
-            padding: 4px 8px;
-            text-align: center;
-            margin: 2px 0;
-            display: inline-block;
-        }
-        
-        .denegado {
-            background-color: #F44336;
-            color: white;
-            font-weight: 600;
-            border-radius: 4px;
-            padding: 4px 8px;
-            text-align: center;
-            margin: 2px 0;
-            display: inline-block;
-        }
-        
-        .disfrutado {
-            background-color: #4CAF50;
-            color: white;
-            font-weight: 600;
-            border-radius: 4px;
-            padding: 4px 8px;
-            text-align: center;
-            margin: 2px 0;
-            display: inline-block;
-        }
-        
-        .pendiente {
-            background-color: #9E9E9E;
-            color: white;
-            font-weight: 600;
-            border-radius: 4px;
-            padding: 4px 8px;
-            text-align: center;
-            margin: 2px 0;
-            display: inline-block;
-        }
-        
-        .actions {
-            display: flex;
-            gap: 5px;
-            justify-content: flex-end;
-        }
-        
-        .btn-action {
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            border: none;
-            border-radius: 3px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-        
-        /* Botones de acción con colores brillantes e intensos */
-        .btn-tramite {
-            background-color: #FFEB3B;
-            color: #333;
-            border: 1px solid #FBC02D;
-        }
-        
-        .btn-tramite:hover {
-            background-color: #FBC02D;
-        }
-        
-        .btn-denegado {
-            background-color: #F44336;
-            color: white;
-            border: 1px solid #D32F2F;
-        }
-        
-        .btn-denegado:hover {
-            background-color: #D32F2F;
-        }
-        
-        .btn-disfrutado {
-            background-color: #4CAF50;
-            color: white;
-            border: 1px solid #388E3C;
-        }
-        
-        .btn-disfrutado:hover {
-            background-color: #388E3C;
-        }
-        
-        .btn-eliminar {
-            background-color: #7f8c8d;
-            color: white;
-            border: 1px solid #636e72;
-            padding: 5px 8px;
-        }
-        
-        .btn-eliminar:hover {
-            background-color: #636e72;
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-        
-        .success {
-            background-color: #d1edff;
-            color: #0c5460;
-            padding: 10px;
-            border-radius: 4px;
-            margin-bottom: 15px;
-        }
-        
-        .form-row {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .form-column {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .filtros {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .btn-filtro {
-            background-color: #e9ecef;
-            border: 1px solid #ced4da;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .btn-filtro.active {
-            background-color: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-        
-        /* Modal para gestión de horas */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.5);
-            z-index: 1000;
+            white-space: nowrap; /* Evitar que el texto del botón salte */
+            display: inline-flex;
+            align-items: center;
             justify-content: center;
-            align-items: center;
+            height: 28px;
         }
         
-        .modal-content {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+        /* Colores sólidos para los botones de acción (más moderno) */
+        .btn-tramite { background-color: #f39c12; } 
+        .btn-tramite:hover { background-color: #e67e22; }
         
-        .modal-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: var(--dark-color);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-        }
+        .btn-denegado { background-color: #e74c3c; } 
+        .btn-denegado:hover { background-color: #c0392b; }
         
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 20px;
-        }
+        .btn-disfrutado { background-color: #27ae60; } 
+        .btn-disfrutado:hover { background-color: #219150; }
         
-        .form-row-modal {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 15px;
+        /* Botones iconos (Editar / Borrar) */
+        .btn-icon {
+            width: 28px;
+            padding: 0;
+            font-size: 1rem;
         }
+        .btn-eliminar { background-color: #7f8c8d; }
+        .btn-eliminar:hover { background-color: #636e72; }
         
-        .form-column-modal {
-            flex: 1;
+        .btn-editar { background-color: #3498db; }
+        .btn-editar:hover { background-color: #2980b9; }
+        
+        /* Filtros */
+        .filtros { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .btn-filtro { background: white; border: 1px solid #ddd; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.85rem; color: #555; transition: all 0.2s; }
+        .btn-filtro:hover { background-color: #f0f0f0; }
+        .btn-filtro.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        
+        /* Modales */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background-color: white; padding: 25px; border-radius: 8px; width: 95%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-title { font-size: 1.4rem; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; color: var(--dark-color); }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
+        
+        /* Historiales */
+        .historial-list { max-height: 250px; overflow-y: auto; border: 1px solid #eee; padding: 0; border-radius: 4px; margin-top: 10px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; background: #fff; }
+        .item-row:last-child { border-bottom: none; }
+        .item-row:nth-child(even) { background-color: #f9f9f9; }
+        .horas-pos { color: var(--success-color); font-weight: bold; }
+        .horas-neg { color: var(--danger-color); font-weight: bold; }
+        
+        /* Utilidades */
+        .hidden { display: none !important; }
+        .loading { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:3000; display:flex; justify-content:center; align-items:center; font-size:1.2rem; color:var(--primary-color); }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 4px; color: white; z-index: 4000; animation: slideIn 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; }
+        .notif-success { background-color: var(--success-color); }
+        .notif-error { background-color: var(--danger-color); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .form-row { flex-direction: column; }
+            .status-grid { grid-template-columns: repeat(2, 1fr); }
+            /* En móvil, permitimos que la tabla haga scroll horizontal */
+            .actions { flex-wrap: wrap; justify-content: flex-start; } 
+            .btn-action { margin-bottom: 3px; }
         }
-        
-        .horas-operacion {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .btn-horas {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            flex: 1;
-        }
-        
-        .btn-sumar {
-            background-color: #27ae60;
-            color: white;
-        }
-        
-        .btn-sumar:hover {
-            background-color: #219653;
-        }
-        
-        .btn-restar {
-            background-color: #e74c3c;
-            color: white;
-        }
-        
-        .btn-restar:hover {
-            background-color: #c0392b;
-        }
-        
-        .historial-horas {
-            margin-top: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 10px;
-        }
-        
-        .item-horas {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .info-horas {
-            flex-grow: 1;
-        }
-        
-        .horas-positivas {
-            color: #27ae60;
-            font-weight: bold;
-        }
-        
-        .horas-negativas {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        
-        .btn-editar-horas {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 1.2rem;
-            margin-left: 10px;
-            color: var(--primary-color);
-        }
-        
-        .btn-editar-horas:hover {
-            color: var(--secondary-color);
-        }
-        
-        .permutas-list {
-            margin-top: 15px;
-        }
-        
-        .permuta-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .permuta-info {
-            flex-grow: 1;
-        }
-        
-        .permuta-fechas {
-            display: flex;
-            gap: 10px;
-            margin-top: 5px;
-        }
-        
-        .fecha-item {
-            background-color: #f8f9fa;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-        
-        @media (max-width: 1024px) {
-            .form-row {
-                flex-direction: column;
-            }
-            
-            .form-row-modal {
-                flex-direction: column;
-            }
-            
-            .status-grid {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .status-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .actions {
-                flex-direction: column;
-            }
-            
-            .filtros {
-                flex-direction: column;
-            }
-            
-            .card-title {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .card-title-left {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .card-title-config {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-            
-            .permuta-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .permuta-fechas {
-                flex-direction: column;
-            }
-            
-            .horas-operacion {
-                flex-direction: column;
-            }
-            
-            .item-horas {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
+        @media (max-width: 600px) {
+            .status-grid { grid-template-columns: 1fr; }
+            .header-content { flex-direction: column; text-align: center; gap: 10px; }
         }
     </style>
 </head>
 <body>
     <header>
-        <div class="container">
-            <div class="header-content">
-                <h1>Sistema de Gestión de Vacaciones y Asuntos Propios</h1>
-                <a href="index.html" class="btn btn-secondary">Volver al Inicio</a>
-            </div>
+        <div class="container header-content">
+            <h1>Gestión de Vacaciones y Asuntos Propios</h1>
+            <a href="index.html" class="btn btn-secondary">Volver al Inicio</a>
         </div>
     </header>
     
     <div class="container">
-        <div id="loading" class="loading">
-            <p>Cargando datos...</p>
+        <div id="notification-area"></div>
+
+        <div id="loading">
+            <div>Cargando sistema...</div>
         </div>
         
         <div id="app" class="hidden">
+            
             <div class="status-grid">
                 <div class="status-card">
-                    <h3>Vacaciones Disponibles <span id="anio-actual-texto"></span></h3>
-                    <div class="status-value vacaciones" id="vacaciones-disponibles">0</div>
-                    <p>Días restantes</p>
+                    <h3>Vacaciones <span class="anio-display"></span></h3>
+                    <div class="status-value vacaciones" id="vacaciones-disponibles">--</div>
+                    <p style="font-size:0.85rem; color:#777;">Días restantes</p>
                 </div>
+                
                 <div class="status-card">
-                    <h3>Asuntos Propios Disponibles <span id="anio-actual-texto-2"></span></h3>
-                    <div class="status-value asuntos-propios" id="asuntos-propios-disponibles">0</div>
-                    <p>Días restantes</p>
+                    <h3>Asuntos Propios <span class="anio-display"></span></h3>
+                    <div class="status-value asuntos-propios" id="asuntos-propios-disponibles">--</div>
+                    <p style="font-size:0.85rem; color:#777;">Días restantes</p>
                 </div>
+                
                 <div class="status-card">
-                    <h3>Horas Acumuladas <span id="anio-actual-texto-3"></span></h3>
-                    <div class="status-value horas-acumuladas" id="horas-acumuladas">0</div>
-                    <p>Horas disponibles</p>
-                    <div class="status-buttons">
-                        <button id="btn-gestionar-horas" class="btn btn-primary btn-small">Gestionar Horas</button>
-                    </div>
+                    <h3>Bolsa de Horas</h3>
+                    <div class="status-value horas-acumuladas" id="horas-acumuladas">--</div>
+                    <p style="font-size:0.85rem; color:#777;">Acumulado Total Histórico</p>
+                    <button id="btn-gestionar-horas" class="btn btn-primary btn-small" style="margin-top:5px;">Gestionar Horas</button>
                 </div>
+                
                 <div class="status-card">
-                    <h3>Días del Año Anterior</h3>
-                    <div class="status-value anio-anterior" id="vacaciones-anio-anterior">0</div>
-                    <p>Vacaciones pendientes</p>
-                    <div class="status-value anio-anterior" id="asuntos-anio-anterior">0</div>
-                    <p>Asuntos propios pendientes</p>
+                    <h3>Año Anterior</h3>
+                    <div class="status-value anio-anterior" id="vacaciones-anio-anterior">--</div>
+                    <p style="font-size:0.85rem; color:#777;">Vacaciones (Límite 31 Ene)</p>
+                    <div class="status-value anio-anterior" id="asuntos-anio-anterior" style="font-size:1.5rem; margin-top:5px;">--</div>
+                    <p style="font-size:0.85rem; color:#777;">Asuntos (Límite 15 Feb)</p>
                 </div>
+                
                 <div class="status-card">
-                    <h3>Permutas Realizadas <span id="anio-actual-texto-4"></span></h3>
+                    <h3>Permutas <span class="anio-display"></span></h3>
                     <div class="status-value permutas" id="permutas-realizadas">0</div>
-                    <p>Permutas este año</p>
                     <div class="status-buttons">
-                        <button id="btn-añadir-permuta" class="btn btn-primary btn-small">Añadir</button>
-                        <button id="btn-ver-permutas" class="btn btn-secondary btn-small">Ver</button>
+                        <button id="btn-add-permuta" class="btn btn-primary btn-small">Añadir</button>
+                        <button id="btn-view-permuta" class="btn btn-secondary btn-small">Ver</button>
                     </div>
                 </div>
             </div>
@@ -668,74 +231,75 @@
             <div class="form-row">
                 <div class="form-column">
                     <div class="card">
-                        <h2 class="card-title-left">
+                        <div class="card-title-left">
                             <span>Planificación Anual</span>
-                            <select id="selector-anio-config" class="selector-anio-small">
-                                <!-- Opciones se llenarán con JavaScript -->
-                            </select>
-                        </h2>
-                        <div class="form-group">
-                            <label for="dias-vacaciones">Días de Vacaciones para este año:</label>
-                            <input type="number" id="dias-vacaciones" min="0" step="1">
+                            <select id="selector-anio-config" class="selector-anio-small"></select>
+                        </div>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div class="form-group">
+                                <label>Días Vacaciones:</label>
+                                <input type="number" id="dias-vacaciones" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Días Asuntos Propios:</label>
+                                <input type="number" id="dias-asuntos-propios" min="0">
+                            </div>
                         </div>
                         <div class="form-group">
-                            <label for="dias-asuntos-propios">Días de Asuntos Propios para este año:</label>
-                            <input type="number" id="dias-asuntos-propios" min="0" step="1">
+                            <label>Saldo Inicial Horas (1 Ene):</label>
+                            <div style="display:flex; gap:5px;">
+                                <input type="number" id="horas-manuales" step="0.5">
+                                <button id="btn-unlock" type="button" title="Editar manualmente" style="border:1px solid #ccc; background:#fff; cursor:pointer; padding:0 8px;">🔓</button>
+                            </div>
+                            <small id="msg-horas-auto" style="color:#27ae60; font-size:0.8rem; display:none;">* Calculado automáticamente desde el año anterior</small>
                         </div>
-                        <div class="form-group">
-                            <label for="horas-manuales" id="label-horas-manuales">Horas Acumuladas a 1 de Enero <span id="anio-horas-texto"></span>:</label>
-                            <input type="number" id="horas-manuales" min="0" step="0.5">
-                        </div>
-                        <button id="btn-guardar-config" class="btn btn-primary">Guardar Configuración</button>
+                        <button id="btn-guardar-config" class="btn btn-primary" style="width:100%; margin-top:10px;">Guardar Configuración</button>
                     </div>
                 </div>
                 
                 <div class="form-column">
                     <div class="card">
-                        <h2 class="card-title" style="color: var(--success-color); font-weight: bold;">Solicitar Día de Descanso</h2>
+                        <h2 class="card-title-left" style="color:var(--success-color)">Solicitar Descanso</h2>
                         <div class="form-group">
-                            <label for="tipo-descanso">Tipo de Descanso:</label>
+                            <label>Tipo:</label>
                             <select id="tipo-descanso">
                                 <option value="vacaciones">Vacaciones</option>
                                 <option value="asuntos-propios">Asuntos Propios</option>
                                 <option value="horas">Horas Sueltas</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="fecha-descanso">Fecha del Descanso:</label>
-                            <input type="date" id="fecha-descanso">
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                            <div class="form-group">
+                                <label>Fecha:</label>
+                                <input type="date" id="fecha-descanso">
+                            </div>
+                            <div class="form-group">
+                                <label>Cómputo (Año):</label>
+                                <select id="computo"></select>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label for="computo">Año de Cómputo:</label>
-                            <select id="computo">
-                                <!-- Opciones se llenarán con JavaScript -->
-                            </select>
+                        <div class="form-group hidden" id="group-horas-cantidad">
+                            <label>Cantidad Horas:</label>
+                            <input type="number" id="horas-solicitadas" value="8" step="0.5">
                         </div>
-                        <div class="form-group" id="horas-grupo" style="display: none;">
-                            <label for="horas-solicitadas">Horas Solicitadas:</label>
-                            <input type="number" id="horas-solicitadas" min="0.5" step="0.5" value="8">
-                        </div>
-                        <button id="btn-solicitar" class="btn btn-primary">Solicitar Día</button>
+                        <button id="btn-solicitar" class="btn btn-primary" style="width:100%; margin-top:10px;">Registrar Solicitud</button>
                     </div>
                 </div>
             </div>
             
             <div class="card">
                 <div class="card-title-left">
-                    <span>Gestión de Descansos</span>
-                    <select id="selector-anio-gestion" class="selector-anio-small">
-                        <!-- Opciones se llenarán con JavaScript -->
-                    </select>
+                    <span>Historial de Solicitudes</span>
+                    <select id="selector-anio-gestion" class="selector-anio-small" style="font-size:1.1rem; padding:2px 5px;"></select>
                 </div>
                 
                 <div class="filtros">
                     <button class="btn-filtro active" data-filtro="todos">Todos</button>
                     <button class="btn-filtro" data-filtro="vacaciones">Vacaciones</button>
-                    <button class="btn-filtro" data-filtro="asuntos-propios">Asuntos Propios</button>
+                    <button class="btn-filtro" data-filtro="asuntos-propios">Asuntos P.</button>
                     <button class="btn-filtro" data-filtro="horas">Horas</button>
                     <button class="btn-filtro" data-filtro="pendiente">Pendientes</button>
-                    <button class="btn-filtro" data-filtro="tramite">En Trámite</button>
-                    <button class="btn-filtro" data-filtro="denegado">Denegados</button>
+                    <button class="btn-filtro" data-filtro="tramite">Trámite</button>
                     <button class="btn-filtro" data-filtro="disfrutado">Disfrutados</button>
                 </div>
                 
@@ -745,117 +309,107 @@
                             <tr>
                                 <th>Fecha</th>
                                 <th>Tipo</th>
-                                <th>Año Cómputo</th>
+                                <th>Cómputo</th>
                                 <th>Estado</th>
-                                <th>Acciones</th>
+                                <th style="text-align:right">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="cuerpo-tabla">
-                            <!-- Filas se llenarán con JavaScript -->
-                        </tbody>
+                        <tbody id="cuerpo-tabla"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal para gestión de horas -->
-    <div id="modal-gestion-horas" class="modal">
+    <div id="modal-editar-solicitud" class="modal">
         <div class="modal-content">
-            <h2 class="modal-title">Gestión de Horas Acumuladas <span id="anio-gestion-horas-texto"></span></h2>
-            
+            <h2 class="modal-title">Editar Solicitud</h2>
+            <input type="hidden" id="edit-index">
             <div class="form-group">
-                <label for="fecha-operacion-horas">Fecha de la operación:</label>
-                <input type="date" id="fecha-operacion-horas">
+                <label>Tipo:</label>
+                <select id="edit-tipo">
+                    <option value="vacaciones">Vacaciones</option>
+                    <option value="asuntos-propios">Asuntos Propios</option>
+                    <option value="horas">Horas Sueltas</option>
+                </select>
             </div>
-            
-            <div class="form-group">
-                <label for="concepto-horas">Concepto:</label>
-                <input type="text" id="concepto-horas" placeholder="Descripción de la operación">
-            </div>
-            
-            <div class="form-group">
-                <label for="cantidad-horas">Cantidad de horas:</label>
-                <input type="number" id="cantidad-horas" min="0.5" step="0.5" value="1">
-            </div>
-            
-            <div class="horas-operacion">
-                <button id="btn-sumar-horas" class="btn-horas btn-sumar">Sumar Horas</button>
-                <button id="btn-restar-horas" class="btn-horas btn-restar">Restar Horas</button>
-            </div>
-            
-            <div class="historial-horas" id="historial-horas">
-                <h3>Historial de Operaciones</h3>
-                <div id="lista-horas">
-                    <!-- Aquí se cargarán las operaciones de horas -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div class="form-group">
+                    <label>Fecha:</label>
+                    <input type="date" id="edit-fecha">
+                </div>
+                <div class="form-group">
+                    <label>Año Cómputo:</label>
+                    <select id="edit-computo"></select>
                 </div>
             </div>
-            
+            <div class="form-group hidden" id="edit-group-horas">
+                <label>Horas:</label>
+                <input type="number" id="edit-horas" step="0.5">
+            </div>
             <div class="modal-actions">
-                <button id="btn-cerrar-gestion-horas" class="btn btn-secondary">Cerrar</button>
+                <button onclick="document.getElementById('modal-editar-solicitud').style.display='none'" class="btn btn-secondary">Cancelar</button>
+                <button onclick="guardarEdicionSolicitud()" class="btn btn-primary">Guardar Cambios</button>
             </div>
         </div>
     </div>
 
-    <!-- Modales existentes para permutas -->
+    <div id="modal-horas" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Gestión de Bolsa de Horas (Histórico)</h2>
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
+                <div class="form-group"><label>Fecha:</label><input type="date" id="fecha-op-horas"></div>
+                <div class="form-group"><label>Horas:</label><input type="number" id="cantidad-op-horas" value="1" step="0.5"></div>
+            </div>
+            <div class="form-group">
+                <label>Concepto:</label>
+                <input type="text" id="concepto-op-horas" placeholder="Ej: Juicio, Compensación...">
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button id="btn-sumar" class="btn btn-primary" style="flex:1; background-color:var(--success-color)">+ Añadir (Haber)</button>
+                <button id="btn-restar" class="btn btn-primary" style="flex:1; background-color:var(--danger-color)">- Restar (Debe)</button>
+            </div>
+            <h4>Historial de Movimientos</h4>
+            <div class="historial-list" id="lista-horas"></div>
+            <div class="modal-actions">
+                <button onclick="document.getElementById('modal-horas').style.display='none'" class="btn btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <div id="modal-permuta" class="modal">
         <div class="modal-content">
-            <h2 class="modal-title">Añadir Nueva Permuta</h2>
-            <div class="form-group">
-                <label for="agente-permuta">Agente con quien permutas:</label>
-                <input type="text" id="agente-permuta" placeholder="Nombre del agente">
+            <h2 class="modal-title">Añadir Permuta</h2>
+            <div class="form-group"><label>Agente:</label><input type="text" id="p-agente"></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div class="form-group"><label>Mi Fecha:</label><input type="date" id="p-fecha-yo"></div>
+                <div class="form-group"><label>Mi Turno:</label><select id="p-turno-yo"><option>Mañana</option><option>Tarde</option><option>Noche</option></select></div>
             </div>
-            <div class="form-row-modal">
-                <div class="form-column-modal">
-                    <label for="fecha-propia">Tu día a permutar:</label>
-                    <input type="date" id="fecha-propia">
-                </div>
-                <div class="form-column-modal">
-                    <label for="turno-propio">Tu turno:</label>
-                    <select id="turno-propio">
-                        <option value="primero">Turno Primero</option>
-                        <option value="segundo">Turno Segundo</option>
-                        <option value="tercero">Turno Tercero</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-row-modal">
-                <div class="form-column-modal">
-                    <label for="fecha-agente">Día del agente:</label>
-                    <input type="date" id="fecha-agente">
-                </div>
-                <div class="form-column-modal">
-                    <label for="turno-agente">Turno del agente:</label>
-                    <select id="turno-agente">
-                        <option value="primero">Turno Primero</option>
-                        <option value="segundo">Turno Segundo</option>
-                        <option value="tercero">Turno Tercero</option>
-                    </select>
-                </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div class="form-group"><label>Fecha Agente:</label><input type="date" id="p-fecha-el"></div>
+                <div class="form-group"><label>Turno Agente:</label><select id="p-turno-el"><option>Mañana</option><option>Tarde</option><option>Noche</option></select></div>
             </div>
             <div class="modal-actions">
-                <button id="btn-cancelar-permuta" class="btn btn-secondary">Cancelar</button>
-                <button id="btn-guardar-permuta" class="btn btn-primary">Guardar Permuta</button>
+                <button onclick="document.getElementById('modal-permuta').style.display='none'" class="btn btn-secondary">Cancelar</button>
+                <button id="btn-save-permuta" class="btn btn-primary">Guardar</button>
             </div>
         </div>
     </div>
 
     <div id="modal-ver-permutas" class="modal">
         <div class="modal-content">
-            <h2 class="modal-title">Permutas Realizadas <span id="anio-permutas-texto"></span></h2>
-            <div class="permutas-list" id="lista-permutas">
-                <!-- Lista de permutas se llenará con JavaScript -->
-            </div>
+            <h2 class="modal-title">Permutas del Año</h2>
+            <div class="historial-list" id="lista-permutas"></div>
             <div class="modal-actions">
-                <button id="btn-cerrar-permutas" class="btn btn-secondary">Cerrar</button>
+                <button onclick="document.getElementById('modal-ver-permutas').style.display='none'" class="btn btn-secondary">Cerrar</button>
             </div>
         </div>
     </div>
 
     <script>
-        // Configuración de Firebase
+        // --- FIREBASE CONFIG (MANTENER TU CONFIGURACIÓN) ---
         const firebaseConfig = {
-            apiKey: "AIzaSyC4w7q3Q8X9Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8",
+            apiKey: "AIzaSyC4w7q3Q8X9Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8", // PON TU API KEY REAL AQUI
             authDomain: "markarma279.firebaseapp.com",
             databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "markarma279",
@@ -863,993 +417,440 @@
             messagingSenderId: "123456789",
             appId: "1:123456789:web:abcdef123456"
         };
-        
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-        
-        // Referencias a elementos del DOM
-        const app = document.getElementById('app');
-        const loading = document.getElementById('loading');
-        const vacacionesDisponibles = document.getElementById('vacaciones-disponibles');
-        const asuntosPropiosDisponibles = document.getElementById('asuntos-propios-disponibles');
-        const horasAcumuladas = document.getElementById('horas-acumuladas');
-        const permutasRealizadas = document.getElementById('permutas-realizadas');
-        const vacacionesAnioAnterior = document.getElementById('vacaciones-anio-anterior');
-        const asuntosAnioAnterior = document.getElementById('asuntos-anio-anterior');
-        const anioActualTexto = document.getElementById('anio-actual-texto');
-        const anioActualTexto2 = document.getElementById('anio-actual-texto-2');
-        const anioActualTexto3 = document.getElementById('anio-actual-texto-3');
-        const anioActualTexto4 = document.getElementById('anio-actual-texto-4');
-        const selectorAnioConfig = document.getElementById('selector-anio-config');
-        const selectorAnioGestion = document.getElementById('selector-anio-gestion');
-        const diasVacacionesInput = document.getElementById('dias-vacaciones');
-        const diasAsuntosPropiosInput = document.getElementById('dias-asuntos-propios');
-        const horasManualesInput = document.getElementById('horas-manuales');
-        const btnGuardarConfig = document.getElementById('btn-guardar-config');
-        const tipoDescansoSelect = document.getElementById('tipo-descanso');
-        const fechaDescansoInput = document.getElementById('fecha-descanso');
-        const computoSelect = document.getElementById('computo');
-        const horasGrupo = document.getElementById('horas-grupo');
-        const horasSolicitadasInput = document.getElementById('horas-solicitadas');
-        const btnSolicitar = document.getElementById('btn-solicitar');
-        const cuerpoTabla = document.getElementById('cuerpo-tabla');
-        const filtros = document.querySelectorAll('.btn-filtro');
-        const btnAñadirPermuta = document.getElementById('btn-añadir-permuta');
-        const btnVerPermutas = document.getElementById('btn-ver-permutas');
-        const modalPermuta = document.getElementById('modal-permuta');
-        const modalVerPermutas = document.getElementById('modal-ver-permutas');
-        const btnCancelarPermuta = document.getElementById('btn-cancelar-permuta');
-        const btnGuardarPermuta = document.getElementById('btn-guardar-permuta');
-        const btnCerrarPermutas = document.getElementById('btn-cerrar-permutas');
-        const agentePermutaInput = document.getElementById('agente-permuta');
-        const fechaPropiaInput = document.getElementById('fecha-propia');
-        const turnoPropioSelect = document.getElementById('turno-propio');
-        const fechaAgenteInput = document.getElementById('fecha-agente');
-        const turnoAgenteSelect = document.getElementById('turno-agente');
-        const listaPermutas = document.getElementById('lista-permutas');
-        const anioPermutasTexto = document.getElementById('anio-permutas-texto');
-        
-        // Nuevas referencias para gestión de horas
-        const btnGestionarHoras = document.getElementById('btn-gestionar-horas');
-        const modalGestionHoras = document.getElementById('modal-gestion-horas');
-        const btnCerrarGestionHoras = document.getElementById('btn-cerrar-gestion-horas');
-        const fechaOperacionHoras = document.getElementById('fecha-operacion-horas');
-        const conceptoHoras = document.getElementById('concepto-horas');
-        const cantidadHoras = document.getElementById('cantidad-horas');
-        const btnSumarHoras = document.getElementById('btn-sumar-horas');
-        const btnRestarHoras = document.getElementById('btn-restar-horas');
-        const listaHoras = document.getElementById('lista-horas');
-        const anioGestionHorasTexto = document.getElementById('anio-gestion-horas-texto');
-        const labelHorasManuales = document.getElementById('label-horas-manuales');
-        const anioHorasTexto = document.getElementById('anio-horas-texto');
-        
-        // Variables globales
-        let datosUsuario = {};
-        let solicitudes = [];
-        let permutas = [];
+
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const USER_ID = 'usuario-demo'; // RESTAURADO ID ORIGINAL
+
+        // --- VARIABLES GLOBALES ---
+        let datos = { configuraciones: {}, solicitudes: [], horas: [], permutas: [] };
+        const anioActual = new Date().getFullYear();
+        let anioGestion = anioActual;
+        let anioConfig = anioActual;
         let filtroActual = 'todos';
-        const añoActual = new Date().getFullYear();
-        let añoConfigSeleccionado = añoActual;
-        let añoGestionSeleccionado = añoActual;
-        
-        // Inicializar la aplicación
-        document.addEventListener('DOMContentLoaded', function() {
+
+        // --- REFERENCIAS DOM ---
+        const dom = {
+            loading: document.getElementById('loading'),
+            app: document.getElementById('app'),
+            txtAnio: document.querySelectorAll('.anio-display'),
+            // Selectores
+            selConfig: document.getElementById('selector-anio-config'),
+            selGestion: document.getElementById('selector-anio-gestion'),
+            selComputo: document.getElementById('computo'),
+            selComputoEdit: document.getElementById('edit-computo'),
+            // Contadores
+            vacDisp: document.getElementById('vacaciones-disponibles'),
+            apDisp: document.getElementById('asuntos-propios-disponibles'),
+            horasAcum: document.getElementById('horas-acumuladas'),
+            vacAnt: document.getElementById('vacaciones-anio-anterior'),
+            apAnt: document.getElementById('asuntos-anio-anterior'),
+            permDisp: document.getElementById('permutas-realizadas'),
+            // Config Inputs
+            inpVac: document.getElementById('dias-vacaciones'),
+            inpAp: document.getElementById('dias-asuntos-propios'),
+            inpHoras: document.getElementById('horas-manuales'),
+            btnUnlock: document.getElementById('btn-unlock'),
+            msgHoras: document.getElementById('msg-horas-auto'),
+            // Solicitud
+            selTipo: document.getElementById('tipo-descanso'),
+            inpFecha: document.getElementById('fecha-descanso'),
+            groupHoras: document.getElementById('group-horas-cantidad'),
+            inpHoraSol: document.getElementById('horas-solicitadas'),
+            btnSol: document.getElementById('btn-solicitar'),
+            // Tabla
+            tbody: document.getElementById('cuerpo-tabla'),
+            filtros: document.querySelectorAll('.btn-filtro'),
+            // Modales
+            modalHoras: document.getElementById('modal-horas'),
+            modalPerm: document.getElementById('modal-permuta'),
+            modalVerPerm: document.getElementById('modal-ver-permutas'),
+            modalEdit: document.getElementById('modal-editar-solicitud'),
+            // Inputs Horas
+            inpFechaOp: document.getElementById('fecha-op-horas'),
+            inpConcOp: document.getElementById('concepto-op-horas'),
+            inpCantOp: document.getElementById('cantidad-op-horas'),
+            listHoras: document.getElementById('lista-horas')
+        };
+
+        // --- INICIO ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            dom.inpFecha.value = today;
+            dom.inpFechaOp.value = today;
             cargarDatos();
+            setupListeners();
+        });
+
+        function setupListeners() {
+            // Cambios de Año
+            dom.selConfig.addEventListener('change', e => { anioConfig = parseInt(e.target.value); renderConfig(anioConfig); });
+            dom.selGestion.addEventListener('change', e => { anioGestion = parseInt(e.target.value); renderUI(); });
+            document.getElementById('btn-guardar-config').addEventListener('click', guardarConfig);
+
+            // Solicitud
+            dom.selTipo.addEventListener('change', e => dom.groupHoras.classList.toggle('hidden', e.target.value !== 'horas'));
+            dom.btnSol.addEventListener('click', procesarSolicitud);
+
+            // Filtros
+            dom.filtros.forEach(b => b.addEventListener('click', e => {
+                dom.filtros.forEach(f => f.classList.remove('active'));
+                e.target.classList.add('active');
+                filtroActual = e.target.dataset.filtro;
+                renderTabla();
+            }));
+
+            // Gestión Horas
+            document.getElementById('btn-gestionar-horas').addEventListener('click', () => { renderListaHoras(); dom.modalHoras.style.display = 'flex'; });
+            document.getElementById('btn-sumar').addEventListener('click', () => opHoras('suma'));
+            document.getElementById('btn-restar').addEventListener('click', () => opHoras('resta'));
             
-            // Configurar la fecha mínima para hoy
-            const hoy = new Date().toISOString().split('T')[0];
-            fechaDescansoInput.min = hoy;
-            fechaPropiaInput.min = hoy;
-            fechaAgenteInput.min = hoy;
-            fechaOperacionHoras.min = hoy;
-            
-            // Mostrar/ocultar campo de horas según el tipo de descanso
-            tipoDescansoSelect.addEventListener('change', function() {
-                if (this.value === 'horas') {
-                    horasGrupo.style.display = 'block';
-                } else {
-                    horasGrupo.style.display = 'none';
+            // Unlock manual
+            dom.btnUnlock.addEventListener('click', () => {
+                if(confirm("¿Editar manualmente el saldo inicial?")) {
+                    dom.inpHoras.disabled = false;
+                    dom.inpHoras.focus();
                 }
-            });
-            
-            // Cambiar año de configuración
-            selectorAnioConfig.addEventListener('change', function() {
-                añoConfigSeleccionado = parseInt(this.value);
-                cargarConfiguracionAnio(añoConfigSeleccionado);
-            });
-            
-            // Cambiar año de gestión
-            selectorAnioGestion.addEventListener('change', function() {
-                añoGestionSeleccionado = parseInt(this.value);
-                actualizarInterfaz();
-            });
-            
-            // Guardar configuración
-            btnGuardarConfig.addEventListener('click', guardarConfiguracion);
-            
-            // Solicitar día
-            btnSolicitar.addEventListener('click', solicitarDia);
-            
-            // Configurar filtros
-            filtros.forEach(filtro => {
-                filtro.addEventListener('click', function() {
-                    // Remover clase active de todos los filtros
-                    filtros.forEach(f => f.classList.remove('active'));
-                    // Agregar clase active al filtro seleccionado
-                    this.classList.add('active');
-                    // Actualizar filtro actual
-                    filtroActual = this.getAttribute('data-filtro');
-                    // Actualizar tabla
-                    actualizarTablaSolicitudes();
-                });
-            });
-            
-            // Modal de gestión de horas
-            btnGestionarHoras.addEventListener('click', function() {
-                anioGestionHorasTexto.textContent = `(${añoGestionSeleccionado})`;
-                mostrarHistorialHoras();
-                modalGestionHoras.style.display = 'flex';
-            });
-            
-            btnCerrarGestionHoras.addEventListener('click', function() {
-                modalGestionHoras.style.display = 'none';
-            });
-            
-            btnSumarHoras.addEventListener('click', function() {
-                gestionarHoras('suma');
-            });
-            
-            btnRestarHoras.addEventListener('click', function() {
-                gestionarHoras('resta');
-            });
-            
-            // Event listener para eliminar operaciones de horas
-            listaHoras.addEventListener('click', function(event) {
-                const deleteButton = event.target.closest('.btn-eliminar-horas');
-                if (deleteButton) {
-                    const index = parseInt(deleteButton.getAttribute('data-index'));
-                    if (!isNaN(index)) {
-                        eliminarOperacionHoras(index);
-                    }
-                }
-            });
-            
-            // Modal de permutas
-            btnAñadirPermuta.addEventListener('click', function() {
-                modalPermuta.style.display = 'flex';
-            });
-            
-            btnCancelarPermuta.addEventListener('click', function() {
-                modalPermuta.style.display = 'none';
-                limpiarFormularioPermuta();
-            });
-            
-            btnGuardarPermuta.addEventListener('click', guardarPermuta);
-            
-            // Modal ver permutas
-            btnVerPermutas.addEventListener('click', function() {
-                mostrarPermutas();
-                modalVerPermutas.style.display = 'flex';
-            });
-            
-            btnCerrarPermutas.addEventListener('click', function() {
-                modalVerPermutas.style.display = 'none';
             });
 
-            // Event listener para eliminar permutas (delegación de eventos)
-            listaPermutas.addEventListener('click', function(event) {
-                const deleteButton = event.target.closest('.btn-eliminar-permuta');
-                if (deleteButton) {
-                    const index = parseInt(deleteButton.getAttribute('data-index'));
-                    if (!isNaN(index)) {
-                        eliminarPermuta(index);
-                    }
-                }
+            // Permutas
+            document.getElementById('btn-add-permuta').addEventListener('click', () => dom.modalPerm.style.display = 'flex');
+            document.getElementById('btn-save-permuta').addEventListener('click', guardarPermuta);
+            document.getElementById('btn-view-permuta').addEventListener('click', () => { renderListaPermutas(); dom.modalVerPerm.style.display = 'flex'; });
+
+            // Edición Solicitud
+            document.getElementById('edit-tipo').addEventListener('change', e => {
+                document.getElementById('edit-group-horas').classList.toggle('hidden', e.target.value !== 'horas');
             });
-        });
-        
-        // Cargar datos desde Firebase
+        }
+
+        // --- CARGA DATOS ---
         function cargarDatos() {
-            const usuarioId = obtenerUsuarioId();
-            console.log("Intentando cargar datos para usuario:", usuarioId);
-            
-            // Cargar datos de usuario
-            database.ref('descansos/' + usuarioId).once('value')
-                .then(snapshot => {
-                    console.log("Snapshot recibido:", snapshot.exists());
-                    if (snapshot.exists()) {
-                        datosUsuario = snapshot.val();
-                        console.log("Datos cargados de Firebase:", datosUsuario);
-                        inicializarSelectoresAnios();
-                        actualizarInterfaz();
-                    } else {
-                        console.log("No hay datos en Firebase, usando datos por defecto");
-                        // Datos por defecto si no existen
-                        datosUsuario = {
-                            configuraciones: {},
-                            solicitudes: [],
-                            permutas: [],
-                            horas: [] // Nuevo array para operaciones de horas
-                        };
-                        inicializarSelectoresAnios();
-                        actualizarInterfaz();
-                    }
-                    loading.classList.add('hidden');
-                    app.classList.remove('hidden');
-                })
-                .catch(error => {
-                    console.error('Error al cargar datos:', error);
-                    mostrarError('Error al cargar los datos. Inténtalo de nuevo.');
-                    loading.classList.add('hidden');
-                    app.classList.remove('hidden');
-                });
-        }
-        
-        // Inicializar selectores de años
-        function inicializarSelectoresAnios() {
-            // Limpiar selectores
-            selectorAnioConfig.innerHTML = '';
-            selectorAnioGestion.innerHTML = '';
-            computoSelect.innerHTML = '';
-            
-            // Obtener años disponibles (actual, anterior y siguiente)
-            const añosDisponibles = [añoActual - 1, añoActual, añoActual + 1];
-            
-            // Llenar selectores
-            añosDisponibles.forEach(año => {
-                // Selector de configuración
-                const optionConfig = document.createElement('option');
-                optionConfig.value = año;
-                optionConfig.textContent = año;
-                if (año === añoActual) {
-                    optionConfig.selected = true;
+            db.ref('descansos/' + USER_ID).once('value').then(snap => {
+                if(snap.exists()) {
+                    datos = snap.val();
+                    if(!datos.solicitudes) datos.solicitudes = [];
+                    if(!datos.horas) datos.horas = [];
+                    if(!datos.permutas) datos.permutas = [];
+                    if(!datos.configuraciones) datos.configuraciones = {};
+                    
+                    // IMPORTANTE: Convertir 'computo' a número siempre para evitar errores de filtro
+                    datos.solicitudes.forEach(s => s.computo = parseInt(s.computo));
                 }
-                selectorAnioConfig.appendChild(optionConfig);
                 
-                // Selector de gestión
-                const optionGestion = document.createElement('option');
-                optionGestion.value = año;
-                optionGestion.textContent = año;
-                if (año === añoActual) {
-                    optionGestion.selected = true;
-                }
-                selectorAnioGestion.appendChild(optionGestion);
+                initSelectores();
+                dom.loading.classList.add('hidden');
+                dom.app.classList.remove('hidden');
                 
-                // Selector de cómputo
-                const optionComputo = document.createElement('option');
-                optionComputo.value = año;
-                optionComputo.textContent = año;
-                if (año === añoActual) {
-                    optionComputo.selected = true;
-                }
-                computoSelect.appendChild(optionComputo);
+                renderConfig(anioConfig);
+                renderUI();
             });
         }
-        
-        // Cargar configuración de un año específico
-        function cargarConfiguracionAnio(año) {
-            // Actualizar etiqueta de horas
-            anioHorasTexto.textContent = año;
+
+        function initSelectores() {
+            const arr = [anioActual-2, anioActual-1, anioActual, anioActual+1, anioActual+2];
+            [dom.selConfig, dom.selGestion, dom.selComputo, dom.selComputoEdit].forEach(sel => {
+                sel.innerHTML = '';
+                arr.forEach(y => {
+                    const o = document.createElement('option');
+                    o.value = y; o.textContent = y;
+                    if(y===anioActual) o.selected = true;
+                    sel.appendChild(o);
+                });
+            });
+        }
+
+        // --- RENDERIZADO UI (Cálculos Blindados) ---
+        function renderUI() {
+            dom.txtAnio.forEach(e => e.textContent = `(${anioGestion})`);
+            const conf = datos.configuraciones[anioGestion] || {diasVacaciones:0, diasAsuntosPropios:0};
             
-            if (año >= 2026) {
-                // A partir de 2026, calcular automáticamente las horas del año anterior
-                const añoAnterior = año - 1;
-                const saldoAnterior = calcularSaldoHoras(añoAnterior);
-                diasVacacionesInput.value = datosUsuario.configuraciones && datosUsuario.configuraciones[año] 
-                    ? datosUsuario.configuraciones[año].diasVacaciones || '' 
-                    : '';
-                diasAsuntosPropiosInput.value = datosUsuario.configuraciones && datosUsuario.configuraciones[año] 
-                    ? datosUsuario.configuraciones[año].diasAsuntosPropios || '' 
-                    : '';
-                horasManualesInput.value = saldoAnterior;
-                horasManualesInput.disabled = true;
+            // 1. Contadores del AÑO SELECCIONADO (Filtro Estricto)
+            const vacU = datos.solicitudes.filter(s => s.tipo==='vacaciones' && s.estado!=='denegado' && s.computo===anioGestion).length;
+            const apU = datos.solicitudes.filter(s => s.tipo==='asuntos-propios' && s.estado!=='denegado' && s.computo===anioGestion).length;
+            
+            dom.vacDisp.textContent = Math.max(0, (conf.diasVacaciones||0) - vacU);
+            dom.apDisp.textContent = Math.max(0, (conf.diasAsuntosPropios||0) - apU);
+            
+            // 2. Horas Acumuladas (Total Global)
+            const saldoH = getSaldoHorasGlobal();
+            dom.horasAcum.textContent = saldoH.toFixed(2);
+            dom.horasAcum.style.color = saldoH < 0 ? 'var(--danger-color)' : 'var(--success-color)';
+            
+            // 3. Año Anterior & Caducidad
+            const prev = anioGestion - 1;
+            const confPrev = datos.configuraciones[prev] || {diasVacaciones:0, diasAsuntosPropios:0};
+            const vacPrevU = datos.solicitudes.filter(s => s.tipo==='vacaciones' && s.estado!=='denegado' && s.computo===prev).length;
+            const apPrevU = datos.solicitudes.filter(s => s.tipo==='asuntos-propios' && s.estado!=='denegado' && s.computo===prev).length;
+            
+            let vPend = Math.max(0, (confPrev.diasVacaciones||0) - vacPrevU);
+            let aPend = Math.max(0, (confPrev.diasAsuntosPropios||0) - apPrevU);
+            
+            // Lógica fechas límite
+            const hoy = new Date();
+            const esAnioEnCurso = (anioGestion === new Date().getFullYear());
+            // Limites en el año actual de gestión
+            const limV = new Date(anioGestion, 0, 31); // 31 Ene
+            const limA = new Date(anioGestion, 1, 15); // 15 Feb
+            
+            if(esAnioEnCurso && hoy > limV && vPend > 0) dom.vacAnt.innerHTML = `<s style="color:#999">${vPend}</s> <span style="font-size:0.7em;color:red">Caducado</span>`;
+            else dom.vacAnt.textContent = vPend;
+            
+            if(esAnioEnCurso && hoy > limA && aPend > 0) dom.apAnt.innerHTML = `<s style="color:#999">${aPend}</s> <span style="font-size:0.7em;color:red">Caducado</span>`;
+            else dom.apAnt.textContent = aPend;
+            
+            // Permutas
+            dom.permDisp.textContent = datos.permutas.filter(p => parseInt(p.año) === anioGestion).length;
+            
+            renderTabla();
+        }
+
+        function getSaldoHorasGlobal() {
+            let saldo = 0;
+            // Base inicial del primer año
+            const years = Object.keys(datos.configuraciones).map(Number).sort((a,b)=>a-b);
+            const baseYear = years[0] || anioActual;
+            if(datos.configuraciones[baseYear]) saldo += parseFloat(datos.configuraciones[baseYear].horasManuales || 0);
+            
+            // Todas las operaciones históricas
+            datos.horas.forEach(op => {
+                if(op.tipo==='suma') saldo += parseFloat(op.cantidad);
+                else saldo -= parseFloat(op.cantidad);
+            });
+            return saldo;
+        }
+
+        function renderConfig(y) {
+            const c = datos.configuraciones[y] || {};
+            dom.inpVac.value = c.diasVacaciones || '';
+            dom.inpAp.value = c.diasAsuntosPropios || '';
+            
+            const years = Object.keys(datos.configuraciones).map(Number).sort((a,b)=>a-b);
+            const base = years[0] || anioActual;
+            
+            // Si no es el año base, es automático
+            if(y > base) {
+                // Calcular saldo arrastrado hasta el final del año anterior
+                // (Simplificación: usamos saldo global para visualización)
+                dom.inpHoras.value = getSaldoHorasGlobal().toFixed(2);
+                dom.inpHoras.disabled = true;
+                dom.msgHoras.style.display = 'inline';
             } else {
-                // Para años anteriores a 2026, permitir edición manual
-                if (datosUsuario.configuraciones && datosUsuario.configuraciones[año]) {
-                    const config = datosUsuario.configuraciones[año];
-                    diasVacacionesInput.value = config.diasVacaciones || '';
-                    diasAsuntosPropiosInput.value = config.diasAsuntosPropios || '';
-                    horasManualesInput.value = config.horasManuales || '';
-                } else {
-                    diasVacacionesInput.value = '';
-                    diasAsuntosPropiosInput.value = '';
-                    horasManualesInput.value = '';
-                }
-                horasManualesInput.disabled = false;
+                dom.inpHoras.value = c.horasManuales || 0;
+                dom.inpHoras.disabled = false;
+                dom.msgHoras.style.display = 'none';
             }
         }
-        
-        // Calcular saldo de horas para un año específico
-        function calcularSaldoHoras(año) {
-            if (!datosUsuario.horas || datosUsuario.horas.length === 0) return 0;
+
+        // --- TABLA Y EDICIÓN ---
+        function renderTabla() {
+            dom.tbody.innerHTML = '';
+            // Solo items del año seleccionado
+            let list = datos.solicitudes.filter(s => s.computo === anioGestion);
+            list.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
             
-            const operacionesAño = datosUsuario.horas.filter(op => {
-                const fechaOp = new Date(op.fecha);
-                return fechaOp.getFullYear() === año;
-            });
-            
-            return operacionesAño.reduce((total, op) => {
-                if (op.tipo === 'suma') {
-                    return total + op.cantidad;
-                } else {
-                    return total - op.cantidad;
-                }
-            }, 0);
-        }
-        
-        // Actualizar la interfaz con los datos cargados
-        function actualizarInterfaz() {
-            // Cargar configuración del año seleccionado
-            cargarConfiguracionAnio(añoConfigSeleccionado);
-            
-            // Actualizar textos del año actual
-            anioActualTexto.textContent = `(${añoGestionSeleccionado})`;
-            anioActualTexto2.textContent = `(${añoGestionSeleccionado})`;
-            anioActualTexto3.textContent = `(${añoGestionSeleccionado})`;
-            anioActualTexto4.textContent = `(${añoGestionSeleccionado})`;
-            
-            // Calcular saldos actuales
-            calcularSaldos();
-            
-            // Actualizar tabla de solicitudes
-            actualizarTablaSolicitudes();
-        }
-        
-        // Calcular saldos actuales
-        function calcularSaldos() {
-            const solicitudesActuales = datosUsuario.solicitudes || [];
-            const permutasActuales = datosUsuario.permutas || [];
-            
-            // Obtener configuración del año de gestión seleccionado
-            const configGestion = datosUsuario.configuraciones && datosUsuario.configuraciones[añoGestionSeleccionado] 
-                ? datosUsuario.configuraciones[añoGestionSeleccionado] 
-                : { diasVacaciones: 0, diasAsuntosPropios: 0, horasManuales: 0 };
-            
-            // Calcular días de vacaciones usados del año de gestión
-            const vacacionesUsadas = solicitudesActuales
-                .filter(s => s.tipo === 'vacaciones' && s.estado !== 'denegado' && s.computo === añoGestionSeleccionado)
-                .length;
-            
-            // Calcular días de asuntos propios usados del año de gestión
-            const asuntosPropiosUsados = solicitudesActuales
-                .filter(s => s.tipo === 'asuntos-propios' && s.estado !== 'denegado' && s.computo === añoGestionSeleccionado)
-                .length;
-            
-            // Calcular horas usadas del año de gestión
-            const horasUsadas = solicitudesActuales
-                .filter(s => s.tipo === 'horas' && s.estado !== 'denegado' && s.computo === añoGestionSeleccionado)
-                .reduce((total, s) => total + (s.horas || 0), 0);
-            
-            // Calcular permutas del año de gestión
-            const permutasCount = permutasActuales
-                .filter(p => p.año === añoGestionSeleccionado)
-                .length;
-            
-            // Calcular horas disponibles (incluyendo operaciones manuales)
-            const horasBase = configGestion.horasManuales || 0;
-            const horasOperaciones = calcularSaldoHoras(añoGestionSeleccionado);
-            const horasTotales = horasBase + horasOperaciones;
-            
-            // Actualizar saldos del año de gestión
-            vacacionesDisponibles.textContent = Math.max(0, (configGestion.diasVacaciones || 0) - vacacionesUsadas);
-            asuntosPropiosDisponibles.textContent = Math.max(0, (configGestion.diasAsuntosPropios || 0) - asuntosPropiosUsados);
-            horasAcumuladas.textContent = Math.max(0, horasTotales - horasUsadas);
-            permutasRealizadas.textContent = permutasCount;
-            
-            // Calcular días del año anterior
-            const añoAnterior = añoGestionSeleccionado - 1;
-            const configAnioAnterior = datosUsuario.configuraciones && datosUsuario.configuraciones[añoAnterior] 
-                ? datosUsuario.configuraciones[añoAnterior] 
-                : { diasVacaciones: 0, diasAsuntosPropios: 0 };
-            
-            const vacacionesAnioAnteriorUsadas = solicitudesActuales
-                .filter(s => s.tipo === 'vacaciones' && s.estado !== 'denegado' && s.computo === añoAnterior)
-                .length;
-                
-            const asuntosAnioAnteriorUsadas = solicitudesActuales
-                .filter(s => s.tipo === 'asuntos-propios' && s.estado !== 'denegado' && s.computo === añoAnterior)
-                .length;
-            
-            // Actualizar días del año anterior
-            vacacionesAnioAnterior.textContent = Math.max(0, (configAnioAnterior.diasVacaciones || 0) - vacacionesAnioAnteriorUsadas);
-            asuntosAnioAnterior.textContent = Math.max(0, (configAnioAnterior.diasAsuntosPropios || 0) - asuntosAnioAnteriorUsadas);
-        }
-        
-        // Actualizar la tabla de solicitudes con filtros
-        function actualizarTablaSolicitudes() {
-            cuerpoTabla.innerHTML = '';
-            
-            if (!datosUsuario.solicitudes || datosUsuario.solicitudes.length === 0) {
-                cuerpoTabla.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay solicitudes registradas</td></tr>';
-                return;
-            }
-            
-            // Filtrar solicitudes por año de gestión seleccionado
-            const solicitudesFiltradasPorAnio = datosUsuario.solicitudes.filter(s => 
-                s.computo === añoGestionSeleccionado
-            );
-            
-            if (solicitudesFiltradasPorAnio.length === 0) {
-                cuerpoTabla.innerHTML = `<tr><td colspan="5" style="text-align: center;">No hay solicitudes para el año ${añoGestionSeleccionado}</td></tr>`;
-                return;
-            }
-            
-            // Ordenar solicitudes por fecha (más recientes primero)
-            const solicitudesOrdenadas = [...solicitudesFiltradasPorAnio].sort((a, b) => 
-                new Date(b.fecha) - new Date(a.fecha)
-            );
-            
-            // Aplicar filtro adicional
-            let solicitudesFiltradas = solicitudesOrdenadas;
-            if (filtroActual !== 'todos') {
-                solicitudesFiltradas = solicitudesOrdenadas.filter(solicitud => {
-                    if (filtroActual === 'vacaciones' || filtroActual === 'asuntos-propios' || filtroActual === 'horas') {
-                        return solicitud.tipo === filtroActual;
-                    } else {
-                        return solicitud.estado === filtroActual;
-                    }
+            if(filtroActual !== 'todos') {
+                list = list.filter(s => {
+                    if(['vacaciones','asuntos-propios','horas'].includes(filtroActual)) return s.tipo === filtroActual;
+                    return s.estado.toLowerCase() === filtroActual.toLowerCase() || (filtroActual==='tramite' && s.estado==='En Trámite');
                 });
             }
             
-            if (solicitudesFiltradas.length === 0) {
-                cuerpoTabla.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay solicitudes que coincidan con el filtro</td></tr>';
-                return;
-            }
+            if(list.length === 0) return dom.tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">Sin registros</td></tr>';
             
-            solicitudesFiltradas.forEach((solicitud, index) => {
-                // Encontrar el índice real en el array original
-                const indexReal = datosUsuario.solicitudes.findIndex(s => 
-                    s.fecha === solicitud.fecha && 
-                    s.tipo === solicitud.tipo && 
-                    s.estado === solicitud.estado &&
-                    s.computo === solicitud.computo
-                );
+            list.forEach(s => {
+                const idx = datos.solicitudes.indexOf(s);
+                const tr = document.createElement('tr');
                 
-                const fila = document.createElement('tr');
-                
-                fila.innerHTML = `
-                    <td>${formatearFechaDDMMAAAA(solicitud.fecha)}</td>
-                    <td>${formatearTipo(solicitud.tipo)}${solicitud.tipo === 'horas' ? ` (${solicitud.horas}h)` : ''}</td>
-                    <td>${solicitud.computo}</td>
-                    <td><span class="${solicitud.estado}">${formatearEstado(solicitud.estado)}</span></td>
-                    <td class="actions">
-                        <button class="btn-action btn-tramite" data-index="${indexReal}" data-estado="tramite">En Trámite</button>
-                        <button class="btn-action btn-denegado" data-index="${indexReal}" data-estado="denegado">Denegado</button>
-                        <button class="btn-action btn-disfrutado" data-index="${indexReal}" data-estado="disfrutado">Disfrutado</button>
-                        <button class="btn-action btn-eliminar" data-index="${indexReal}">🗑️</button>
-                    </td>
+                // Botones Compactos
+                const btns = `
+                    <button onclick="cambiarEstado(${idx},'En Trámite')" class="btn-action btn-tramite">Trámite</button>
+                    <button onclick="cambiarEstado(${idx},'Denegado')" class="btn-action btn-denegado">Denegado</button>
+                    <button onclick="cambiarEstado(${idx},'Disfrutado')" class="btn-action btn-disfrutado">Disfrutado</button>
+                    <button onclick="abrirEdicion(${idx})" class="btn-action btn-editar btn-icon" title="Editar">✏️</button>
+                    <button onclick="eliminarSol(${idx})" class="btn-action btn-eliminar btn-icon" title="Borrar">🗑️</button>
                 `;
                 
-                cuerpoTabla.appendChild(fila);
-            });
-            
-            // Agregar event listeners a los botones de acción
-            document.querySelectorAll('.btn-action').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const index = parseInt(this.getAttribute('data-index'));
-                    if (this.classList.contains('btn-eliminar')) {
-                        eliminarSolicitud(index);
-                    } else {
-                        const estado = this.getAttribute('data-estado');
-                        cambiarEstadoSolicitud(index, estado);
-                    }
-                });
-            });
-        }
-        
-        // Guardar configuración
-        function guardarConfiguracion() {
-            const diasVacaciones = parseInt(diasVacacionesInput.value) || 0;
-            const diasAsuntosPropios = parseInt(diasAsuntosPropiosInput.value) || 0;
-            const horasManuales = parseFloat(horasManualesInput.value) || 0;
-            
-            if (diasVacaciones < 0 || diasAsuntosPropios < 0 || horasManuales < 0) {
-                mostrarError('Los valores no pueden ser negativos');
-                return;
-            }
-            
-            const usuarioId = obtenerUsuarioId();
-            
-            // Inicializar configuraciones si no existen
-            if (!datosUsuario.configuraciones) {
-                datosUsuario.configuraciones = {};
-            }
-            
-            // Guardar configuración para el año seleccionado
-            datosUsuario.configuraciones[añoConfigSeleccionado] = {
-                diasVacaciones: diasVacaciones,
-                diasAsuntosPropios: diasAsuntosPropios,
-                horasManuales: horasManuales
-            };
-            
-            // Guardar en Firebase
-            database.ref('descansos/' + usuarioId).set(datosUsuario)
-                .then(() => {
-                    mostrarExito(`Configuración para ${añoConfigSeleccionado} guardada correctamente`);
-                    actualizarInterfaz();
-                })
-                .catch(error => {
-                    console.error('Error al guardar configuración:', error);
-                    mostrarError('Error al guardar la configuración. Inténtalo de nuevo.');
-                });
-        }
-        
-        // Solicitar día de descanso
-        function solicitarDia() {
-            const tipo = tipoDescansoSelect.value;
-            const fecha = fechaDescansoInput.value;
-            const computo = parseInt(computoSelect.value);
-            const horas = tipo === 'horas' ? parseFloat(horasSolicitadasInput.value) : 0;
-            
-            // Validaciones
-            if (!fecha) {
-                mostrarError('Debes seleccionar una fecha');
-                return;
-            }
-            
-            if (tipo === 'horas' && (!horas || horas <= 0)) {
-                mostrarError('Debes introducir un número válido de horas');
-                return;
-            }
-            
-            // Verificar disponibilidad
-            const configComputo = datosUsuario.configuraciones && datosUsuario.configuraciones[computo] 
-                ? datosUsuario.configuraciones[computo] 
-                : { diasVacaciones: 0, diasAsuntosPropios: 0, horasManuales: 0 };
-                
-            if (tipo === 'vacaciones' && configComputo.diasVacaciones <= 0) {
-                mostrarError('No tienes días de vacaciones disponibles para ese año');
-                return;
-            }
-            
-            if (tipo === 'asuntos-propios' && configComputo.diasAsuntosPropios <= 0) {
-                mostrarError('No tienes días de asuntos propios disponibles para ese año');
-                return;
-            }
-            
-            if (tipo === 'horas') {
-                // Calcular horas totales disponibles (base + operaciones)
-                const horasBase = configComputo.horasManuales || 0;
-                const horasOperaciones = calcularSaldoHoras(computo);
-                const horasTotales = horasBase + horasOperaciones;
-                
-                if (horasTotales < horas) {
-                    mostrarError('No tienes suficientes horas acumuladas para ese año');
-                    return;
-                }
-            }
-            
-            const usuarioId = obtenerUsuarioId();
-            
-            // Crear nueva solicitud
-            const nuevaSolicitud = {
-                tipo: tipo,
-                fecha: fecha,
-                computo: computo,
-                estado: 'pendiente',
-                fechaSolicitud: new Date().toISOString().split('T')[0]
-            };
-            
-            if (tipo === 'horas') {
-                nuevaSolicitud.horas = horas;
-                
-                // CREAR OPERACIÓN DE RESTA EN EL HISTORIAL DE HORAS
-                const operacionResta = {
-                    tipo: 'resta',
-                    fecha: fecha,
-                    concepto: `Descanso por horas sueltas`,
-                    cantidad: horas,
-                    año: computo,
-                    fechaRegistro: new Date().toISOString(),
-                    relacionadoConSolicitud: true // Marcar que está relacionado con una solicitud
-                };
-                
-                // Agregar a la lista de operaciones de horas
-                if (!datosUsuario.horas) {
-                    datosUsuario.horas = [];
-                }
-                datosUsuario.horas.push(operacionResta);
-            }
-            
-            // Agregar a la lista de solicitudes
-            if (!datosUsuario.solicitudes) {
-                datosUsuario.solicitudes = [];
-            }
-            
-            datosUsuario.solicitudes.push(nuevaSolicitud);
-            
-            // Guardar en Firebase
-            database.ref('descansos/' + usuarioId).set(datosUsuario)
-                .then(() => {
-                    mostrarExito('Solicitud registrada correctamente');
-                    actualizarInterfaz();
-                    
-                    // Limpiar formulario
-                    fechaDescansoInput.value = '';
-                    if (tipo === 'horas') {
-                        horasSolicitadasInput.value = '8';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al guardar solicitud:', error);
-                    mostrarError('Error al registrar la solicitud. Inténtalo de nuevo.');
-                });
-        }
-        
-        // Cambiar estado de una solicitud
-        function cambiarEstadoSolicitud(index, nuevoEstado) {
-            const usuarioId = obtenerUsuarioId();
-            
-            // Actualizar estado
-            datosUsuario.solicitudes[index].estado = nuevoEstado;
-            
-            // Guardar en Firebase
-            database.ref('descansos/' + usuarioId).set(datosUsuario)
-                .then(() => {
-                    mostrarExito(`Estado actualizado a "${formatearEstado(nuevoEstado)}"`);
-                    actualizarInterfaz();
-                })
-                .catch(error => {
-                    console.error('Error al cambiar estado:', error);
-                    mostrarError('Error al cambiar el estado. Inténtalo de nuevo.');
-                });
-        }
-        
-        // Eliminar una solicitud
-        function eliminarSolicitud(index) {
-            if (confirm('¿Estás seguro de que quieres eliminar esta solicitud?')) {
-                const usuarioId = obtenerUsuarioId();
-                const solicitud = datosUsuario.solicitudes[index];
-                
-                // Si es una solicitud de horas, también eliminar la operación correspondiente
-                if (solicitud.tipo === 'horas') {
-                    // Buscar y eliminar la operación de resta relacionada
-                    if (datosUsuario.horas) {
-                        const indexOperacion = datosUsuario.horas.findIndex(op => 
-                            op.relacionadoConSolicitud && 
-                            op.fecha === solicitud.fecha && 
-                            op.cantidad === solicitud.horas &&
-                            op.año === solicitud.computo
-                        );
-                        
-                        if (indexOperacion !== -1) {
-                            datosUsuario.horas.splice(indexOperacion, 1);
-                        }
-                    }
-                }
-                
-                // Eliminar la solicitud del array
-                datosUsuario.solicitudes.splice(index, 1);
-                
-                // Guardar en Firebase
-                database.ref('descansos/' + usuarioId).set(datosUsuario)
-                    .then(() => {
-                        mostrarExito('Solicitud eliminada correctamente');
-                        actualizarInterfaz();
-                    })
-                    .catch(error => {
-                        console.error('Error al eliminar solicitud:', error);
-                        mostrarError('Error al eliminar la solicitud. Inténtalo de nuevo.');
-                    });
-            }
-        }
-        
-        // Gestión de horas (sumar o restar)
-        function gestionarHoras(tipo) {
-            const fecha = fechaOperacionHoras.value;
-            const concepto = conceptoHoras.value.trim();
-            const cantidad = parseFloat(cantidadHoras.value);
-            
-            // Validaciones
-            if (!fecha) {
-                mostrarError('Debes seleccionar una fecha');
-                return;
-            }
-            
-            if (!concepto) {
-                mostrarError('Debes introducir un concepto');
-                return;
-            }
-            
-            if (!cantidad || cantidad <= 0) {
-                mostrarError('Debes introducir una cantidad válida de horas');
-                return;
-            }
-            
-            const usuarioId = obtenerUsuarioId();
-            
-            // Crear nueva operación de horas
-            const nuevaOperacion = {
-                tipo: tipo,
-                fecha: fecha,
-                concepto: concepto,
-                cantidad: cantidad,
-                año: añoGestionSeleccionado,
-                fechaRegistro: new Date().toISOString()
-            };
-            
-            // Agregar a la lista de operaciones de horas
-            if (!datosUsuario.horas) {
-                datosUsuario.horas = [];
-            }
-            
-            datosUsuario.horas.push(nuevaOperacion);
-            
-            // Guardar en Firebase
-            database.ref('descansos/' + usuarioId).set(datosUsuario)
-                .then(() => {
-                    mostrarExito(`Horas ${tipo === 'suma' ? 'sumadas' : 'restadas'} correctamente`);
-                    mostrarHistorialHoras();
-                    actualizarInterfaz();
-                    
-                    // Limpiar formulario
-                    conceptoHoras.value = '';
-                    cantidadHoras.value = '1';
-                })
-                .catch(error => {
-                    console.error('Error al guardar operación de horas:', error);
-                    mostrarError('Error al registrar la operación. Inténtalo de nuevo.');
-                });
-        }
-        
-        // Mostrar historial de horas
-        function mostrarHistorialHoras() {
-            listaHoras.innerHTML = '';
-            
-            const operacionesHoras = datosUsuario.horas || [];
-            const operacionesFiltradas = operacionesHoras.filter(op => op.año === añoGestionSeleccionado);
-            
-            if (operacionesFiltradas.length === 0) {
-                listaHoras.innerHTML = '<p style="text-align: center; padding: 20px;">No hay operaciones de horas registradas para este año</p>';
-                return;
-            }
-            
-            // Ordenar por fecha (más recientes primero)
-            const operacionesOrdenadas = [...operacionesFiltradas].sort((a, b) => 
-                new Date(b.fecha) - new Date(a.fecha)
-            );
-            
-            operacionesOrdenadas.forEach((operacion, index) => {
-                const indexReal = datosUsuario.horas.findIndex(op => op.fechaRegistro === operacion.fechaRegistro);
-                
-                const itemHoras = document.createElement('div');
-                itemHoras.className = 'item-horas';
-                
-                const claseHoras = operacion.tipo === 'suma' ? 'horas-positivas' : 'horas-negativas';
-                const simbolo = operacion.tipo === 'suma' ? '+' : '-';
-                
-                itemHoras.innerHTML = `
-                    <div class="info-horas">
-                        <strong>${formatearFechaDDMMAAAA(operacion.fecha)}</strong> - ${operacion.concepto}
-                        <div class="${claseHoras}">${simbolo} ${operacion.cantidad} horas</div>
-                    </div>
-                    <button class="btn-action btn-eliminar btn-eliminar-horas" data-index="${indexReal}" title="Eliminar operación">🗑️</button>
+                tr.innerHTML = `
+                    <td>${fmtDate(s.fecha)}</td>
+                    <td>${fmtType(s.tipo)}${s.tipo==='horas'? ` (${s.horas}h)` : ''}</td>
+                    <td>${s.computo}</td>
+                    <td><span class="estado-badge ${s.estado.replace(/\s/g,'')}">${s.estado}</span></td>
+                    <td class="actions">${btns}</td>
                 `;
-                
-                listaHoras.appendChild(itemHoras);
+                dom.tbody.appendChild(tr);
             });
         }
-        
-        // Eliminar una operación de horas
-        function eliminarOperacionHoras(index) {
-            if (confirm('¿Estás seguro de que quieres eliminar esta operación de horas?')) {
-                const usuarioId = obtenerUsuarioId();
-                
-                // Eliminar la operación del array
-                datosUsuario.horas.splice(index, 1);
-                
-                // Guardar en Firebase
-                database.ref('descansos/' + usuarioId).set(datosUsuario)
-                    .then(() => {
-                        mostrarExito('Operación de horas eliminada correctamente');
-                        actualizarInterfaz();
-                        mostrarHistorialHoras();
-                    })
-                    .catch(error => {
-                        console.error('Error al eliminar operación de horas:', error);
-                        mostrarError('Error al eliminar la operación. Inténtalo de nuevo.');
-                        cargarDatos(); // Recargar datos para evitar inconsistencias
-                    });
+
+        // --- EDICIÓN ---
+        window.abrirEdicion = (idx) => {
+            const s = datos.solicitudes[idx];
+            document.getElementById('edit-index').value = idx;
+            document.getElementById('edit-tipo').value = s.tipo;
+            document.getElementById('edit-fecha').value = s.fecha;
+            document.getElementById('edit-computo').value = s.computo;
+            
+            const gh = document.getElementById('edit-group-horas');
+            const ih = document.getElementById('edit-horas');
+            if(s.tipo==='horas') { gh.classList.remove('hidden'); ih.value = s.horas; }
+            else { gh.classList.add('hidden'); ih.value = ''; }
+            
+            dom.modalEdit.style.display = 'flex';
+        };
+
+        window.guardarEdicionSolicitud = () => {
+            const idx = parseInt(document.getElementById('edit-index').value);
+            const solOld = datos.solicitudes[idx];
+            const tipo = document.getElementById('edit-tipo').value;
+            const fecha = document.getElementById('edit-fecha').value;
+            const comp = parseInt(document.getElementById('edit-computo').value);
+            const horas = parseFloat(document.getElementById('edit-horas').value);
+            
+            if(!fecha) return notificar("Falta fecha", "error");
+            
+            // Si era horas, borrar operación vieja
+            if(solOld.tipo==='horas') {
+                const opIdx = datos.horas.findIndex(h => h.relacionado && h.fecha===solOld.fecha && h.cantidad===solOld.horas);
+                if(opIdx > -1) datos.horas.splice(opIdx,1);
             }
+            
+            // Actualizar
+            solOld.tipo = tipo; solOld.fecha = fecha; solOld.computo = comp;
+            if(tipo==='horas') {
+                solOld.horas = horas;
+                datos.horas.push({ tipo:'resta', fecha, concepto:'Día (Editado)', cantidad:horas, relacionado:true, fechaReg:new Date().toISOString() });
+            } else {
+                delete solOld.horas;
+            }
+            
+            dom.modalEdit.style.display='none';
+            guardarEnBD("Editado correctamente");
+        };
+
+        // --- LOGICA ACCIONES ---
+        function guardarConfig() {
+            if(!datos.configuraciones[anioConfig]) datos.configuraciones[anioConfig] = {};
+            datos.configuraciones[anioConfig].diasVacaciones = parseInt(dom.inpVac.value)||0;
+            datos.configuraciones[anioConfig].diasAsuntosPropios = parseInt(dom.inpAp.value)||0;
+            datos.configuraciones[anioConfig].horasManuales = !dom.inpHoras.disabled ? parseFloat(dom.inpHoras.value)||0 : (datos.configuraciones[anioConfig].horasManuales||0);
+            guardarEnBD("Configuración guardada");
         }
-        
-        // Guardar permuta
+
+        function procesarSolicitud() {
+            const t = dom.selTipo.value;
+            const f = dom.inpFecha.value;
+            const c = parseInt(dom.selComputo.value);
+            const h = parseFloat(dom.inpHoraSol.value);
+            
+            if(!f) return notificar("Fecha requerida", "error");
+            
+            // Validación Caducidad Año Anterior
+            const hoy = new Date();
+            if(c < hoy.getFullYear()) {
+                const limitV = new Date(c+1, 0, 31);
+                const limitA = new Date(c+1, 1, 15);
+                if(t==='vacaciones' && hoy > limitV) return notificar("Plazo vacaciones caducado", "error");
+                if(t==='asuntos-propios' && hoy > limitA) return notificar("Plazo asuntos caducado", "error");
+            }
+
+            const sol = { tipo:t, fecha:f, computo:c, estado:'Pendiente', fechaReg:new Date().toISOString() };
+            if(t==='horas') {
+                sol.horas = h;
+                datos.horas.push({ tipo:'resta', fecha:f, concepto:'Día Solicitado', cantidad:h, relacionado:true, fechaReg:new Date().toISOString() });
+            }
+            
+            datos.solicitudes.push(sol);
+            guardarEnBD("Solicitud creada");
+        }
+
+        function opHoras(tipo) {
+            const f = dom.inpFechaOp.value;
+            const c = dom.inpConcOp.value;
+            const h = parseFloat(dom.inpCantOp.value);
+            if(!f || !c || !h) return notificar("Datos incompletos", "error");
+            
+            datos.horas.push({ tipo, fecha:f, concepto:c, cantidad:h, fechaReg:new Date().toISOString() });
+            document.getElementById('concepto-op-horas').value='';
+            guardarEnBD("Operación registrada");
+            renderListaHoras();
+        }
+
         function guardarPermuta() {
-            const agente = agentePermutaInput.value.trim();
-            const fechaPropia = fechaPropiaInput.value;
-            const turnoPropio = turnoPropioSelect.value;
-            const fechaAgente = fechaAgenteInput.value;
-            const turnoAgente = turnoAgenteSelect.value;
-            
-            // Validaciones
-            if (!agente) {
-                mostrarError('Debes introducir el nombre del agente');
-                return;
-            }
-            
-            if (!fechaPropia || !fechaAgente) {
-                mostrarError('Debes seleccionar ambas fechas');
-                return;
-            }
-            
-            const usuarioId = obtenerUsuarioId();
-            
-            // Crear nueva permuta
-            const nuevaPermuta = {
-                agente: agente,
-                fechaPropia: fechaPropia,
-                turnoPropio: turnoPropio,
-                fechaAgente: fechaAgente,
-                turnoAgente: turnoAgente,
-                año: añoGestionSeleccionado,
-                fechaRegistro: new Date().toISOString()
-            };
-            
-            // Agregar a la lista de permutas
-            if (!datosUsuario.permutas) {
-                datosUsuario.permutas = [];
-            }
-            
-            datosUsuario.permutas.push(nuevaPermuta);
-            
-            // Guardar en Firebase
-            database.ref('descansos/' + usuarioId).set(datosUsuario)
-                .then(() => {
-                    mostrarExito('Permuta registrada correctamente');
-                    modalPermuta.style.display = 'none';
-                    limpiarFormularioPermuta();
-                    actualizarInterfaz();
-                })
-                .catch(error => {
-                    console.error('Error al guardar permuta:', error);
-                    mostrarError('Error al registrar la permuta. Inténtalo de nuevo.');
-                });
+            datos.permutas.push({
+                agente: document.getElementById('p-agente').value,
+                fechaYo: document.getElementById('p-fecha-yo').value,
+                turnoYo: document.getElementById('p-turno-yo').value,
+                fechaEl: document.getElementById('p-fecha-el').value,
+                turnoEl: document.getElementById('p-turno-el').value,
+                año: anioGestion,
+                fechaReg: new Date().toISOString()
+            });
+            dom.modalPerm.style.display='none';
+            guardarEnBD("Permuta guardada");
         }
-        
-        // Mostrar permutas en el modal
-        function mostrarPermutas() {
-            anioPermutasTexto.textContent = `(${añoGestionSeleccionado})`;
-            listaPermutas.innerHTML = '';
-            
-            const permutasActuales = datosUsuario.permutas || [];
-            const permutasFiltradas = permutasActuales.filter(p => p.año === añoGestionSeleccionado);
-            
-            if (permutasFiltradas.length === 0) {
-                listaPermutas.innerHTML = '<p style="text-align: center; padding: 20px;">No hay permutas registradas para este año</p>';
-                return;
+
+        // --- GLOBALES & LISTAS ---
+        window.cambiarEstado = (idx, st) => { datos.solicitudes[idx].estado = st; guardarEnBD("Estado actualizado"); };
+        window.eliminarSol = (idx) => {
+            if(!confirm("¿Borrar?")) return;
+            const s = datos.solicitudes[idx];
+            if(s.tipo==='horas') {
+                const opIdx = datos.horas.findIndex(h => h.relacionado && h.fecha===s.fecha && h.cantidad===s.horas);
+                if(opIdx > -1) datos.horas.splice(opIdx,1);
             }
-            
-            // Ordenar por fecha de registro (más recientes primero)
-            const permutasOrdenadas = [...permutasFiltradas].sort((a, b) => 
-                new Date(b.fechaRegistro) - new Date(a.fechaRegistro)
-            );
-            
-            permutasOrdenadas.forEach(permuta => {
-                const indexReal = datosUsuario.permutas.findIndex(p => p.fechaRegistro === permuta.fechaRegistro);
-                
-                const permutaItem = document.createElement('div');
-                permutaItem.className = 'permuta-item';
-                
-                permutaItem.innerHTML = `
-                    <div class="permuta-info">
-                        <strong>Agente:</strong> ${permuta.agente}
-                        <div class="permuta-fechas">
-                            <div class="fecha-item">
-                                <strong>279:</strong> ${formatearFechaDDMMAAAA(permuta.fechaPropia)} (${formatearTurno(permuta.turnoPropio)})
-                            </div>
-                            <div class="fecha-item">
-                                <strong>${permuta.agente}:</strong> ${formatearFechaDDMMAAAA(permuta.fechaAgente)} (${formatearTurno(permuta.turnoAgente)})
-                            </div>
+            datos.solicitudes.splice(idx,1);
+            guardarEnBD("Eliminado");
+        };
+        window.eliminarHora = (idx) => { if(confirm("¿Borrar?")) { datos.horas.splice(idx,1); guardarEnBD("Hora borrada"); renderListaHoras(); } };
+        window.eliminarPermuta = (idx) => { if(confirm("¿Borrar?")) { datos.permutas.splice(idx,1); guardarEnBD("Permuta borrada"); renderListaPermutas(); } };
+
+        function renderListaHoras() {
+            dom.listHoras.innerHTML = '';
+            // Mostrar TODO el historial
+            const list = [...datos.horas].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+            list.forEach(h => {
+                const idx = datos.horas.indexOf(h);
+                dom.listHoras.innerHTML += `
+                    <div class="item-row">
+                        <div><strong>${fmtDate(h.fecha)}</strong>: ${h.concepto}</div>
+                        <div style="display:flex;align-items:center;gap:5px;">
+                            <span class="${h.tipo==='suma'?'horas-pos':'horas-neg'}">${h.tipo==='suma'?'+':'-'} ${h.cantidad}h</span>
+                            <button onclick="eliminarHora(${idx})" class="btn-action btn-eliminar btn-icon">🗑️</button>
                         </div>
-                    </div>
-                    <button class="btn-action btn-eliminar btn-eliminar-permuta" data-index="${indexReal}" title="Eliminar permuta">🗑️</button>
-                `;
-                
-                listaPermutas.appendChild(permutaItem);
+                    </div>`;
             });
         }
-        
-        // Eliminar una permuta
-        function eliminarPermuta(index) {
-            if (confirm('¿Estás seguro de que quieres eliminar esta permuta?')) {
-                const usuarioId = obtenerUsuarioId();
-                
-                // Eliminar la permuta del array
-                datosUsuario.permutas.splice(index, 1);
-                
-                // Guardar en Firebase
-                database.ref('descansos/' + usuarioId).set(datosUsuario)
-                    .then(() => {
-                        mostrarExito('Permuta eliminada correctamente');
-                        actualizarInterfaz(); // Actualiza contadores en la página principal
-                        mostrarPermutas(); // Refresca la lista en el modal
-                    })
-                    .catch(error => {
-                        console.error('Error al eliminar permuta:', error);
-                        mostrarError('Error al eliminar la permuta. Inténtalo de nuevo.');
-                        cargarDatos(); // Recargar datos para evitar inconsistencias
-                    });
-            }
+
+        function renderListaPermutas() {
+            document.getElementById('lista-permutas').innerHTML = '';
+            datos.permutas.filter(p=>parseInt(p.año)===anioGestion).forEach(p => {
+                const idx = datos.permutas.indexOf(p);
+                document.getElementById('lista-permutas').innerHTML += `
+                    <div class="item-row">
+                        <div><strong>${p.agente}</strong> <small>${fmtDate(p.fechaYo)} ↔ ${fmtDate(p.fechaEl)}</small></div>
+                        <button onclick="eliminarPermuta(${idx})" class="btn-action btn-eliminar btn-icon">🗑️</button>
+                    </div>`;
+            });
         }
-        
-        // Limpiar formulario de permuta
-        function limpiarFormularioPermuta() {
-            agentePermutaInput.value = '';
-            fechaPropiaInput.value = '';
-            turnoPropioSelect.value = 'primero';
-            fechaAgenteInput.value = '';
-            turnoAgenteSelect.value = 'primero';
+
+        // --- UTILS & DB ---
+        function guardarEnBD(msg) {
+            renderUI(); // Update optimista
+            db.ref('descansos/' + USER_ID).set(datos).then(() => {
+                notificar(msg, 'success');
+                renderUI(); // Sync final
+            });
         }
-        
-        // Funciones auxiliares
-        function obtenerUsuarioId() {
-            // VERIFICA QUE ESTE ID COINCIDE CON EL QUE USAS EN FIREBASE
-            return 'usuario-demo';
+
+        function notificar(msg, type) {
+            const d = document.createElement('div'); d.className = `notification ${type==='success'?'notif-success':'notif-error'}`;
+            d.textContent = msg; document.getElementById('notification-area').appendChild(d);
+            setTimeout(() => d.remove(), 3000);
         }
-        
-        function formatearFechaDDMMAAAA(fecha) {
-            const partes = fecha.split('-');
-            return `${partes[2]}/${partes[1]}/${partes[0]}`;
-        }
-        
-        function formatearTipo(tipo) {
-            switch(tipo) {
-                case 'vacaciones': return 'Vacaciones';
-                case 'asuntos-propios': return 'Asuntos Propios';
-                case 'horas': return 'Horas';
-                default: return tipo;
-            }
-        }
-        
-        function formatearEstado(estado) {
-            switch(estado) {
-                case 'pendiente': return 'Pendiente';
-                case 'tramite': return 'En Trámite';
-                case 'denegado': return 'Denegado';
-                case 'disfrutado': return 'Disfrutado';
-                default: return estado;
-            }
-        }
-        
-        function formatearTurno(turno) {
-            switch(turno) {
-                case 'primero': return 'Turno Primero';
-                case 'segundo': return 'Turno Segundo';
-                case 'tercero': return 'Turno Tercero';
-                default: return turno;
-            }
-        }
-        
-        function mostrarError(mensaje) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'error';
-            errorDiv.textContent = mensaje;
-            
-            // Insertar al principio del contenedor
-            const container = document.querySelector('.container');
-            container.insertBefore(errorDiv, container.firstChild);
-            
-            // Eliminar después de 5 segundos
-            setTimeout(() => {
-                errorDiv.remove();
-            }, 5000);
-        }
-        
-        function mostrarExito(mensaje) {
-            const exitoDiv = document.createElement('div');
-            exitoDiv.className = 'success';
-            exitoDiv.textContent = mensaje;
-            
-            // Insertar al principio del contenedor
-            const container = document.querySelector('.container');
-            container.insertBefore(exitoDiv, container.firstChild);
-            
-            // Eliminar después de 5 segundos
-            setTimeout(() => {
-                exitoDiv.remove();
-            }, 5000);
-        }
+
+        function fmtDate(f) { if(!f)return''; const p=f.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
+        function fmtType(t) { return t.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()); }
+
     </script>
 </body>
 </html>

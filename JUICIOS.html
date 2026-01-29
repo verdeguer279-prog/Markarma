@@ -17,6 +17,7 @@
       --accent-green: #28a745;
       --accent-red: #dc3545;
       --accent-yellow: #ffc107;
+      --accent-grey: #adb5bd; /* Nuevo color para cancelados */
       --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
     }
     * {
@@ -30,7 +31,7 @@
       padding: 0;
     }
     .wrap {
-      max-width: 1400px; /* AUMENTADO de 1200px a 1400px */
+      max-width: 1400px;
       margin: 20px auto;
       padding: 0 20px;
     }
@@ -169,7 +170,7 @@
     table { 
       width: 100%; 
       border-collapse: collapse;
-      min-width: 1000px; /* Mínimo ancho para evitar cortes */
+      min-width: 1000px;
     }
     th, td {
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -201,13 +202,14 @@
     .status-celebrado { color: var(--accent-green); font-weight: bold; }
     .status-suspendido { color: var(--accent-blue); font-weight: bold; }
     .status-webex { color: var(--accent-yellow); font-weight: bold; }
+    .status-cancelado { color: var(--accent-grey); font-weight: bold; } /* Nuevo estilo para cancelado */
 
-    /* JUICIOS SUSPENDIDOS */
-    tr.is-suspended {
+    /* JUICIOS CANCELADOS (Antes suspendidos tachados) */
+    tr.is-cancelled {
         text-decoration: line-through;
         opacity: 0.6;
     }
-    tr.is-suspended .action-item {
+    tr.is-cancelled .action-item {
         text-decoration: none;
     }
 
@@ -441,14 +443,12 @@
                 </tr>
               </thead>
               <tbody id="juicios-body">
-                <!-- Los datos se cargarán aquí -->
-              </tbody>
+                </tbody>
             </table>
         </div>
     </div>
   </div>
 
-  <!-- Modal para añadir/editar juicios -->
   <div id="dlgNuevo" class="modal-overlay">
     <div class="modal">
       <div class="modal-header">
@@ -499,7 +499,8 @@
                 <select id="estado" name="estado" tabindex="6">
                     <option value="pendiente">Pendiente</option>
                     <option value="celebrado">Celebrado</option>
-                    <option value="suspendido">Suspendido</option>
+                    <option value="suspendido">Suspendido (En Sala)</option>
+                    <option value="cancelado">Cancelado (Tachado)</option>
                     <option value="webex">Webex</option>
                 </select>
             </div>
@@ -522,7 +523,6 @@
     </div>
   </div>
 
-  <!-- Modal de mensajes -->
   <div id="dlgMessage" class="modal-overlay">
     <div class="modal">
       <div class="modal-header">
@@ -621,7 +621,12 @@
             case 'suspendido':
                 statusClass = 'status-suspendido';
                 statusText = 'Suspendido';
-                rowClass = 'is-suspended';
+                // YA NO AÑADIMOS la clase is-suspended aquí para que no se tache
+                break;
+            case 'cancelado': // NUEVO CASO
+                statusClass = 'status-cancelado';
+                statusText = 'Cancelado';
+                rowClass = 'is-cancelled'; // Clase para tachar
                 break;
             case 'webex':
                 statusClass = 'status-webex';
@@ -690,7 +695,14 @@
       db.ref('juicios').on('value', (snapshot) => {
         const data = snapshot.val();
         const juicios = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
-        juicios.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+        
+        // MODIFICADO: Ordenar por Fecha (descendente) y luego por Hora (descendente)
+        juicios.sort((a, b) => {
+            const dateA = new Date(a.fecha + 'T' + (a.hora || '00:00'));
+            const dateB = new Date(b.fecha + 'T' + (b.hora || '00:00'));
+            return dateB - dateA;
+        });
+
         renderJuicios(juicios);
         populateJuzgadoDatalist(juicios);
         window.allJuiciosData = juicios;

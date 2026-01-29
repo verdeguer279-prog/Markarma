@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GAD - Acceso</title>
+    <title>GAD - Panel de Control</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -44,9 +44,9 @@
             transition: opacity 0.5s ease-in-out;
         }
         
-        /* Imagen Central GAD (Logo) */
+        /* Imagen Central Login */
         .brand-logo {
-            max-width: 180px;
+            max-width: 200px;
             height: auto;
             margin-bottom: 30px;
             filter: drop-shadow(0 0 15px rgba(102, 126, 234, 0.3));
@@ -68,11 +68,12 @@
             max-width: 350px;
             width: 90%;
             border: 1px solid rgba(255,255,255,0.05);
-            opacity: 0; /* Se muestra con animación */
+            opacity: 0; 
             transform: translateY(20px);
             transition: all 0.5s ease;
+            display: none; /* Oculto hasta que termine carga */
         }
-        .login-card.visible { opacity: 1; transform: translateY(0); }
+        .login-card.visible { opacity: 1; transform: translateY(0); display: block; }
         
         .google-btn {
             background-color: #fff;
@@ -96,7 +97,7 @@
 
         /* --- DASHBOARD PRINCIPAL --- */
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 40px auto;
             padding: 0 20px;
             display: none;
@@ -115,78 +116,112 @@
         
         .header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
         
-        /* Logo pequeño en dashboard */
-        .dashboard-logo { height: 60px; width: auto; }
+        /* ESTILO CORREGIDO PARA EL LOGO DEL MENÚ */
+        .app-logo {
+            height: 90px;
+            width: auto;
+            min-width: 100px; /* Espacio mínimo */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: transparent; /* Sin fondo gris */
+            border-radius: 0; /* Sin círculo */
+            border: none; /* Sin borde */
+            position: relative;
+        }
+        
+        .app-logo img {
+            height: 100%;
+            width: auto;
+            object-fit: contain; /* Ajustar imagen completa */
+            max-width: 200px;
+        }
+        
+        /* Hover solo en modo edición */
+        .edit-mode .app-logo { cursor: pointer; border: 2px dashed var(--accent-orange); border-radius: 8px; padding: 5px; }
 
         .header-title { flex-grow: 1; }
         .header-title h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
         .header-title p { margin: 5px 0 0; font-size: 0.85rem; color: var(--text-muted); }
         
         .button-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
         }
         .button-wrapper { position: relative; min-height: 80px; }
         .button-wrapper.long { grid-column: span 2; }
-        @media (max-width: 600px) { .button-wrapper.long { grid-column: span 1; } }
+        @media (max-width: 768px) { .button-wrapper.long { grid-column: span 1; } }
         
         .button {
             display: flex; align-items: center; justify-content: center; padding: 25px 20px;
             border-radius: 12px; background-image: var(--accent-gradient); color: var(--text-light);
-            font-weight: 600; text-decoration: none; text-align: center;
+            font-weight: 600; text-decoration: none; text-align: center; text-transform: uppercase;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); height: 100%; width: 100%; box-sizing: border-box;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1rem; letter-spacing: 0.5px;
         }
-        .button:hover:not(.edit-mode .button) { transform: translateY(-3px); }
+        .button:hover:not(.edit-mode .button) { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); }
 
         /* Controles */
         .session-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-left: auto; }
-        .btn-control { padding: 8px 12px; border-radius: 8px; border: none; font-size: 0.8rem; cursor: pointer; }
-        .btn-logout { background: rgba(255,255,255,0.1); color: #ccc; }
+        .btn-control { 
+            padding: 8px 16px; border-radius: 8px; border: 1px solid transparent; 
+            font-size: 0.9rem; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;
+            transition: all 0.2s;
+        }
+        .btn-logout { background: rgba(255,255,255,0.05); color: #ccc; border-color: rgba(255,255,255,0.1); }
+        .btn-logout:hover { background: rgba(255,255,255,0.1); color: white; }
         
-        #btnToggleEdit { background: var(--accent-orange); color: var(--bg-dark); display: none; font-weight: bold;}
+        #btnToggleEdit { background: var(--accent-orange); color: var(--bg-dark); display: none; }
         #btnUsuarios { background: transparent; border: 1px solid var(--admin-gold); color: var(--admin-gold); display: none; }
+        #btnUsuarios:hover { background: rgba(255, 215, 0, 0.1); }
 
         /* Edit Mode */
         .edit-mode .button { pointer-events: none; opacity: 0.8; }
-        .edit-mode .button-wrapper { border: 2px dashed var(--accent-orange); border-radius: 14px; padding: 5px; }
+        .edit-mode .button-wrapper { border: 2px dashed var(--accent-orange); border-radius: 14px; padding: 5px; background: rgba(255,152,0,0.05); }
         .action-buttons { position: absolute; top: -10px; right: -10px; display: flex; gap: 5px; z-index: 10; }
-        .action-button { width: 28px; height: 28px; border-radius: 50%; border: none; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; }
+        .action-button { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
         .edit { background: var(--accent-orange); } .delete { background: var(--accent-red); }
         
-        #btnAddButton { background: rgba(40,167,69,0.1); color: var(--accent-green); border: 2px dashed var(--accent-green); padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; text-align: center; display: none; }
+        #btnAddButton { 
+            background: rgba(40,167,69,0.1); color: var(--accent-green); 
+            border: 2px dashed var(--accent-green); padding: 15px; border-radius: 12px; 
+            font-weight: bold; cursor: pointer; margin-top: 25px; text-align: center; display: none; 
+        }
 
         /* Modales */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 9999; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(5px); }
         .modal-overlay.open { display: flex; }
-        .modal { background: var(--card-bg); padding: 30px; border-radius: 16px; width: 90%; max-width: 400px; position: relative; }
-        .modal input, .modal select { width: 100%; padding: 10px; margin-bottom: 15px; background: var(--bg-dark); border: 1px solid #555; color: white; border-radius: 6px; box-sizing: border-box; }
-        .btn-primary { background: var(--accent-gradient); color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; width: 100%; }
-        .close-modal { position: absolute; top: 15px; right: 20px; cursor: pointer; color: #aaa; font-size: 1.2rem; }
+        .modal { background: var(--card-bg); padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; position: relative; border: 1px solid rgba(255,255,255,0.1); }
+        .modal h3 { margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px; }
+        .modal input, .modal select { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--bg-dark); border: 1px solid #555; color: white; border-radius: 8px; box-sizing: border-box; }
+        .btn-primary { background: var(--accent-gradient); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 600; font-size: 1rem; }
+        .close-modal { position: absolute; top: 20px; right: 20px; cursor: pointer; color: #aaa; font-size: 1.2rem; }
 
-        .user-list-item { display: flex; justify-content: space-between; padding: 10px; background: rgba(0,0,0,0.2); margin-bottom: 5px; border-radius: 4px; }
+        .user-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0,0,0,0.2); margin-bottom: 8px; border-radius: 8px; }
         
         /* Spinner Loader */
         .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-left-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
-        .error-msg { color: var(--accent-red); font-size: 0.8rem; margin-top: 10px; display: none; }
+        .error-msg { color: var(--accent-red); font-size: 0.9rem; margin-top: 15px; display: none; background: rgba(220,53,69,0.1); padding: 10px; border-radius: 8px; }
 
         @media (max-width: 600px) {
             .header { flex-direction: column; text-align: center; }
-            .session-controls { justify-content: center; width: 100%; margin-top: 10px; }
+            .session-controls { justify-content: center; width: 100%; margin-top: 15px; }
+            .btn-control { flex: 1; justify-content: center; }
         }
     </style>
 </head>
 <body>
 
 <div id="login-screen">
-    <img src="logogad.PNG" alt="GAD Logo" class="brand-logo" onerror="this.style.display='none'">
+    <img src="logogad.png" alt="GAD Logo" class="brand-logo" onerror="this.src='https://placehold.co/200x100?text=GAD'">
     
     <div id="initial-loader" class="spinner"></div>
 
     <div id="login-card-content" class="login-card">
-        <h2 style="margin: 0 0 10px;">Acceso GAD</h2>
-        <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 25px;">Identifícate para entrar</p>
+        <h2 style="margin: 0 0 10px; font-size: 1.5rem;">Bienvenido</h2>
+        <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 30px;">Inicia sesión para acceder al panel</p>
         
         <button id="btn-login-google" class="google-btn">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G">
@@ -199,10 +234,13 @@
 <div class="container" id="main-content">
     <div class="card">
         <header class="header">
-            <img src="logogad.PNG" alt="GAD" class="dashboard-logo" onerror="this.src='https://placehold.co/100x50?text=GAD'">
+            <div class="app-logo" id="appLogo">
+                <img id="logoImage" src="logogad.png" alt="GAD" onerror="this.src='https://placehold.co/100x50?text=GAD'">
+            </div>
+            <input type="file" id="logoFileInput" style="display: none;" accept="image/*">
 
             <div class="header-title">
-                <h1 id="welcome-message">Bienvenido</h1>
+                <h1 id="welcome-message">Hola, Usuario</h1>
                 <p>Panel de Control</p>
             </div>
             
@@ -225,13 +263,20 @@
     <div class="modal">
         <span class="close-modal" id="close-button-modal">&times;</span>
         <h3>Configurar Botón</h3>
-        <input type="text" id="button-name" placeholder="Nombre">
-        <input type="text" id="button-url" placeholder="URL o archivo.html">
-        <select id="button-type"><option value="short">Normal</option><option value="long">Ancho</option></select>
-        <div id="drop-area" style="border:1px dashed #555; padding:15px; text-align:center; border-radius:6px; cursor:pointer;">
-            <small>Arrastra un HTML aquí</small>
+        <label style="display:block; text-align:left; margin-bottom:5px; font-size:0.9rem; color:#ccc;">Nombre del botón</label>
+        <input type="text" id="button-name" placeholder="Ej: Usuarios">
+        
+        <label style="display:block; text-align:left; margin-bottom:5px; font-size:0.9rem; color:#ccc;">Enlace / Archivo</label>
+        <input type="text" id="button-url" placeholder="https://... o archivo.html">
+        
+        <label style="display:block; text-align:left; margin-bottom:5px; font-size:0.9rem; color:#ccc;">Tamaño</label>
+        <select id="button-type"><option value="short">Normal (1 hueco)</option><option value="long">Ancho (2 huecos)</option></select>
+        
+        <div id="drop-area" style="border:2px dashed #555; padding:20px; text-align:center; border-radius:8px; cursor:pointer; margin-bottom:15px; transition:0.2s;">
+            <i class="fas fa-file-upload" style="font-size:1.5rem; margin-bottom:10px; display:block; color:#667eea;"></i>
+            <small>Arrastra un archivo HTML aquí para autocompletar</small>
         </div>
-        <button id="button-submit" class="btn-primary" style="margin-top:10px;">Guardar</button>
+        <button id="button-submit" class="btn-primary">Guardar Cambios</button>
     </div>
 </div>
 
@@ -239,11 +284,11 @@
     <div class="modal">
         <span class="close-modal" id="dlgUsuariosClose">&times;</span>
         <h3>Usuarios Autorizados</h3>
-        <div style="display:flex; gap:5px; margin-bottom:15px;">
-            <input type="email" id="txtNewUserEmail" placeholder="email@gmail.com" style="margin-bottom:0;">
-            <button id="btnAddUser" class="btn-primary" style="width:auto;">+</button>
+        <div style="display:flex; gap:10px; margin-bottom:20px;">
+            <input type="email" id="txtNewUserEmail" placeholder="usuario@gmail.com" style="margin-bottom:0;">
+            <button id="btnAddUser" class="btn-primary" style="width:auto; padding:0 20px;">+</button>
         </div>
-        <div id="usersListContainer" style="max-height:200px; overflow-y:auto;"></div>
+        <div id="usersListContainer" style="max-height:250px; overflow-y:auto; padding-right:5px;"></div>
     </div>
 </div>
 
@@ -251,6 +296,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 <script>
+    // 1. CONFIGURACIÓN
     const firebaseConfig = {
       apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
       authDomain: "markarma279.firebaseapp.com",
@@ -265,14 +311,14 @@
     const db = firebase.database();
     const auth = firebase.auth();
     const provider = new firebase.auth.GoogleAuthProvider();
-
-    // PERSISTENCIA: Esto es clave para el login automático
+    
+    // PERSISTENCIA (Mantiene sesión abierta)
     auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
 
     const ADMIN_EMAIL = "verdeguer279@gmail.com";
     const ALLOWED_USERS_REF = db.ref('allowed_users');
 
-    // UI Elements
+    // Referencias UI
     const loginScreen = document.getElementById('login-screen');
     const loginCard = document.getElementById('login-card-content');
     const loader = document.getElementById('initial-loader');
@@ -283,27 +329,26 @@
     let isAdmin = false;
     let editingKey = null;
 
-    // --- LÓGICA DE AUTENTICACIÓN AUTOMÁTICA ---
+    // 2. SISTEMA DE AUTENTICACIÓN
     auth.onAuthStateChanged((user) => {
         if (user) {
-            // Usuario detectado (por login previo o actual)
             checkAccess(user);
         } else {
-            // Nadie logueado: Ocultar spinner, mostrar formulario login
+            // Nadie logueado
             loader.style.display = 'none';
             loginCard.classList.add('visible');
         }
     });
 
     function checkAccess(user) {
-        // 1. Verificar si es Admin
+        // Caso 1: Es Admin
         if (user.email === ADMIN_EMAIL) {
             isAdmin = true;
             enterDashboard(user);
             return;
         }
 
-        // 2. Verificar si es Autorizado
+        // Caso 2: Es usuario normal (verificar lista blanca)
         ALLOWED_USERS_REF.once('value').then(snapshot => {
             const allowed = snapshot.val();
             let isAllowed = false;
@@ -315,35 +360,42 @@
                 isAdmin = false;
                 enterDashboard(user);
             } else {
-                // No autorizado: Expulsar
+                // Denegado
                 auth.signOut();
                 loader.style.display = 'none';
                 loginCard.classList.add('visible');
-                loginError.textContent = "Usuario no autorizado.";
+                loginError.textContent = "Acceso denegado: Usuario no autorizado.";
                 loginError.style.display = 'block';
             }
+        }).catch(err => {
+            // Error de permisos de lectura (reglas firebase bloquean lectura si no es admin/auth)
+            console.error(err);
+            auth.signOut();
+            loginError.textContent = "Error de acceso o permisos insuficientes.";
+            loginError.style.display = 'block';
         });
     }
 
     function enterDashboard(user) {
-        // Ocultar Login Screen con transición
+        // Transición suave
         loginScreen.style.opacity = '0';
         setTimeout(() => {
             loginScreen.style.display = 'none';
             mainContent.style.display = 'block';
         }, 500);
 
-        document.getElementById('welcome-message').textContent = `Hola, ${user.displayName || 'Usuario'}`;
+        document.getElementById('welcome-message').textContent = `Hola, ${user.displayName || 'Usuario'}`.toUpperCase();
         
+        loadLogo(); // Carga logo de DB si existe, sino mantiene logogad.png
         loadButtons();
         
         if (isAdmin) {
-            document.getElementById('btnToggleEdit').style.display = 'block';
-            document.getElementById('btnUsuarios').style.display = 'block';
+            document.getElementById('btnToggleEdit').style.display = 'flex';
+            document.getElementById('btnUsuarios').style.display = 'flex';
         }
     }
 
-    // Botones Login/Logout
+    // Botones Auth
     document.getElementById('btn-login-google').onclick = () => {
         loginError.style.display = 'none';
         auth.signInWithPopup(provider).catch(e => {
@@ -356,24 +408,59 @@
         auth.signOut().then(() => location.reload());
     };
 
-    // --- LÓGICA DASHBOARD ---
+
+    // 3. FUNCIONES DEL DASHBOARD
+
+    // Cargar Logo (Prioridad: DB > logogad.png local)
+    function loadLogo() {
+        db.ref('config/logo').on('value', snap => {
+            const val = snap.val();
+            if(val) {
+                // Si hay un logo subido por el admin, úsalo
+                document.getElementById('logoImage').src = val;
+            } 
+            // Si no hay nada en DB, se queda el src="logogad.png" del HTML
+        });
+    }
+
+    // Subir logo (Solo en modo edición)
+    document.getElementById('appLogo').onclick = () => {
+        if(isEditMode && isAdmin) document.getElementById('logoFileInput').click();
+    };
+    document.getElementById('logoFileInput').onchange = (e) => {
+        const f = e.target.files[0];
+        if(f) {
+            const r = new FileReader();
+            r.onload = ev => db.ref('config/logo').set(ev.target.result);
+            r.readAsDataURL(f);
+        }
+    };
 
     // Toggle Edición
     document.getElementById('btnToggleEdit').onclick = () => {
         isEditMode = !isEditMode;
         const btn = document.getElementById('btnToggleEdit');
-        btn.style.background = isEditMode ? 'var(--accent-green)' : 'var(--accent-orange)';
-        btn.innerHTML = isEditMode ? '<i class="fas fa-check"></i>' : '<i class="fas fa-pen"></i> Editar';
-        document.getElementById('btnAddButton').style.display = isEditMode ? 'block' : 'none';
+        const addBtn = document.getElementById('btnAddButton');
         
-        if(isEditMode) document.body.classList.add('edit-mode');
-        else document.body.classList.remove('edit-mode');
+        if(isEditMode) {
+            btn.innerHTML = '<i class="fas fa-check"></i> Terminar';
+            btn.style.background = 'var(--accent-green)';
+            btn.style.color = 'white';
+            document.body.classList.add('edit-mode');
+            addBtn.style.display = 'block';
+        } else {
+            btn.innerHTML = '<i class="fas fa-pen"></i> Editar';
+            btn.style.background = 'var(--accent-orange)';
+            btn.style.color = 'var(--bg-dark)';
+            document.body.classList.remove('edit-mode');
+            addBtn.style.display = 'none';
+        }
         
-        // Recargar botones para actualizar estado draggable
-        db.ref('botones').once('value').then(snap => renderButtons(snap.val()));
+        // Refrescar botones para activar/desactivar drag
+        db.ref('botones').once('value').then(s => renderButtons(s.val()));
     };
 
-    // Render Botones
+    // Renderizado de Botones
     function loadButtons() {
         db.ref('botones').on('value', snap => renderButtons(snap.val()));
     }
@@ -388,6 +475,8 @@
         sorted.forEach(btn => {
             const div = document.createElement('div');
             div.className = `button-wrapper ${btn.span === 'long' ? 'long' : ''}`;
+            div.setAttribute('data-key', btn.key);
+            
             if(isEditMode && isAdmin) {
                 div.innerHTML = `
                     <div class="action-buttons">
@@ -395,22 +484,21 @@
                         <button class="action-button delete" onclick="deleteBtn('${btn.key}')"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
-                // Drag Logic Simple
                 div.draggable = true;
                 setupDrag(div);
             }
             
             const a = document.createElement('a');
             a.className = 'button';
-            a.href = isEditMode ? '#' : (btn.url || '#');
+            a.href = isEditMode ? 'javascript:void(0)' : (btn.url || '#');
             a.textContent = btn.name;
             div.appendChild(a);
             grid.appendChild(div);
         });
     }
 
-    // --- MODALES Y CRUD ---
-    
+    // 4. MODALES Y LOGICA CRUD
+
     // Modal Botón
     const btnModal = document.getElementById('button-modal');
     window.openModal = (key = null) => {
@@ -427,15 +515,17 @@
         }
         btnModal.classList.add('open');
     };
+    
     document.getElementById('close-button-modal').onclick = () => btnModal.classList.remove('open');
     document.getElementById('btnAddButton').onclick = () => openModal();
 
     document.getElementById('button-submit').onclick = () => {
-        const name = document.getElementById('button-name').value;
-        if(!name) return;
+        const name = document.getElementById('button-name').value.trim();
+        if(!name) return alert("El botón necesita un nombre");
+        
         const data = {
             name: name,
-            url: document.getElementById('button-url').value,
+            url: document.getElementById('button-url').value.trim(),
             span: document.getElementById('button-type').value
         };
         
@@ -449,21 +539,25 @@
         btnModal.classList.remove('open');
     };
 
-    window.deleteBtn = (k) => { if(confirm("¿Borrar?")) db.ref('botones/'+k).remove(); };
+    window.deleteBtn = (k) => { if(confirm("¿Seguro que quieres borrar este botón?")) db.ref('botones/'+k).remove(); };
 
     // Modal Usuarios
     const usrModal = document.getElementById('dlgUsuariosModal');
     document.getElementById('btnUsuarios').onclick = () => {
         usrModal.classList.add('open');
         const list = document.getElementById('usersListContainer');
-        list.innerHTML = 'Cargando...';
+        list.innerHTML = '<p style="text-align:center">Cargando...</p>';
         ALLOWED_USERS_REF.on('value', s => {
             list.innerHTML = '';
             const u = s.val();
             if(u) Object.keys(u).forEach(k => {
-                list.innerHTML += `<div class="user-list-item"><span>${u[k]}</span><button class="action-button delete" onclick="delUser('${k}')">X</button></div>`;
+                list.innerHTML += `
+                    <div class="user-list-item">
+                        <span>${u[k]}</span>
+                        <button class="action-button delete" onclick="delUser('${k}')"><i class="fas fa-trash"></i></button>
+                    </div>`;
             });
-            else list.innerHTML = '<small>Sin usuarios adicionales</small>';
+            else list.innerHTML = '<p style="color:#aaa; text-align:center;">No hay usuarios autorizados extra.</p>';
         });
     };
     document.getElementById('dlgUsuariosClose').onclick = () => usrModal.classList.remove('open');
@@ -474,29 +568,57 @@
     };
     window.delUser = (k) => ALLOWED_USERS_REF.child(k).remove();
 
-    // Drag helper
+    // Drag & Drop
     let dragSrc = null;
     function setupDrag(el) {
-        el.addEventListener('dragstart', e => { dragSrc = el; e.dataTransfer.effectAllowed = 'move'; });
+        el.addEventListener('dragstart', e => { 
+            dragSrc = el; 
+            e.dataTransfer.effectAllowed = 'move'; 
+            setTimeout(()=> el.style.opacity = '0.4', 0);
+        });
+        el.addEventListener('dragend', e => { 
+            el.style.opacity = '1'; 
+            saveOrder();
+        });
         el.addEventListener('dragover', e => { e.preventDefault(); });
         el.addEventListener('drop', e => {
             e.stopPropagation();
             if (dragSrc !== el) {
-                // Intercambio visual simple, el orden real requiere lógica más compleja de reindexado
-                // Para esta demo simple, solo recargamos para no romper la UI
-                // En producción usarías updates de 'order'
+                // Intercambio simple en el DOM visual
+                const grid = document.getElementById('buttonGrid');
+                const children = Array.from(grid.children);
+                const fromIndex = children.indexOf(dragSrc);
+                const toIndex = children.indexOf(el);
+                
+                if(fromIndex < toIndex) el.after(dragSrc);
+                else el.before(dragSrc);
             }
             return false;
         });
     }
-    
-    // Drag File Modal
+
+    function saveOrder() {
+        const updates = {};
+        const buttons = document.querySelectorAll('.button-wrapper');
+        buttons.forEach((btn, index) => {
+            const key = btn.getAttribute('data-key');
+            updates[`botones/${key}/order`] = index;
+        });
+        db.ref().update(updates);
+    }
+
+    // Drag File (Modal)
     const drop = document.getElementById('drop-area');
-    drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.background = '#333'; });
-    drop.addEventListener('dragleave', e => { drop.style.background = 'transparent'; });
+    drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--accent-green)'; drop.style.background = 'rgba(40,167,69,0.1)'; });
+    drop.addEventListener('dragleave', e => { drop.style.borderColor = '#555'; drop.style.background = 'transparent'; });
     drop.addEventListener('drop', e => {
         e.preventDefault();
-        if(e.dataTransfer.files[0]) document.getElementById('button-url').value = e.dataTransfer.files[0].name;
+        drop.style.borderColor = '#555'; drop.style.background = 'transparent';
+        const file = e.dataTransfer.files[0];
+        if(file) {
+            document.getElementById('button-url').value = file.name;
+            drop.innerHTML = `<i class="fas fa-check" style="color:var(--accent-green); font-size:1.5rem;"></i><br>${file.name}`;
+        }
     });
 
 </script>

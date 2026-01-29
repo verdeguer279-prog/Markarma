@@ -12,6 +12,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
     :root {
@@ -46,24 +48,47 @@
         text-align:center; margin-bottom:15px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;
     }
 
-    #btnToggleForm, #btnMainMenu { padding:12px 20px; font-size:0.95rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
+    #btnToggleForm, #btnMainMenu, #btnStats { padding:12px 20px; font-size:0.95rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
     #btnToggleForm { background-image: var(--accent-gradient); color: var(--text-light); }
     #btnMainMenu { background-color: var(--accent-orange); color: #333; }
+    
+    /* Nuevo Botón Estadísticas */
+    #btnStats { background-color: #00bcd4; color: #fff; }
+    #btnStats:hover, #btnToggleForm:hover, #btnMainMenu:hover { transform: scale(1.05); filter: brightness(1.1); }
 
-    /* FORMULARIO MODAL */
-    #data-entry-form { 
+    /* FORMULARIO MODAL Y ESTADÍSTICAS */
+    #data-entry-form, #stats-modal { 
         position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1001; 
         display: none; opacity: 0; transition: opacity .3s ease;
         overflow-y: auto; align-items: flex-start; justify-content: center;
         padding: 20px 10px;
     }
-    #data-entry-form.visible { display: flex; opacity: 1; }
+    #data-entry-form.visible, #stats-modal.visible { display: flex; opacity: 1; }
     
     .modal-content-wrapper {
         background-color: var(--card-bg); border-radius: 12px; padding: 25px;
         width: 100%; max-width: 1000px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         margin-bottom: 50px;
     }
+    
+    /* MODAL ESTADÍSTICAS ESPECÍFICO */
+    .stats-wrapper { max-width: 1300px !important; }
+    .stats-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+    .stats-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; }
+    .chart-container { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; height: 350px; position: relative; }
+    .kpi-container { display: grid; grid-template-columns: 1fr; gap: 15px; }
+    .kpi-card { background: linear-gradient(145deg, #2d2d44, #363652); padding: 20px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
+    .kpi-value { font-size: 1.8rem; font-weight: 800; color: #ffd54f; margin: 5px 0; }
+    .kpi-label { font-size: 0.9rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* TABLA RESUMEN TIPO HOJA DE CÁLCULO */
+    .spreadsheet-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
+    .spreadsheet-table th { background: #3e3e5c; color: #ffd54f; padding: 12px; text-align: right; position: sticky; top: 0; }
+    .spreadsheet-table th:first-child { text-align: left; }
+    .spreadsheet-table td { padding: 10px; border: 1px solid rgba(255,255,255,0.1); text-align: right; color: #e9e9f0; }
+    .spreadsheet-table td:first-child { text-align: left; font-weight: bold; color: var(--accent-blue); }
+    .row-total { background: rgba(255, 213, 79, 0.1); font-weight: bold; }
+    .row-total td { border-top: 2px solid #ffd54f; color: #ffd54f; }
 
     /* Form Grid Desktop */
     .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: end; margin-bottom: 15px; } 
@@ -83,149 +108,85 @@
     #btnSubmitCourse { background: var(--accent-green); color: white; }
     #btnCancelEdit { background: var(--accent-red); color: white; }
 
-    /* ESTADISTICAS */
-    .stats-controls { display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap; }
-    .stats-results { display: flex; gap: 40px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 1.1rem; flex-wrap: wrap; }
-    .stats-results strong { color: #ffd54f; }
-
     /* TABLA ESCITORIO (Por defecto) */
     .table-container { width: 100%; overflow-x: auto; }
     .courses-table { width: 100%; border-collapse: collapse; min-width: 1000px; } 
     .courses-table th { background: var(--header-bg); color: #ffd54f; padding: 12px; text-align: left; }
     .courses-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
     
-    /* Estados y Alertas */
     .status-cobrado { color: var(--accent-green); font-weight:700; background: rgba(40, 167, 69, 0.1); padding: 4px 8px; border-radius: 4px; }
     .status-pendiente { color: var(--accent-red); font-weight:700; background: rgba(220, 53, 69, 0.1); padding: 4px 8px; border-radius: 4px; }
     
     /* Fila con Alerta */
-    tr.row-alert {
-        background-color: rgba(220, 53, 69, 0.15) !important;
-        border-left: 4px solid #f44336;
-    }
+    tr.row-alert { background-color: rgba(220, 53, 69, 0.15) !important; border-left: 4px solid #f44336; }
 
     /* BOTONES DE ACCIÓN */
     .action-btns { display: flex; gap: 5px; }
     .action-btns button { padding: 6px 10px; font-size: 0.8rem; }
     .edit-btn { background: #2196f3; color: white; }
     .delete-btn { background: #f44336; color: white; }
-    
-    /* Botón Ojo Normal */
     .obs-btn { background: #ff9800; color: white; }
-    
-    /* Botón Ojo Alerta */
-    .obs-btn.alert-btn { 
-        background: #d32f2f !important; /* Rojo oscuro */
-        color: white; 
-        border: 1px solid #ff5252;
-        animation: pulse 2s infinite;
-    }
-    
+    .obs-btn.alert-btn { background: #d32f2f !important; color: white; border: 1px solid #ff5252; animation: pulse 2s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-    /* --- ANCHOS DE COLUMNA PC (Ajustado para fecha en 1 línea) --- */
-    .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 3%; }  /* # */
-    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 10%; white-space: nowrap; }  /* Inicio (Más ancho) */
-    .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 15%; } /* Curso */
-    .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 10%; } /* Pagador */
-    .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 10%; } /* Lugar */
-    .courses-table th:nth-child(6), .courses-table td:nth-child(6) { width: 6%; }  /* Horas */
-    .courses-table th:nth-child(7), .courses-table td:nth-child(7) { width: 9%; }  /* Importe */
-    .courses-table th:nth-child(8), .courses-table td:nth-child(8) { width: 8%; }  /* Estado */
-    .courses-table th:nth-child(9), .courses-table td:nth-child(9) { width: 7%; }  /* Cobro */
-    .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; } /* Renta */
-    .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 16%; min-width: 140px; } /* Acciones */
+    /* ANCHOS PC */
+    .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 3%; }
+    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 10%; white-space: nowrap; }
+    .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 15%; }
+    .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 10%; }
+    .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 10%; }
+    .courses-table th:nth-child(6), .courses-table td:nth-child(6) { width: 6%; }
+    .courses-table th:nth-child(7), .courses-table td:nth-child(7) { width: 9%; }
+    .courses-table th:nth-child(8), .courses-table td:nth-child(8) { width: 8%; }
+    .courses-table th:nth-child(9), .courses-table td:nth-child(9) { width: 7%; }
+    .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; }
+    .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 16%; min-width: 140px; }
 
-    /* --- ESTILOS MÓVIL --- */
+    /* --- MÓVIL --- */
     @media (max-width: 900px) {
         .form-grid { grid-template-columns: 1fr 1fr; }
+        .stats-grid { grid-template-columns: 1fr; }
     }
     
     @media (max-width: 768px) {
         .container { padding: 0 10px; margin-top: 15px; }
         .form-grid { grid-template-columns: 1fr; }
         .toggle-form-container { flex-direction: column; }
-        #btnToggleForm, #btnMainMenu { width: 100%; }
+        #btnToggleForm, #btnMainMenu, #btnStats { width: 100%; }
         
-        /* Ocultar cabecera de tabla */
         .courses-table thead { display: none; }
         .courses-table, .courses-table tbody, .courses-table tr, .courses-table td { display: block; width: 100%; }
         
-        /* TRANSFORMACIÓN A TARJETA */
+        /* TARJETAS MÓVIL */
         .courses-table tr {
-            background: #2d2d44;
-            margin-bottom: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.05);
-            position: relative;
-            padding: 0;
-            /* IMPORTANTE: Quitamos overflow hidden para que no corte el importe */
-            overflow: visible; 
+            background: #2d2d44; margin-bottom: 15px; border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
+            position: relative; padding: 0; overflow: visible;
         }
 
-        /* CELDA: CABECERA DE TARJETA (Siempre visible) */
-        .courses-table td:nth-child(3) { /* Nombre Curso */
-            padding: 15px 15px 5px 15px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #fff;
-            border-bottom: none;
-            width: 70% !important; /* Dejar espacio al importe */
+        .courses-table td:nth-child(3) { /* Nombre */
+            padding: 15px 15px 5px 15px; font-size: 1.1rem; font-weight: 700; color: #fff;
+            border-bottom: none; width: 70% !important;
         }
-        
         .courses-table td:nth-child(2) { /* Fecha */
-            padding: 0 15px 15px 15px;
-            font-size: 0.9rem;
-            color: #aaa;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 0 15px 15px 15px; font-size: 0.9rem; color: #aaa; border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-
-        .courses-table td:nth-child(7) { /* Importe (Corrección Móvil) */
-            position: absolute;
-            top: 15px;
-            right: 15px; /* Más margen a la derecha */
-            width: auto !important;
-            text-align: right;
-            padding: 0;
-            font-weight: 800;
-            font-size: 1.1rem;
-            color: #ffd54f;
-            border: none;
-            background: transparent;
-            z-index: 10;
+        .courses-table td:nth-child(7) { /* Importe */
+            position: absolute; top: 15px; right: 15px; width: auto !important;
+            text-align: right; padding: 0; font-weight: 800; font-size: 1.1rem; color: #ffd54f; border: none; background: transparent; z-index: 10;
         }
-
-        /* FLECHA INDICADORA */
         .courses-table tr::after {
-            content: '▼';
-            position: absolute;
-            bottom: 10px; /* Abajo a la derecha */
-            right: 15px;
-            color: rgba(255,255,255,0.3);
-            font-size: 1.2rem;
-            transition: transform 0.3s;
+            content: '▼'; position: absolute; bottom: 10px; right: 15px; color: rgba(255,255,255,0.3); font-size: 1.2rem; transition: transform 0.3s;
         }
         .courses-table tr.expanded::after { transform: rotate(180deg); }
 
-        /* CELDAS OCULTAS (DESPLEGABLES) */
-        .courses-table td:nth-child(1), /* ID */
-        .courses-table td:nth-child(4), /* Pagador */
-        .courses-table td:nth-child(5), /* Lugar */
-        .courses-table td:nth-child(6), /* Horas */
-        .courses-table td:nth-child(8), /* Estado (Pago) */
-        .courses-table td:nth-child(9), /* Cobro */
-        .courses-table td:nth-child(10), /* Renta */
-        .courses-table td:nth-child(11)  /* Acciones */
-        {
-            display: none; 
-            padding: 8px 15px;
-            font-size: 0.95rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(0,0,0,0.1);
+        .courses-table td:nth-child(1), .courses-table td:nth-child(4), .courses-table td:nth-child(5),
+        .courses-table td:nth-child(6), .courses-table td:nth-child(8), .courses-table td:nth-child(9),
+        .courses-table td:nth-child(10), .courses-table td:nth-child(11) {
+            display: none; padding: 8px 15px; font-size: 0.95rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.1);
         }
 
-        /* Etiquetas para datos desplegados */
         .courses-table td:nth-child(4)::before { content: "Pagador: "; font-weight: bold; color: #888; }
         .courses-table td:nth-child(5)::before { content: "Lugar: "; font-weight: bold; color: #888; }
         .courses-table td:nth-child(6)::before { content: "Horas: "; font-weight: bold; color: #888; }
@@ -233,26 +194,10 @@
         .courses-table td:nth-child(9)::before { content: "Fecha Cobro: "; font-weight: bold; color: #888; }
         .courses-table td:nth-child(10)::before { content: "Renta: "; font-weight: bold; color: #888; }
 
-        /* MOSTRAR AL EXPANDIR */
         .courses-table tr.expanded td { display: block; }
-        
-        /* BOTONES DE ACCIÓN (Al final de la tarjeta) */
-        .courses-table td:nth-child(11) {
-            background: transparent;
-            padding: 15px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .courses-table tr.expanded .action-btns {
-            display: flex;
-            width: 100%;
-            gap: 10px;
-        }
-        .courses-table tr.expanded .action-btns button {
-            flex: 1; /* Botones ocupan todo el ancho */
-            padding: 12px;
-            font-size: 1rem;
-            border-radius: 8px;
-        }
+        .courses-table td:nth-child(11) { background: transparent; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .courses-table tr.expanded .action-btns { display: flex; width: 100%; gap: 10px; }
+        .courses-table tr.expanded .action-btns button { flex: 1; padding: 12px; font-size: 1rem; border-radius: 8px; }
     }
 
     /* Modal obs */
@@ -273,30 +218,19 @@
 
   <div class="toggle-form-container">
     <button id="btnMainMenu" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Inicio</button>
+    <button id="btnStats" onclick="showStats()"><i class="fas fa-chart-pie"></i> Estadísticas y Rentas</button>
     <button id="btnToggleForm"><i class="fas fa-plus-circle"></i> Nuevo Curso</button>
-  </div>
-
-  <div id="stats-card" class="card">
-    <div class="stats-controls">
-        <div style="flex:1">
-            <label>Filtrar Año:</label>
-            <select id="filterInicioYear" onchange="renderStats(); render()"><option value="">TODOS</option></select>
-        </div>
-        <div style="flex:1">
-            <label>Filtrar Pagador:</label>
-            <select id="filterPagador" onchange="renderStats(); render()"><option value="">TODOS</option></select>
-        </div>
-    </div>
-    <div class="stats-results">
-        <div>Total Neto: <strong id="totalImporte">0,00 €</strong></div>
-        <div>Total Horas: <strong id="totalHoras">0,00 h</strong></div>
-    </div>
   </div>
 
   <div class="card" style="padding: 10px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding: 0 10px;">
-        <h2 style="margin:0; font-size:1.2rem;">Listado</h2>
-        <button onclick="exportToExcel()" style="background:var(--accent-green); color:white; padding:5px 10px; font-size:0.9rem;"><i class="fas fa-file-excel"></i> Excel</button>
+        <h2 style="margin:0; font-size:1.2rem;">Listado General</h2>
+        <div>
+            <select id="filterInicioYear" onchange="render()" style="width: auto; padding: 5px; margin-right: 10px;">
+                <option value="">Todos los Años</option>
+            </select>
+            <button onclick="exportToExcel()" style="background:var(--accent-green); color:white; padding:5px 10px; font-size:0.9rem;"><i class="fas fa-file-excel"></i> Excel</button>
+        </div>
     </div>
     
     <div class="table-container">
@@ -308,6 +242,55 @@
         </table>
     </div>
   </div>
+</div>
+
+<div id="stats-modal">
+    <div class="modal-content-wrapper stats-wrapper">
+        <div class="stats-header">
+            <h2 style="margin:0; color:#00bcd4;"><i class="fas fa-chart-line"></i> Análisis de Ingresos y Rentas</h2>
+            <button onclick="document.getElementById('stats-modal').classList.remove('visible')" style="background:transparent; color:#fff; font-size:1.5rem;"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="chart-container">
+                <canvas id="incomeChart"></canvas>
+            </div>
+            <div class="kpi-container">
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Neto Cobrado</div>
+                    <div class="kpi-value" id="kpiTotalMoney">0,00 €</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Total Horas Impartidas</div>
+                    <div class="kpi-value" id="kpiTotalHours">0 h</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Cursos Cobrados</div>
+                    <div class="kpi-value" id="kpiTotalCourses">0</div>
+                </div>
+            </div>
+        </div>
+
+        <h3 style="color:#ffd54f; border-bottom:1px solid #555; padding-bottom:10px;">Desglose Fiscal por Ejercicio (Renta)</h3>
+        <div style="overflow-x:auto;">
+            <table class="spreadsheet-table" id="rentaTable">
+                <thead>
+                    <tr>
+                        <th>Ejercicio Renta</th>
+                        <th>Cursos</th>
+                        <th>Horas</th>
+                        <th>Base Imponible</th>
+                        <th>Kilometraje (Exento)</th>
+                        <th>Bruto Total</th>
+                        <th>Retenciones IRPF</th>
+                        <th>Liquido Percibido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <div id="data-entry-form">
@@ -388,12 +371,12 @@ let userDataRef = null;
 let courses = [];
 let masterCompanies = []; 
 let masterTiposCurso = [];
+let myChart = null;
 
 // ELEMENTOS DOM
 const tbody = document.getElementById('coursesTableBody');
 const formModal = document.getElementById('data-entry-form');
 const filterInicioYear = document.getElementById('filterInicioYear');
-const filterPagador = document.getElementById('filterPagador');
 
 // AUTENTICACIÓN
 auth.onAuthStateChanged((user) => {
@@ -445,52 +428,163 @@ async function load() {
     
     // Update Dropdowns
     const years = new Set(courses.map(c => c.inicio ? c.inicio.split('-')[0] : '').filter(y=>y));
-    filterInicioYear.innerHTML = '<option value="">TODOS</option>' + [...years].sort((a,b)=>b-a).map(y=>`<option value="${y}">${y}</option>`).join('');
+    filterInicioYear.innerHTML = '<option value="">Todos los Años</option>' + [...years].sort((a,b)=>b-a).map(y=>`<option value="${y}">${y}</option>`).join('');
     
     const payers = new Set(courses.map(c => c.empresa || c.pagador).filter(p=>p));
-    filterPagador.innerHTML = '<option value="">TODOS</option>' + [...payers].sort().map(p=>`<option value="${p}">${p}</option>`).join('');
-    
     document.getElementById('pagadoresListForm').innerHTML = [...payers].map(p=>`<option value="${p}">`).join('');
     document.getElementById('tipoCursosListForm').innerHTML = masterTiposCurso.map(t=>`<option value="${t}">`).join('');
 
-    renderStats();
     render();
 }
 
-function renderStats() {
-    const y = filterInicioYear.value;
-    const p = filterPagador.value;
-    const filtered = courses.filter(c => 
-        c.cobrado === 'COBRADO' && 
-        (y === '' || c.inicio.startsWith(y)) &&
-        (p === '' || (c.empresa || c.pagador) === p)
-    );
+// --- ESTADÍSTICAS Y GRÁFICAS ---
+window.showStats = () => {
+    // 1. Procesar datos por Renta
+    const stats = {};
+    let grandTotalMoney = 0;
+    let grandTotalHours = 0;
+    let grandTotalCourses = 0;
+
+    courses.forEach(c => {
+        if(c.cobrado !== 'COBRADO') return; // Solo cobrados
+
+        const year = c.renta || (c.fechaCobro ? c.fechaCobro.split('/').pop() : 'Sin Renta');
+        const key = year.length === 2 ? '20' + year : year; // Normalizar a 4 dígitos si es posible
+
+        if(!stats[key]) stats[key] = { courses:0, hours:0, base:0, km:0, bruto:0, retencion:0, liquido:0 };
+
+        const base = parseFloat(c.importeBase || 0);
+        const km = parseFloat(c.kilometraje || 0);
+        const bruto = parseFloat(c.importeBruto || 0);
+        const neto = parseFloat(c.importeNeto || 0);
+        const horas = parseFloat(c.horas || 0);
+        const retencion = bruto - km - (base - (base * (parseFloat(c.irpf||0)/100))); // Aprox, o mejor: base * irpf/100
+
+        stats[key].courses++;
+        stats[key].hours += horas;
+        stats[key].base += base;
+        stats[key].km += km;
+        stats[key].bruto += bruto;
+        stats[key].retencion += (base * (parseFloat(c.irpf||0)/100));
+        stats[key].liquido += neto;
+
+        grandTotalMoney += neto;
+        grandTotalHours += horas;
+        grandTotalCourses++;
+    });
+
+    // 2. Renderizar KPIs
+    document.getElementById('kpiTotalMoney').textContent = grandTotalMoney.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
+    document.getElementById('kpiTotalHours').textContent = grandTotalHours.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' h';
+    document.getElementById('kpiTotalCourses').textContent = grandTotalCourses;
+
+    // 3. Renderizar Tabla Renta
+    const tbodyRenta = document.getElementById('rentaTable').querySelector('tbody');
+    tbodyRenta.innerHTML = '';
     
-    const imp = filtered.reduce((acc, c) => acc + (parseFloat(c.importeNeto)||0), 0);
-    const hrs = filtered.reduce((acc, c) => acc + (parseFloat(c.horas)||0), 0);
+    // Ordenar años descendente
+    const sortedYears = Object.keys(stats).sort().reverse();
     
-    document.getElementById('totalImporte').textContent = imp.toFixed(2).replace('.', ',') + ' €';
-    document.getElementById('totalHoras').textContent = hrs.toFixed(2).replace('.', ',') + ' h';
-}
+    sortedYears.forEach(year => {
+        const d = stats[year];
+        const row = `<tr>
+            <td>${year}</td>
+            <td>${d.courses}</td>
+            <td>${d.hours.toLocaleString('es-ES', {minimumFractionDigits: 2})}</td>
+            <td>${d.base.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+            <td>${d.km.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+            <td>${d.bruto.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+            <td style="color:#ef5350;">-${d.retencion.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+            <td style="color:#66bb6a; font-weight:bold;">${d.liquido.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+        </tr>`;
+        tbodyRenta.innerHTML += row;
+    });
+
+    // Fila total
+    tbodyRenta.innerHTML += `<tr class="row-total">
+        <td>TOTALES</td>
+        <td>${grandTotalCourses}</td>
+        <td>${grandTotalHours.toLocaleString('es-ES', {minimumFractionDigits: 2})}</td>
+        <td>${Object.values(stats).reduce((a,b)=>a+b.base,0).toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+        <td>${Object.values(stats).reduce((a,b)=>a+b.km,0).toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+        <td>${Object.values(stats).reduce((a,b)=>a+b.bruto,0).toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+        <td>-${Object.values(stats).reduce((a,b)=>a+b.retencion,0).toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+        <td>${grandTotalMoney.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+    </tr>`;
+
+    // 4. Renderizar Gráfico (Chart.js)
+    const ctx = document.getElementById('incomeChart').getContext('2d');
+    if(myChart) myChart.destroy(); // Destruir anterior si existe
+
+    // Ordenar para gráfica cronológica (ascendente)
+    const chartYears = Object.keys(stats).sort();
+    
+    myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartYears,
+            datasets: [{
+                label: 'Ingresos Netos (€)',
+                data: chartYears.map(y => stats[y].liquido),
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                yAxisID: 'y',
+            },
+            {
+                label: 'Horas Impartidas',
+                data: chartYears.map(y => stats[y].hours),
+                backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                borderColor: 'rgba(255, 159, 64, 1)',
+                borderWidth: 1,
+                type: 'line',
+                yAxisID: 'y1'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    grid: { color: 'rgba(255,255,255,0.1)' },
+                    ticks: { color: '#ccc' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: { drawOnChartArea: false },
+                    ticks: { color: '#ccc' }
+                },
+                x: {
+                    ticks: { color: '#ccc' },
+                    grid: { display: false }
+                }
+            },
+            plugins: {
+                legend: { labels: { color: '#fff' } },
+                title: { display: true, text: 'Evolución Anual', color: '#fff' }
+            }
+        }
+    });
+
+    document.getElementById('stats-modal').classList.add('visible');
+};
 
 function render() {
     const y = filterInicioYear.value;
-    const p = filterPagador.value;
-    const filtered = courses.filter(c => 
-        (y === '' || c.inicio.startsWith(y)) &&
-        (p === '' || (c.empresa || c.pagador) === p)
-    );
+    const filtered = courses.filter(c => (y === '' || c.inicio.startsWith(y)));
 
     if(filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:20px;">Sin resultados</td></tr>'; return; }
 
     tbody.innerHTML = filtered.map((c, i) => {
         const statusClass = c.cobrado === 'COBRADO' ? 'status-cobrado' : 'status-pendiente';
         const importe = parseFloat(c.importeNeto).toFixed(2).replace('.', ',');
-        
-        // --- GESTIÓN DE ALERTAS (VISUAL) ---
-        // 1. Fila entera rojiza
+        const alert = c.alerta ? 'border-left: 4px solid red;' : '';
         const rowClass = c.alerta ? 'row-alert' : '';
-        // 2. Botón ojo en naranja/rojo
         const alertBtnClass = c.alerta ? 'alert-btn' : '';
         
         return `<tr onclick="this.classList.toggle('expanded')" class="${rowClass}">
@@ -642,7 +736,7 @@ window.exportToExcel = () => {
     let csvContent = headers.join(";") + "\n";
 
     courses.forEach(c => {
-        // Función para formato numérico de Excel (coma, sin puntos de miles, sin símbolo €)
+        // Formato numérico de Excel (coma, sin puntos miles, sin símbolo €)
         const fmtNum = (val) => {
             let n = parseFloat(val);
             if (isNaN(n)) return "0,00";

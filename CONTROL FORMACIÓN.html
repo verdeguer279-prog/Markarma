@@ -26,6 +26,7 @@
       --accent-red: #dc3545;
       --accent-green: #28a745;
       --accent-orange: #ff9800;
+      --accent-cyan: #00bcd4;
       --header-bg: #3e3e5c;
     }
     
@@ -51,9 +52,7 @@
     #btnToggleForm, #btnMainMenu, #btnStats { padding:12px 20px; font-size:0.95rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
     #btnToggleForm { background-image: var(--accent-gradient); color: var(--text-light); }
     #btnMainMenu { background-color: var(--accent-orange); color: #333; }
-    
-    /* Nuevo Botón Estadísticas */
-    #btnStats { background-color: #00bcd4; color: #fff; }
+    #btnStats { background-color: var(--accent-cyan); color: #fff; }
     #btnStats:hover, #btnToggleForm:hover, #btnMainMenu:hover { transform: scale(1.05); filter: brightness(1.1); }
 
     /* FORMULARIO MODAL Y ESTADÍSTICAS */
@@ -71,26 +70,49 @@
         margin-bottom: 50px;
     }
     
-    /* MODAL ESTADÍSTICAS ESPECÍFICO */
-    .stats-wrapper { max-width: 1300px !important; }
-    .stats-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-    .stats-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 30px; }
-    .chart-container { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; height: 350px; position: relative; }
-    .kpi-container { display: grid; grid-template-columns: 1fr; gap: 15px; }
-    .kpi-card { background: linear-gradient(145deg, #2d2d44, #363652); padding: 20px; border-radius: 10px; text-align: center; border: 1px solid rgba(255,255,255,0.05); }
-    .kpi-value { font-size: 1.8rem; font-weight: 800; color: #ffd54f; margin: 5px 0; }
+    /* MODAL ESTADÍSTICAS DASHBOARD */
+    .stats-wrapper { max-width: 1400px !important; }
+    .stats-header { 
+        display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; 
+        border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; flex-wrap: wrap; gap: 15px;
+    }
+    .stats-filters { display: flex; gap: 15px; flex-wrap: wrap; }
+    .stats-filters select { 
+        background: #fff; color: #333; padding: 8px 12px; border-radius: 6px; border: none; font-weight: 600; min-width: 150px; 
+    }
+
+    .dashboard-grid { 
+        display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; 
+    }
+    
+    /* Tarjetas KPI */
+    .kpi-row { 
+        display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; 
+    }
+    .kpi-card { 
+        background: linear-gradient(145deg, #2d2d44, #363652); padding: 20px; border-radius: 10px; 
+        text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .kpi-value { font-size: 2rem; font-weight: 800; color: #ffd54f; margin: 5px 0; }
     .kpi-label { font-size: 0.9rem; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
+    .kpi-sub { font-size: 0.8rem; color: var(--accent-green); margin-top: 5px; }
 
-    /* TABLA RESUMEN TIPO HOJA DE CÁLCULO */
-    .spreadsheet-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.9rem; }
-    .spreadsheet-table th { background: #3e3e5c; color: #ffd54f; padding: 12px; text-align: right; position: sticky; top: 0; }
-    .spreadsheet-table th:first-child { text-align: left; }
-    .spreadsheet-table td { padding: 10px; border: 1px solid rgba(255,255,255,0.1); text-align: right; color: #e9e9f0; }
-    .spreadsheet-table td:first-child { text-align: left; font-weight: bold; color: var(--accent-blue); }
-    .row-total { background: rgba(255, 213, 79, 0.1); font-weight: bold; }
-    .row-total td { border-top: 2px solid #ffd54f; color: #ffd54f; }
+    /* Gráfica */
+    .chart-container { 
+        background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; 
+        min-height: 300px; position: relative; border: 1px solid rgba(255,255,255,0.05);
+    }
 
-    /* Form Grid Desktop */
+    /* Tabla Resumen Fiscal */
+    .fiscal-info-card {
+        background: rgba(255,255,255,0.05); border-radius: 10px; padding: 20px;
+        border-left: 5px solid var(--accent-cyan);
+    }
+    .fiscal-header { font-size: 1.2rem; font-weight: 700; color: var(--accent-cyan); margin-bottom: 10px; }
+    .fiscal-detail { font-size: 1rem; margin-bottom: 5px; }
+    .fiscal-highlight { color: #ffd54f; font-weight: bold; }
+
+    /* Form Grid */
     .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: end; margin-bottom: 15px; } 
     .form-group { display: flex; flex-direction: column; }
     .form-group label { margin-bottom: 5px; color: #ccc; font-size: 0.85rem; }
@@ -108,7 +130,7 @@
     #btnSubmitCourse { background: var(--accent-green); color: white; }
     #btnCancelEdit { background: var(--accent-red); color: white; }
 
-    /* TABLA ESCITORIO (Por defecto) */
+    /* TABLA PRINCIPAL */
     .table-container { width: 100%; overflow-x: auto; }
     .courses-table { width: 100%; border-collapse: collapse; min-width: 1000px; } 
     .courses-table th { background: var(--header-bg); color: #ffd54f; padding: 12px; text-align: left; }
@@ -117,10 +139,8 @@
     .status-cobrado { color: var(--accent-green); font-weight:700; background: rgba(40, 167, 69, 0.1); padding: 4px 8px; border-radius: 4px; }
     .status-pendiente { color: var(--accent-red); font-weight:700; background: rgba(220, 53, 69, 0.1); padding: 4px 8px; border-radius: 4px; }
     
-    /* Fila con Alerta */
     tr.row-alert { background-color: rgba(220, 53, 69, 0.15) !important; border-left: 4px solid #f44336; }
 
-    /* BOTONES DE ACCIÓN */
     .action-btns { display: flex; gap: 5px; }
     .action-btns button { padding: 6px 10px; font-size: 0.8rem; }
     .edit-btn { background: #2196f3; color: white; }
@@ -129,9 +149,8 @@
     .obs-btn.alert-btn { background: #d32f2f !important; color: white; border: 1px solid #ff5252; animation: pulse 2s infinite; }
     @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-    /* ANCHOS PC */
     .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 3%; }
-    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 10%; white-space: nowrap; }
+    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 10%; white-space: nowrap; } 
     .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 15%; }
     .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 10%; }
     .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 10%; }
@@ -142,10 +161,10 @@
     .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; }
     .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 16%; min-width: 140px; }
 
-    /* --- MÓVIL --- */
     @media (max-width: 900px) {
         .form-grid { grid-template-columns: 1fr 1fr; }
-        .stats-grid { grid-template-columns: 1fr; }
+        .dashboard-grid { grid-template-columns: 1fr; }
+        .kpi-row { grid-template-columns: 1fr; }
     }
     
     @media (max-width: 768px) {
@@ -157,27 +176,16 @@
         .courses-table thead { display: none; }
         .courses-table, .courses-table tbody, .courses-table tr, .courses-table td { display: block; width: 100%; }
         
-        /* TARJETAS MÓVIL */
         .courses-table tr {
             background: #2d2d44; margin-bottom: 15px; border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
             position: relative; padding: 0; overflow: visible;
         }
 
-        .courses-table td:nth-child(3) { /* Nombre */
-            padding: 15px 15px 5px 15px; font-size: 1.1rem; font-weight: 700; color: #fff;
-            border-bottom: none; width: 70% !important;
-        }
-        .courses-table td:nth-child(2) { /* Fecha */
-            padding: 0 15px 15px 15px; font-size: 0.9rem; color: #aaa; border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .courses-table td:nth-child(7) { /* Importe */
-            position: absolute; top: 15px; right: 15px; width: auto !important;
-            text-align: right; padding: 0; font-weight: 800; font-size: 1.1rem; color: #ffd54f; border: none; background: transparent; z-index: 10;
-        }
-        .courses-table tr::after {
-            content: '▼'; position: absolute; bottom: 10px; right: 15px; color: rgba(255,255,255,0.3); font-size: 1.2rem; transition: transform 0.3s;
-        }
+        .courses-table td:nth-child(3) { padding: 15px 15px 5px 15px; font-size: 1.1rem; font-weight: 700; color: #fff; border-bottom: none; width: 70% !important; }
+        .courses-table td:nth-child(2) { padding: 0 15px 15px 15px; font-size: 0.9rem; color: #aaa; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .courses-table td:nth-child(7) { position: absolute; top: 15px; right: 15px; width: auto !important; text-align: right; padding: 0; font-weight: 800; font-size: 1.1rem; color: #ffd54f; border: none; background: transparent; z-index: 10; }
+        .courses-table tr::after { content: '▼'; position: absolute; bottom: 10px; right: 15px; color: rgba(255,255,255,0.3); font-size: 1.2rem; transition: transform 0.3s; }
         .courses-table tr.expanded::after { transform: rotate(180deg); }
 
         .courses-table td:nth-child(1), .courses-table td:nth-child(4), .courses-table td:nth-child(5),
@@ -200,7 +208,6 @@
         .courses-table tr.expanded .action-btns button { flex: 1; padding: 12px; font-size: 1rem; border-radius: 8px; }
     }
 
-    /* Modal obs */
     .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); align-items:center; justify-content:center; z-index:2000; }
     .modal-content { background:#fff; color:#333; padding:20px; border-radius:10px; max-width:500px; width:90%; position: relative;}
     .close-modal { position: absolute; top:10px; right:10px; background:#ddd; color:#333; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-weight: bold;}
@@ -211,14 +218,14 @@
 </head>
 <body>
 
-<div id="loading-overlay">Cargando base de datos segura...</div>
+<div id="loading-overlay">Cargando datos seguros...</div>
 
 <div class="container" id="app-container">
   <h1>Control de Cursos</h1>
 
   <div class="toggle-form-container">
     <button id="btnMainMenu" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Inicio</button>
-    <button id="btnStats" onclick="showStats()"><i class="fas fa-chart-pie"></i> Estadísticas y Rentas</button>
+    <button id="btnStats" onclick="openStats()"><i class="fas fa-chart-line"></i> Estadísticas y Renta</button>
     <button id="btnToggleForm"><i class="fas fa-plus-circle"></i> Nuevo Curso</button>
   </div>
 
@@ -226,7 +233,7 @@
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding: 0 10px;">
         <h2 style="margin:0; font-size:1.2rem;">Listado General</h2>
         <div>
-            <select id="filterInicioYear" onchange="render()" style="width: auto; padding: 5px; margin-right: 10px;">
+            <select id="filterListYear" onchange="render()" style="width: auto; padding: 5px; margin-right: 10px;">
                 <option value="">Todos los Años</option>
             </select>
             <button onclick="exportToExcel()" style="background:var(--accent-green); color:white; padding:5px 10px; font-size:0.9rem;"><i class="fas fa-file-excel"></i> Excel</button>
@@ -247,48 +254,45 @@
 <div id="stats-modal">
     <div class="modal-content-wrapper stats-wrapper">
         <div class="stats-header">
-            <h2 style="margin:0; color:#00bcd4;"><i class="fas fa-chart-line"></i> Análisis de Ingresos y Rentas</h2>
-            <button onclick="document.getElementById('stats-modal').classList.remove('visible')" style="background:transparent; color:#fff; font-size:1.5rem;"><i class="fas fa-times"></i></button>
+            <h2 style="margin:0; color:#00bcd4;"><i class="fas fa-chart-pie"></i> Dashboard Financiero</h2>
+            <div class="stats-filters">
+                <select id="statsYear" onchange="calculateStats()">
+                    <option value="ALL">Todos los Años</option>
+                </select>
+                <select id="statsPayer" onchange="calculateStats()">
+                    <option value="ALL">Todos los Pagadores</option>
+                </select>
+            </div>
+            <button onclick="document.getElementById('stats-modal').classList.remove('visible')" style="background:transparent; color:#fff; font-size:1.5rem; border:none; cursor:pointer;"><i class="fas fa-times"></i></button>
         </div>
         
-        <div class="stats-grid">
-            <div class="chart-container">
-                <canvas id="incomeChart"></canvas>
+        <div class="kpi-row">
+            <div class="kpi-card">
+                <div class="kpi-label">Ingresos Netos</div>
+                <div class="kpi-value" id="statNeto">0,00 €</div>
+                <div class="kpi-sub" id="statBruto">Bruto: 0,00 €</div>
             </div>
-            <div class="kpi-container">
-                <div class="kpi-card">
-                    <div class="kpi-label">Total Neto Cobrado</div>
-                    <div class="kpi-value" id="kpiTotalMoney">0,00 €</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">Total Horas Impartidas</div>
-                    <div class="kpi-value" id="kpiTotalHours">0 h</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-label">Cursos Cobrados</div>
-                    <div class="kpi-value" id="kpiTotalCourses">0</div>
-                </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Horas Impartidas</div>
+                <div class="kpi-value" id="statHoras">0 h</div>
+                <div class="kpi-sub" id="statAvgPrice">Media: 0,00 €/h</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-label">Cursos Cobrados</div>
+                <div class="kpi-value" id="statCourses">0</div>
             </div>
         </div>
 
-        <h3 style="color:#ffd54f; border-bottom:1px solid #555; padding-bottom:10px;">Desglose Fiscal por Ejercicio (Renta)</h3>
-        <div style="overflow-x:auto;">
-            <table class="spreadsheet-table" id="rentaTable">
-                <thead>
-                    <tr>
-                        <th>Ejercicio Renta</th>
-                        <th>Cursos</th>
-                        <th>Horas</th>
-                        <th>Base Imponible</th>
-                        <th>Kilometraje (Exento)</th>
-                        <th>Bruto Total</th>
-                        <th>Retenciones IRPF</th>
-                        <th>Liquido Percibido</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    </tbody>
-            </table>
+        <div class="dashboard-grid">
+            <div class="chart-container">
+                <canvas id="mainChart"></canvas>
+            </div>
+            <div class="fiscal-info-card">
+                <div class="fiscal-header"><i class="fas fa-file-invoice-dollar"></i> Información Fiscal</div>
+                <div id="fiscalDetails">
+                    <p class="fiscal-detail">Selecciona un año específico arriba para ver el detalle de la declaración de la Renta.</p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -298,42 +302,34 @@
         <h2 style="color:#ffd54f; margin-bottom:20px;">Editar/Crear Curso</h2>
         <form id="courseForm">
         <input type="hidden" id="courseKey">
-        
         <div class="form-grid">
             <div class="form-group" style="grid-column: 1/-1;"><label>Nombre del Curso</label><input type="text" id="nombreCurso" required placeholder="Nombre del curso..."></div>
             <div class="form-group"><label>Inicio</label><input type="date" id="inicio" required></div>
             <div class="form-group"><label>Fin</label><input type="date" id="fin" required></div>
             <div class="form-group"><label>Pagador</label><input type="text" id="pagador" list="pagadoresListForm" required><datalist id="pagadoresListForm"></datalist></div>
             <div class="form-group"><label>Tipo</label><input type="text" id="tipoCurso" list="tipoCursosListForm"><datalist id="tipoCursosListForm"></datalist></div>
-            
             <div class="form-group"><label>Horas</label><input type="text" id="horas" onblur="formatNumericDisplay(this); calculateFromHours();"></div>
             <div class="form-group"><label>Precio/Hora</label><input type="text" id="precioHoraBruto" onblur="formatNumericDisplay(this); calculateFromPrice();"></div>
             <div class="form-group"><label>Base (€)</label><input type="text" id="importeBase" onblur="formatNumericDisplay(this); calculateFromBase();"></div>
             <div class="form-group"><label>KM (€)</label><input type="text" id="kilometraje" onblur="formatNumericDisplay(this); calculateTotals();"></div>
-            
             <div class="form-group"><label>IRPF (%)</label><input type="text" id="irpf" onblur="formatNumericDisplay(this); calculateTotals();"></div>
             <div class="form-group"><label>Total Neto (€)</label><input type="text" id="importeNetoCobrado" readonly></div>
-            
             <div class="form-group"><label>Estado</label><select id="cobrado"><option value="PENDIENTE">PENDIENTE</option><option value="COBRADO">COBRADO</option></select></div>
             <div class="form-group"><label>Fecha Cobro</label><input type="text" id="fechaCobro"></div>
             <div class="form-group"><label>Lugar</label><input type="text" id="lugarCelebracion"></div>
             <div class="form-group"><label>Renta (Año)</label><input type="number" id="renta"></div>
-            
             <div class="form-group" style="grid-column: 1/-1;"><label>Observaciones</label><textarea id="observaciones"></textarea></div>
-            
             <div class="form-group" style="grid-column: 1/-1;">
                <div style="display:flex; align-items:center; gap:10px;">
                    <input type="checkbox" id="alerta" style="width:20px; height:20px;"> 
                    <label for="alerta" style="margin:0; color:#fff;">Marcar incidencia</label>
                </div>
             </div>
-            
             <input type="hidden" id="importeBruto">
             <input type="hidden" id="importeHoraNeto">
             <input type="hidden" id="horario">
             <input type="hidden" id="asistentes">
         </div>
-
         <div class="nav-actions">
             <button type="button" onclick="closeFormModal()" style="background:#555; color:white;">Cancelar</button>
             <button type="submit" id="btnSubmitCourse">Guardar</button>
@@ -351,7 +347,6 @@
 </div>
 
 <script>
-// CONFIGURACIÓN FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
     authDomain: "markarma279.firebaseapp.com",
@@ -371,12 +366,12 @@ let userDataRef = null;
 let courses = [];
 let masterCompanies = []; 
 let masterTiposCurso = [];
-let myChart = null;
+let chartInstance = null;
 
 // ELEMENTOS DOM
 const tbody = document.getElementById('coursesTableBody');
 const formModal = document.getElementById('data-entry-form');
-const filterInicioYear = document.getElementById('filterInicioYear');
+const filterListYear = document.getElementById('filterListYear');
 
 // AUTENTICACIÓN
 auth.onAuthStateChanged((user) => {
@@ -420,162 +415,141 @@ async function load() {
     }
     courses.sort((a,b) => new Date(b.inicio) - new Date(a.inicio));
     
-    // Cargar Maestros
+    // Cargar Listas
     const compSnap = await userDataRef.child('empresas').once('value');
     masterCompanies = compSnap.val() || [];
     const typeSnap = await userDataRef.child('tipos').once('value');
     masterTiposCurso = typeSnap.val() || [];
     
-    // Update Dropdowns
-    const years = new Set(courses.map(c => c.inicio ? c.inicio.split('-')[0] : '').filter(y=>y));
-    filterInicioYear.innerHTML = '<option value="">Todos los Años</option>' + [...years].sort((a,b)=>b-a).map(y=>`<option value="${y}">${y}</option>`).join('');
-    
     const payers = new Set(courses.map(c => c.empresa || c.pagador).filter(p=>p));
     document.getElementById('pagadoresListForm').innerHTML = [...payers].map(p=>`<option value="${p}">`).join('');
     document.getElementById('tipoCursosListForm').innerHTML = masterTiposCurso.map(t=>`<option value="${t}">`).join('');
 
+    // Llenar selectores de años
+    const years = new Set(courses.map(c => c.inicio ? c.inicio.split('-')[0] : '').filter(y=>y));
+    const sortedYears = [...years].sort((a,b)=>b-a);
+    
+    const options = '<option value="">Todos los Años</option>' + sortedYears.map(y=>`<option value="${y}">${y}</option>`).join('');
+    filterListYear.innerHTML = options;
+    
+    // Selectores del Dashboard
+    document.getElementById('statsYear').innerHTML = '<option value="ALL">Todos los Años</option>' + sortedYears.map(y=>`<option value="${y}">${y}</option>`).join('');
+    document.getElementById('statsPayer').innerHTML = '<option value="ALL">Todos los Pagadores</option>' + [...payers].sort().map(p=>`<option value="${p}">${p}</option>`).join('');
+
     render();
 }
 
-// --- ESTADÍSTICAS Y GRÁFICAS ---
-window.showStats = () => {
-    // 1. Procesar datos por Renta
-    const stats = {};
-    let grandTotalMoney = 0;
-    let grandTotalHours = 0;
-    let grandTotalCourses = 0;
+// --- DASHBOARD INTELIGENTE ---
+window.openStats = () => {
+    document.getElementById('stats-modal').classList.add('visible');
+    calculateStats();
+};
 
-    courses.forEach(c => {
-        if(c.cobrado !== 'COBRADO') return; // Solo cobrados
-
-        const year = c.renta || (c.fechaCobro ? c.fechaCobro.split('/').pop() : 'Sin Renta');
-        const key = year.length === 2 ? '20' + year : year; // Normalizar a 4 dígitos si es posible
-
-        if(!stats[key]) stats[key] = { courses:0, hours:0, base:0, km:0, bruto:0, retencion:0, liquido:0 };
-
-        const base = parseFloat(c.importeBase || 0);
-        const km = parseFloat(c.kilometraje || 0);
-        const bruto = parseFloat(c.importeBruto || 0);
-        const neto = parseFloat(c.importeNeto || 0);
-        const horas = parseFloat(c.horas || 0);
-        const retencion = bruto - km - (base - (base * (parseFloat(c.irpf||0)/100))); // Aprox, o mejor: base * irpf/100
-
-        stats[key].courses++;
-        stats[key].hours += horas;
-        stats[key].base += base;
-        stats[key].km += km;
-        stats[key].bruto += bruto;
-        stats[key].retencion += (base * (parseFloat(c.irpf||0)/100));
-        stats[key].liquido += neto;
-
-        grandTotalMoney += neto;
-        grandTotalHours += horas;
-        grandTotalCourses++;
+window.calculateStats = () => {
+    const yearFilter = document.getElementById('statsYear').value;
+    const payerFilter = document.getElementById('statsPayer').value;
+    
+    const filtered = courses.filter(c => {
+        if(c.cobrado !== 'COBRADO') return false;
+        const y = c.renta || (c.fechaCobro ? c.fechaCobro.split('/').pop() : c.inicio.split('-')[0]);
+        // Normalizar año
+        const fullYear = y.length === 2 ? '20'+y : y;
+        
+        if (yearFilter !== 'ALL' && fullYear !== yearFilter) return false;
+        if (payerFilter !== 'ALL' && (c.empresa || c.pagador) !== payerFilter) return false;
+        return true;
     });
 
-    // 2. Renderizar KPIs
-    document.getElementById('kpiTotalMoney').textContent = grandTotalMoney.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
-    document.getElementById('kpiTotalHours').textContent = grandTotalHours.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' h';
-    document.getElementById('kpiTotalCourses').textContent = grandTotalCourses;
-
-    // 3. Renderizar Tabla Renta
-    const tbodyRenta = document.getElementById('rentaTable').querySelector('tbody');
-    tbodyRenta.innerHTML = '';
-    
-    // Ordenar años descendente
-    const sortedYears = Object.keys(stats).sort().reverse();
-    
-    sortedYears.forEach(year => {
-        const d = stats[year];
-        const row = `<tr>
-            <td>${year}</td>
-            <td>${d.courses}</td>
-            <td>${d.hours.toLocaleString('es-ES', {minimumFractionDigits: 2})}</td>
-            <td>${d.base.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-            <td>${d.km.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-            <td>${d.bruto.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-            <td style="color:#ef5350;">-${d.retencion.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-            <td style="color:#66bb6a; font-weight:bold;">${d.liquido.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-        </tr>`;
-        tbodyRenta.innerHTML += row;
+    // KPIs
+    let totalNeto = 0, totalBruto = 0, totalHoras = 0;
+    filtered.forEach(c => {
+        totalNeto += parseFloat(c.importeNeto || 0);
+        totalBruto += parseFloat(c.importeBruto || 0);
+        totalHoras += parseFloat(c.horas || 0);
     });
 
-    // Fila total
-    tbodyRenta.innerHTML += `<tr class="row-total">
-        <td>TOTALES</td>
-        <td>${grandTotalCourses}</td>
-        <td>${grandTotalHours.toLocaleString('es-ES', {minimumFractionDigits: 2})}</td>
-        <td>${Object.values(stats).reduce((a,b)=>a+b.base,0).toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-        <td>${Object.values(stats).reduce((a,b)=>a+b.km,0).toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-        <td>${Object.values(stats).reduce((a,b)=>a+b.bruto,0).toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-        <td>-${Object.values(stats).reduce((a,b)=>a+b.retencion,0).toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-        <td>${grandTotalMoney.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-    </tr>`;
-
-    // 4. Renderizar Gráfico (Chart.js)
-    const ctx = document.getElementById('incomeChart').getContext('2d');
-    if(myChart) myChart.destroy(); // Destruir anterior si existe
-
-    // Ordenar para gráfica cronológica (ascendente)
-    const chartYears = Object.keys(stats).sort();
+    document.getElementById('statNeto').textContent = totalNeto.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
+    document.getElementById('statBruto').textContent = 'Bruto: ' + totalBruto.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
+    document.getElementById('statHoras').textContent = totalHoras.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' h';
+    document.getElementById('statCourses').textContent = filtered.length;
     
-    myChart = new Chart(ctx, {
+    const avg = totalHoras > 0 ? (totalNeto / totalHoras) : 0;
+    document.getElementById('statAvgPrice').textContent = 'Media: ' + avg.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €/h';
+
+    // RENTA Y TEXTO
+    const fiscalDiv = document.getElementById('fiscalDetails');
+    if (yearFilter !== 'ALL') {
+        const nextYear = parseInt(yearFilter) + 1;
+        fiscalDiv.innerHTML = `
+            <p class="fiscal-detail">Ejercicio Fiscal seleccionado: <span class="fiscal-highlight">${yearFilter}</span></p>
+            <p class="fiscal-detail">Declaración de la Renta a presentar en: <span class="fiscal-highlight">${nextYear}</span></p>
+            <hr style="border-top:1px solid rgba(255,255,255,0.1)">
+            <p>Total Rendimientos Íntegros (Bruto): <strong>${totalBruto.toLocaleString('es-ES')} €</strong></p>
+            <p>Total Gastos Deducibles (Seg. Social, etc): <strong>(Consultar nóminas)</strong></p>
+            <p>Total Retenciones IRPF Soportadas: <strong>${(totalBruto - totalNeto).toLocaleString('es-ES')} €</strong> (Aprox)</p>
+        `;
+    } else {
+        fiscalDiv.innerHTML = '<p>Selecciona un año concreto para ver la previsión de la Declaración de la Renta.</p>';
+    }
+
+    // GRÁFICA DINÁMICA
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    if(chartInstance) chartInstance.destroy();
+
+    let labels = [], dataMoney = [];
+    
+    if (yearFilter === 'ALL') {
+        // Modo Evolución Anual
+        const yearGroups = {};
+        filtered.forEach(c => {
+            const y = (c.renta || c.inicio.split('-')[0]).toString().length===2 ? '20'+(c.renta||'') : (c.renta || c.inicio.split('-')[0]);
+            if(!yearGroups[y]) yearGroups[y] = 0;
+            yearGroups[y] += parseFloat(c.importeNeto || 0);
+        });
+        labels = Object.keys(yearGroups).sort();
+        dataMoney = labels.map(l => yearGroups[l]);
+    } else {
+        // Modo Mensual (Año seleccionado)
+        const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+        const monthGroups = new Array(12).fill(0);
+        filtered.forEach(c => {
+            const d = new Date(c.inicio);
+            if(!isNaN(d)) monthGroups[d.getMonth()] += parseFloat(c.importeNeto || 0);
+        });
+        labels = monthNames;
+        dataMoney = monthGroups;
+    }
+
+    chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: chartYears,
+            labels: labels,
             datasets: [{
                 label: 'Ingresos Netos (€)',
-                data: chartYears.map(y => stats[y].liquido),
-                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                borderColor: 'rgba(75, 192, 192, 1)',
+                data: dataMoney,
+                backgroundColor: 'rgba(0, 188, 212, 0.6)',
+                borderColor: 'rgba(0, 188, 212, 1)',
                 borderWidth: 1,
-                yAxisID: 'y',
-            },
-            {
-                label: 'Horas Impartidas',
-                data: chartYears.map(y => stats[y].hours),
-                backgroundColor: 'rgba(255, 159, 64, 0.6)',
-                borderColor: 'rgba(255, 159, 64, 1)',
-                borderWidth: 1,
-                type: 'line',
-                yAxisID: 'y1'
+                borderRadius: 5
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    grid: { color: 'rgba(255,255,255,0.1)' },
-                    ticks: { color: '#ccc' }
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    grid: { drawOnChartArea: false },
-                    ticks: { color: '#ccc' }
-                },
-                x: {
-                    ticks: { color: '#ccc' },
-                    grid: { display: false }
-                }
-            },
             plugins: {
                 legend: { labels: { color: '#fff' } },
-                title: { display: true, text: 'Evolución Anual', color: '#fff' }
+                title: { display: true, text: yearFilter === 'ALL' ? 'Evolución Anual' : 'Distribución Mensual ' + yearFilter, color: '#fff' }
+            },
+            scales: {
+                y: { ticks: { color: '#ccc' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                x: { ticks: { color: '#ccc' }, grid: { display: false } }
             }
         }
     });
-
-    document.getElementById('stats-modal').classList.add('visible');
 };
 
 function render() {
-    const y = filterInicioYear.value;
+    const y = filterListYear.value;
     const filtered = courses.filter(c => (y === '' || c.inicio.startsWith(y)));
 
     if(filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:20px;">Sin resultados</td></tr>'; return; }
@@ -583,7 +557,6 @@ function render() {
     tbody.innerHTML = filtered.map((c, i) => {
         const statusClass = c.cobrado === 'COBRADO' ? 'status-cobrado' : 'status-pendiente';
         const importe = parseFloat(c.importeNeto).toFixed(2).replace('.', ',');
-        const alert = c.alerta ? 'border-left: 4px solid red;' : '';
         const rowClass = c.alerta ? 'row-alert' : '';
         const alertBtnClass = c.alerta ? 'alert-btn' : '';
         
@@ -724,7 +697,7 @@ window.showObs = (key) => {
 };
 window.closeObsModal = () => document.getElementById('obsModal').style.display = 'none';
 
-// --- EXPORTAR EXCEL CORREGIDO (AUTOSUMA OK) ---
+// --- EXPORTAR EXCEL PERFECTO (NUMÉRICO) ---
 window.exportToExcel = () => {
     const headers = [
         "Inicio", "Fin", "Nombre Curso", "Tipo", "Pagador", "Lugar", 
@@ -736,7 +709,7 @@ window.exportToExcel = () => {
     let csvContent = headers.join(";") + "\n";
 
     courses.forEach(c => {
-        // Formato numérico de Excel (coma, sin puntos miles, sin símbolo €)
+        // Formato número: Coma decimal, sin separador miles, sin símbolo euro
         const fmtNum = (val) => {
             let n = parseFloat(val);
             if (isNaN(n)) return "0,00";

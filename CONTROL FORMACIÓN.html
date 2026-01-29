@@ -14,6 +14,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
   <style>
+    /* =========================================
+       ESTILOS ORIGINALES (MANTENIDOS AL 100%)
+       ========================================= */
     :root {
       --bg-dark: #1a1a2e;
       --card-bg: #282844;
@@ -183,7 +186,7 @@
 </head>
 <body>
 
-<div id="loading-overlay">Conectando con base de datos segura...</div>
+<div id="loading-overlay">Conectando con tu base de datos segura...</div>
 
 <div class="container" id="app-container">
   <h1><i class="fas fa-graduation-cap"></i> Control de Cursos</h1>
@@ -299,7 +302,9 @@ const firebaseConfig = {
     appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 const db = firebase.database();
 const auth = firebase.auth();
 auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
@@ -312,41 +317,56 @@ let userDataRef = null;
 // ==========================================
 auth.onAuthStateChanged((user) => {
     if (user) {
+        // ID seguro basado en email
         USER_ID = user.email.replace(/\./g, ',');
-        console.log("Usuario:", USER_ID);
-        // La ruta base para este usuario será: formacion/EMAIL_USUARIO
+        console.log("Usuario detectado:", USER_ID);
+        // Ruta personal: formacion/EMAIL_USUARIO
         userDataRef = db.ref('formacion/' + USER_ID);
+        
         cargarDatosConMigracion();
     } else {
+        // Si no hay sesión, volver al menú principal
         window.location.href = "index.html";
     }
 });
 
 function cargarDatosConMigracion() {
+    // 1. Verificar si ya tengo datos en mi carpeta personal
     userDataRef.child('cursos').once('value').then(snapshot => {
         if (snapshot.exists()) {
-            // Usuario ya tiene datos
+            // Ya existen datos -> Cargar normal
             document.getElementById('loading-overlay').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
             load();
         } else {
-            // Usuario nuevo -> intentar migrar datos antiguos
+            // No existen datos -> Intentar migración desde ubicación antigua
             console.log("Cuenta nueva, buscando datos antiguos...");
-            // Intentar leer de la raíz antigua (FORMACION)
+            
+            // Buscar en la raíz antigua (FORMACION) donde guardaba la versión insegura
             db.ref('FORMACION').once('value').then(oldSnap => {
                 if (oldSnap.exists()) {
-                    // Migrar Cursos
-                    userDataRef.child('cursos').set(oldSnap.val());
-                    // Migrar Empresas
-                    db.ref('EMPRESAS').once('value').then(s => { if(s.exists()) userDataRef.child('empresas').set(s.val()); });
-                    // Migrar Tipos
+                    // Encontrados datos viejos: COPIARLOS a la carpeta segura
+                    const updates = {};
+                    updates['cursos'] = oldSnap.val();
+                    
+                    // Copiar empresas y tipos si existen
+                    db.ref('EMPRESAS').once('value').then(s => { 
+                        if(s.exists()) userDataRef.child('empresas').set(s.val()); 
+                    });
+                    
                     db.ref('TIPOS_CURSO').once('value').then(s => { 
                         if(s.exists()) userDataRef.child('tipos').set(s.val());
-                        alert("Tus datos antiguos han sido importados a tu cuenta segura.");
-                        setTimeout(() => location.reload(), 1000);
+                    });
+
+                    // Guardar cursos
+                    userDataRef.update(updates).then(() => {
+                        alert("¡Tus datos antiguos han sido importados a tu cuenta segura!");
+                        document.getElementById('loading-overlay').style.display = 'none';
+                        document.getElementById('app-container').style.display = 'block';
+                        load();
                     });
                 } else {
-                    // Si no hay en raíz, intentar en usuario-demo
+                    // Si no hay en raíz, intentar en usuario-demo (por si acaso)
                     db.ref('formacion/usuario-demo').once('value').then(demoSnap => {
                         if(demoSnap.exists()) {
                             userDataRef.set(demoSnap.val()).then(() => {
@@ -354,6 +374,7 @@ function cargarDatosConMigracion() {
                                 location.reload();
                             });
                         } else {
+                            // Nada encontrado, cuenta nueva limpia
                             document.getElementById('loading-overlay').style.display = 'none';
                             document.getElementById('app-container').style.display = 'block';
                             load();
@@ -366,7 +387,7 @@ function cargarDatosConMigracion() {
 }
 
 // ==========================================
-// 3. LÓGICA DE LA APLICACIÓN
+// 3. LÓGICA DE LA APLICACIÓN (MANTENIDA)
 // ==========================================
 
 const tbody = document.getElementById('coursesTableBody');
@@ -394,7 +415,7 @@ let initialFormData = {};
 let isSaveSuccess = false; 
 let successTimeout = null; 
 
-// Campos
+// Campos Formulario
 const inicio = document.getElementById('inicio');
 const fin = document.getElementById('fin');
 const tipoCurso = document.getElementById('tipoCurso'); 
@@ -521,7 +542,7 @@ formTitleInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') disa
 async function load() {
     if (!USER_ID) return;
     try {
-        // Cargar Cursos
+        // Cargar Cursos desde carpeta personal
         const coursesSnap = await userDataRef.child('cursos').once('value');
         const coursesData = coursesSnap.val();
         
@@ -529,6 +550,7 @@ async function load() {
         if (coursesData) {
             for (const key in coursesData) {
                 const course = coursesData[key];
+                // Recálculo de seguridad al cargar
                 const brutoTotal = parseFloat((course.importeBruto || 0).toString().replace(',', '.')) || 0;
                 const km = parseFloat((course.kilometraje || 0).toString().replace(',', '.')) || 0;
                 const irpfPerc = parseFloat((course.irpf || 0).toString().replace(',', '.')) || 0;
@@ -668,7 +690,27 @@ function updateNavigationButtons(currentKey) {
 function showObs(key){ 
     const c = courses.find(x => x.key === key); if (!c) return;
     const format = v => (v || 0).toString().replace('.', ',');
-    const details = `<p><strong>Nombre:</strong> ${c.nombreCurso}</p><p><strong>Pagador:</strong> ${c.empresa||c.pagador}</p><p><strong>Obs:</strong> ${c.observaciones}</p>`;
+    
+    // Cálculos para mostrar en detalle
+    const h = parseFloat(c.horas || 0);
+    const brutoTotal = parseFloat(c.importeBruto || 0);
+    const km = parseFloat(c.kilometraje || 0);
+    const irpfPerc = parseFloat(c.irpf || 0);
+    const baseCurso = brutoTotal - km;
+    const retencion = baseCurso * (irpfPerc / 100);
+    const netoTotal = (baseCurso - retencion) + km;
+    
+    const details = `
+        <p><strong>Nombre:</strong> ${c.nombreCurso}</p>
+        <p><strong>Pagador:</strong> ${c.empresa||c.pagador}</p>
+        <hr style="border-top:1px solid #ddd; margin:10px 0;">
+        <p><strong>Importe Base:</strong> ${format(baseCurso.toFixed(2))} €</p>
+        <p><strong>+ Kilometraje:</strong> ${format(km.toFixed(2))} €</p>
+        <p><strong>- IRPF (${format(irpfPerc.toFixed(2))}%):</strong> -${format(retencion.toFixed(2))} €</p>
+        <p><strong>= Total Neto:</strong> <strong style="color:var(--accent-green)">${format(netoTotal.toFixed(2))} €</strong></p>
+        <hr style="border-top:1px solid #ddd; margin:10px 0;">
+        <p><strong>Obs:</strong> ${c.observaciones || 'Sin observaciones'}</p>
+    `;
     document.getElementById('obsModal').querySelector('.modal-content').innerHTML = `<button class="close-modal" onclick="closeObsModal()">X</button><h3>Detalles</h3>${details}`;
     document.getElementById('obsModal').style.display="flex"; 
 }

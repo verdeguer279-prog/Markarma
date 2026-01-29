@@ -75,7 +75,6 @@
       color: #333; width: 100%; font-size: 1rem;
     }
     
-    /* Highlight inputs */
     #importeNetoCobrado { background-color: #d4edda; color: #155724; font-weight: 800; border: 2px solid #28a745; font-size: 1.1rem; }
     
     .nav-actions { display: flex; justify-content: space-between; margin-top: 20px; flex-wrap: wrap; gap: 10px; }
@@ -95,17 +94,49 @@
     .courses-table th { background: var(--header-bg); color: #ffd54f; padding: 12px; text-align: left; }
     .courses-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
     
+    /* Estados y Alertas */
     .status-cobrado { color: var(--accent-green); font-weight:700; background: rgba(40, 167, 69, 0.1); padding: 4px 8px; border-radius: 4px; }
     .status-pendiente { color: var(--accent-red); font-weight:700; background: rgba(220, 53, 69, 0.1); padding: 4px 8px; border-radius: 4px; }
+    
+    /* Fila con Alerta */
+    tr.row-alert {
+        background-color: rgba(220, 53, 69, 0.15) !important;
+        border-left: 4px solid #f44336;
+    }
 
     /* BOTONES DE ACCIÓN */
     .action-btns { display: flex; gap: 5px; }
     .action-btns button { padding: 6px 10px; font-size: 0.8rem; }
     .edit-btn { background: #2196f3; color: white; }
     .delete-btn { background: #f44336; color: white; }
+    
+    /* Botón Ojo Normal */
     .obs-btn { background: #ff9800; color: white; }
+    
+    /* Botón Ojo Alerta */
+    .obs-btn.alert-btn { 
+        background: #d32f2f !important; /* Rojo oscuro */
+        color: white; 
+        border: 1px solid #ff5252;
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-    /* --- ESTILOS MÓVIL (TARJETAS LIMPIAS) --- */
+    /* --- ANCHOS DE COLUMNA PC (Ajustado para fecha en 1 línea) --- */
+    .courses-table th:nth-child(1), .courses-table td:nth-child(1) { width: 3%; }  /* # */
+    .courses-table th:nth-child(2), .courses-table td:nth-child(2) { width: 10%; white-space: nowrap; }  /* Inicio (Más ancho) */
+    .courses-table th:nth-child(3), .courses-table td:nth-child(3) { width: 15%; } /* Curso */
+    .courses-table th:nth-child(4), .courses-table td:nth-child(4) { width: 10%; } /* Pagador */
+    .courses-table th:nth-child(5), .courses-table td:nth-child(5) { width: 10%; } /* Lugar */
+    .courses-table th:nth-child(6), .courses-table td:nth-child(6) { width: 6%; }  /* Horas */
+    .courses-table th:nth-child(7), .courses-table td:nth-child(7) { width: 9%; }  /* Importe */
+    .courses-table th:nth-child(8), .courses-table td:nth-child(8) { width: 8%; }  /* Estado */
+    .courses-table th:nth-child(9), .courses-table td:nth-child(9) { width: 7%; }  /* Cobro */
+    .courses-table th:nth-child(10), .courses-table td:nth-child(10) { width: 6%; } /* Renta */
+    .courses-table th:nth-child(11), .courses-table td:nth-child(11) { width: 16%; min-width: 140px; } /* Acciones */
+
+    /* --- ESTILOS MÓVIL --- */
     @media (max-width: 900px) {
         .form-grid { grid-template-columns: 1fr 1fr; }
     }
@@ -128,17 +159,19 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
             border: 1px solid rgba(255,255,255,0.05);
             position: relative;
-            padding: 0; /* Padding controlado por celdas */
-            overflow: hidden;
+            padding: 0;
+            /* IMPORTANTE: Quitamos overflow hidden para que no corte el importe */
+            overflow: visible; 
         }
 
         /* CELDA: CABECERA DE TARJETA (Siempre visible) */
         .courses-table td:nth-child(3) { /* Nombre Curso */
             padding: 15px 15px 5px 15px;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: #fff;
             border-bottom: none;
+            width: 70% !important; /* Dejar espacio al importe */
         }
         
         .courses-table td:nth-child(2) { /* Fecha */
@@ -148,26 +181,29 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .courses-table td:nth-child(7) { /* Importe */
+        .courses-table td:nth-child(7) { /* Importe (Corrección Móvil) */
             position: absolute;
             top: 15px;
-            right: 40px; /* Espacio para flecha */
+            right: 15px; /* Más margen a la derecha */
+            width: auto !important;
+            text-align: right;
             padding: 0;
             font-weight: 800;
             font-size: 1.1rem;
             color: #ffd54f;
             border: none;
             background: transparent;
+            z-index: 10;
         }
 
         /* FLECHA INDICADORA */
         .courses-table tr::after {
             content: '▼';
             position: absolute;
-            top: 18px;
+            bottom: 10px; /* Abajo a la derecha */
             right: 15px;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.8rem;
+            color: rgba(255,255,255,0.3);
+            font-size: 1.2rem;
             transition: transform 0.3s;
         }
         .courses-table tr.expanded::after { transform: rotate(180deg); }
@@ -177,12 +213,12 @@
         .courses-table td:nth-child(4), /* Pagador */
         .courses-table td:nth-child(5), /* Lugar */
         .courses-table td:nth-child(6), /* Horas */
-        .courses-table td:nth-child(8), /* Pago */
+        .courses-table td:nth-child(8), /* Estado (Pago) */
         .courses-table td:nth-child(9), /* Cobro */
         .courses-table td:nth-child(10), /* Renta */
         .courses-table td:nth-child(11)  /* Acciones */
         {
-            display: none; /* Oculto por defecto */
+            display: none; 
             padding: 8px 15px;
             font-size: 0.95rem;
             border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -230,7 +266,7 @@
 </head>
 <body>
 
-<div id="loading-overlay">Cargando datos seguros...</div>
+<div id="loading-overlay">Cargando base de datos segura...</div>
 
 <div class="container" id="app-container">
   <h1>Control de Cursos</h1>
@@ -373,7 +409,6 @@ auth.onAuthStateChanged((user) => {
 function cargarDatos() {
     userDataRef.child('cursos').once('value').then(snapshot => {
         if (!snapshot.exists()) {
-            // Intentar migrar si está vacío
             db.ref('FORMACION').once('value').then(old => {
                 if(old.exists()) {
                     userDataRef.child('cursos').set(old.val()).then(() => location.reload());
@@ -451,10 +486,14 @@ function render() {
     tbody.innerHTML = filtered.map((c, i) => {
         const statusClass = c.cobrado === 'COBRADO' ? 'status-cobrado' : 'status-pendiente';
         const importe = parseFloat(c.importeNeto).toFixed(2).replace('.', ',');
-        const alert = c.alerta ? 'border-left: 4px solid red;' : '';
         
-        // onclick toggle para desplegar en móvil
-        return `<tr onclick="this.classList.toggle('expanded')" style="${alert}">
+        // --- GESTIÓN DE ALERTAS (VISUAL) ---
+        // 1. Fila entera rojiza
+        const rowClass = c.alerta ? 'row-alert' : '';
+        // 2. Botón ojo en naranja/rojo
+        const alertBtnClass = c.alerta ? 'alert-btn' : '';
+        
+        return `<tr onclick="this.classList.toggle('expanded')" class="${rowClass}">
             <td>${i+1}</td>
             <td>${c.inicio}</td>
             <td>${c.nombreCurso || c.tituloCurso}</td>
@@ -467,9 +506,9 @@ function render() {
             <td>${c.renta || ''}</td>
             <td>
                 <div class="action-btns">
-                    <button class="obs-btn" onclick="event.stopPropagation(); showObs('${c.key}')"><i class="fas fa-eye"></i></button>
-                    <button class="edit-btn" onclick="event.stopPropagation(); editCourse('${c.key}')"><i class="fas fa-edit"></i></button>
-                    <button class="delete-btn" onclick="event.stopPropagation(); delCourse('${c.key}')"><i class="fas fa-trash"></i></button>
+                    <button class="obs-btn ${alertBtnClass}" onclick="event.stopPropagation(); showObs('${c.key}')" title="Ver Detalles"><i class="fas fa-eye"></i></button>
+                    <button class="edit-btn" onclick="event.stopPropagation(); editCourse('${c.key}')" title="Editar"><i class="fas fa-edit"></i></button>
+                    <button class="delete-btn" onclick="event.stopPropagation(); delCourse('${c.key}')" title="Eliminar"><i class="fas fa-trash"></i></button>
                 </div>
             </td>
         </tr>`;
@@ -485,7 +524,7 @@ document.getElementById('btnToggleForm').onclick = () => {
 
 function closeFormModal() { formModal.classList.remove('visible'); }
 
-// CÁLCULOS AUTOMÁTICOS
+// CÁLCULOS
 function getVal(id) { return parseFloat(document.getElementById(id).value.replace(',','.')) || 0; }
 function setVal(id, val) { document.getElementById(id).value = val.toFixed(2).replace('.', ','); }
 
@@ -513,8 +552,8 @@ window.calculateFromHours = () => {
     calculateTotals();
 };
 
-window.calculateFromPrice = calculateFromHours; // Mismo efecto
-window.calculateFromBase = calculateTotals; // Si cambia base, recalcula todo
+window.calculateFromPrice = calculateFromHours; 
+window.calculateFromBase = calculateTotals; 
 
 // GUARDAR
 document.getElementById('courseForm').onsubmit = async (e) => {
@@ -553,7 +592,7 @@ document.getElementById('courseForm').onsubmit = async (e) => {
 window.editCourse = (key) => {
     const c = courses.find(x => x.key === key);
     document.getElementById('courseKey').value = key;
-    document.getElementById('nombreCurso').value = c.nombreCurso;
+    document.getElementById('nombreCurso').value = c.nombreCurso || c.tituloCurso;
     document.getElementById('inicio').value = c.inicio;
     document.getElementById('fin').value = c.fin;
     document.getElementById('pagador').value = c.empresa || c.pagador;
@@ -591,14 +630,58 @@ window.showObs = (key) => {
 };
 window.closeObsModal = () => document.getElementById('obsModal').style.display = 'none';
 
+// --- EXPORTAR EXCEL CORREGIDO (AUTOSUMA OK) ---
 window.exportToExcel = () => {
-    let csv = "Nombre;Pagador;Importe Neto;Estado\n";
-    courses.forEach(c => csv += `"${c.nombreCurso}";"${c.empresa}";${c.importeNeto};${c.cobrado}\n`);
-    const blob = new Blob(["\ufeff"+csv], {type: 'text/csv;charset=utf-8;'});
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = "cursos.csv";
+    const headers = [
+        "Inicio", "Fin", "Nombre Curso", "Tipo", "Pagador", "Lugar", 
+        "Horas", "Precio Hora", "Importe Base", "Kilometraje", 
+        "Importe Bruto", "IRPF %", "Importe Neto", 
+        "Estado", "Fecha Cobro", "Renta", "Observaciones"
+    ];
+
+    let csvContent = headers.join(";") + "\n";
+
+    courses.forEach(c => {
+        // Función para formato numérico de Excel (coma, sin puntos de miles, sin símbolo €)
+        const fmtNum = (val) => {
+            let n = parseFloat(val);
+            if (isNaN(n)) return "0,00";
+            return n.toFixed(2).replace('.', ','); 
+        };
+
+        const txt = (val) => `"${(val || "").replace(/"/g, '""')}"`;
+
+        let row = [
+            c.inicio || "",
+            c.fin || "",
+            txt(c.nombreCurso || c.tituloCurso),
+            txt(c.tipoCurso),
+            txt(c.empresa || c.pagador),
+            txt(c.lugarCelebracion),
+            fmtNum(c.horas),
+            fmtNum(c.precioHoraBruto),
+            fmtNum(c.importeBase),
+            fmtNum(c.kilometraje),
+            fmtNum(c.importeBruto),
+            fmtNum(c.irpf),
+            fmtNum(c.importeNeto),
+            txt(c.cobrado),
+            txt(c.fechaCobro),
+            c.renta || "",
+            txt(c.observaciones)
+        ];
+        
+        csvContent += row.join(";") + "\n";
+    });
+
+    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Cursos_Completo_${new Date().toISOString().slice(0,10)}.csv`);
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 };
 </script>
 </body>

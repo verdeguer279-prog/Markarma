@@ -1,4 +1,4 @@
-c:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.htmlc:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.html<!doctype html>
+<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -30,7 +30,7 @@ c:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.htmlc:
       padding: 0;
     }
     .wrap {
-      max-width: 1500px; /* ANCHO DE ESCRITORIO */
+      max-width: 1500px;
       margin: 20px auto;
       padding: 0 20px;
     }
@@ -199,7 +199,7 @@ c:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.htmlc:
     .form-actions-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 20px; }
     .file-inputs { flex: 1; min-width: 0; }
 
-    /* --- RESPONSIVE / MÓVIL (LA MAGIA) --- */
+    /* --- RESPONSIVE / MÓVIL CORREGIDO --- */
     @media (max-width: 768px) {
       .wrap { max-width: 100%; margin: 10px auto; padding: 0 15px; }
       .form-actions-top { flex-direction: column; }
@@ -208,7 +208,7 @@ c:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.htmlc:
       .filter-buttons { width: 100%; justify-content: center; }
       .row-2-cols { grid-template-columns: 1fr; }
 
-      /* TRANSFORMACIÓN DE TABLA A TARJETAS */
+      /* TRANSFORMACIÓN DE TABLA A TARJETAS FLEXIBLES */
       .table-container { overflow-x: visible; }
       table, tbody { display: block; width: 100%; min-width: 0; }
       thead { display: none; } /* Ocultar cabeceras */
@@ -219,15 +219,11 @@ c:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.htmlc:
         border-radius: 12px;
         margin-bottom: 12px;
         padding: 16px;
-        display: grid;
-        grid-template-columns: 1fr 1fr; /* Dos columnas arriba: Fecha | Hora */
-        grid-template-areas: 
-            "fecha hora"
-            "juzgado juzgado"
-            "detalles detalles";
-        gap: 8px;
+        display: flex; /* USAMOS FLEX PARA EVITAR SUPERPOSICIÓN */
+        flex-wrap: wrap; /* Permitir que los elementos salten de línea */
+        gap: 8px; /* Espacio entre elementos */
         position: relative;
-        cursor: pointer; /* Indicar que es clickeable */
+        cursor: pointer;
         transition: background 0.2s;
       }
       tr:active { background: rgba(255,255,255,0.08); }
@@ -251,27 +247,27 @@ c:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.htmlc:
         padding: 0;
         white-space: normal;
         max-width: none;
-        width: auto !important;
+        width: 100% !important; /* Por defecto ocupan todo */
         min-width: 0 !important;
       }
 
-      /* 1. FECHA */
+      /* 1. FECHA (Ocupa mitad izquierda) */
       td:nth-child(1) { 
-          grid-area: fecha; 
+          width: 50% !important;
           font-weight: bold; 
           font-size: 1.1rem;
           color: var(--accent-blue);
       }
-      /* 2. HORA */
+      /* 2. HORA (Ocupa mitad derecha) */
       td:nth-child(2) { 
-          grid-area: hora; 
+          width: 50% !important;
           text-align: right; 
           font-weight: bold;
           font-size: 1.1rem;
       }
-      /* 3. JUZGADO */
+      /* 3. JUZGADO (Línea entera) */
       td:nth-child(3) { 
-          grid-area: juzgado; 
+          width: 100% !important;
           font-size: 1.2rem;
           font-weight: 600;
           margin-bottom: 5px;
@@ -279,10 +275,10 @@ c:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.htmlc:
           border-bottom: 1px solid rgba(255,255,255,0.05);
       }
 
-      /* 4, 5, 6, 7 (DETALLES OCULTOS) */
-      td:nth-child(4), td:nth-child(5), td:nth-child(6), td:nth-child(7) {
-          grid-area: detalles;
+      /* 4, 5, 6 (DETALLES OCULTOS) */
+      td:nth-child(4), td:nth-child(5), td:nth-child(6) {
           display: none; /* Ocultos por defecto */
+          width: 100% !important;
           font-size: 0.95rem;
           color: #ccc;
           margin-top: 5px;
@@ -296,19 +292,27 @@ c:\Users\copg2\OneDrive\CODIGOS GENERADOS\PROYECTO PERSONAL G-279\JUICIOS.htmlc:
       /* CUANDO ESTÁ EXPANDIDO */
       tr.expanded td:nth-child(4),
       tr.expanded td:nth-child(5),
-      tr.expanded td:nth-child(6),
+      tr.expanded td:nth-child(6) {
+          display: block;
+          animation: fadeIn 0.3s ease;
+      }
+      
+      /* Botones (Acciones) - SIEMPRE DEBAJO DE TODO */
+      td:nth-child(7) {
+          display: none; /* Ocultos inicialmente */
+          width: 100% !important;
+          margin-top: 15px;
+          padding-top: 10px;
+          border-top: 1px solid rgba(255,255,255,0.1);
+      }
+      
+      /* Mostrar botones al expandir */
       tr.expanded td:nth-child(7) {
           display: block;
           animation: fadeIn 0.3s ease;
       }
       
-      /* Botones (Acciones) */
-      td:nth-child(7) {
-          margin-top: 15px;
-          padding-top: 10px;
-          border-top: 1px solid rgba(255,255,255,0.1);
-      }
-      td:nth-child(7)::before { content: ""; } /* Quitar etiqueta en acciones */
+      td:nth-child(7)::before { content: ""; } 
       
       .action-buttons {
           flex-wrap: wrap;

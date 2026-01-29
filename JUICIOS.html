@@ -130,7 +130,7 @@
     /* Anchos Escritorio */
     th:nth-child(1), td:nth-child(1) { width: 110px; min-width: 110px; }
     th:nth-child(2), td:nth-child(2) { width: 80px; min-width: 80px; }
-    th:nth-child(3), td:nth-child(3) { width: 160px; min-width: 160px; }
+    th:nth-child(3), td:nth-child(3) { width: 220px; min-width: 220px; } /* AUMENTADO PARA QUE QUEPA PERITO */
     th:nth-child(4), td:nth-child(4) { width: 140px; min-width: 140px; }
     th:nth-child(5), td:nth-child(5) { width: 130px; min-width: 130px; }
     th:nth-child(6), td:nth-child(6) { width: 110px; min-width: 110px; }
@@ -146,9 +146,10 @@
     .status-nocobrado { color: var(--accent-red); font-weight: bold; font-size: 0.85rem; }
     .status-noentregada { color: var(--accent-red); font-weight: bold; font-size: 0.85rem; }
     
+    /* ETIQUETA PERITO */
     .badge-perito {
         display: inline-block; background: var(--accent-blue); color: white;
-        font-size: 0.8rem; padding: 2px 6px; border-radius: 4px;
+        font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;
         margin-left: 8px; font-weight: bold; vertical-align: middle;
         text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
@@ -199,7 +200,7 @@
     .form-actions-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 20px; }
     .file-inputs { flex: 1; min-width: 0; }
 
-    /* --- RESPONSIVE / MÓVIL CORREGIDO --- */
+    /* --- RESPONSIVE / MÓVIL --- */
     @media (max-width: 768px) {
       .wrap { max-width: 100%; margin: 10px auto; padding: 0 15px; }
       .form-actions-top { flex-direction: column; }
@@ -211,7 +212,7 @@
       /* TRANSFORMACIÓN DE TABLA A TARJETAS FLEXIBLES */
       .table-container { overflow-x: visible; }
       table, tbody { display: block; width: 100%; min-width: 0; }
-      thead { display: none; } /* Ocultar cabeceras */
+      thead { display: none; }
       
       tr {
         background: rgba(255,255,255,0.03);
@@ -219,9 +220,9 @@
         border-radius: 12px;
         margin-bottom: 12px;
         padding: 16px;
-        display: flex; /* USAMOS FLEX PARA EVITAR SUPERPOSICIÓN */
-        flex-wrap: wrap; /* Permitir que los elementos salten de línea */
-        gap: 8px; /* Espacio entre elementos */
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
         position: relative;
         cursor: pointer;
         transition: background 0.2s;
@@ -247,18 +248,18 @@
         padding: 0;
         white-space: normal;
         max-width: none;
-        width: 100% !important; /* Por defecto ocupan todo */
+        width: 100% !important;
         min-width: 0 !important;
       }
 
-      /* 1. FECHA (Ocupa mitad izquierda) */
+      /* 1. FECHA (Mitad izquierda) */
       td:nth-child(1) { 
           width: 50% !important;
           font-weight: bold; 
           font-size: 1.1rem;
           color: var(--accent-blue);
       }
-      /* 2. HORA (Ocupa mitad derecha) */
+      /* 2. HORA (Mitad derecha) */
       td:nth-child(2) { 
           width: 50% !important;
           text-align: right; 
@@ -277,14 +278,13 @@
 
       /* 4, 5, 6 (DETALLES OCULTOS) */
       td:nth-child(4), td:nth-child(5), td:nth-child(6) {
-          display: none; /* Ocultos por defecto */
+          display: none;
           width: 100% !important;
           font-size: 0.95rem;
           color: #ccc;
           margin-top: 5px;
       }
 
-      /* Etiquetas para saber qué es cada cosa */
       td:nth-child(4)::before { content: "Entrega: "; color: #888; }
       td:nth-child(5)::before { content: "Cobro: "; color: #888; }
       td:nth-child(6)::before { content: "Estado: "; color: #888; }
@@ -297,16 +297,15 @@
           animation: fadeIn 0.3s ease;
       }
       
-      /* Botones (Acciones) - SIEMPRE DEBAJO DE TODO */
+      /* Botones (Acciones) */
       td:nth-child(7) {
-          display: none; /* Ocultos inicialmente */
+          display: none;
           width: 100% !important;
           margin-top: 15px;
           padding-top: 10px;
           border-top: 1px solid rgba(255,255,255,0.1);
       }
       
-      /* Mostrar botones al expandir */
       tr.expanded td:nth-child(7) {
           display: block;
           animation: fadeIn 0.3s ease;
@@ -320,7 +319,7 @@
           gap: 8px;
       }
       .action-item {
-          flex: 1; /* Botones grandes en móvil */
+          flex: 1;
           min-width: 45%;
       }
     }
@@ -542,9 +541,7 @@
       filteredJuicios.forEach(juicio => {
         const tr = document.createElement("tr");
         
-        // INTERACCIÓN MÓVIL: CLIC EN FILA
         tr.onclick = function(e) {
-            // Si el ancho es móvil, alternar clase expanded
             if (window.innerWidth <= 768) {
                 this.classList.toggle('expanded');
             }
@@ -569,10 +566,9 @@
         const fechaEntregaContent = juicio.fechaEntrega ? juicio.fechaEntrega : '<span class="status-noentregada">NO ENTREGADA</span>';
         
         const juzgadoDisplay = juicio.esPerito 
-            ? `${juicio.juzgado} <span class="badge-perito" title="Citado como Perito">P</span>` 
+            ? `${juicio.juzgado} <span class="badge-perito" title="Citado como Perito">PERITO</span>` 
             : juicio.juzgado;
 
-        // IMPORTANTE: stopPropagation para que al pulsar botones no se cierre/abra la tarjeta
         let citacionBtn = juicio.citacionUrl ? `<a href="${juicio.citacionUrl}" target="_blank" class="action-item has-link button" onclick="event.stopPropagation()">Citación</a>` : `<button class="action-item button" onclick="event.stopPropagation(); editJuicio('${juicio.id}')">Citación</button>`;
         let diligenciasBtn = juicio.diligenciasUrl ? `<a href="${juicio.diligenciasUrl}" target="_blank" class="action-item has-link button" onclick="event.stopPropagation()">Diligencias</a>` : `<button class="action-item button" onclick="event.stopPropagation(); editJuicio('${juicio.id}')">Diligencias</button>`;
 

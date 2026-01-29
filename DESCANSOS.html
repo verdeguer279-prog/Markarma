@@ -169,7 +169,7 @@
     
     <div class="container">
         <div id="notification-area"></div>
-        <div id="loading"><div class="loading">Conectando...</div></div>
+        <div id="loading"><div class="loading">Sincronizando con base de datos...</div></div>
         
         <div id="app" class="hidden">
             <div class="status-grid">
@@ -333,9 +333,7 @@
     </div></div>
 
     <script>
-        // ==========================================
-        //  1. CONFIGURACIÓN FIREBASE (Versión 9 Compat)
-        // ==========================================
+        // CONFIGURACIÓN FIREBASE (Tus claves reales)
         const firebaseConfig = {
             apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
             authDomain: "markarma279.firebaseapp.com",
@@ -346,20 +344,12 @@
             appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
         };
         
-        // Inicializar solo si no existe ya (seguridad extra)
-        if (!firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
-        
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
-        
-        // Mantener sesión del index
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         
         let USER_ID = null; 
-
-        // Variables de datos (vacías por defecto)
         let datos = { configuraciones: {}, solicitudes: [], horas: [], permutas: [] };
         const anioActual = new Date().getFullYear();
         let anioGestion = anioActual;
@@ -405,27 +395,77 @@
             listPermutas: document.getElementById('lista-permutas')
         };
 
-        // ==========================================
-        //  LÓGICA DE LOGIN Y CARGA
-        // ==========================================
+        // ===============================================
+        //  LÓGICA DE LOGIN Y MIGRACIÓN AUTOMÁTICA
+        // ===============================================
         auth.onAuthStateChanged((user) => {
             if (user) {
                 // Generar ID seguro basado en email (ej: pepe@gmail,com)
                 USER_ID = user.email.replace(/\./g, ',');
                 console.log("Conectado. ID Usuario:", USER_ID);
                 
-                // Preparar UI
+                // Preparar UI fecha hoy
                 const today = new Date().toISOString().split('T')[0];
                 dom.inpFecha.value = today;
                 dom.inpFechaOp.value = today;
                 
-                cargarDatos(); // Leer de Firebase
+                cargarDatosConMigracion(); // Intentar cargar y migrar si es necesario
                 setupListeners();
             } else {
-                // Si no hay usuario, volver al login
+                // Si no hay login, volver al index
                 window.location.href = "index.html";
             }
         });
+
+        function cargarDatosConMigracion() {
+            const userRef = db.ref('descansos/' + USER_ID);
+            
+            userRef.once('value').then(snap => {
+                if(snap.exists()) {
+                    // SI EXISTEN DATOS EN TU CUENTA, CÁRGALOS NORMALMENTE
+                    datos = snap.val();
+                    comprobarArrays();
+                    renderTodo();
+                } else {
+                    // SI TU CUENTA NUEVA ESTÁ VACÍA -> INTENTAR RECUPERAR DE 'usuario-demo'
+                    notificar("Buscando datos antiguos...", "info");
+                    db.ref('descansos/usuario-demo').once('value').then(oldSnap => {
+                        if(oldSnap.exists()) {
+                            // ENCONTRADOS: Copiar a la nueva cuenta
+                            datos = oldSnap.val();
+                            userRef.set(datos).then(() => {
+                                notificar("¡Datos antiguos recuperados con éxito!", "success");
+                                comprobarArrays();
+                                renderTodo();
+                            });
+                        } else {
+                            // Si no hay nada antiguo tampoco, iniciar limpio
+                            comprobarArrays();
+                            renderTodo();
+                        }
+                    });
+                }
+            }).catch(err => {
+                console.error(err);
+                alert("Error de conexión. Asegúrate de tener acceso a internet.");
+            });
+        }
+
+        function comprobarArrays() {
+            if(!datos.solicitudes) datos.solicitudes = [];
+            if(!datos.horas) datos.horas = [];
+            if(!datos.permutas) datos.permutas = [];
+            if(!datos.configuraciones) datos.configuraciones = {};
+            datos.solicitudes.forEach(s => s.computo = parseInt(s.computo));
+        }
+
+        function renderTodo() {
+            initSelectores();
+            dom.loading.classList.add('hidden');
+            dom.app.classList.remove('hidden');
+            renderConfig(anioConfig);
+            renderUI();
+        }
 
         function setupListeners() {
             dom.selConfig.addEventListener('change', e => { anioConfig = parseInt(e.target.value); renderConfig(anioConfig); });
@@ -456,33 +496,6 @@
             
             // Editores
             document.getElementById('edit-tipo').addEventListener('change', e => document.getElementById('edit-group-horas').classList.toggle('hidden', e.target.value !== 'horas'));
-        }
-
-        function cargarDatos() {
-            // Lee SOLO la carpeta de ESTE usuario
-            db.ref('descansos/' + USER_ID).once('value').then(snap => {
-                if(snap.exists()) {
-                    datos = snap.val();
-                    // Asegurar arrays si vienen vacíos
-                    if(!datos.solicitudes) datos.solicitudes = [];
-                    if(!datos.horas) datos.horas = [];
-                    if(!datos.permutas) datos.permutas = [];
-                    if(!datos.configuraciones) datos.configuraciones = {};
-                    datos.solicitudes.forEach(s => s.computo = parseInt(s.computo));
-                } else {
-                    // Si es usuario nuevo, datos limpios
-                    console.log("Cuenta nueva: Iniciando datos vacíos.");
-                }
-                
-                initSelectores();
-                dom.loading.classList.add('hidden');
-                dom.app.classList.remove('hidden');
-                renderConfig(anioConfig);
-                renderUI();
-            }).catch(err => {
-                console.error(err);
-                alert("Error cargando datos. Verifica tu conexión.");
-            });
         }
 
         function initSelectores() {

@@ -70,7 +70,7 @@
         margin-bottom: 50px;
     }
     
-    /* ESTILOS NUEVOS ESTADÍSTICAS */
+    /* ESTILOS ESTADÍSTICAS */
     .stats-wrapper { max-width: 1500px !important; }
     .stats-header { 
         display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; 
@@ -90,30 +90,22 @@
         text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         position: relative; overflow: hidden;
     }
-    .kpi-card::before {
-        content: ''; position: absolute; top:0; left:0; width: 4px; height: 100%; background: var(--accent-blue);
-    }
     .kpi-value { font-size: 2.2rem; font-weight: 800; color: #fff; margin: 10px 0; letter-spacing: -1px; }
     .kpi-label { font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
     .kpi-sub { font-size: 0.9rem; color: #ffd54f; font-weight: 600; margin-top: 5px; }
 
-    /* Gráfica y Tabla Grid */
     .dashboard-content { display: grid; grid-template-columns: 350px 1fr; gap: 25px; }
     .chart-box { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); height: 400px; }
-    
     .renta-analysis { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow-x: auto; }
     
-    /* Tabla Profesional */
     .pro-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
     .pro-table th { text-align: left; padding: 12px; color: #ccc; border-bottom: 2px solid rgba(255,255,255,0.1); font-weight: 600; }
     .pro-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .pro-table tr:last-child td { border-bottom: none; }
     .pro-table .money { text-align: right; font-family: 'Courier New', monospace; font-weight: 700; color: #ffd54f; }
-    .pro-table .year-badge { background: var(--accent-blue); color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.8rem; }
     .pro-table .status-ok { color: var(--accent-green); }
     .pro-table .status-wait { color: var(--accent-orange); }
 
-    /* Formulario Estándar */
+    /* Form Grid */
     .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: end; margin-bottom: 15px; } 
     .form-group { display: flex; flex-direction: column; }
     .form-group label { margin-bottom: 5px; color: #ccc; font-size: 0.85rem; }
@@ -131,7 +123,7 @@
     #btnSubmitCourse { background: var(--accent-green); color: white; }
     #btnCancelEdit { background: var(--accent-red); color: white; }
 
-    /* TABLA LISTADO (Escritorio) */
+    /* TABLA LISTADO */
     .table-container { width: 100%; overflow-x: auto; }
     .courses-table { width: 100%; border-collapse: collapse; min-width: 1000px; } 
     .courses-table th { background: var(--header-bg); color: #ffd54f; padding: 12px; text-align: left; }
@@ -151,7 +143,7 @@
 
     /* ANCHOS PC */
     .courses-table th:nth-child(1) { width: 3%; }
-    .courses-table th:nth-child(2) { width: 10%; } /* Fecha */
+    .courses-table th:nth-child(2) { width: 10%; white-space: nowrap; } 
     .courses-table th:nth-child(3) { width: 15%; }
     .courses-table th:nth-child(4) { width: 10%; }
     .courses-table th:nth-child(5) { width: 10%; }
@@ -163,7 +155,6 @@
     .courses-table th:nth-child(11) { width: 16%; min-width: 140px; }
     .courses-table td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
 
-    /* --- MÓVIL --- */
     @media (max-width: 900px) {
         .form-grid { grid-template-columns: 1fr 1fr; }
         .kpi-row { grid-template-columns: 1fr 1fr; }
@@ -181,24 +172,15 @@
         .courses-table thead { display: none; }
         .courses-table, .courses-table tbody, .courses-table tr, .courses-table td { display: block; width: 100%; }
         
-        /* TARJETAS MÓVIL */
         .courses-table tr {
             background: #2d2d44; margin-bottom: 15px; border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
             position: relative; padding: 0; overflow: visible;
         }
 
-        .courses-table td:nth-child(3) { /* Nombre */
-            padding: 15px 15px 5px 15px; font-size: 1.1rem; font-weight: 700; color: #fff;
-            border-bottom: none; width: 70% !important; white-space: normal;
-        }
-        .courses-table td:nth-child(2) { /* Fecha */
-            padding: 0 15px 15px 15px; font-size: 0.9rem; color: #aaa; border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .courses-table td:nth-child(7) { /* Importe */
-            position: absolute; top: 15px; right: 15px; width: auto !important;
-            text-align: right; padding: 0; font-weight: 800; font-size: 1.1rem; color: #ffd54f; border: none; background: transparent; z-index: 10;
-        }
+        .courses-table td:nth-child(3) { padding: 15px 15px 5px 15px; font-size: 1.1rem; font-weight: 700; color: #fff; border-bottom: none; width: 70% !important; white-space: normal; }
+        .courses-table td:nth-child(2) { padding: 0 15px 15px 15px; font-size: 0.9rem; color: #aaa; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .courses-table td:nth-child(7) { position: absolute; top: 15px; right: 15px; width: auto !important; text-align: right; padding: 0; font-weight: 800; font-size: 1.1rem; color: #ffd54f; border: none; background: transparent; z-index: 10; }
         .courses-table tr::after { content: '▼'; position: absolute; bottom: 10px; right: 15px; color: rgba(255,255,255,0.3); font-size: 1.2rem; transition: transform 0.3s; }
         .courses-table tr.expanded::after { transform: rotate(180deg); }
 
@@ -243,7 +225,29 @@
     <button id="btnToggleForm"><i class="fas fa-plus-circle"></i> Nuevo Curso</button>
   </div>
 
-  <div id="stats-modal">
+  <div class="card" style="padding: 10px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding: 0 10px;">
+        <h2 style="margin:0; font-size:1.2rem;">Listado General</h2>
+        <div>
+            <select id="filterListYear" onchange="render()" style="width: auto; padding: 5px; margin-right: 10px;">
+                <option value="">Todos los Años</option>
+            </select>
+            <button onclick="exportToExcel()" style="background:var(--accent-green); color:white; padding:5px 10px; font-size:0.9rem;"><i class="fas fa-file-excel"></i> Excel</button>
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <table class="courses-table">
+          <thead>
+            <tr><th>#</th><th>Inicio</th><th>Curso</th><th>Pagador</th><th>Lugar</th><th>Horas</th><th>Importe</th><th>Estado</th><th>Cobro</th><th>Renta</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="coursesTableBody"></tbody>
+        </table>
+    </div>
+  </div>
+</div>
+
+<div id="stats-modal">
     <div class="modal-content-wrapper stats-wrapper">
         <div class="stats-header">
             <h2 style="margin:0; color:#00bcd4;"><i class="fas fa-chart-pie"></i> Análisis Financiero</h2>
@@ -271,14 +275,14 @@
                 <div class="kpi-sub" id="statAvgPrice">Media: 0,00 €/h</div>
             </div>
             <div class="kpi-card" style="border-bottom: 4px solid var(--accent-green);">
-                <div class="kpi-label">Cobrado en este Año</div>
+                <div class="kpi-label">Importe Total Generado</div>
                 <div class="kpi-value" id="statNetoYear">0,00 €</div>
-                <div class="kpi-sub" style="color:#aaa;">(Efectivo en cuenta)</div>
+                <div class="kpi-sub" style="color:#aaa;">(Valor total de los cursos)</div>
             </div>
             <div class="kpi-card" style="border-bottom: 4px solid var(--accent-red);">
-                <div class="kpi-label">Diferido / Pendiente</div>
+                <div class="kpi-label">Pendiente de Cobro</div>
                 <div class="kpi-value" id="statPending" style="color:#ef5350;">0,00 €</div>
-                <div class="kpi-sub">Se cobrará/declarará después</div>
+                <div class="kpi-sub">Importe sin cobrar</div>
             </div>
         </div>
 
@@ -303,35 +307,12 @@
                             <th style="text-align:right">Importe Neto</th>
                         </tr>
                     </thead>
-                    <tbody id="statsTableBody">
-                        </tbody>
+                    <tbody id="statsTableBody"></tbody>
                 </table>
             </div>
         </div>
     </div>
   </div>
-
-  <div class="card" style="padding: 10px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding: 0 10px;">
-        <h2 style="margin:0; font-size:1.2rem;">Listado General</h2>
-        <div>
-            <select id="filterListYear" onchange="render()" style="width: auto; padding: 5px; margin-right: 10px;">
-                <option value="">Todos los Años</option>
-            </select>
-            <button onclick="exportToExcel()" style="background:var(--accent-green); color:white; padding:5px 10px; font-size:0.9rem;"><i class="fas fa-file-excel"></i> Excel</button>
-        </div>
-    </div>
-    
-    <div class="table-container">
-        <table class="courses-table">
-          <thead>
-            <tr><th>#</th><th>Inicio</th><th>Curso</th><th>Pagador</th><th>Lugar</th><th>Horas</th><th>Importe</th><th>Estado</th><th>Cobro</th><th>Renta</th><th>Acciones</th></tr>
-          </thead>
-          <tbody id="coursesTableBody"></tbody>
-        </table>
-    </div>
-  </div>
-</div>
 
 <div id="data-entry-form">
     <div class="modal-content-wrapper">
@@ -404,12 +385,10 @@ let masterCompanies = [];
 let masterTiposCurso = [];
 let chartInstance = null;
 
-// ELEMENTOS DOM
 const tbody = document.getElementById('coursesTableBody');
 const formModal = document.getElementById('data-entry-form');
 const filterListYear = document.getElementById('filterListYear');
 
-// AUTENTICACIÓN
 auth.onAuthStateChanged((user) => {
     if (user) {
         USER_ID = user.email.replace(/\./g, ',');
@@ -451,7 +430,6 @@ async function load() {
     }
     courses.sort((a,b) => new Date(b.inicio) - new Date(a.inicio));
     
-    // Cargar Listas
     const compSnap = await userDataRef.child('empresas').once('value');
     masterCompanies = compSnap.val() || [];
     const typeSnap = await userDataRef.child('tipos').once('value');
@@ -461,7 +439,6 @@ async function load() {
     document.getElementById('pagadoresListForm').innerHTML = [...payers].map(p=>`<option value="${p}">`).join('');
     document.getElementById('tipoCursosListForm').innerHTML = masterTiposCurso.map(t=>`<option value="${t}">`).join('');
 
-    // Obtener años de INICIO para el filtro
     const years = new Set(courses.map(c => c.inicio ? c.inicio.split('-')[0] : '').filter(y=>y.match(/\d{4}/)));
     const sortedYears = [...years].sort((a,b)=>b-a);
     
@@ -474,18 +451,16 @@ async function load() {
     render();
 }
 
-// --- ESTADÍSTICAS INTELIGENTES (CORREGIDAS) ---
 window.openStats = () => {
     document.getElementById('stats-modal').classList.add('visible');
     calculateStats();
 };
 
 window.calculateStats = () => {
-    const yearFilter = document.getElementById('statsYear').value; // Año seleccionado (ej: 2025)
+    const yearFilter = document.getElementById('statsYear').value;
     const payerFilter = document.getElementById('statsPayer').value;
     
     // FILTRO BASE: Cursos cuya FECHA DE INICIO es el año seleccionado
-    // Esto responde a: "¿Cuántos cursos HICE en 2025?"
     const filtered = courses.filter(c => {
         const startYear = c.inicio ? c.inicio.split('-')[0] : '';
         if (yearFilter !== 'ALL' && startYear !== yearFilter) return false;
@@ -493,68 +468,58 @@ window.calculateStats = () => {
         return true;
     });
 
-    // CÁLCULOS
     let totalCourses = filtered.length;
     let totalHoras = 0;
-    let totalCobradoEnAno = 0; // Dinero que entró en el año seleccionado (o año del curso si es ALL)
-    let totalPendienteODiferido = 0;
+    let totalGenerado = 0; // Suma de todos los netos
+    let totalPendiente = 0;
 
     const tableRows = [];
 
     filtered.forEach(c => {
-        totalHoras += parseFloat(c.horas || 0);
+        const horas = parseFloat(c.horas || 0);
         const neto = parseFloat(c.importeNeto || 0);
         
-        // Determinar año real de cobro
-        // Prioridad: 1. Fecha Cobro real, 2. Renta manual, 3. Inicio curso
-        let cobroYear = c.inicio.split('-')[0]; // Por defecto, año del curso
+        totalHoras += horas;
+        totalGenerado += neto; // Sumamos TODO
         
-        if (c.cobrado === 'COBRADO' && c.fechaCobro) {
-            const match = c.fechaCobro.match(/(\d{4})/); // Buscar 4 dígitos
-            if(match) cobroYear = match[0];
-            else if (c.fechaCobro.includes('/')) cobroYear = '20' + c.fechaCobro.split('/').pop(); // dd/mm/25
-        } else if (c.renta) {
-            cobroYear = c.renta.toString();
+        if (c.cobrado !== 'COBRADO') {
+            totalPendiente += neto;
         }
 
-        // Lógica Financiera:
-        // Si el filtro es ALL, sumamos todo lo cobrado.
-        // Si el filtro es 2025, sumamos al "Cobrado en Año" SOLO si el año de cobro es 2025.
-        // Si se cobró en 2026, va a "Diferido".
-        
-        const isCobrado = c.cobrado === 'COBRADO';
-        
-        if (yearFilter === 'ALL') {
-            if(isCobrado) totalCobradoEnAno += neto;
-            else totalPendienteODiferido += neto;
-        } else {
-            // Estamos viendo 2025
-            if (isCobrado && cobroYear === yearFilter) {
-                totalCobradoEnAno += neto;
+        // Determinar año real de cobro para la tabla
+        let cobroYear = "Pendiente";
+        if (c.cobrado === 'COBRADO') {
+            if (c.renta) cobroYear = c.renta.toString();
+            else if (c.fechaCobro) {
+                const match = c.fechaCobro.match(/(\d{4})/);
+                if(match) cobroYear = match[0];
+                else if (c.fechaCobro.includes('/')) cobroYear = '20' + c.fechaCobro.split('/').pop();
+                else cobroYear = c.inicio.split('-')[0]; // Fallback al inicio
             } else {
-                totalPendienteODiferido += neto;
+                cobroYear = c.inicio.split('-')[0]; // Fallback
             }
         }
 
-        // Preparar fila para tabla detallada
-        const rentaYear = isCobrado ? cobroYear : "Pendiente";
-        const declaracionYear = isCobrado ? (parseInt(cobroYear) + 1) : "-";
+        const declaracionYear = (c.cobrado === 'COBRADO' && !isNaN(cobroYear)) ? (parseInt(cobroYear) + 1) : "-";
         
         tableRows.push({
             name: c.nombreCurso,
             status: c.cobrado,
-            fiscal: isCobrado ? `Ejercicio ${rentaYear} (Renta ${declaracionYear})` : "Pendiente de cobro",
+            fiscal: c.cobrado === 'COBRADO' ? `Ejercicio ${cobroYear} (Renta ${declaracionYear})` : "Pendiente de cobro",
             amount: neto
         });
     });
 
-    // PINTAR KPIS
+    // KPIS ARREGLADOS
     document.getElementById('statCourses').textContent = totalCourses;
     document.getElementById('statHoras').textContent = totalHoras.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' h';
-    document.getElementById('statNetoYear').textContent = totalCobradoEnAno.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
-    document.getElementById('statPending').textContent = totalPendienteODiferido.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
+    document.getElementById('statNetoYear').textContent = totalGenerado.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
+    document.getElementById('statPending').textContent = totalPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
     
-    // PINTAR TABLA DETALLE
+    // MEDIA ARREGLADA (Total / Horas)
+    const avg = totalHoras > 0 ? (totalGenerado / totalHoras) : 0;
+    document.getElementById('statAvgPrice').textContent = 'Media: ' + avg.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €/h';
+
     const tbodyStats = document.getElementById('statsTableBody');
     tbodyStats.innerHTML = '';
     tableRows.forEach(r => {
@@ -569,17 +534,16 @@ window.calculateStats = () => {
         `;
     });
 
-    // PINTAR GRÁFICA
+    // Gráfica Cobrado vs Pendiente
     const ctx = document.getElementById('mainChart').getContext('2d');
     if(chartInstance) chartInstance.destroy();
 
-    // Gráfica simple: Cobrado vs Pendiente/Diferido
     chartInstance = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Cobrado en Ejercicio', 'Diferido / Pendiente'],
+            labels: ['Cobrado', 'Pendiente'],
             datasets: [{
-                data: [totalCobradoEnAno, totalPendienteODiferido],
+                data: [totalGenerado - totalPendiente, totalPendiente],
                 backgroundColor: ['#28a745', '#dc3545'],
                 borderWidth: 0
             }]
@@ -589,18 +553,17 @@ window.calculateStats = () => {
             maintainAspectRatio: false,
             plugins: {
                 legend: { position: 'bottom', labels: { color: '#fff' } },
-                title: { display: true, text: 'Distribución Económica', color: '#fff' }
+                title: { display: true, text: 'Estado de Pagos', color: '#fff' }
             }
         }
     });
 
-    // Mensaje Fiscal
     const fiscalMsg = document.getElementById('fiscalNotice');
     if(yearFilter !== 'ALL') {
         const next = parseInt(yearFilter) + 1;
         fiscalMsg.innerHTML = `Viendo cursos realizados en <strong>${yearFilter}</strong>.<br>
         Lo cobrado en ${yearFilter} se declara en la <strong>Renta ${next}</strong>.<br>
-        Lo que cobres en ${next} (aunque el curso sea de ${yearFilter}) irá a la Renta ${next + 1}.`;
+        Lo que cobres en ${next} irá a la Renta ${next + 1}.`;
     } else {
         fiscalMsg.textContent = "Resumen global de todos los años.";
     }
@@ -640,7 +603,6 @@ function render() {
     }).join('');
 }
 
-// FORM LOGIC
 document.getElementById('btnToggleForm').onclick = () => {
     document.getElementById('courseForm').reset();
     document.getElementById('courseKey').value = '';
@@ -649,7 +611,6 @@ document.getElementById('btnToggleForm').onclick = () => {
 
 function closeFormModal() { formModal.classList.remove('visible'); }
 
-// CÁLCULOS
 function getVal(id) { return parseFloat(document.getElementById(id).value.replace(',','.')) || 0; }
 function setVal(id, val) { document.getElementById(id).value = val.toFixed(2).replace('.', ','); }
 
@@ -680,7 +641,6 @@ window.calculateFromHours = () => {
 window.calculateFromPrice = calculateFromHours; 
 window.calculateFromBase = calculateTotals; 
 
-// GUARDAR
 document.getElementById('courseForm').onsubmit = async (e) => {
     e.preventDefault();
     const key = document.getElementById('courseKey').value;
@@ -713,7 +673,6 @@ document.getElementById('courseForm').onsubmit = async (e) => {
     load();
 };
 
-// ACCIONES
 window.editCourse = (key) => {
     const c = courses.find(x => x.key === key);
     document.getElementById('courseKey').value = key;
@@ -755,7 +714,6 @@ window.showObs = (key) => {
 };
 window.closeObsModal = () => document.getElementById('obsModal').style.display = 'none';
 
-// --- EXPORTAR EXCEL PERFECTO (NUMÉRICO) ---
 window.exportToExcel = () => {
     const headers = [
         "Inicio", "Fin", "Nombre Curso", "Tipo", "Pagador", "Lugar", 
@@ -767,7 +725,6 @@ window.exportToExcel = () => {
     let csvContent = headers.join(";") + "\n";
 
     courses.forEach(c => {
-        // Formato número: Coma decimal, sin separador miles, sin símbolo euro
         const fmtNum = (val) => {
             let n = parseFloat(val);
             if (isNaN(n)) return "0,00";

@@ -11,7 +11,7 @@
     
     <style>
         /* =========================================
-           ESTILOS (DISEÑO ESCRITORIO + MÓVIL)
+           ESTILOS (TU DISEÑO ORIGINAL INTACTO)
            ========================================= */
         :root {
             --primary-color: #3498db;
@@ -169,7 +169,7 @@
     
     <div class="container">
         <div id="notification-area"></div>
-        <div id="loading"><div class="loading">Cargando datos...</div></div>
+        <div id="loading"><div class="loading">Conectando...</div></div>
         
         <div id="app" class="hidden">
             <div class="status-grid">
@@ -243,7 +243,7 @@
                         <div class="form-group"><label>Cómputo (Año):</label><select id="computo"></select></div>
                     </div>
                     <div class="form-group hidden" id="group-horas-cantidad"><label>Cantidad Horas:</label><input type="number" id="horas-solicitadas" value="8" step="0.5"></div>
-                    <button id="btn-solicitar" class="btn btn-primary" style="margin-top:auto; width:100%; background-color:var(--success-color);">Registrar Solicitud</button>
+                    <button id="btn-solicitar" class="btn btn-primary" style="margin-top:auto; width:100%;">Registrar Solicitud</button>
                 </div>
             </div>
             
@@ -333,7 +333,9 @@
     </div></div>
 
     <script>
-        // 1. CONFIGURACIÓN FIREBASE (Versión 9 Compat)
+        // ==========================================
+        //  1. CONFIGURACIÓN FIREBASE (Versión 9 Compat)
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
             authDomain: "markarma279.firebaseapp.com",
@@ -344,15 +346,20 @@
             appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
         };
         
-        firebase.initializeApp(firebaseConfig);
+        // Inicializar solo si no existe ya (seguridad extra)
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
         const db = firebase.database();
         const auth = firebase.auth();
         
-        // PERSISTENCIA (Clave para mantener el login entre archivos)
+        // Mantener sesión del index
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         
-        let USER_ID = null; // Se rellenará automáticamente
+        let USER_ID = null; 
 
+        // Variables de datos (vacías por defecto)
         let datos = { configuraciones: {}, solicitudes: [], horas: [], permutas: [] };
         const anioActual = new Date().getFullYear();
         let anioGestion = anioActual;
@@ -399,22 +406,23 @@
         };
 
         // ==========================================
-        //  SISTEMA DE AUTENTICACIÓN Y CARGA DE DATOS
+        //  LÓGICA DE LOGIN Y CARGA
         // ==========================================
         auth.onAuthStateChanged((user) => {
             if (user) {
-                // Usuario detectado: Convertimos el email en ID válido para Firebase (puntos por comas)
+                // Generar ID seguro basado en email (ej: pepe@gmail,com)
                 USER_ID = user.email.replace(/\./g, ',');
-                console.log("Conectado como:", USER_ID);
+                console.log("Conectado. ID Usuario:", USER_ID);
                 
-                // Iniciar la app
+                // Preparar UI
                 const today = new Date().toISOString().split('T')[0];
                 dom.inpFecha.value = today;
                 dom.inpFechaOp.value = today;
-                cargarDatos();
+                
+                cargarDatos(); // Leer de Firebase
                 setupListeners();
             } else {
-                // Si no hay login, expulsar al index
+                // Si no hay usuario, volver al login
                 window.location.href = "index.html";
             }
         });
@@ -451,25 +459,29 @@
         }
 
         function cargarDatos() {
+            // Lee SOLO la carpeta de ESTE usuario
             db.ref('descansos/' + USER_ID).once('value').then(snap => {
                 if(snap.exists()) {
                     datos = snap.val();
+                    // Asegurar arrays si vienen vacíos
                     if(!datos.solicitudes) datos.solicitudes = [];
                     if(!datos.horas) datos.horas = [];
                     if(!datos.permutas) datos.permutas = [];
                     if(!datos.configuraciones) datos.configuraciones = {};
                     datos.solicitudes.forEach(s => s.computo = parseInt(s.computo));
                 } else {
-                    console.log("Usuario nuevo o sin datos. Iniciando vacío.");
+                    // Si es usuario nuevo, datos limpios
+                    console.log("Cuenta nueva: Iniciando datos vacíos.");
                 }
+                
                 initSelectores();
                 dom.loading.classList.add('hidden');
                 dom.app.classList.remove('hidden');
                 renderConfig(anioConfig);
                 renderUI();
-            }).catch(error => {
-                console.error("Error cargando datos:", error);
-                alert("Error de permisos o conexión. Revisa si has actualizado las Reglas de Firebase.");
+            }).catch(err => {
+                console.error(err);
+                alert("Error cargando datos. Verifica tu conexión.");
             });
         }
 
@@ -684,7 +696,7 @@
                 if(t==='vacaciones' && hoy > limV) return notificar("Plazo vacaciones caducado", "error");
                 if(t==='asuntos-propios' && hoy > limA) return notificar("Plazo asuntos caducado", "error");
             }
-            // ESTADO INICIAL 'En Trámite' (Color Amarillo)
+            // ESTADO INICIAL 'En Trámite'
             const sol = { tipo:t, fecha:f, computo:c, estado:'En Trámite', fechaReg:new Date().toISOString() };
             if(t==='horas') { sol.horas = h; datos.horas.push({ tipo:'resta', fecha:f, concepto:'Día Solicitado', cantidad:h, relacionado:true, fechaReg:new Date().toISOString() }); }
             datos.solicitudes.push(sol); guardarEnBD("Solicitud creada");
@@ -732,7 +744,7 @@
         window.eliminarHora = (idx) => { if(confirm("¿Borrar?")) { datos.horas.splice(idx,1); guardarEnBD("Hora borrada"); renderListaHoras(); } };
         window.eliminarPermuta = (idx) => { if(confirm("¿Borrar?")) { datos.permutas.splice(idx,1); guardarEnBD("Permuta borrada"); renderListaPermutas(); } };
 
-        function guardarEnBD(msg) { renderUI(); db.ref('descansos/' + USER_ID).set(datos).then(() => { notificar(msg, 'success'); renderUI(); }).catch(e => { console.error(e); notificar("Error al guardar: " + e.message, 'error'); }); }
+        function guardarEnBD(msg) { renderUI(); db.ref('descansos/' + USER_ID).set(datos).then(() => { notificar(msg, 'success'); renderUI(); }).catch(e => { console.error(e); notificar("Error guardando: " + e.message, 'error'); }); }
         function notificar(msg, type) { const d = document.createElement('div'); d.className = `notification ${type==='success'?'notif-success':'notif-error'}`; d.textContent = msg; document.getElementById('notification-area').appendChild(d); setTimeout(() => d.remove(), 3000); }
         function fmtDate(f) { if(!f)return''; const p=f.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
         function fmtType(t) { return t.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()); }

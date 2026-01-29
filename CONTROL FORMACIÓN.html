@@ -16,6 +16,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
+    /* ESTILOS IDÉNTICOS (MANTENIDOS) */
     :root {
       --bg-dark: #1a1a2e;
       --card-bg: #282844;
@@ -252,7 +253,7 @@
         <div class="stats-header">
             <h2 style="margin:0; color:#00bcd4;"><i class="fas fa-chart-pie"></i> Análisis Financiero</h2>
             <div class="stats-filters">
-                <label>Filtrar Ejercicio:</label>
+                <label>Filtrar por año de realización:</label>
                 <select id="statsYear" onchange="calculateStats()">
                     <option value="ALL">Todos los Años</option>
                 </select>
@@ -267,22 +268,22 @@
             <div class="kpi-card" style="border-bottom: 4px solid var(--accent-blue);">
                 <div class="kpi-label">Cursos Realizados</div>
                 <div class="kpi-value" id="statCourses">0</div>
-                <div class="kpi-sub">En el periodo seleccionado</div>
+                <div class="kpi-sub">En el año seleccionado</div>
             </div>
             <div class="kpi-card" style="border-bottom: 4px solid var(--accent-orange);">
                 <div class="kpi-label">Horas Impartidas</div>
                 <div class="kpi-value" id="statHoras">0 h</div>
-                <div class="kpi-sub" id="statAvgPrice">Media: 0,00 €/h</div>
+                <div class="kpi-sub" style="color:#aaa;">(Total trabajo realizado)</div>
             </div>
             <div class="kpi-card" style="border-bottom: 4px solid var(--accent-green);">
-                <div class="kpi-label">Importe Total Generado</div>
-                <div class="kpi-value" id="statNetoYear">0,00 €</div>
-                <div class="kpi-sub" style="color:#aaa;">(Valor total de los cursos)</div>
+                <div class="kpi-label">Total Generado</div>
+                <div class="kpi-value" id="statNetoTotal">0,00 €</div>
+                <div class="kpi-sub">Valor total de los cursos</div>
             </div>
             <div class="kpi-card" style="border-bottom: 4px solid var(--accent-red);">
                 <div class="kpi-label">Pendiente de Cobro</div>
                 <div class="kpi-value" id="statPending" style="color:#ef5350;">0,00 €</div>
-                <div class="kpi-sub">Importe sin cobrar</div>
+                <div class="kpi-sub">Aún no pagado</div>
             </div>
         </div>
 
@@ -293,18 +294,18 @@
             
             <div class="renta-analysis">
                 <h3 style="color:#ffd54f; margin-top:0; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-                    <i class="fas fa-file-invoice-dollar"></i> Desglose Detallado
+                    <i class="fas fa-file-invoice-dollar"></i> Desglose por Ejercicio Fiscal (Cobro)
                 </h3>
                 <p id="fiscalNotice" style="color:#ccc; font-size:0.9rem; margin-bottom:15px; font-style:italic;">
-                    * Los importes cobrados en el ejercicio X se declaran en la Renta del año X+1.
+                    * El dinero se declara en la Renta del año siguiente al que se cobra.
                 </p>
                 <table class="pro-table">
                     <thead>
                         <tr>
-                            <th>Curso / Concepto</th>
-                            <th>Estado Pago</th>
-                            <th>Ejercicio Fiscal</th>
+                            <th>Concepto</th>
                             <th style="text-align:right">Importe Neto</th>
+                            <th>Ejercicio Fiscal</th>
+                            <th>Declaración Renta</th>
                         </tr>
                     </thead>
                     <tbody id="statsTableBody"></tbody>
@@ -456,11 +457,12 @@ window.openStats = () => {
     calculateStats();
 };
 
+// --- LÓGICA ESTADÍSTICA CORREGIDA ---
 window.calculateStats = () => {
     const yearFilter = document.getElementById('statsYear').value;
     const payerFilter = document.getElementById('statsPayer').value;
     
-    // FILTRO BASE: Cursos cuya FECHA DE INICIO es el año seleccionado
+    // 1. Filtrar cursos REALIZADOS en el año seleccionado
     const filtered = courses.filter(c => {
         const startYear = c.inicio ? c.inicio.split('-')[0] : '';
         if (yearFilter !== 'ALL' && startYear !== yearFilter) return false;
@@ -470,81 +472,107 @@ window.calculateStats = () => {
 
     let totalCourses = filtered.length;
     let totalHoras = 0;
-    let totalGenerado = 0; // Suma de todos los netos
+    let totalGenerado = 0; 
     let totalPendiente = 0;
-
-    const tableRows = [];
+    
+    // Objeto para agrupar por año de cobro real
+    const moneyByPaymentYear = {};
 
     filtered.forEach(c => {
         const horas = parseFloat(c.horas || 0);
         const neto = parseFloat(c.importeNeto || 0);
         
         totalHoras += horas;
-        totalGenerado += neto; // Sumamos TODO
+        totalGenerado += neto; 
         
         if (c.cobrado !== 'COBRADO') {
             totalPendiente += neto;
-        }
-
-        // Determinar año real de cobro para la tabla
-        let cobroYear = "Pendiente";
-        if (c.cobrado === 'COBRADO') {
-            if (c.renta) cobroYear = c.renta.toString();
-            else if (c.fechaCobro) {
+        } else {
+            // Determinar año real de cobro para el desglose fiscal
+            let payYear = null;
+            
+            // Prioridad 1: Fecha de cobro explícita
+            if (c.fechaCobro) {
                 const match = c.fechaCobro.match(/(\d{4})/);
-                if(match) cobroYear = match[0];
-                else if (c.fechaCobro.includes('/')) cobroYear = '20' + c.fechaCobro.split('/').pop();
-                else cobroYear = c.inicio.split('-')[0]; // Fallback al inicio
-            } else {
-                cobroYear = c.inicio.split('-')[0]; // Fallback
+                if(match) payYear = match[0];
+                else if (c.fechaCobro.includes('/')) payYear = '20' + c.fechaCobro.split('/').pop();
+            } 
+            
+            // Prioridad 2: Renta (si dice renta 2026 -> Ejercicio 2025 -> Cobrado en 2025)
+            // OJO: La gente suele poner "Renta 2026" para referirse a la declaración que se hace en 2026
+            // correspondiente al ejercicio 2025.
+            if (!payYear && c.renta) {
+                // Asumimos que el usuario pone el año de la campaña de renta.
+                // Ejercicio = Campaña - 1
+                payYear = (parseInt(c.renta) - 1).toString();
             }
-        }
+            
+            // Prioridad 3: Fecha inicio curso (asumimos cobrado en el mismo año)
+            if (!payYear) {
+                payYear = c.inicio.split('-')[0];
+            }
 
-        const declaracionYear = (c.cobrado === 'COBRADO' && !isNaN(cobroYear)) ? (parseInt(cobroYear) + 1) : "-";
-        
-        tableRows.push({
-            name: c.nombreCurso,
-            status: c.cobrado,
-            fiscal: c.cobrado === 'COBRADO' ? `Ejercicio ${cobroYear} (Renta ${declaracionYear})` : "Pendiente de cobro",
-            amount: neto
-        });
+            if (!moneyByPaymentYear[payYear]) moneyByPaymentYear[payYear] = 0;
+            moneyByPaymentYear[payYear] += neto;
+        }
     });
 
-    // KPIS ARREGLADOS
+    // KPIS
     document.getElementById('statCourses').textContent = totalCourses;
     document.getElementById('statHoras').textContent = totalHoras.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' h';
-    document.getElementById('statNetoYear').textContent = totalGenerado.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
+    document.getElementById('statNetoTotal').textContent = totalGenerado.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
     document.getElementById('statPending').textContent = totalPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
-    
-    // MEDIA ARREGLADA (Total / Horas)
-    const avg = totalHoras > 0 ? (totalGenerado / totalHoras) : 0;
-    document.getElementById('statAvgPrice').textContent = 'Media: ' + avg.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €/h';
 
+    // TABLA FISCAL
     const tbodyStats = document.getElementById('statsTableBody');
     tbodyStats.innerHTML = '';
-    tableRows.forEach(r => {
-        const color = r.status === 'COBRADO' ? 'status-ok' : 'status-wait';
+    
+    // Ordenar años de cobro
+    const sortedPayYears = Object.keys(moneyByPaymentYear).sort();
+    
+    sortedPayYears.forEach(year => {
+        const amount = moneyByPaymentYear[year];
+        const rentaYear = parseInt(year) + 1;
         tbodyStats.innerHTML += `
             <tr>
-                <td>${r.name}</td>
-                <td class="${color}"><strong>${r.status}</strong></td>
-                <td>${r.fiscal}</td>
-                <td class="money">${r.amount.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+                <td>Cobrado en <strong>${year}</strong></td>
+                <td class="money status-ok">${amount.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+                <td>Ejercicio Fiscal ${year}</td>
+                <td>Declaración Renta ${rentaYear}</td>
             </tr>
         `;
     });
 
-    // Gráfica Cobrado vs Pendiente
+    if (totalPendiente > 0) {
+        tbodyStats.innerHTML += `
+            <tr>
+                <td>Pendiente de Cobro</td>
+                <td class="money status-wait">${totalPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+        `;
+    }
+
+    // GRÁFICA
     const ctx = document.getElementById('mainChart').getContext('2d');
     if(chartInstance) chartInstance.destroy();
 
+    const labels = sortedPayYears.map(y => `Cobrado en ${y}`);
+    const data = sortedPayYears.map(y => moneyByPaymentYear[y]);
+    
+    if (totalPendiente > 0) {
+        labels.push('Pendiente');
+        data.push(totalPendiente);
+    }
+
     chartInstance = new Chart(ctx, {
-        type: 'doughnut',
+        type: 'pie',
         data: {
-            labels: ['Cobrado', 'Pendiente'],
+            labels: labels,
             datasets: [{
-                data: [totalGenerado - totalPendiente, totalPendiente],
-                backgroundColor: ['#28a745', '#dc3545'],
+                data: data,
+                backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#f44336'],
                 borderWidth: 0
             }]
         },
@@ -552,21 +580,11 @@ window.calculateStats = () => {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { position: 'bottom', labels: { color: '#fff' } },
-                title: { display: true, text: 'Estado de Pagos', color: '#fff' }
+                legend: { position: 'right', labels: { color: '#fff' } },
+                title: { display: true, text: 'Distribución Real del Cobro', color: '#fff' }
             }
         }
     });
-
-    const fiscalMsg = document.getElementById('fiscalNotice');
-    if(yearFilter !== 'ALL') {
-        const next = parseInt(yearFilter) + 1;
-        fiscalMsg.innerHTML = `Viendo cursos realizados en <strong>${yearFilter}</strong>.<br>
-        Lo cobrado en ${yearFilter} se declara en la <strong>Renta ${next}</strong>.<br>
-        Lo que cobres en ${next} irá a la Renta ${next + 1}.`;
-    } else {
-        fiscalMsg.textContent = "Resumen global de todos los años.";
-    }
 };
 
 function render() {

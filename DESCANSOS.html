@@ -145,6 +145,14 @@
 
         .consumo-item { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #eee; align-items: center;}
         .consumo-item:last-child { border-bottom: none; }
+        /* --- AJUSTES EXTRA PARA MÓVILES --- */
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; text-align: center; gap: 15px; padding: 15px; }
+            .header-content > div { flex-wrap: wrap; justify-content: center; width: 100%; }
+            .header-content button, .header-content a { width: 100%; justify-content: center; text-align: center; margin-bottom: 5px;}
+            /* Hacer que los formularios dentro de los modales se pongan en una sola columna en móvil */
+            .modal-content > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
@@ -158,13 +166,15 @@
                 <select id="selector-anio-global" style="width: auto; height: 30px; font-weight: bold; padding: 0 10px; border:none;"></select>
             </div>
 
-            <div style="display: flex; gap: 10px; align-items: center;">
+            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center;">
+                <button onclick="abrirIncidencias()" class="btn btn-primary" style="background-color: #8e44ad; display: flex; align-items: center; gap: 8px;">
+                    <span>⚠️</span> Incidencias
+                </button>
                 <button onclick="abrirHistoricoMovimientos()" class="btn btn-warning" style="display: flex; align-items: center; gap: 8px;">
                     <span>📖</span> Histórico Movimientos
                 </button>
                 <a href="index.html" class="btn btn-secondary">Volver al Inicio</a>
             </div>
-        </div>
     </header>
     
     <div class="container">
@@ -355,8 +365,36 @@
         <div class="modal-actions"><button id="btn-cerrar-permutas" class="btn btn-secondary">Cerrar</button></div>
     </div></div>
 
-    <script>
-        // CONFIGURACIÓN FIREBASE 
+    <div id="modal-incidencias" class="modal"><div class="modal-content">
+        <h2 class="modal-title">Gestión de Incidencias</h2>
+        <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px; margin-bottom: 10px;">
+            <div class="form-group" style="margin-bottom:0;"><label>Fecha:</label><input type="date" id="incidencia-fecha"></div>
+            <div class="form-group" style="margin-bottom:0;"><label>Texto / Motivo:</label><input type="text" id="incidencia-texto" placeholder="Describe la incidencia..."></div>
+        </div>
+        <button onclick="guardarIncidencia()" class="btn btn-primary" style="width: 100%; margin-bottom: 15px; background-color:#8e44ad;">Añadir Incidencia</button>
+        
+        <h4>Historial de Incidencias</h4>
+        <div class="historial-list" id="lista-incidencias"></div>
+        
+        <div class="modal-actions"><button onclick="document.getElementById('modal-incidencias').style.display='none'" class="btn btn-secondary">Cerrar</button></div>
+    </div></div>
+
+    <div id="modal-editar-incidencia" class="modal"><div class="modal-content">
+        <h2 class="modal-title">Editar Incidencia</h2>
+        <input type="hidden" id="edit-incidencia-index">
+        <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px;">
+            <div class="form-group"><label>Fecha:</label><input type="date" id="edit-incidencia-fecha"></div>
+            <div class="form-group"><label>Texto:</label><input type="text" id="edit-incidencia-texto"></div>
+        </div>
+        <div class="modal-actions">
+            <button onclick="document.getElementById('modal-editar-incidencia').style.display='none'" class="btn btn-secondary">Cancelar</button>
+            <button onclick="guardarEdicionIncidencia()" class="btn btn-primary" style="background-color:#8e44ad;">Guardar Cambios</button>
+        </div>
+    </div></div>
+   <script>
+        // =========================================
+        // 1. CONFIGURACIÓN FIREBASE
+        // =========================================
         const firebaseConfig = {
             apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
             authDomain: "markarma279.firebaseapp.com",
@@ -373,7 +411,7 @@
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
         
         let USER_ID = null; 
-        let datos = { configuraciones: {}, solicitudes: [], horas: [], permutas: [] };
+        let datos = { configuraciones: {}, solicitudes: [], horas: [], permutas: [], incidencias: [] };
         const anioActual = new Date().getFullYear();
         let anioActivo = anioActual;
         let filtroActual = 'todos';
@@ -415,13 +453,15 @@
             listPermutas: document.getElementById('lista-permutas')
         };
 
-        // Función para Paneles Plegables
         window.toggleCollapsible = (id, headerEl) => {
             const content = document.getElementById(id);
             content.classList.toggle('open');
             headerEl.classList.toggle('open');
         };
 
+        // =========================================
+        // 2. INICIO Y CARGA DE DATOS
+        // =========================================
         auth.onAuthStateChanged((user) => {
             if (user) {
                 USER_ID = user.email.replace(/\./g, ',');
@@ -466,6 +506,7 @@
             if(!datos.solicitudes) datos.solicitudes = [];
             if(!datos.horas) datos.horas = [];
             if(!datos.permutas) datos.permutas = [];
+            if(!datos.incidencias) datos.incidencias = [];
             if(!datos.configuraciones) datos.configuraciones = {};
             datos.solicitudes.forEach(s => s.computo = parseInt(s.computo));
         }
@@ -477,6 +518,9 @@
             renderUI();
         }
 
+        // =========================================
+        // 3. LISTENERS Y SELECTORES
+        // =========================================
         function setupListeners() {
             dom.selGlobal.addEventListener('change', e => { 
                 anioActivo = parseInt(e.target.value); 
@@ -497,7 +541,7 @@
             document.getElementById('btn-cerrar-gestion-horas').addEventListener('click', () => dom.modalHoras.style.display = 'none');
             document.getElementById('btn-sumar').addEventListener('click', () => opHoras('suma'));
             document.getElementById('btn-restar').addEventListener('click', () => opHoras('resta'));
-            dom.btnUnlock.addEventListener('click', () => { if(confirm("¿Editar saldo inicial manualmente? (Solo en caso de error)")) { dom.inpHoras.disabled = false; dom.inpHoras.focus(); } });
+            dom.btnUnlock.addEventListener('click', () => { if(confirm("¿Editar saldo inicial manualmente?")) { dom.inpHoras.disabled = false; dom.inpHoras.focus(); } });
             
             document.getElementById('btn-add-permuta').addEventListener('click', () => dom.modalPerm.style.display = 'flex');
             document.getElementById('btn-cancelar-permuta').addEventListener('click', () => dom.modalPerm.style.display = 'none');
@@ -520,6 +564,9 @@
             });
         }
 
+        // =========================================
+        // 4. LÓGICA PRINCIPAL (VISTAS Y HORAS)
+        // =========================================
         function getSaldoHorasCierreAnterior(anioObjetivo) {
             let saldoAcumulado = 0;
             const yearsConfig = Object.keys(datos.configuraciones).map(Number).sort((a,b)=>a-b);
@@ -529,7 +576,6 @@
                 if (datos.configuraciones[y] && datos.configuraciones[y].horasManuales !== undefined && datos.configuraciones[y].horasManuales !== 0) {
                     saldoAcumulado = parseFloat(datos.configuraciones[y].horasManuales);
                 }
-                
                 datos.horas.forEach(op => {
                     if (new Date(op.fecha).getFullYear() === y) {
                         if (op.tipo === 'suma') saldoAcumulado += parseFloat(op.cantidad);
@@ -595,21 +641,21 @@
             renderTabla();
         }
 
-       window.abrirHistoricoMovimientos = () => {
+        // =========================================
+        // 5. HISTÓRICO Y RESÚMENES (TABLAS)
+        // =========================================
+        window.abrirHistoricoMovimientos = () => {
             document.getElementById('historico-anio-display').textContent = anioActivo;
             const lista = document.getElementById('lista-historico-movimientos');
             lista.innerHTML = '';
             
             let allMovs = [];
             
-            // 1. Días Disfrutados (Corregido para evitar fallos de mayúsculas o zonas horarias)
             const solsFiltered = datos.solicitudes.filter(s => {
                 if (s.tipo === 'horas') return false;
                 const estadoLimpio = s.estado ? s.estado.trim().toLowerCase() : '';
                 if (estadoLimpio !== 'disfrutado') return false;
                 if (!s.fecha) return false;
-                
-                // Extraemos el año directamente del texto (YYYY-MM-DD)
                 const yearDisfrute = parseInt(s.fecha.split('-')[0]);
                 return yearDisfrute === anioActivo;
             });
@@ -617,35 +663,16 @@
             solsFiltered.forEach(s => {
                  let titulo = s.tipo === 'vacaciones' ? 'Vacaciones' : 'Asuntos Propios';
                  let concepto = 'Día de descanso disfrutado';
-                 
                  if (parseInt(s.computo) !== anioActivo) {
                      titulo += ` (del año ${s.computo})`;
                      concepto = `Día disfrutado perteneciente a la bolsa del año ${s.computo}`;
                  }
-
-                 allMovs.push({
-                     fecha: s.fecha,
-                     fechaReal: new Date(s.fecha),
-                     titulo: titulo,
-                     concepto: concepto,
-                     valor: '-1 día',
-                     claseValor: 'horas-neg',
-                     icono: s.tipo === 'vacaciones' ? '🏖️' : '📝'
-                 });
+                 allMovs.push({ fecha: s.fecha, fechaReal: new Date(s.fecha), titulo: titulo, concepto: concepto, valor: '-1 día', claseValor: 'horas-neg', icono: s.tipo === 'vacaciones' ? '🏖️' : '📝' });
             });
 
-            // 2. Movimientos de Horas
             const horasOp = datos.horas.filter(h => h.fecha && parseInt(h.fecha.split('-')[0]) === anioActivo);
             horasOp.forEach(h => {
-                 allMovs.push({
-                     fecha: h.fecha,
-                     fechaReal: new Date(h.fecha),
-                     titulo: h.tipo === 'suma' ? 'Horas Añadidas' : 'Horas Descontadas',
-                     concepto: h.concepto || 'Ajuste de horas',
-                     valor: (h.tipo === 'suma' ? '+' : '-') + h.cantidad + 'h',
-                     claseValor: h.tipo === 'suma' ? 'horas-pos' : 'horas-neg',
-                     icono: h.tipo === 'suma' ? '📈' : '📉'
-                 });
+                 allMovs.push({ fecha: h.fecha, fechaReal: new Date(h.fecha), titulo: h.tipo === 'suma' ? 'Horas Añadidas' : 'Horas Descontadas', concepto: h.concepto || 'Ajuste de horas', valor: (h.tipo === 'suma' ? '+' : '-') + h.cantidad + 'h', claseValor: h.tipo === 'suma' ? 'horas-pos' : 'horas-neg', icono: h.tipo === 'suma' ? '📈' : '📉' });
             });
 
             allMovs.sort((a, b) => b.fechaReal - a.fechaReal);
@@ -658,28 +685,19 @@
                         <div class="item-row" style="align-items: center; padding: 6px 10px; border-bottom: 1px solid #eee; background: #fff; font-size: 0.9rem;">
                             <div style="font-size: 1.2rem; margin-right: 10px;">${m.icono}</div>
                             <div style="flex: 1; display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <span style="font-weight: bold; color: var(--dark-color);">${fmtDate(m.fecha)}</span> - ${m.titulo} 
-                                    <span style="color: #666; font-style: italic; font-size: 0.8rem; margin-left: 5px;">(${m.concepto})</span>
-                                </div>
-                                <div class="${m.claseValor}" style="font-weight: bold; margin-left: 10px;">
-                                    ${m.valor}
-                                </div>
+                                <div><span style="font-weight: bold; color: var(--dark-color);">${fmtDate(m.fecha)}</span> - ${m.titulo} <span style="color: #666; font-style: italic; font-size: 0.8rem; margin-left: 5px;">(${m.concepto})</span></div>
+                                <div class="${m.claseValor}" style="font-weight: bold; margin-left: 10px;">${m.valor}</div>
                             </div>
                         </div>
                     `;
                 });
             }
-            
             document.getElementById('modal-historico-movimientos').style.display = 'flex';
         };
 
-        // Resumen Rápido (En la tarjeta de la pantalla principal)
         function renderResumenConsumo() {
             const lista = document.getElementById('lista-consumo');
             lista.innerHTML = '';
-            
-            // Aquí sí filtramos por cómputo, porque esta tarjeta muestra lo gastado de "esa" bolsa
             const disfrutados = datos.solicitudes.filter(s => s.computo === anioActivo && s.estado === 'Disfrutado');
             disfrutados.sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
 
@@ -690,11 +708,7 @@
             disfrutados.forEach(d => {
                 const icono = d.tipo === 'vacaciones' ? '🏖️' : (d.tipo === 'asuntos-propios' ? '📝' : '⏱️');
                 const tipoTexto = d.tipo === 'horas' ? `${d.horas}h (Horas)` : fmtType(d.tipo);
-                lista.innerHTML += `
-                    <div class="consumo-item">
-                        <span>${icono} <strong>${fmtDate(d.fecha)}</strong> - ${tipoTexto}</span>
-                        <span style="color:var(--success-color); font-weight:bold;">✔ Consumido</span>
-                    </div>`;
+                lista.innerHTML += `<div class="consumo-item"><span>${icono} <strong>${fmtDate(d.fecha)}</strong> - ${tipoTexto}</span><span style="color:var(--success-color); font-weight:bold;">✔ Consumido</span></div>`;
             });
         }
 
@@ -714,53 +728,83 @@
                 const idx = datos.solicitudes.indexOf(s);
                 const tr = document.createElement('tr');
                 tr.className = 'main-row';
-                
-                const btns = `
-                    <button onclick="cambiarEstado(${idx},'En Trámite')" class="btn-action btn-tramite">Trámite</button>
-                    <button onclick="cambiarEstado(${idx},'Denegado')" class="btn-action btn-denegado">Denegado</button>
-                    <button onclick="cambiarEstado(${idx},'Disfrutado')" class="btn-action btn-disfrutado">Disfrutado</button>
-                    <button onclick="abrirEdicion(${idx})" class="btn-action btn-editar btn-icon" title="Editar">✏️</button>
-                    <button onclick="eliminarSol(${idx})" class="btn-action btn-eliminar btn-icon" title="Borrar">🗑️</button>
-                `;
-
+                const btns = `<button onclick="cambiarEstado(${idx},'En Trámite')" class="btn-action btn-tramite">Trámite</button><button onclick="cambiarEstado(${idx},'Denegado')" class="btn-action btn-denegado">Denegado</button><button onclick="cambiarEstado(${idx},'Disfrutado')" class="btn-action btn-disfrutado">Disfrutado</button><button onclick="abrirEdicion(${idx})" class="btn-action btn-editar btn-icon" title="Editar">✏️</button><button onclick="eliminarSol(${idx})" class="btn-action btn-eliminar btn-icon" title="Borrar">🗑️</button>`;
                 const estadoClass = s.estado.replace(/\s+/g, '');
 
-                tr.innerHTML = `
-                    <td>${fmtDate(s.fecha)}</td>
-                    <td class="mobile-trigger">${fmtType(s.tipo)}${s.tipo==='horas'? ` (${s.horas}h)` : ''}</td>
-                    <td class="hide-mobile">${s.computo}</td>
-                    <td class="hide-mobile"><span class="estado-badge ${estadoClass}">${s.estado}</span></td>
-                    <td class="hide-mobile actions">${btns}</td>
-                `;
-                
-                tr.onclick = (e) => {
-                    if(window.innerWidth <= 768 && !e.target.closest('button')) {
-                        const detail = document.getElementById(`detail-${idx}`);
-                        tr.classList.toggle('active');
-                        detail.classList.toggle('open');
-                    }
-                };
-                
+                tr.innerHTML = `<td>${fmtDate(s.fecha)}</td><td class="mobile-trigger">${fmtType(s.tipo)}${s.tipo==='horas'? ` (${s.horas}h)` : ''}</td><td class="hide-mobile">${s.computo}</td><td class="hide-mobile"><span class="estado-badge ${estadoClass}">${s.estado}</span></td><td class="hide-mobile actions">${btns}</td>`;
+                tr.onclick = (e) => { if(window.innerWidth <= 768 && !e.target.closest('button')) { const detail = document.getElementById(`detail-${idx}`); tr.classList.toggle('active'); detail.classList.toggle('open'); } };
                 dom.tbody.appendChild(tr);
                 
                 const trDetail = document.createElement('tr');
                 trDetail.className = 'detail-row';
                 trDetail.id = `detail-${idx}`;
-                trDetail.innerHTML = `
-                    <td colspan="5" style="padding:0;">
-                        <div class="mobile-detail-content">
-                            <div class="mobile-info-grid">
-                                <div><strong>Año:</strong> ${s.computo}</div>
-                                <div><strong>Estado:</strong> <span class="estado-badge ${estadoClass}">${s.estado}</span></div>
-                            </div>
-                            <div class="mobile-actions-grid">${btns}</div>
-                        </div>
-                    </td>
-                `;
+                trDetail.innerHTML = `<td colspan="5" style="padding:0;"><div class="mobile-detail-content"><div class="mobile-info-grid"><div><strong>Año:</strong> ${s.computo}</div><div><strong>Estado:</strong> <span class="estado-badge ${estadoClass}">${s.estado}</span></div></div><div class="mobile-actions-grid">${btns}</div></div></td>`;
                 dom.tbody.appendChild(trDetail);
             });
         }
 
+        // =========================================
+        // 6. GESTIÓN DE INCIDENCIAS (NUEVO)
+        // =========================================
+        window.abrirIncidencias = () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('incidencia-fecha').value = today;
+            document.getElementById('incidencia-texto').value = '';
+            renderListaIncidencias();
+            document.getElementById('modal-incidencias').style.display = 'flex';
+        };
+
+        window.guardarIncidencia = () => {
+            const fecha = document.getElementById('incidencia-fecha').value;
+            const texto = document.getElementById('incidencia-texto').value;
+            if(!fecha || !texto) return notificar("Rellena la fecha y el texto", "error");
+            datos.incidencias.push({ fecha, texto, fechaReg: new Date().toISOString() });
+            guardarEnBD("Incidencia guardada");
+            document.getElementById('incidencia-texto').value = '';
+            renderListaIncidencias();
+        };
+
+        window.renderListaIncidencias = () => {
+            const lista = document.getElementById('lista-incidencias');
+            lista.innerHTML = '';
+            const list = [...(datos.incidencias || [])].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+            if(list.length === 0) { lista.innerHTML = '<div style="padding:15px; text-align:center; color:#888;">No hay incidencias registradas</div>'; return; }
+            list.forEach(inc => {
+                const idx = datos.incidencias.indexOf(inc);
+                lista.innerHTML += `<div class="item-row" style="align-items:center;"><div style="flex:1;"><strong>${fmtDate(inc.fecha)}</strong>: <br><span style="color:#555; font-size:0.95rem;">${inc.texto}</span></div><div style="display:flex; gap:5px;"><button onclick="abrirEditarIncidencia(${idx})" class="btn-action btn-editar btn-icon">✏️</button><button onclick="eliminarIncidencia(${idx})" class="btn-action btn-eliminar btn-icon">🗑️</button></div></div>`;
+            });
+        };
+
+        window.abrirEditarIncidencia = (idx) => {
+            const inc = datos.incidencias[idx];
+            document.getElementById('edit-incidencia-index').value = idx;
+            document.getElementById('edit-incidencia-fecha').value = inc.fecha;
+            document.getElementById('edit-incidencia-texto').value = inc.texto;
+            document.getElementById('modal-editar-incidencia').style.display = 'flex';
+        };
+
+        window.guardarEdicionIncidencia = () => {
+            const idx = parseInt(document.getElementById('edit-incidencia-index').value);
+            const fecha = document.getElementById('edit-incidencia-fecha').value;
+            const texto = document.getElementById('edit-incidencia-texto').value;
+            if(!fecha || !texto) return notificar("Datos incompletos", "error");
+            datos.incidencias[idx] = { ...datos.incidencias[idx], fecha, texto };
+            document.getElementById('modal-editar-incidencia').style.display = 'none';
+            guardarEnBD("Incidencia editada");
+            renderListaIncidencias();
+        };
+
+        window.eliminarIncidencia = (idx) => {
+            if(confirm("¿Seguro que quieres borrar esta incidencia?")) {
+                datos.incidencias.splice(idx, 1);
+                guardarEnBD("Incidencia borrada");
+                renderListaIncidencias();
+            }
+        };
+
+        // =========================================
+        // 7. FUNCIONES DE GUARDADO Y EDICIÓN
+        // =========================================
         function abrirEditarHora(idx) {
             const h = datos.horas[idx];
             document.getElementById('edit-hora-index').value = idx;
@@ -779,9 +823,7 @@
             const tipo = document.getElementById('edit-hora-tipo').value;
             if(!fecha || !cant) return notificar("Datos incompletos", "error");
             datos.horas[idx] = { ...datos.horas[idx], fecha, cantidad:cant, concepto:conc, tipo };
-            dom.modalEditHora.style.display='none';
-            guardarEnBD("Hora editada");
-            renderListaHoras();
+            dom.modalEditHora.style.display='none'; guardarEnBD("Hora editada"); renderListaHoras();
         }
 
         window.abrirEdicion = (idx) => {
@@ -815,11 +857,8 @@
             if(!datos.configuraciones[anioActivo]) datos.configuraciones[anioActivo] = {};
             datos.configuraciones[anioActivo].diasVacaciones = parseInt(dom.inpVac.value)||0;
             datos.configuraciones[anioActivo].diasAsuntosPropios = parseInt(dom.inpAp.value)||0;
-            if (!dom.inpHoras.disabled) {
-                datos.configuraciones[anioActivo].horasManuales = parseFloat(dom.inpHoras.value)||0;
-            }
+            if (!dom.inpHoras.disabled) { datos.configuraciones[anioActivo].horasManuales = parseFloat(dom.inpHoras.value)||0; }
             guardarEnBD("Configuración guardada");
-            // Contraer el panel tras guardar para dejar la pantalla limpia
             document.getElementById('content-config').classList.remove('open');
             document.querySelector('[onclick="toggleCollapsible(\'content-config\', this)"]').classList.remove('open');
         }
@@ -836,8 +875,6 @@
             const sol = { tipo:t, fecha:f, computo:c, estado:'En Trámite', fechaReg:new Date().toISOString() };
             if(t==='horas') { sol.horas = h; datos.horas.push({ tipo:'resta', fecha:f, concepto:'Día Solicitado', cantidad:h, relacionado:true, fechaReg:new Date().toISOString() }); }
             datos.solicitudes.push(sol); guardarEnBD("Solicitud creada");
-            
-            // Contraer el panel tras solicitar
             document.getElementById('content-solicitar').classList.remove('open');
             document.querySelector('[onclick="toggleCollapsible(\'content-solicitar\', this)"]').classList.remove('open');
         }
@@ -860,22 +897,10 @@
         }
 
         function renderListaPermutas() {
-            dom.listPermutas.innerHTML = ''; 
-            const list = [...datos.permutas].sort((a,b) => new Date(b.fechaReg) - new Date(a.fechaReg)); 
+            dom.listPermutas.innerHTML = ''; const list = [...datos.permutas].sort((a,b) => new Date(b.fechaReg) - new Date(a.fechaReg)); 
             list.forEach(p => { 
-                const idx = datos.permutas.indexOf(p); 
-                const fYo = p.fechaPropia || p.fechaYo; const tYo = p.turnoPropio || p.turnoYo;
-                const fEl = p.fechaAgente || p.fechaEl; const tEl = p.turnoAgente || p.turnoEl;
-
-                dom.listPermutas.innerHTML += `
-                    <div class="permuta-display" style="border-bottom:1px solid #eee; padding:15px 0;">
-                        <div class="permuta-header">Agente: ${p.agente} <span style="font-size:0.85rem; font-weight:normal; color:#888;">(${p.año})</span></div>
-                        <div class="permuta-details">
-                            <div class="permuta-chip"><strong>279:</strong> ${fmtDate(fYo)} (${fmtTurno(tYo)})</div>
-                            <div class="permuta-chip"><strong>${p.agente}:</strong> ${fmtDate(fEl)} (${fmtTurno(tEl)})</div>
-                            <button onclick="eliminarPermuta(${idx})" class="btn-action btn-eliminar btn-icon" style="margin-left:auto;">🗑️</button>
-                        </div>
-                    </div>`; 
+                const idx = datos.permutas.indexOf(p); const fYo = p.fechaPropia || p.fechaYo; const tYo = p.turnoPropio || p.turnoYo; const fEl = p.fechaAgente || p.fechaEl; const tEl = p.turnoAgente || p.turnoEl;
+                dom.listPermutas.innerHTML += `<div class="permuta-display" style="border-bottom:1px solid #eee; padding:15px 0;"><div class="permuta-header">Agente: ${p.agente} <span style="font-size:0.85rem; font-weight:normal; color:#888;">(${p.año})</span></div><div class="permuta-details"><div class="permuta-chip"><strong>279:</strong> ${fmtDate(fYo)} (${fmtTurno(tYo)})</div><div class="permuta-chip"><strong>${p.agente}:</strong> ${fmtDate(fEl)} (${fmtTurno(tEl)})</div><button onclick="eliminarPermuta(${idx})" class="btn-action btn-eliminar btn-icon" style="margin-left:auto;">🗑️</button></div></div>`; 
             });
         }
 
@@ -889,18 +914,17 @@
         function fmtDate(f) { if(!f)return''; const p=f.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
         function fmtType(t) { return t.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()); }
         function fmtTurno(t) { if(!t) return ''; return t.charAt(0).toUpperCase() + t.slice(1); }
-       window.generarPDF = () => {
+
+        window.generarPDF = () => {
             const modalActions = document.querySelector('#modal-historico-movimientos .modal-actions');
             const btnPdf = document.getElementById('btn-generar-pdf');
             const listaContenedor = document.getElementById('lista-historico-movimientos');
             const pDesc = document.getElementById('texto-explicativo-historico');
 
-            // 1. Ocultamos botones y textos innecesarios para ahorrar espacio en el PDF
             modalActions.style.display = 'none';
             btnPdf.style.display = 'none';
             if(pDesc) pDesc.style.display = 'none';
 
-            // 2. ¡CLAVE! Quitamos el límite de altura y el scroll temporalmente
             const oldMaxHeight = listaContenedor.style.maxHeight;
             const oldOverflow = listaContenedor.style.overflowY;
             listaContenedor.style.maxHeight = 'none';
@@ -909,17 +933,15 @@
             const elemento = document.querySelector('#modal-historico-movimientos .modal-content');
             
             const opt = {
-                margin:       [10, 10, 10, 10], // Margen en los 4 lados
-                filename:     `Movimientos_AP_y_Vacaciones_${anioActivo}.pdf`, // Nombre solicitado
+                margin:       [10, 10, 10, 10],
+                filename:     `Movimientos_AP_y_Vacaciones_${anioActivo}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak:    { mode: 'avoid-all' } // Evita cortar líneas por la mitad entre hojas
+                pagebreak:    { mode: 'avoid-all' }
             };
 
-            // 3. Generamos el PDF
             html2pdf().set(opt).from(elemento).save().then(() => {
-                // 4. Restauramos la pantalla a la normalidad
                 modalActions.style.display = 'flex';
                 btnPdf.style.display = 'block';
                 if(pDesc) pDesc.style.display = 'block';

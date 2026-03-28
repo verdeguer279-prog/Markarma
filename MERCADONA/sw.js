@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mercadona-pro-v1';
+const CACHE_NAME = 'lista-compra-mercadona-v6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

@@ -1,6 +1,6 @@
 {
   "name": "Lista Compra Mercadona",
-  "short_name": "Mercadona Pro",
+  "short_name": "Lista Compra Mercadona",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#007a33",

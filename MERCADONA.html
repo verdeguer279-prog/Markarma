@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mercadona Pro V18 - Diseño Vertical</title>
+    <title>Mercadona Pro V19 - Diseño Compacto</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -36,9 +36,9 @@
             .panel-title { display: block; }
         }
 
-        .card { background: var(--card-bg); border-radius: 10px; padding: 12px 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: transform 0.1s; border: 1px solid #eee; }
+        .card { background: var(--card-bg); border-radius: 10px; padding: 12px 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: transform 0.1s; border: 1px solid #eee; }
         .card-info { flex: 1; display: flex; flex-direction: column; overflow: hidden;}
-        .card-title { font-weight: 500; font-size: 16px; text-transform: capitalize; margin-bottom: 2px; }
+        .card-title { font-weight: 500; font-size: 16px; text-transform: capitalize; margin-bottom: 2px; white-space: normal; line-height: 1.2;}
         .card-ticket-name { font-size: 11px; color: #999; text-transform: uppercase; }
         .crossed { text-decoration: line-through; color: #aaa; }
 
@@ -46,14 +46,26 @@
         .btn-add, .btn-edit { border: none; width: 36px; height: 36px; border-radius: 8px; font-size: 18px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; flex-shrink: 0;}
         .btn-add { background: var(--m-green); color: white; border-radius: 50%; }
         .btn-edit { background: transparent; color: #888; border: 1px solid #ddd; font-size: 14px; }
-        .btn-cart { background: #f0f0f0; border: 2px solid #ddd; width: 44px; height: 44px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; filter: grayscale(100%); opacity: 0.6; flex-shrink: 0;}
+        
+        /* Contenedor del carrito con Globo de Notificación (NUEVO) */
+        .cart-wrapper { position: relative; display: inline-block; flex-shrink: 0; }
+        .btn-cart { background: #f0f0f0; border: 2px solid #ddd; width: 44px; height: 44px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; filter: grayscale(100%); opacity: 0.6; }
         .btn-cart.active { background: #fff4e5; border-color: var(--m-orange); filter: grayscale(0%); opacity: 1; }
+        .cart-badge { position: absolute; top: -6px; right: -6px; background: #dc3545; color: white; font-size: 12px; font-weight: bold; border-radius: 20px; min-width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none; padding: 0 4px; box-sizing: border-box;}
 
-        /* Control de Cantidades Vertical (NUEVO) */
+        /* Control de Cantidades Vertical para CATÁLOGO */
         .qty-vert { display: flex; flex-direction: column; align-items: center; justify-content: space-between; background: #eaf5eb; border: 1px solid var(--m-green); border-radius: 18px; width: 36px; height: 80px; flex-shrink: 0; overflow: hidden; box-shadow: 0 2px 5px rgba(0,122,51,0.1);}
         .qty-btn-v { background: transparent; border: none; color: var(--m-green); font-size: 18px; font-weight: bold; width: 100%; flex: 1; display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 0; margin: 0; }
         .qty-btn-v:active { background: rgba(0,122,51,0.15); }
         .qty-val-v { font-size: 15px; font-weight: bold; color: #333; user-select: none; display: flex; align-items: center; justify-content: center; width: 100%; height: 24px; border-top: 1px solid rgba(0,122,51,0.1); border-bottom: 1px solid rgba(0,122,51,0.1); background: white;}
+
+        /* Control de Cantidades Horizontal Compacto para MI LISTA (NUEVO) */
+        .qty-list-controls { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+        .qty-btn-list { background: #eaf5eb; border: 1px solid var(--m-green); color: var(--m-green); font-size: 18px; font-weight: bold; width: 34px; height: 34px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; padding: 0; transition: 0.1s;}
+        .qty-btn-list:active { background: rgba(0,122,51,0.2); transform: scale(0.95);}
+
+        .btn-discreet-trash { background: transparent; border: none; cursor: pointer; font-size: 18px; opacity: 0.4; padding: 5px; transition: 0.2s; flex-shrink: 0;}
+        .btn-discreet-trash:hover { opacity: 1; transform: scale(1.1); }
 
         .controls-row { display: flex; gap: 10px; margin-bottom: 15px; }
         .search-bar { flex: 1 1 auto; min-width: 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box; background: #fff; }
@@ -113,7 +125,7 @@
 
     <div id="app" class="hidden">
         <header>
-            <strong style="font-size: 18px;">🛒 Mercadona Pro V18</strong>
+            <strong style="font-size: 18px;">🛒 Mercadona Pro V19</strong>
             <button onclick="logout()" style="background:none; border:none; color:white; opacity: 0.8; font-size:14px; cursor:pointer;">Salir</button>
         </header>
 
@@ -153,7 +165,7 @@
                         <h3 class="panel-title" style="margin:0; border:none;">Compra Actual</h3>
                         <div style="font-size: 12px; color: #888; margin-top: 2px;">Crea y edita tu lista</div>
                     </div>
-                    <span class="badge" style="background:var(--m-orange);"><span id="contador-lista">0</span> en lista</span>
+                    <span class="badge" style="background:var(--m-orange);"><span id="contador-lista">0</span> artículos</span>
                 </div>
                 
                 <div id="no-list" class="hidden" style="text-align: center; padding: 40px 0;">
@@ -232,26 +244,25 @@
             return texto.toLowerCase().trim().replace(/[.#$[\]]/g, '').replace(/\s+/g, '_');
         }
 
-        // --- SISTEMA SWIPE TÁCTIL MEJORADO ---
+        // --- SISTEMA SWIPE TÁCTIL ---
         let startX = 0;
         let startY = 0;
         const tabsOrder = ['catalogo', 'lista', 'historial'];
         let currentTabIndex = 0;
 
         document.addEventListener('touchstart', e => {
-            if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.modal-content') || e.target.closest('.qty-vert')) return;
+            if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.modal-content') || e.target.closest('.qty-vert') || e.target.closest('.qty-list-controls')) return;
             startX = e.changedTouches[0].screenX;
             startY = e.changedTouches[0].screenY;
         }, {passive: true});
 
         document.addEventListener('touchend', e => {
-            if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.modal-content') || e.target.closest('.qty-vert')) return;
+            if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.modal-content') || e.target.closest('.qty-vert') || e.target.closest('.qty-list-controls')) return;
             let endX = e.changedTouches[0].screenX;
             let endY = e.changedTouches[0].screenY;
             let diffX = startX - endX;
             let diffY = startY - endY;
 
-            // Seguro: Solo si el movimiento horizontal (diffX) es mayor que el vertical (diffY) y supera los 40px de sensibilidad
             if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
                 if (diffX > 0 && currentTabIndex < tabsOrder.length - 1) {
                     switchTab(tabsOrder[currentTabIndex + 1]);
@@ -345,7 +356,6 @@
             let newQty = currentQty + delta;
 
             if (newQty <= 0) {
-                // Confirmación anti-errores al llegar a 0
                 if (confirm("¿Desea eliminar el producto de la lista?")) {
                     db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}`).remove();
                 }
@@ -369,6 +379,11 @@
             }
             updates[`mercadona/listas/${idListaActual}/productos/${idProducto}/comprado`] = nuevoEstado;
             db.ref().update(updates);
+        }
+
+        function eliminarDeListaActual(idProducto) {
+            if (!idListaActual) return;
+            db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}`).remove();
         }
 
         function renderizarCatalogo() {
@@ -444,13 +459,17 @@
                             <div class="card-title ${p.comprado ? 'crossed' : ''}">${nombreVisual}</div>
                         </div>
                         
-                        <div class="qty-vert" onclick="event.stopPropagation()">
-                            <button class="qty-btn-v" onclick="updateQty('${key}', 1, event)">+</button>
-                            <div class="qty-val-v">${qty}</div>
-                            <button class="qty-btn-v" onclick="updateQty('${key}', -1, event)">-</button>
+                        <div class="qty-list-controls" onclick="event.stopPropagation()">
+                            <button class="qty-btn-list" onclick="updateQty('${key}', -1, event)">-</button>
+                            <button class="qty-btn-list" onclick="updateQty('${key}', 1, event)">+</button>
                         </div>
                         
-                        <button class="btn-cart ${p.comprado ? 'active' : ''}" onclick="toggleCarrito('${key}', ${p.comprado})">🛒</button>
+                        <button class="btn-discreet-trash" title="Quitar de la lista" onclick="eliminarDeListaActual('${key}')">🗑️</button>
+                        
+                        <div class="cart-wrapper">
+                            <button class="btn-cart ${p.comprado ? 'active' : ''}" onclick="toggleCarrito('${key}', ${p.comprado})">🛒</button>
+                            <div class="cart-badge">${qty}</div>
+                        </div>
                     </div>
                 `;
             });
@@ -553,7 +572,7 @@
         function finalizarLista() { if(confirm("¿Archivar lista? Pasará a Historial.")) db.ref(`mercadona/listas/${idListaActual}/estado`).set('archivada'); }
         
         function switchTab(tab) {
-            currentTabIndex = tabsOrder.indexOf(tab); // Sincronizar el swipe con los botones
+            currentTabIndex = tabsOrder.indexOf(tab);
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));

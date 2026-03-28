@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mercadona Pro V14 - Perfección UI</title>
+    <title>Lista de la compra Mercadona Pro V16 - Sincronización Perfecta</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
@@ -63,7 +63,6 @@
         .upload-area { border: 2px dashed var(--m-green); background: #f9fdfa; padding: 25px 15px; text-align: center; border-radius: 12px; color: var(--m-green); font-weight: 600; cursor: pointer; margin-top: 20px; transition: background 0.2s; }
         .upload-area.dragover { background: #d0ead2; border-color: #005b26; }
 
-        /* Estilos del Historial Comprimido */
         .history-card { background: white; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; }
         .history-header { background: #f4f6f8; padding: 15px; font-weight: bold; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
         .history-header:hover { background: #eef2f5; }
@@ -78,7 +77,6 @@
             .history-body { grid-template-columns: 1fr; }
         }
 
-        /* Modal Edición */
         #modal-edicion { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .modal-input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
@@ -111,7 +109,7 @@
 
     <div id="app" class="hidden">
         <header>
-            <strong style="font-size: 18px;">🛒 Lista de la compra de Mercadona Pro V14</strong>
+            <strong style="font-size: 18px;">🛒 Mercadona Pro V16</strong>
             <button onclick="logout()" style="background:none; border:none; color:white; opacity: 0.8; font-size:14px; cursor:pointer;">Salir</button>
         </header>
 
@@ -209,6 +207,7 @@
         let idListaActual = null;
         let datosListaActual = null;
         let catalogoProductos = {};
+        let historialArchivado = {};
         let productoEditandoId = null;
 
         auth.onAuthStateChanged(user => {
@@ -225,7 +224,6 @@
         function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
         function logout() { auth.signOut(); }
 
-        // Función auxiliar para crear IDs limpios en la base de datos
         function limpiarKey(texto) {
             return texto.toLowerCase().trim().replace(/[.#$[\]]/g, '').replace(/\s+/g, '_');
         }
@@ -246,18 +244,23 @@
                     document.getElementById('active-list').classList.add('hidden');
                     document.getElementById('contador-lista').innerText = "0";
                 }
+                // Dibuja la lista usando lo que haya en el catálogo ahora mismo
                 renderizarListaActual();
                 renderizarCatalogo(); 
             });
 
+            // AQUÍ ESTÁ LA MAGIA: Cada vez que el catálogo carga, OBLIGAMOS a la lista a repintarse.
             db.ref('mercadona/catalogo').on('value', snap => {
                 catalogoProductos = snap.val() || {};
                 document.getElementById('contador-productos').innerText = Object.keys(catalogoProductos).length;
                 renderizarCatalogo();
+                renderizarListaActual(); // Esto elimina los "Desconocidos"
+                renderizarHistorial(historialArchivado); 
             });
 
             db.ref('mercadona/listas').orderByChild('estado').equalTo('archivada').on('value', snap => {
-                renderizarHistorial(snap.val() || {});
+                historialArchivado = snap.val() || {};
+                renderizarHistorial(historialArchivado);
             });
         }
 
@@ -291,6 +294,15 @@
             }
         }
 
+        function vaciarCatalogoCompleto() {
+            const codigo = Math.floor(1000 + Math.random() * 9000);
+            const respuesta = prompt(`⚠️ ¡ALERTA DE SEGURIDAD!\nVas a borrar TODOS los productos de tu base de datos.\nSi estás seguro, escribe este número: ${codigo}`);
+            if (respuesta === codigo.toString()) {
+                db.ref('mercadona/catalogo').remove();
+                alert("El catálogo ha sido vaciado por completo.");
+            }
+        }
+
         function toggleProductoEnLista(idProducto) {
             const consumosActuales = catalogoProductos[idProducto].consumos || 0;
             db.ref(`mercadona/catalogo/${idProducto}/consumos`).set(consumosActuales + 1);
@@ -319,7 +331,6 @@
 
         function eliminarDeListaActual(idProducto) {
             if (!idListaActual) return;
-            // Elimina el producto exclusivamente de la lista actual sin preguntar
             db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}`).remove();
         }
 
@@ -372,8 +383,10 @@
             const keys = Object.keys(prods).sort((a,b) => prods[a].comprado - prods[b].comprado);
             keys.forEach(key => {
                 const p = prods[key];
-                const catProd = catalogoProductos[key] || {};
-                const nombreVisual = catProd.nombrePersonalizado || catProd.nombre || catProd.nombreOriginal || "Desconocido";
+                const catProd = catalogoProductos[key];
+                
+                // Si el catálogo aún no ha respondido desde Firebase, ponemos "Sincronizando..." para no asustar
+                const nombreVisual = catProd ? (catProd.nombrePersonalizado || catProd.nombre || catProd.nombreOriginal) : "Sincronizando datos...";
 
                 cont.innerHTML += `
                     <div class="card">
@@ -387,7 +400,6 @@
             });
         }
 
-        // --- RENDERIZAR HISTORIAL COMPRIMIDO ---
         function toggleHistorial(idBody) {
             document.getElementById(idBody).classList.toggle('hidden');
         }
@@ -442,7 +454,8 @@
                 const prodsPlaneados = lista.productos ? Object.keys(lista.productos).map(k => {
                     const catProd = catalogoProductos[k] || {};
                     const tachado = lista.productos[k].comprado ? 'text-decoration:line-through; color:#aaa;' : '';
-                    return `<div class="history-item" style="${tachado}">- ${catProd.nombrePersonalizado || catProd.nombreOriginal || "Desconocido"}</div>`;
+                    const nVis = catProd.nombrePersonalizado || catProd.nombreOriginal || "Sincronizando...";
+                    return `<div class="history-item" style="${tachado}">- ${nVis}</div>`;
                 }).join('') : '<div class="history-empty">Nada en la lista</div>';
 
                 const prodsReales = lista.ticket_extraido ? lista.ticket_extraido.map(nombre => {
@@ -533,13 +546,14 @@
                     if (!idDestino) return;
                     prodsUltimo.forEach(nombreProd => {
                         const safeKey = limpiarKey(nombreProd);
-                        if (catalogoProductos[safeKey]) db.ref(`mercadona/listas/${idDestino}/productos/${safeKey}`).set({ comprado: false });
+                        if (catalogoProductos[safeKey]) {
+                            db.ref(`mercadona/listas/${idDestino}/productos/${safeKey}`).set({ comprado: false });
+                        }
                     });
                 });
             });
         }
 
-        // --- EXTRACCIÓN DEL PDF ---
         const dropZone = document.getElementById('drop-zone');
         const statusEl = document.getElementById('ticket-status');
 

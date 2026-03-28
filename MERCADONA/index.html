@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lista Compra Mercadona V3</title>
+    <title>Lista Compra Mercadona V5</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007a33">
@@ -106,7 +106,12 @@
 
     <div id="login-screen" class="hidden">
         <h2>🔐 Acceso Restringido</h2>
-        <p style="color: #666; margin-bottom: 25px;">Lista Compra Mercadona V3</p>
+        <p style="color: #666; margin-bottom: 25px;">Lista Compra Mercadona V5</p>
+        
+        <div id="error-auth" class="hidden" style="background: #ffebee; color: #dc3545; padding: 12px 20px; border-radius: 8px; border: 1px solid #f5c6cb; margin-bottom: 20px; font-size: 14px; text-align: center; max-width: 300px;">
+            ⛔ <b>Acceso Denegado:</b><br>Tu cuenta no está en la lista de usuarios autorizados.
+        </div>
+
         <button class="btn-login" onclick="login()">Entrar con Google</button>
     </div>
 
@@ -139,7 +144,7 @@
 
     <div id="app" class="hidden">
         <header>
-            <strong style="font-size: 18px;">🛒 Lista Compra Mercadona V3</strong>
+            <strong style="font-size: 18px;">🛒 Lista Compra Mercadona V5</strong>
             <button onclick="logout()" style="background:none; border:none; color:white; opacity: 0.8; font-size:14px; cursor:pointer;">Salir</button>
         </header>
 
@@ -268,19 +273,22 @@
         });
 
         auth.onAuthStateChanged(user => {
-            document.getElementById('loading-screen').classList.add('hidden');
-            
             if (user) {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('app').classList.remove('hidden');
                 iniciarApp();
             } else {
+                // Si no hay usuario, quitamos la pantalla de carga y mostramos el login
+                document.getElementById('loading-screen').classList.add('hidden');
                 document.getElementById('login-screen').classList.remove('hidden');
                 document.getElementById('app').classList.add('hidden');
             }
         });
 
-        function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+        function login() { 
+            document.getElementById('error-auth').classList.add('hidden'); // Limpiar errores al intentar de nuevo
+            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); 
+        }
         function logout() { auth.signOut(); }
 
         function limpiarKey(texto) {
@@ -314,6 +322,17 @@
         }, {passive: true});
 
         function iniciarApp() {
+            // Manejador global para usuarios no autorizados por reglas de Firebase
+            const errorAcceso = (err) => {
+                if(err.code === 'PERMISSION_DENIED') {
+                    auth.signOut(); // Expulsar inmediatamente
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('app').classList.add('hidden');
+                    document.getElementById('login-screen').classList.remove('hidden');
+                    document.getElementById('error-auth').classList.remove('hidden'); // Mostrar el aviso rojo
+                }
+            };
+
             db.ref('mercadona/listas').orderByChild('estado').equalTo('activa').on('value', snap => {
                 const listas = snap.val();
                 if (listas) {
@@ -329,9 +348,11 @@
                     document.getElementById('active-list').classList.add('hidden');
                     document.getElementById('contador-lista').innerText = "0";
                 }
+                
+                document.getElementById('loading-screen').classList.add('hidden'); // Quita pantalla de carga al tener datos
                 renderizarListaActual();
                 renderizarCatalogo(); 
-            });
+            }, errorAcceso); // Se añade el control de errores
 
             db.ref('mercadona/catalogo').on('value', snap => {
                 catalogoProductos = snap.val() || {};
@@ -339,12 +360,12 @@
                 renderizarCatalogo();
                 renderizarListaActual();
                 renderizarHistorial(historialArchivado); 
-            });
+            }, errorAcceso);
 
             db.ref('mercadona/listas').orderByChild('estado').equalTo('archivada').on('value', snap => {
                 historialArchivado = snap.val() || {};
                 renderizarHistorial(historialArchivado);
-            });
+            }, errorAcceso);
         }
 
         function abrirEdicion(id) {

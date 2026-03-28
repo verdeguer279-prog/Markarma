@@ -1,626 +1,761 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GAD - Panel de Control</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lista Compra Mercadona V5</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007a33">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mercadona">
+    <link rel="apple-touch-icon" href="logo192.png">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
+
     <style>
-        :root {
-            --bg-dark: #1a1a2e;
-            --card-bg: #282844;
-            --text-light: #e9e9f0;
-            --text-muted: #a0a0b0;
-            --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
-            --accent-red: #dc3545;
-            --accent-green: #28a745;
-            --accent-orange: #ff9800;
-            --admin-gold: #ffd700;
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            overflow-x: hidden;
+        :root { --m-green: #007a33; --m-orange: #f29100; --bg: #f4f6f8; --card-bg: #ffffff; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 0; background: var(--bg); color: #333; padding-bottom: 20px;}
+        
+        /* Pantallas de Carga y Login */
+        #loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: var(--m-green); color: white; }
+        #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: white; }
+        .btn-login { background: white; border: 1px solid #ddd; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); color: #333; }
+
+        header { background: var(--m-green); color: white; padding: 15px 20px; position: sticky; top: 0; z-index: 90; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .tabs-mobile { display: flex; background: rgba(0,0,0,0.1); padding: 5px; margin: 10px 15px; border-radius: 10px; gap: 5px; overflow-x: auto;}
+        .tab { flex: 1; text-align: center; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #666; transition: 0.2s; white-space: nowrap; }
+        .tab.active { background: white; color: var(--m-green); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+        .app-grid { padding: 15px; max-width: 1200px; margin: 0 auto; }
+        .panel { display: none; background: transparent; }
+        .panel.active { display: block; }
+        .panel-title { display: none; color: var(--m-green); margin-top: 0; border-bottom: 2px solid var(--m-green); padding-bottom: 10px; }
+
+        @media (min-width: 768px) {
+            .tabs-mobile { display: none; }
+            .app-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; align-items: start; }
+            .panel { display: block !important; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+            .panel-title { display: block; }
         }
 
-        /* --- PANTALLA DE CARGA Y LOGIN --- */
-        #login-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 50%, #2a2a40 0%, var(--bg-dark) 80%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 5000;
-            transition: opacity 0.5s ease-in-out;
-        }
-        
-        /* Imagen Central Login */
-        .brand-logo {
-            max-width: 200px;
-            height: auto;
-            margin-bottom: 30px;
-            filter: drop-shadow(0 0 15px rgba(102, 126, 234, 0.3));
-            animation: float 6s ease-in-out infinite;
-        }
+        .card { background: var(--card-bg); border-radius: 10px; padding: 12px 15px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); transition: transform 0.1s; border: 1px solid #eee; }
+        .card-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 4px 0; }
+        .card-title { font-weight: 500; font-size: 16px; text-transform: capitalize; margin-bottom: 4px; white-space: normal; line-height: 1.2;}
+        .card-ticket-name { font-size: 11px; color: #999; text-transform: uppercase; }
+        .crossed { text-decoration: line-through; color: #aaa; }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
+        .btn-add { background: var(--m-green); color: white; border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,122,51,0.2);}
         
-        .login-card {
-            background: rgba(40, 40, 68, 0.6);
-            backdrop-filter: blur(10px);
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 350px;
-            width: 90%;
-            border: 1px solid rgba(255,255,255,0.05);
-            opacity: 0; 
-            transform: translateY(20px);
-            transition: all 0.5s ease;
-            display: none; /* Oculto hasta que termine carga */
-        }
-        .login-card.visible { opacity: 1; transform: translateY(0); display: block; }
-        
-        .google-btn {
-            background-color: #fff;
-            color: #333;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-family: 'Poppins', sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            width: 100%;
-            font-size: 0.95rem;
-        }
-        .google-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .google-btn img { width: 20px; height: 20px; }
+        .cart-wrapper { position: relative; display: inline-block; flex-shrink: 0; margin-left: 5px; }
+        .btn-cart { background: #f0f0f0; border: 2px solid #ddd; width: 46px; height: 46px; border-radius: 12px; font-size: 22px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; filter: grayscale(100%); opacity: 0.6; }
+        .btn-cart.active { background: #fff4e5; border-color: var(--m-orange); filter: grayscale(0%); opacity: 1; }
+        .cart-badge { position: absolute; top: -6px; right: -6px; background: #dc3545; color: white; font-size: 12px; font-weight: bold; border-radius: 20px; min-width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none; padding: 0 4px; box-sizing: border-box;}
 
-        /* --- DASHBOARD PRINCIPAL --- */
-        .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
-            display: none;
-            animation: fadeIn 0.8s ease-out;
-        }
-        
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .qty-vert { display: flex; flex-direction: column; align-items: center; justify-content: space-between; background: #eaf5eb; border: 1px solid var(--m-green); border-radius: 18px; width: 38px; height: 86px; flex-shrink: 0; overflow: hidden; box-shadow: 0 2px 5px rgba(0,122,51,0.1);}
+        .qty-btn-v { background: transparent; border: none; color: var(--m-green); font-size: 18px; font-weight: bold; width: 100%; flex: 1; display: flex; justify-content: center; align-items: center; cursor: pointer; padding: 0; margin: 0; }
+        .qty-btn-v:active { background: rgba(0,122,51,0.15); }
+        .qty-val-v { font-size: 15px; font-weight: bold; color: #333; user-select: none; display: flex; align-items: center; justify-content: center; width: 100%; height: 26px; border-top: 1px solid rgba(0,122,51,0.1); border-bottom: 1px solid rgba(0,122,51,0.1); background: white;}
 
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            margin-bottom: 30px;
-        }
-        
-        .header { display: flex; align-items: center; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
-        
-        /* ESTILO CORREGIDO PARA EL LOGO DEL MENÚ */
-        .app-logo {
-            height: 90px;
-            width: auto;
-            min-width: 100px; /* Espacio mínimo */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: transparent; /* Sin fondo gris */
-            border-radius: 0; /* Sin círculo */
-            border: none; /* Sin borde */
-            position: relative;
-        }
-        
-        .app-logo img {
-            height: 100%;
-            width: auto;
-            object-fit: contain; /* Ajustar imagen completa */
-            max-width: 200px;
-        }
-        
-        /* Hover solo en modo edición */
-        .edit-mode .app-logo { cursor: pointer; border: 2px dashed var(--accent-orange); border-radius: 8px; padding: 5px; }
+        .qty-list-controls { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+        .qty-btn-list { background: #eaf5eb; border: 1px solid var(--m-green); color: var(--m-green); font-size: 18px; font-weight: bold; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; padding: 0; transition: 0.1s; box-shadow: 0 2px 4px rgba(0,122,51,0.1);}
+        .qty-btn-list:active { background: rgba(0,122,51,0.2); transform: scale(0.95);}
 
-        .header-title { flex-grow: 1; }
-        .header-title h1 { margin: 0; font-size: 1.5rem; font-weight: 600; }
-        .header-title p { margin: 5px 0 0; font-size: 0.85rem; color: var(--text-muted); }
+        .controls-row { display: flex; gap: 10px; margin-bottom: 15px; }
+        .search-bar { flex: 1 1 auto; min-width: 0; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box; background: #fff; }
+        .select-bar { flex: 0 0 auto; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; box-sizing: border-box; background: #fff; font-weight: bold; color: #444; cursor: pointer; }
         
-        .button-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
-        }
-        .button-wrapper { position: relative; min-height: 80px; }
-        .button-wrapper.long { grid-column: span 2; }
-        @media (max-width: 768px) { .button-wrapper.long { grid-column: span 1; } }
-        
-        .button {
-            display: flex; align-items: center; justify-content: center; padding: 25px 20px;
-            border-radius: 12px; background-image: var(--accent-gradient); color: var(--text-light);
-            font-weight: 600; text-decoration: none; text-align: center; text-transform: uppercase;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); height: 100%; width: 100%; box-sizing: border-box;
-            transition: transform 0.2s, box-shadow 0.2s;
-            font-size: 1rem; letter-spacing: 0.5px;
-        }
-        .button:hover:not(.edit-mode .button) { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4); }
+        .primary { background: var(--m-green); color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        .hidden { display: none !important; }
+        .badge { font-size:14px; background:var(--m-green); color:white; padding:4px 10px; border-radius:20px; }
 
-        /* Controles */
-        .session-controls { display: flex; gap: 10px; flex-wrap: wrap; margin-left: auto; }
-        .btn-control { 
-            padding: 8px 16px; border-radius: 8px; border: 1px solid transparent; 
-            font-size: 0.9rem; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 8px;
-            transition: all 0.2s;
-        }
-        .btn-logout { background: rgba(255,255,255,0.05); color: #ccc; border-color: rgba(255,255,255,0.1); }
-        .btn-logout:hover { background: rgba(255,255,255,0.1); color: white; }
-        
-        #btnToggleEdit { background: var(--accent-orange); color: var(--bg-dark); display: none; }
-        #btnUsuarios { background: transparent; border: 1px solid var(--admin-gold); color: var(--admin-gold); display: none; }
-        #btnUsuarios:hover { background: rgba(255, 215, 0, 0.1); }
+        .upload-area { border: 2px dashed var(--m-green); background: #f9fdfa; padding: 25px 15px; text-align: center; border-radius: 12px; color: var(--m-green); font-weight: 600; cursor: pointer; margin-top: 20px; transition: background 0.2s; }
+        .upload-area.dragover { background: #d0ead2; border-color: #005b26; }
 
-        /* Edit Mode */
-        .edit-mode .button { pointer-events: none; opacity: 0.8; }
-        .edit-mode .button-wrapper { border: 2px dashed var(--accent-orange); border-radius: 14px; padding: 5px; background: rgba(255,152,0,0.05); }
-        .action-buttons { position: absolute; top: -10px; right: -10px; display: flex; gap: 5px; z-index: 10; }
-        .action-button { width: 30px; height: 30px; border-radius: 50%; border: none; cursor: pointer; color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .edit { background: var(--accent-orange); } .delete { background: var(--accent-red); }
-        
-        #btnAddButton { 
-            background: rgba(40,167,69,0.1); color: var(--accent-green); 
-            border: 2px dashed var(--accent-green); padding: 15px; border-radius: 12px; 
-            font-weight: bold; cursor: pointer; margin-top: 25px; text-align: center; display: none; 
-        }
+        .history-card { background: white; border-radius: 10px; border: 1px solid #ddd; margin-bottom: 15px; overflow: hidden; }
+        .history-header { background: #f4f6f8; padding: 15px; font-weight: bold; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+        .history-header:hover { background: #eef2f5; }
+        .history-body { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .history-col h4 { margin: 0 0 10px 0; font-size: 13px; color: #666; text-transform: uppercase; border-bottom: 1px dashed #ccc; padding-bottom: 5px;}
+        .history-item { font-size: 14px; padding: 4px 0; border-bottom: 1px solid #eee; text-transform: capitalize; }
+        .history-empty { grid-column: 1 / -1; text-align: center; color: #999; font-style: italic; font-size: 14px; }
+        .btn-trash { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-size: 14px; }
 
-        /* Modales */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 9999; backdrop-filter: blur(5px); }
-        .modal-overlay.open { display: flex; }
-        .modal { background: var(--card-bg); padding: 30px; border-radius: 16px; width: 90%; max-width: 450px; position: relative; border: 1px solid rgba(255,255,255,0.1); }
-        .modal h3 { margin-top: 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px; }
-        .modal input, .modal select { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--bg-dark); border: 1px solid #555; color: white; border-radius: 8px; box-sizing: border-box; }
-        .btn-primary { background: var(--accent-gradient); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 600; font-size: 1rem; }
-        .close-modal { position: absolute; top: 20px; right: 20px; cursor: pointer; color: #aaa; font-size: 1.2rem; }
+        @media (max-width: 768px) { .history-body { grid-template-columns: 1fr; } }
 
-        .user-list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; background: rgba(0,0,0,0.2); margin-bottom: 8px; border-radius: 8px; }
-        
-        /* Spinner Loader */
-        .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-left-color: #667eea; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        .error-msg { color: var(--accent-red); font-size: 0.9rem; margin-top: 15px; display: none; background: rgba(220,53,69,0.1); padding: 10px; border-radius: 8px; }
+        #modal-edicion { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .modal-input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px; }
+        .action-row { display: flex; gap: 10px; margin-bottom: 15px; }
 
-        @media (max-width: 600px) {
-            .header { flex-direction: column; text-align: center; }
-            .session-controls { justify-content: center; width: 100%; margin-top: 15px; }
-            .btn-control { flex: 1; justify-content: center; }
-        }
+        #install-banner { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: white; padding: 15px; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 2000; display: flex; align-items: center; gap: 15px; width: 90%; max-width: 400px; border: 2px solid var(--m-green); }
     </style>
 </head>
 <body>
 
-<div id="login-screen">
-    <img src="logogad.png" alt="GAD Logo" class="brand-logo" onerror="this.src='https://placehold.co/200x100?text=GAD'">
-    
-    <div id="initial-loader" class="spinner"></div>
-
-    <div id="login-card-content" class="login-card">
-        <h2 style="margin: 0 0 10px; font-size: 1.5rem;">Bienvenido</h2>
-        <p style="font-size: 0.9rem; color: #aaa; margin-bottom: 30px;">Inicia sesión para acceder al panel</p>
-        
-        <button id="btn-login-google" class="google-btn">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="G">
-            Iniciar sesión con Google
-        </button>
-        <p id="login-error" class="error-msg"></p>
+    <div id="loading-screen">
+        <h1 style="margin: 0; font-size: 40px;">🛒</h1>
+        <h2 style="margin-top: 15px; font-weight: 500;">Iniciando Mercadona...</h2>
     </div>
-</div>
 
-<div class="container" id="main-content">
-    <div class="card">
-        <header class="header">
-            <div class="app-logo" id="appLogo">
-                <img id="logoImage" src="logogad.png" alt="GAD" onerror="this.src='https://placehold.co/100x50?text=GAD'">
-            </div>
-            <input type="file" id="logoFileInput" style="display: none;" accept="image/*">
+    <div id="login-screen" class="hidden">
+        <h2>🔐 Acceso Restringido</h2>
+        <p style="color: #666; margin-bottom: 25px;">Lista Compra Mercadona V5</p>
+        
+        <div id="error-auth" class="hidden" style="background: #ffebee; color: #dc3545; padding: 12px 20px; border-radius: 8px; border: 1px solid #f5c6cb; margin-bottom: 20px; font-size: 14px; text-align: center; max-width: 300px;">
+            ⛔ <b>Acceso Denegado:</b><br>Tu cuenta no está en la lista de usuarios autorizados.
+        </div>
 
-            <div class="header-title">
-                <h1 id="welcome-message">Hola, Usuario</h1>
-                <p>Panel de Control</p>
-            </div>
+        <button class="btn-login" onclick="login()">Entrar con Google</button>
+    </div>
+
+    <div id="install-banner" class="hidden">
+        <img src="logo192.png" width="45" style="border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1);" alt="Icono app">
+        <div style="flex:1;">
+            <strong style="display:block; font-size:15px; color:var(--m-green);">Instalar App</strong>
+            <span style="font-size:12px; color:#666;">Añade Mercadona a tu menú</span>
+        </div>
+        <button id="btn-install" class="primary" style="margin:0; width:auto; padding:8px 15px; font-size:14px; border-radius:20px;">Instalar</button>
+        <button onclick="document.getElementById('install-banner').classList.add('hidden')" style="background:none; border:none; font-size:22px; color:#999; padding:0 5px;">&times;</button>
+    </div>
+
+    <div id="modal-edicion" class="hidden">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--m-green);">Editar Producto</h3>
+            <label style="font-size:12px; font-weight:bold; color:#d9534f;">Nombre Original (Del Ticket PDF)</label>
+            <input type="text" id="edit-original" class="modal-input" disabled style="background:#eee; color:#666; font-family:monospace;">
             
-            <div class="session-controls">
-                <button id="btnUsuarios" class="btn-control"><i class="fas fa-users"></i> Usuarios</button>
-                <button id="btnToggleEdit" class="btn-control"><i class="fas fa-pen"></i> Editar</button>
-                <button id="btn-logout" class="btn-control btn-logout"><i class="fas fa-sign-out-alt"></i></button>
+            <label style="font-size:12px; font-weight:bold; color:#555;">Tu Descripción / Nombre Visible</label>
+            <input type="text" id="edit-visible" class="modal-input" placeholder="Ej. Yogur Griego de Fresa...">
+            
+            <div style="display:flex; gap:10px;">
+                <button class="primary" style="background:#dc3545; flex:0.3;" onclick="eliminarProducto()">🗑️</button>
+                <button class="primary" style="background:#888; margin-top:0; flex:0.7;" onclick="cerrarModal()">Cancelar</button>
+                <button class="primary" style="margin-top:0; flex:1;" onclick="guardarEdicion()">Guardar</button>
             </div>
+        </div>
+    </div>
+
+    <div id="app" class="hidden">
+        <header>
+            <strong style="font-size: 18px;">🛒 Lista Compra Mercadona V5</strong>
+            <button onclick="logout()" style="background:none; border:none; color:white; opacity: 0.8; font-size:14px; cursor:pointer;">Salir</button>
         </header>
 
-        <div class="button-grid" id="buttonGrid"></div>
-
-        <div id="btnAddButton">
-            <i class="fas fa-plus-circle"></i> NUEVO BOTÓN
+        <div class="tabs-mobile">
+            <div class="tab active" onclick="switchTab('catalogo')" id="tab-catalogo">📖 Catálogo</div>
+            <div class="tab" onclick="switchTab('lista')" id="tab-lista">🛒 Mi Lista</div>
+            <div class="tab" onclick="switchTab('historial')" id="tab-historial">📦 Historial</div>
         </div>
-    </div>
-</div>
 
-<div id="button-modal" class="modal-overlay">
-    <div class="modal">
-        <span class="close-modal" id="close-button-modal">&times;</span>
-        <h3>Configurar Botón</h3>
-        <label style="display:block; text-align:left; margin-bottom:5px; font-size:0.9rem; color:#ccc;">Nombre del botón</label>
-        <input type="text" id="button-name" placeholder="Ej: Usuarios">
-        
-        <label style="display:block; text-align:left; margin-bottom:5px; font-size:0.9rem; color:#ccc;">Enlace / Archivo</label>
-        <input type="text" id="button-url" placeholder="https://... o archivo.html">
-        
-        <label style="display:block; text-align:left; margin-bottom:5px; font-size:0.9rem; color:#ccc;">Tamaño</label>
-        <select id="button-type"><option value="short">Normal (1 hueco)</option><option value="long">Ancho (2 huecos)</option></select>
-        
-        <div id="drop-area" style="border:2px dashed #555; padding:20px; text-align:center; border-radius:8px; cursor:pointer; margin-bottom:15px; transition:0.2s;">
-            <i class="fas fa-file-upload" style="font-size:1.5rem; margin-bottom:10px; display:block; color:#667eea;"></i>
-            <small>Arrastra un archivo HTML aquí para autocompletar</small>
-        </div>
-        <button id="button-submit" class="btn-primary">Guardar Cambios</button>
-    </div>
-</div>
-
-<div id="dlgUsuariosModal" class="modal-overlay">
-    <div class="modal">
-        <span class="close-modal" id="dlgUsuariosClose">&times;</span>
-        <h3>Usuarios Autorizados</h3>
-        <div style="display:flex; gap:10px; margin-bottom:20px;">
-            <input type="email" id="txtNewUserEmail" placeholder="usuario@gmail.com" style="margin-bottom:0;">
-            <button id="btnAddUser" class="btn-primary" style="width:auto; padding:0 20px;">+</button>
-        </div>
-        <div id="usersListContainer" style="max-height:250px; overflow-y:auto; padding-right:5px;"></div>
-    </div>
-</div>
-
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-<script>
-    // 1. CONFIGURACIÓN
-    const firebaseConfig = {
-      apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
-      authDomain: "markarma279.firebaseapp.com",
-      databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "markarma279",
-      storageBucket: "markarma279.firebasestorage.app",
-      messagingSenderId: "280620278315",
-      appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const auth = firebase.auth();
-    const provider = new firebase.auth.GoogleAuthProvider();
-    
-    // PERSISTENCIA (Mantiene sesión abierta)
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
-
-    const ADMIN_EMAIL = "verdeguer279@gmail.com";
-    const ALLOWED_USERS_REF = db.ref('allowed_users');
-
-    // Referencias UI
-    const loginScreen = document.getElementById('login-screen');
-    const loginCard = document.getElementById('login-card-content');
-    const loader = document.getElementById('initial-loader');
-    const mainContent = document.getElementById('main-content');
-    const loginError = document.getElementById('login-error');
-    
-    let isEditMode = false;
-    let isAdmin = false;
-    let editingKey = null;
-
-    // 2. SISTEMA DE AUTENTICACIÓN
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            checkAccess(user);
-        } else {
-            // Nadie logueado
-            loader.style.display = 'none';
-            loginCard.classList.add('visible');
-        }
-    });
-
-    function checkAccess(user) {
-        // Caso 1: Es Admin
-        if (user.email === ADMIN_EMAIL) {
-            isAdmin = true;
-            enterDashboard(user);
-            return;
-        }
-
-        // Caso 2: Es usuario normal (verificar lista blanca)
-        ALLOWED_USERS_REF.once('value').then(snapshot => {
-            const allowed = snapshot.val();
-            let isAllowed = false;
-            if (allowed) {
-                if (Object.values(allowed).includes(user.email)) isAllowed = true;
-            }
-
-            if (isAllowed) {
-                isAdmin = false;
-                enterDashboard(user);
-            } else {
-                // Denegado
-                auth.signOut();
-                loader.style.display = 'none';
-                loginCard.classList.add('visible');
-                loginError.textContent = "Acceso denegado: Usuario no autorizado.";
-                loginError.style.display = 'block';
-            }
-        }).catch(err => {
-            // Error de permisos de lectura (reglas firebase bloquean lectura si no es admin/auth)
-            console.error(err);
-            auth.signOut();
-            loginError.textContent = "Error de acceso o permisos insuficientes.";
-            loginError.style.display = 'block';
-        });
-    }
-
-    function enterDashboard(user) {
-        // Transición suave
-        loginScreen.style.opacity = '0';
-        setTimeout(() => {
-            loginScreen.style.display = 'none';
-            mainContent.style.display = 'block';
-        }, 500);
-
-        document.getElementById('welcome-message').textContent = `Hola, ${user.displayName || 'Usuario'}`.toUpperCase();
-        
-        loadLogo(); // Carga logo de DB si existe, sino mantiene logogad.png
-        loadButtons();
-        
-        if (isAdmin) {
-            document.getElementById('btnToggleEdit').style.display = 'flex';
-            document.getElementById('btnUsuarios').style.display = 'flex';
-        }
-    }
-
-    // Botones Auth
-    document.getElementById('btn-login-google').onclick = () => {
-        loginError.style.display = 'none';
-        auth.signInWithPopup(provider).catch(e => {
-            loginError.textContent = e.message;
-            loginError.style.display = 'block';
-        });
-    };
-    
-    document.getElementById('btn-logout').onclick = () => {
-        auth.signOut().then(() => location.reload());
-    };
-
-
-    // 3. FUNCIONES DEL DASHBOARD
-
-    // Cargar Logo (Prioridad: DB > logogad.png local)
-    function loadLogo() {
-        db.ref('config/logo').on('value', snap => {
-            const val = snap.val();
-            if(val) {
-                // Si hay un logo subido por el admin, úsalo
-                document.getElementById('logoImage').src = val;
-            } 
-            // Si no hay nada en DB, se queda el src="logogad.png" del HTML
-        });
-    }
-
-    // Subir logo (Solo en modo edición)
-    document.getElementById('appLogo').onclick = () => {
-        if(isEditMode && isAdmin) document.getElementById('logoFileInput').click();
-    };
-    document.getElementById('logoFileInput').onchange = (e) => {
-        const f = e.target.files[0];
-        if(f) {
-            const r = new FileReader();
-            r.onload = ev => db.ref('config/logo').set(ev.target.result);
-            r.readAsDataURL(f);
-        }
-    };
-
-    // Toggle Edición
-    document.getElementById('btnToggleEdit').onclick = () => {
-        isEditMode = !isEditMode;
-        const btn = document.getElementById('btnToggleEdit');
-        const addBtn = document.getElementById('btnAddButton');
-        
-        if(isEditMode) {
-            btn.innerHTML = '<i class="fas fa-check"></i> Terminar';
-            btn.style.background = 'var(--accent-green)';
-            btn.style.color = 'white';
-            document.body.classList.add('edit-mode');
-            addBtn.style.display = 'block';
-        } else {
-            btn.innerHTML = '<i class="fas fa-pen"></i> Editar';
-            btn.style.background = 'var(--accent-orange)';
-            btn.style.color = 'var(--bg-dark)';
-            document.body.classList.remove('edit-mode');
-            addBtn.style.display = 'none';
-        }
-        
-        // Refrescar botones para activar/desactivar drag
-        db.ref('botones').once('value').then(s => renderButtons(s.val()));
-    };
-
-    // Renderizado de Botones
-    function loadButtons() {
-        db.ref('botones').on('value', snap => renderButtons(snap.val()));
-    }
-
-    function renderButtons(data) {
-        const grid = document.getElementById('buttonGrid');
-        grid.innerHTML = '';
-        if(!data) return;
-
-        const sorted = Object.keys(data).map(k => ({...data[k], key: k})).sort((a,b) => (a.order||999)-(b.order||999));
-        
-        sorted.forEach(btn => {
-            const div = document.createElement('div');
-            div.className = `button-wrapper ${btn.span === 'long' ? 'long' : ''}`;
-            div.setAttribute('data-key', btn.key);
+        <div class="app-grid">
             
-            if(isEditMode && isAdmin) {
-                div.innerHTML = `
-                    <div class="action-buttons">
-                        <button class="action-button edit" onclick="openModal('${btn.key}')"><i class="fas fa-edit"></i></button>
-                        <button class="action-button delete" onclick="deleteBtn('${btn.key}')"><i class="fas fa-trash"></i></button>
+            <div id="panel-catalogo" class="panel active">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                    <h3 class="panel-title" style="margin:0; border:none;">Catálogo</h3>
+                    <span class="badge"><span id="contador-productos">0</span> prods</span>
+                </div>
+                
+                <div class="controls-row">
+                    <input type="text" id="buscador" class="search-bar" placeholder="🔍 Buscar..." onkeyup="filtrarCatalogo()">
+                    <select id="orden-catalogo" class="select-bar" onchange="renderizarCatalogo()">
+                        <option value="alfa">A - Z</option>
+                        <option value="consumos">⭐ Habituales</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="text" id="nuevo-producto" class="search-bar" style="margin:0;" placeholder="Nuevo producto...">
+                    <button class="primary" style="width: auto; margin:0;" onclick="crearProductoEnCatalogo()">Añadir</button>
+                </div>
+
+                <div id="items-catalogo"></div>
+            </div>
+
+            <div id="panel-lista" class="panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                    <div>
+                        <h3 class="panel-title" style="margin:0; border:none;">Compra Actual</h3>
+                        <div style="font-size: 12px; color: #888; margin-top: 2px;">Crea y edita tu lista</div>
+                    </div>
+                    <span class="badge" style="background:var(--m-orange);"><span id="contador-lista">0</span> artículos</span>
+                </div>
+                
+                <div id="no-list" class="hidden" style="text-align: center; padding: 40px 0;">
+                    <span style="font-size: 40px;">📝</span>
+                    <p style="color: #666;">No hay ninguna lista en curso</p>
+                    <button class="primary" onclick="crearNuevaLista()">Crear Lista Vacía</button>
+                    <button class="primary" style="background:#555; margin-top:10px;" onclick="cargarUltimoTicket(true)">🔄 Empezar con el último ticket</button>
+                </div>
+
+                <div id="active-list" class="hidden">
+                    <div style="background: #fff4e5; border-left: 4px solid var(--m-orange); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-size: 14px; color: #555;">
+                        <span id="fecha-lista"></span>
+                    </div>
+                    
+                    <div class="action-row">
+                        <button class="primary" style="background:#f29100; margin:0;" onclick="cargarUltimoTicket(false)">🔄 Último Ticket</button>
+                        <button class="primary" style="background:#dc3545; margin:0;" onclick="vaciarListaActual()">🗑️ Vaciar Lista</button>
+                    </div>
+
+                    <div id="items-comprando"></div>
+
+                    <div class="upload-area" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                        📄 Toca o arrastra aquí tu ticket (PDF)<br>
+                        <span style="font-size: 12px; font-weight: normal; color: #666;">(Extraerá los productos al instante)</span>
+                        <input type="file" id="file-input" class="hidden" accept="application/pdf" onchange="procesarArchivo(this.files[0])">
+                    </div>
+                    <div id="ticket-status" style="text-align:center; margin-top:10px; font-size:14px; font-weight:bold; word-wrap: break-word;"></div>
+
+                    <button class="primary" style="background: #222; margin-top: 25px;" onclick="finalizarLista()">📦 ARCHIVAR COMPRA</button>
+                </div>
+            </div>
+
+            <div id="panel-historial" class="panel">
+                <h3 class="panel-title">Historial de Compras</h3>
+                <div id="lista-historial"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
+            authDomain: "markarma279.firebaseapp.com",
+            databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "markarma279",
+            messagingSenderId: "280620278315",
+            appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        let idListaActual = null;
+        let datosListaActual = null;
+        let catalogoProductos = {};
+        let historialArchivado = {};
+        let productoEditandoId = null;
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(reg => console.log('Service Worker registrado correctamente'))
+                    .catch(err => console.log('Error al registrar Service Worker', err));
+            });
+        }
+
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBanner = document.getElementById('install-banner');
+            installBanner.classList.remove('hidden');
+
+            document.getElementById('btn-install').addEventListener('click', () => {
+                installBanner.classList.add('hidden');
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('App instalada en el dispositivo');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                iniciarApp();
+            } else {
+                // Si no hay usuario, quitamos la pantalla de carga y mostramos el login
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('app').classList.add('hidden');
+            }
+        });
+
+        function login() { 
+            document.getElementById('error-auth').classList.add('hidden'); // Limpiar errores al intentar de nuevo
+            auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); 
+        }
+        function logout() { auth.signOut(); }
+
+        function limpiarKey(texto) {
+            return texto.toLowerCase().trim().replace(/[.#$[\]]/g, '').replace(/\s+/g, '_');
+        }
+
+        let startX = 0, startY = 0;
+        const tabsOrder = ['catalogo', 'lista', 'historial'];
+        let currentTabIndex = 0;
+
+        document.addEventListener('touchstart', e => {
+            if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.modal-content') || e.target.closest('.qty-vert') || e.target.closest('.qty-list-controls')) return;
+            startX = e.changedTouches[0].screenX;
+            startY = e.changedTouches[0].screenY;
+        }, {passive: true});
+
+        document.addEventListener('touchend', e => {
+            if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.modal-content') || e.target.closest('.qty-vert') || e.target.closest('.qty-list-controls')) return;
+            let endX = e.changedTouches[0].screenX;
+            let endY = e.changedTouches[0].screenY;
+            let diffX = startX - endX;
+            let diffY = startY - endY;
+
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                if (diffX > 0 && currentTabIndex < tabsOrder.length - 1) {
+                    switchTab(tabsOrder[currentTabIndex + 1]);
+                } else if (diffX < 0 && currentTabIndex > 0) {
+                    switchTab(tabsOrder[currentTabIndex - 1]);
+                }
+            }
+        }, {passive: true});
+
+        function iniciarApp() {
+            // Manejador global para usuarios no autorizados por reglas de Firebase
+            const errorAcceso = (err) => {
+                if(err.code === 'PERMISSION_DENIED') {
+                    auth.signOut(); // Expulsar inmediatamente
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('app').classList.add('hidden');
+                    document.getElementById('login-screen').classList.remove('hidden');
+                    document.getElementById('error-auth').classList.remove('hidden'); // Mostrar el aviso rojo
+                }
+            };
+
+            db.ref('mercadona/listas').orderByChild('estado').equalTo('activa').on('value', snap => {
+                const listas = snap.val();
+                if (listas) {
+                    const keys = Object.keys(listas);
+                    idListaActual = keys[0]; 
+                    datosListaActual = listas[idListaActual];
+                    document.getElementById('no-list').classList.add('hidden');
+                    document.getElementById('active-list').classList.remove('hidden');
+                } else {
+                    idListaActual = null;
+                    datosListaActual = null;
+                    document.getElementById('no-list').classList.remove('hidden');
+                    document.getElementById('active-list').classList.add('hidden');
+                    document.getElementById('contador-lista').innerText = "0";
+                }
+                
+                document.getElementById('loading-screen').classList.add('hidden'); // Quita pantalla de carga al tener datos
+                renderizarListaActual();
+                renderizarCatalogo(); 
+            }, errorAcceso); // Se añade el control de errores
+
+            db.ref('mercadona/catalogo').on('value', snap => {
+                catalogoProductos = snap.val() || {};
+                document.getElementById('contador-productos').innerText = Object.keys(catalogoProductos).length;
+                renderizarCatalogo();
+                renderizarListaActual();
+                renderizarHistorial(historialArchivado); 
+            }, errorAcceso);
+
+            db.ref('mercadona/listas').orderByChild('estado').equalTo('archivada').on('value', snap => {
+                historialArchivado = snap.val() || {};
+                renderizarHistorial(historialArchivado);
+            }, errorAcceso);
+        }
+
+        function abrirEdicion(id) {
+            const p = catalogoProductos[id];
+            productoEditandoId = id;
+            document.getElementById('edit-original').value = (p.nombreOriginal || p.nombre || "").toUpperCase();
+            document.getElementById('edit-visible').value = p.nombrePersonalizado || p.nombre || "";
+            document.getElementById('modal-edicion').classList.remove('hidden');
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal-edicion').classList.add('hidden');
+            productoEditandoId = null;
+        }
+
+        function guardarEdicion() {
+            const nuevoVisible = document.getElementById('edit-visible').value.trim();
+            if (nuevoVisible && productoEditandoId) {
+                db.ref(`mercadona/catalogo/${productoEditandoId}`).update({ nombrePersonalizado: nuevoVisible }).then(() => cerrarModal());
+            }
+        }
+
+        function eliminarProducto() {
+            if (productoEditandoId && confirm("⚠️ ¿Eliminar este producto definitivamente de tu catálogo?")) {
+                db.ref(`mercadona/catalogo/${productoEditandoId}`).remove().then(() => cerrarModal());
+            }
+        }
+
+        function toggleProductoEnLista(idProducto) {
+            const consumosActuales = catalogoProductos[idProducto].consumos || 0;
+            db.ref(`mercadona/catalogo/${idProducto}/consumos`).set(consumosActuales + 1);
+
+            if (!idListaActual) {
+                crearNuevaLista().then((nuevaKey) => {
+                    db.ref(`mercadona/listas/${nuevaKey}/productos/${idProducto}`).set({ comprado: false, cantidad: 1 });
+                });
+                return;
+            }
+            const estaEnLista = datosListaActual.productos && datosListaActual.productos[idProducto];
+            if (estaEnLista) db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}`).remove();
+            else db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}`).set({ comprado: false, cantidad: 1 });
+        }
+
+        function updateQty(idProducto, delta, event) {
+            if(event) event.stopPropagation();
+
+            if (!idListaActual) {
+                if(delta > 0) {
+                    crearNuevaLista().then((nuevaKey) => {
+                        db.ref(`mercadona/listas/${nuevaKey}/productos/${idProducto}`).set({ comprado: false, cantidad: 1 });
+                        const cons = catalogoProductos[idProducto].consumos || 0;
+                        db.ref(`mercadona/catalogo/${idProducto}/consumos`).set(cons + 1);
+                    });
+                }
+                return;
+            }
+
+            let currentQty = 0;
+            if (datosListaActual.productos && datosListaActual.productos[idProducto]) {
+                currentQty = datosListaActual.productos[idProducto].cantidad || 1;
+            }
+
+            let newQty = currentQty + delta;
+
+            if (newQty <= 0) {
+                if (confirm("¿Desea eliminar el producto de la lista?")) {
+                    db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}`).remove();
+                }
+            } else {
+                if (currentQty === 0) {
+                    db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}`).set({ comprado: false, cantidad: newQty });
+                    const cons = catalogoProductos[idProducto].consumos || 0;
+                    db.ref(`mercadona/catalogo/${idProducto}/consumos`).set(cons + 1);
+                } else {
+                    db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}/cantidad`).set(newQty);
+                }
+            }
+        }
+
+        function toggleCarrito(idProducto, estadoActual) {
+            if (!idListaActual) return;
+            const nuevoEstado = !estadoActual;
+            const updates = {};
+            if (nuevoEstado === true && (!datosListaActual.fechaCompra || datosListaActual.fechaCompra === '')) {
+                updates[`mercadona/listas/${idListaActual}/fechaCompra`] = new Date().toISOString().split('T')[0];
+            }
+            updates[`mercadona/listas/${idListaActual}/productos/${idProducto}/comprado`] = nuevoEstado;
+            db.ref().update(updates);
+        }
+
+        function renderizarCatalogo() {
+            const cont = document.getElementById('items-catalogo');
+            cont.innerHTML = '';
+            const busqueda = document.getElementById('buscador').value.toLowerCase();
+            const orden = document.getElementById('orden-catalogo').value;
+            
+            let keys = Object.keys(catalogoProductos);
+            if (orden === 'alfa') keys.sort((a,b) => (catalogoProductos[a].nombrePersonalizado || catalogoProductos[a].nombre || "").localeCompare(catalogoProductos[b].nombrePersonalizado || catalogoProductos[b].nombre || ""));
+            else keys.sort((a,b) => (catalogoProductos[b].consumos || 0) - (catalogoProductos[a].consumos || 0));
+
+            keys.forEach(key => {
+                const prod = catalogoProductos[key];
+                const nombreVisual = prod.nombrePersonalizado || prod.nombre || prod.nombreOriginal;
+                const nombreOculto = prod.nombreOriginal || prod.nombre || "";
+
+                if (nombreVisual.toLowerCase().includes(busqueda) || nombreOculto.toLowerCase().includes(busqueda)) {
+                    const estaEnLista = datosListaActual && datosListaActual.productos && datosListaActual.productos[key];
+                    
+                    let actionBtn = '';
+                    if (estaEnLista) {
+                        const qty = datosListaActual.productos[key].cantidad || 1;
+                        actionBtn = `
+                            <div class="qty-vert" onclick="event.stopPropagation()">
+                                <button class="qty-btn-v" onclick="updateQty('${key}', 1, event)">+</button>
+                                <div class="qty-val-v">${qty}</div>
+                                <button class="qty-btn-v" onclick="updateQty('${key}', -1, event)">-</button>
+                            </div>
+                        `;
+                    } else {
+                        actionBtn = `<button class="btn-add" onclick="updateQty('${key}', 1, event)">+</button>`;
+                    }
+
+                    cont.innerHTML += `
+                        <div class="card">
+                            <div class="card-info" onclick="abrirEdicion('${key}')" style="cursor:pointer;" title="Toca para editar el nombre">
+                                <div class="card-title">${nombreVisual}</div>
+                                <div class="card-ticket-name">🎟️ TICKET: ${nombreOculto}</div>
+                            </div>
+                            ${actionBtn}
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        function renderizarListaActual() {
+            if (!datosListaActual) return;
+            const fCreada = datosListaActual.fechaCreacion;
+            const fCompra = datosListaActual.fechaCompra;
+            document.getElementById('fecha-lista').innerHTML = fCompra ? `📅 Compra real: <b>${fCompra}</b>` : `Borrador del: ${fCreada}`;
+            
+            const cont = document.getElementById('items-comprando');
+            cont.innerHTML = '';
+            
+            const prods = datosListaActual.productos || {};
+            let totalItems = 0;
+            Object.values(prods).forEach(p => totalItems += (p.cantidad || 1));
+            document.getElementById('contador-lista').innerText = totalItems;
+
+            const keys = Object.keys(prods).sort((a,b) => prods[a].comprado - prods[b].comprado);
+            keys.forEach(key => {
+                const p = prods[key];
+                const catProd = catalogoProductos[key] || {};
+                const nombreVisual = catProd.nombrePersonalizado || catProd.nombre || catProd.nombreOriginal || "Sincronizando...";
+                const qty = p.cantidad || 1;
+
+                cont.innerHTML += `
+                    <div class="card">
+                        <div class="card-info" onclick="abrirEdicion('${key}')" style="cursor:pointer;" title="Toca para editar el nombre">
+                            <div class="card-title ${p.comprado ? 'crossed' : ''}">${nombreVisual}</div>
+                        </div>
+                        
+                        <div class="qty-list-controls" onclick="event.stopPropagation()">
+                            <button class="qty-btn-list" onclick="updateQty('${key}', -1, event)">-</button>
+                            <button class="qty-btn-list" onclick="updateQty('${key}', 1, event)">+</button>
+                        </div>
+                        
+                        <div class="cart-wrapper" onclick="event.stopPropagation()">
+                            <button class="btn-cart ${p.comprado ? 'active' : ''}" onclick="toggleCarrito('${key}', ${p.comprado})">🛒</button>
+                            <div class="cart-badge">${qty}</div>
+                        </div>
                     </div>
                 `;
-                div.draggable = true;
-                setupDrag(div);
+            });
+        }
+
+        function toggleHistorial(idBody) { document.getElementById(idBody).classList.toggle('hidden'); }
+        function borrarHistorial(key, event) {
+            event.stopPropagation();
+            if(confirm('⚠️ ¿Seguro que quieres borrar este historial de compra definitivamente?')) {
+                db.ref(`mercadona/listas/${key}`).remove();
+            }
+        }
+
+        function repetirCompraHistorial(keyLista) {
+            db.ref(`mercadona/listas/${keyLista}`).once('value', snap => {
+                const data = snap.val();
+                const prodsParaAñadir = data.ticket_extraido || Object.keys(data.productos || {});
+                if(!prodsParaAñadir || prodsParaAñadir.length === 0) return;
+
+                const promesa = idListaActual ? Promise.resolve(idListaActual) : crearNuevaLista();
+                promesa.then(idDestino => {
+                    prodsParaAñadir.forEach(prod => {
+                        let safeKey = (typeof prod === 'string') ? limpiarKey(prod) : prod;
+                        if(catalogoProductos[safeKey]) db.ref(`mercadona/listas/${idDestino}/productos/${safeKey}`).set({ comprado: false, cantidad: 1 });
+                    });
+                    alert("✅ Productos del historial añadidos a tu compra actual.");
+                    switchTab('lista');
+                });
+            });
+        }
+
+        function renderizarHistorial(listasArchivadas) {
+            const cont = document.getElementById('lista-historial');
+            cont.innerHTML = '';
+
+            const keys = Object.keys(listasArchivadas).sort((a,b) => {
+                const fechaA = listasArchivadas[a].fechaCompra || listasArchivadas[a].fechaCreacion;
+                const fechaB = listasArchivadas[b].fechaCompra || listasArchivadas[b].fechaCreacion;
+                return new Date(fechaB) - new Date(fechaA);
+            });
+
+            if(keys.length === 0) {
+                cont.innerHTML = "<p style='text-align:center; color:#999; margin-top:30px;'>Aún no tienes compras archivadas.</p>";
+                return;
+            }
+
+            keys.forEach(key => {
+                const lista = listasArchivadas[key];
+                const fechaMostrar = lista.fechaCompra || lista.fechaCreacion || "Fecha desconocida";
+                
+                const prodsPlaneados = lista.productos ? Object.keys(lista.productos).map(k => {
+                    const catProd = catalogoProductos[k] || {};
+                    const tachado = lista.productos[k].comprado ? 'text-decoration:line-through; color:#aaa;' : '';
+                    const qty = lista.productos[k].cantidad || 1;
+                    const nVis = catProd.nombrePersonalizado || catProd.nombreOriginal || "Sincronizando...";
+                    return `<div class="history-item" style="${tachado}">- ${qty}x ${nVis}</div>`;
+                }).join('') : '<div class="history-empty">Nada en la lista</div>';
+
+                const prodsReales = lista.ticket_extraido ? lista.ticket_extraido.map(nombre => {
+                    return `<div class="history-item">- ${nombre}</div>`;
+                }).join('') : '<div class="history-empty">No se adjuntó ticket</div>';
+
+                cont.innerHTML += `
+                    <div class="history-card">
+                        <div class="history-header" onclick="toggleHistorial('hist-${key}')">
+                            <span>📅 ${fechaMostrar}</span>
+                            <div>
+                                <span style="font-size:12px; color:#888; font-weight:normal; margin-right:10px;">Ver detalles ▼</span>
+                                <button class="btn-trash" onclick="borrarHistorial('${key}', event)">🗑️</button>
+                            </div>
+                        </div>
+                        <div id="hist-${key}" class="history-body hidden">
+                            <div class="history-col"><h4>Planeabas Comprar</h4>${prodsPlaneados}</div>
+                            <div class="history-col"><h4>Compraste Realmente</h4>${prodsReales}</div>
+                            <div style="grid-column: 1 / -1; margin-top:10px;">
+                                <button class="primary" style="background:var(--m-orange); margin:0;" onclick="repetirCompraHistorial('${key}')">🛒 Repetir esta compra</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filtrarCatalogo() { renderizarCatalogo(); }
+        
+        function crearProductoEnCatalogo() {
+            const nombre = document.getElementById('nuevo-producto').value.trim();
+            if(nombre) { 
+                const safeKey = limpiarKey(nombre);
+                db.ref(`mercadona/catalogo/${safeKey}`).set({ nombreOriginal: nombre.toLowerCase(), nombrePersonalizado: nombre, consumos: 1 }); 
+                document.getElementById('nuevo-producto').value = ''; 
+            }
+        }
+
+        function crearNuevaLista() {
+            const date = new Date();
+            const nuevaKey = `${date.toISOString().split('T')[0]}_${date.getHours()}-${date.getMinutes()}-${date.getSeconds()}`;
+            return db.ref(`mercadona/listas/${nuevaKey}`).set({ estado: 'activa', fechaCreacion: date.toISOString().split('T')[0], fechaCompra: '', productos: {} }).then(() => nuevaKey);
+        }
+
+        function vaciarListaActual() { if (idListaActual && confirm("⚠️ ¿Seguro que quieres VACIAR toda la lista?")) db.ref(`mercadona/listas/${idListaActual}/productos`).remove(); }
+        function finalizarLista() { if(confirm("¿Archivar lista? Pasará a Historial.")) db.ref(`mercadona/listas/${idListaActual}/estado`).set('archivada'); }
+        
+        function switchTab(tab) {
+            currentTabIndex = tabsOrder.indexOf(tab);
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(`panel-${tab}`).classList.add('active');
+        }
+
+        function cargarUltimoTicket(crearListaSiNoExiste) {
+            const promesa = (crearListaSiNoExiste && !idListaActual) ? crearNuevaLista() : Promise.resolve(idListaActual);
+            db.ref('mercadona/ultimo_ticket/productos').once('value', snap => {
+                const prodsUltimo = snap.val();
+                if(!prodsUltimo || prodsUltimo.length === 0) { alert("No hay productos recientes."); return; }
+                promesa.then(idDestino => {
+                    if (!idDestino) return;
+                    prodsUltimo.forEach(nombreProd => {
+                        const safeKey = limpiarKey(nombreProd);
+                        if (catalogoProductos[safeKey]) db.ref(`mercadona/listas/${idDestino}/productos/${safeKey}`).set({ comprado: false, cantidad: 1 });
+                    });
+                });
+            });
+        }
+
+        const dropZone = document.getElementById('drop-zone');
+        const statusEl = document.getElementById('ticket-status');
+
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); procesarArchivo(e.dataTransfer.files[0]); });
+
+        async function procesarArchivo(file) {
+            if (!file || !idListaActual) return;
+            const safeFileName = limpiarKey(file.name);
+
+            const snap = await db.ref(`mercadona/tickets_subidos/${safeFileName}`).once('value');
+            if (snap.exists()) {
+                document.getElementById('file-input').value = ""; 
+                statusEl.innerText = "";
+                alert(`❌ OPERACIÓN CANCELADA: El ticket "${file.name}" ya ha sido procesado anteriormente.`);
+                return;
+            }
+
+            statusEl.style.color = "var(--m-orange)";
+            statusEl.innerText = "🔍 Analizando PDF y extrayendo productos...";
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                let textoCompleto = "";
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    textoCompleto += textContent.items.map(item => item.str).join(' ') + " ";
+                }
+                
+                const extraidos = await extraerYGuardarProductos(textoCompleto);
+
+                if(extraidos && extraidos.length > 0) {
+                    await db.ref(`mercadona/listas/${idListaActual}/ticket_extraido`).set(extraidos);
+                }
+                await db.ref(`mercadona/tickets_subidos/${safeFileName}`).set({ subidoEl: new Date().toISOString() });
+
+                statusEl.style.color = "var(--m-green)";
+                statusEl.innerText = "✅ ¡Ticket analizado y datos guardados al instante!";
+
+            } catch (err) { 
+                console.warn("Fallo lectura texto PDF", err);
+                statusEl.style.color = "red";
+                statusEl.innerText = "❌ Error: No se pudo leer el contenido del PDF.";
+            }
+        }
+
+        async function extraerYGuardarProductos(texto) {
+            const textoLimpio = texto.replace(/\s+/g, ' ');
+            const fechaMatch = textoLimpio.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/);
+            let fechaTicketIso = "1970-01-01"; 
+            if (fechaMatch) fechaTicketIso = `${fechaMatch[3]}-${fechaMatch[2]}-${fechaMatch[1]}`; 
+
+            const regex = /(\d+)\s+([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ0-9\s+%.\-+]{2,})\s+(\d+,\d{2})/g;
+            let match;
+            const extraidos = [];
+            const ignorar = ["MERCADONA", "TOTAL", "IMPORTE", "TARJETA", "FACTURA", "IVA", "BASE", "CUOTA"];
+
+            while ((match = regex.exec(textoLimpio)) !== null) {
+                const nombre = match[2].trim();
+                if (nombre.length > 3 && !ignorar.some(i => nombre.includes(i))) {
+                    extraidos.push(nombre.toLowerCase());
+                }
+            }
+
+            if (extraidos.length > 0) {
+                extraidos.forEach(limpio => {
+                    const safeKey = limpiarKey(limpio); 
+
+                    if (!catalogoProductos[safeKey]) {
+                        db.ref(`mercadona/catalogo/${safeKey}`).set({ 
+                            nombreOriginal: limpio, 
+                            nombrePersonalizado: limpio.charAt(0).toUpperCase() + limpio.slice(1), 
+                            consumos: 1 
+                        });
+                    } else {
+                        const consumosActuales = catalogoProductos[safeKey].consumos || 0;
+                        db.ref(`mercadona/catalogo/${safeKey}/consumos`).set(consumosActuales + 1);
+                    }
+                });
+
+                const snapUltimo = await db.ref('mercadona/ultimo_ticket').once('value');
+                const dataUltimo = snapUltimo.val();
+
+                if (!dataUltimo || !dataUltimo.fecha || fechaTicketIso >= dataUltimo.fecha) {
+                    await db.ref('mercadona/ultimo_ticket').set({ fecha: fechaTicketIso, productos: extraidos });
+                }
             }
             
-            const a = document.createElement('a');
-            a.className = 'button';
-            a.href = isEditMode ? 'javascript:void(0)' : (btn.url || '#');
-            a.textContent = btn.name;
-            div.appendChild(a);
-            grid.appendChild(div);
-        });
-    }
-
-    // 4. MODALES Y LOGICA CRUD
-
-    // Modal Botón
-    const btnModal = document.getElementById('button-modal');
-    window.openModal = (key = null) => {
-        editingKey = key;
-        document.getElementById('button-name').value = '';
-        document.getElementById('button-url').value = '';
-        if(key) {
-            db.ref('botones/'+key).once('value').then(s => {
-                const d = s.val();
-                document.getElementById('button-name').value = d.name;
-                document.getElementById('button-url').value = d.url;
-                document.getElementById('button-type').value = d.span;
-            });
+            return extraidos;
         }
-        btnModal.classList.add('open');
-    };
-    
-    document.getElementById('close-button-modal').onclick = () => btnModal.classList.remove('open');
-    document.getElementById('btnAddButton').onclick = () => openModal();
-
-    document.getElementById('button-submit').onclick = () => {
-        const name = document.getElementById('button-name').value.trim();
-        if(!name) return alert("El botón necesita un nombre");
-        
-        const data = {
-            name: name,
-            url: document.getElementById('button-url').value.trim(),
-            span: document.getElementById('button-type').value
-        };
-        
-        if(editingKey) db.ref('botones/'+editingKey).update(data);
-        else {
-            db.ref('botones').once('value').then(s => {
-                data.order = s.numChildren() + 1;
-                db.ref('botones').push(data);
-            });
-        }
-        btnModal.classList.remove('open');
-    };
-
-    window.deleteBtn = (k) => { if(confirm("¿Seguro que quieres borrar este botón?")) db.ref('botones/'+k).remove(); };
-
-    // Modal Usuarios
-    const usrModal = document.getElementById('dlgUsuariosModal');
-    document.getElementById('btnUsuarios').onclick = () => {
-        usrModal.classList.add('open');
-        const list = document.getElementById('usersListContainer');
-        list.innerHTML = '<p style="text-align:center">Cargando...</p>';
-        ALLOWED_USERS_REF.on('value', s => {
-            list.innerHTML = '';
-            const u = s.val();
-            if(u) Object.keys(u).forEach(k => {
-                list.innerHTML += `
-                    <div class="user-list-item">
-                        <span>${u[k]}</span>
-                        <button class="action-button delete" onclick="delUser('${k}')"><i class="fas fa-trash"></i></button>
-                    </div>`;
-            });
-            else list.innerHTML = '<p style="color:#aaa; text-align:center;">No hay usuarios autorizados extra.</p>';
-        });
-    };
-    document.getElementById('dlgUsuariosClose').onclick = () => usrModal.classList.remove('open');
-    
-    document.getElementById('btnAddUser').onclick = () => {
-        const mail = document.getElementById('txtNewUserEmail').value.trim();
-        if(mail) { ALLOWED_USERS_REF.push(mail); document.getElementById('txtNewUserEmail').value=''; }
-    };
-    window.delUser = (k) => ALLOWED_USERS_REF.child(k).remove();
-
-    // Drag & Drop
-    let dragSrc = null;
-    function setupDrag(el) {
-        el.addEventListener('dragstart', e => { 
-            dragSrc = el; 
-            e.dataTransfer.effectAllowed = 'move'; 
-            setTimeout(()=> el.style.opacity = '0.4', 0);
-        });
-        el.addEventListener('dragend', e => { 
-            el.style.opacity = '1'; 
-            saveOrder();
-        });
-        el.addEventListener('dragover', e => { e.preventDefault(); });
-        el.addEventListener('drop', e => {
-            e.stopPropagation();
-            if (dragSrc !== el) {
-                // Intercambio simple en el DOM visual
-                const grid = document.getElementById('buttonGrid');
-                const children = Array.from(grid.children);
-                const fromIndex = children.indexOf(dragSrc);
-                const toIndex = children.indexOf(el);
-                
-                if(fromIndex < toIndex) el.after(dragSrc);
-                else el.before(dragSrc);
-            }
-            return false;
-        });
-    }
-
-    function saveOrder() {
-        const updates = {};
-        const buttons = document.querySelectorAll('.button-wrapper');
-        buttons.forEach((btn, index) => {
-            const key = btn.getAttribute('data-key');
-            updates[`botones/${key}/order`] = index;
-        });
-        db.ref().update(updates);
-    }
-
-    // Drag File (Modal)
-    const drop = document.getElementById('drop-area');
-    drop.addEventListener('dragover', e => { e.preventDefault(); drop.style.borderColor = 'var(--accent-green)'; drop.style.background = 'rgba(40,167,69,0.1)'; });
-    drop.addEventListener('dragleave', e => { drop.style.borderColor = '#555'; drop.style.background = 'transparent'; });
-    drop.addEventListener('drop', e => {
-        e.preventDefault();
-        drop.style.borderColor = '#555'; drop.style.background = 'transparent';
-        const file = e.dataTransfer.files[0];
-        if(file) {
-            document.getElementById('button-url').value = file.name;
-            drop.innerHTML = `<i class="fas fa-check" style="color:var(--accent-green); font-size:1.5rem;"></i><br>${file.name}`;
-        }
-    });
-
-</script>
+    </script>
 </body>
 </html>

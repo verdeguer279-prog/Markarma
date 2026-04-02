@@ -713,49 +713,63 @@
         }
 
         async function extraerYGuardarProductos(texto) {
-            const textoLimpio = texto.replace(/\s+/g, ' ');
-            const fechaMatch = textoLimpio.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/);
-            let fechaTicketIso = "1970-01-01"; 
-            if (fechaMatch) fechaTicketIso = `${fechaMatch[3]}-${fechaMatch[2]}-${fechaMatch[1]}`; 
+    // Reemplazamos saltos de línea por espacios para unificar el texto
+    const textoLimpio = texto.replace(/\s+/g, ' ');
 
-            const regex = /(\d+)\s+([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ0-9\s+%.\-+]{2,})\s+(\d+,\d{2})/g;
-            let match;
-            const extraidos = [];
-            const ignorar = ["MERCADONA", "TOTAL", "IMPORTE", "TARJETA", "FACTURA", "IVA", "BASE", "CUOTA"];
+    // Buscamos la fecha del ticket para el registro del "último ticket"
+    const fechaMatch = textoLimpio.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/);
+    let fechaTicketIso = "1970-01-01"; 
+    if (fechaMatch) fechaTicketIso = `${fechaMatch[3]}-${fechaMatch[2]}-${fechaMatch[1]}`; 
 
-            while ((match = regex.exec(textoLimpio)) !== null) {
-                const nombre = match[2].trim();
-                if (nombre.length > 3 && !ignorar.some(i => nombre.includes(i))) {
-                    extraidos.push(nombre.toLowerCase());
-                }
-            }
+    // REGEX ACTUALIZADA: 
+    // 1. Acepta que el nombre empiece por "+" o letra: ([+A-ZÁÉÍÓÚÑ])
+    // 2. Acepta precios con coma o punto: (\d+[,.]\d{2})
+    const regex = /(\d+)\s+([+A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ0-9\s+%.\-+]{2,})\s+(\d+[,.]\d{2})/g;
+    
+    let match;
+    const extraidos = [];
+    const ignorar = ["MERCADONA", "TOTAL", "IMPORTE", "TARJETA", "FACTURA", "IVA", "BASE", "CUOTA"];
 
-            if (extraidos.length > 0) {
-                extraidos.forEach(limpio => {
-                    const safeKey = limpiarKey(limpio); 
+    while ((match = regex.exec(textoLimpio)) !== null) {
+        let nombre = match[2].trim();
+        
+        // Limpieza extra: si el nombre termina en un número suelto (a veces pasa en el PDF), lo quitamos
+        nombre = nombre.replace(/\s+\d+$/, '');
 
-                    if (!catalogoProductos[safeKey]) {
-                        db.ref(`mercadona/catalogo/${safeKey}`).set({ 
-                            nombreOriginal: limpio, 
-                            nombrePersonalizado: limpio.charAt(0).toUpperCase() + limpio.slice(1), 
-                            consumos: 1 
-                        });
-                    } else {
-                        const consumosActuales = catalogoProductos[safeKey].consumos || 0;
-                        db.ref(`mercadona/catalogo/${safeKey}/consumos`).set(consumosActuales + 1);
-                    }
-                });
-
-                const snapUltimo = await db.ref('mercadona/ultimo_ticket').once('value');
-                const dataUltimo = snapUltimo.val();
-
-                if (!dataUltimo || !dataUltimo.fecha || fechaTicketIso >= dataUltimo.fecha) {
-                    await db.ref('mercadona/ultimo_ticket').set({ fecha: fechaTicketIso, productos: extraidos });
-                }
-            }
-            
-            return extraidos;
+        if (nombre.length > 3 && !ignorar.some(i => nombre.includes(i))) {
+            extraidos.push(nombre.toLowerCase());
         }
+    }
+
+    if (extraidos.length > 0) {
+        extraidos.forEach(limpio => {
+            const safeKey = limpiarKey(limpio); 
+
+            if (!catalogoProductos[safeKey]) {
+                // Si es nuevo (como los productos +PROTEÍNAS), se crea en el catálogo
+                db.ref(`mercadona/catalogo/${safeKey}`).set({ 
+                    nombreOriginal: limpio, 
+                    nombrePersonalizado: limpio.charAt(0).toUpperCase() + limpio.slice(1), 
+                    consumos: 1 
+                });
+            } else {
+                // Si ya existe, sumamos un consumo
+                const consumosActuales = catalogoProductos[safeKey].consumos || 0;
+                db.ref(`mercadona/catalogo/${safeKey}/consumos`).set(consumosActuales + 1);
+            }
+        });
+
+        // Actualizamos la referencia del último ticket si este es más reciente
+        const snapUltimo = await db.ref('mercadona/ultimo_ticket').once('value');
+        const dataUltimo = snapUltimo.val();
+
+        if (!dataUltimo || !dataUltimo.fecha || fechaTicketIso >= dataUltimo.fecha) {
+            await db.ref('mercadona/ultimo_ticket').set({ fecha: fechaTicketIso, productos: extraidos });
+        }
+    }
+    
+    return extraidos;
+}
     </script>
 </body>
 </html>

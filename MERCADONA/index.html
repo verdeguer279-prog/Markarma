@@ -245,7 +245,8 @@
                         <button class="clear-search-btn hidden" id="btn-clear-search" onclick="limpiarBusqueda()" title="Limpiar búsqueda">×</button>
                     </div>
                     <select id="orden-catalogo" class="select-bar" onchange="renderizarCatalogo()">
-                        <option value="alfa">A - Z</option>
+                        <option value="seccion">📍 Por Sección</option>
+                        <option value="alfa">🔤 A - Z</option>
                         <option value="consumos">⭐ Habituales</option>
                     </select>
                 </div>
@@ -813,49 +814,95 @@
             const orden = document.getElementById('orden-catalogo').value;
             
             let keys = Object.keys(catalogoProductos);
-            if (orden === 'alfa') keys.sort((a,b) => (catalogoProductos[a].nombrePersonalizado || catalogoProductos[a].nombre || "").localeCompare(catalogoProductos[b].nombrePersonalizado || catalogoProductos[b].nombre || ""));
-            else keys.sort((a,b) => (catalogoProductos[b].consumos || 0) - (catalogoProductos[a].consumos || 0));
+            
+            // 1. Filtramos primero por la búsqueda
+            let keysFiltradas = keys.filter(key => {
+                const prod = catalogoProductos[key];
+                const nombreVisual = prod.nombrePersonalizado || prod.nombre || prod.nombreOriginal || "";
+                const nombreOculto = prod.nombreOriginal || prod.nombre || "";
+                return busqueda.length === 0 || nombreVisual.toLowerCase().includes(busqueda) || nombreOculto.toLowerCase().includes(busqueda);
+            });
 
-            let mostrados = 0;
             let htmlContent = ''; 
 
-            keys.forEach(key => {
+            // 2. Función interna para dibujar el producto
+            const dibujarTarjeta = (key) => {
                 const prod = catalogoProductos[key];
                 const nombreVisual = prod.nombrePersonalizado || prod.nombre || prod.nombreOriginal || "";
                 const nombreOculto = prod.nombreOriginal || prod.nombre || "";
                 const seccion = prod.seccion || "Sin Sección / Pasillo";
+                const estaEnLista = datosListaActual && datosListaActual.productos && datosListaActual.productos[key];
+                
+                let actionBtn = estaEnLista 
+                    ? `<div style="color: var(--m-green); font-size: 22px; padding: 0 10px; flex-shrink: 0; user-select: none;">✅</div>` 
+                    : `<button class="btn-add" onclick="updateQty('${key}', 1, event)">+</button>`;
 
-                const cumpleBusqueda = busqueda.length === 0 || nombreVisual.toLowerCase().includes(busqueda) || nombreOculto.toLowerCase().includes(busqueda);
-
-                if (cumpleBusqueda) {
-                    if (busqueda.length === 0 && orden === 'consumos' && mostrados > 25) return;
-                    mostrados++;
-
-                    const estaEnLista = datosListaActual && datosListaActual.productos && datosListaActual.productos[key];
-                    
-                    let actionBtn = '';
-                    if (estaEnLista) {
-                        // Si ya está en la lista, mostramos un check verde fijo y limpio
-                        actionBtn = `<div style="color: var(--m-green); font-size: 22px; padding: 0 10px; flex-shrink: 0; user-select: none;">✅</div>`;
-                    } else {
-                        // Si no está, mostramos el botón + estándar
-                        actionBtn = `<button class="btn-add" onclick="updateQty('${key}', 1, event)">+</button>`;
-                    }
-
-                    htmlContent += `
-                        <div class="card">
-                            <div class="card-info" onclick="abrirEdicion('${key}')" style="cursor:pointer;" title="Toca para editar">
-                                <div class="card-title">${nombreVisual}</div>
-                                <div class="card-ticket-name">
-                                    <span>🎟️ ${nombreOculto.substring(0,15)}</span> 
-                                    <button class="badge-card-section" onclick="event.stopPropagation(); abrirEdicion('${key}')" title="Cambiar sección">✏️ ${seccion}</button>
-                                </div>
+                return `
+                    <div class="card">
+                        <div class="card-info" onclick="abrirEdicion('${key}')" style="cursor:pointer;" title="Toca para editar">
+                            <div class="card-title">${nombreVisual}</div>
+                            <div class="card-ticket-name">
+                                <span>🎟️ ${nombreOculto.substring(0,15)}</span> 
+                                <button class="badge-card-section" onclick="event.stopPropagation(); abrirEdicion('${key}')" title="Cambiar sección">✏️ ${seccion}</button>
                             </div>
-                            ${actionBtn}
                         </div>
+                        ${actionBtn}
+                    </div>
+                `;
+            };
+
+            // 3. Aplicamos el orden seleccionado por el usuario
+            if (orden === 'seccion') {
+                let estructurado = {};
+                keysFiltradas.forEach(key => {
+                    const sec = catalogoProductos[key].seccion || "Sin Sección / Pasillo";
+                    if (!estructurado[sec]) estructurado[sec] = [];
+                    estructurado[sec].push(key);
+                });
+
+                const ordenSecciones = seccionesPersonalizadas.map(s => s.id);
+                const seccionesOrdenadas = Object.keys(estructurado).sort((a, b) => {
+                    const idxA = ordenSecciones.indexOf(a);
+                    const idxB = ordenSecciones.indexOf(b);
+                    if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+                    if (idxA === -1) return 1;
+                    if (idxB === -1) return -1;
+                    return idxA - idxB;
+                });
+
+                seccionesOrdenadas.forEach(secName => {
+                    estructurado[secName].sort((a,b) => (catalogoProductos[a].nombrePersonalizado || catalogoProductos[a].nombre || "").localeCompare(catalogoProductos[b].nombrePersonalizado || catalogoProductos[b].nombre || ""));
+                    
+                    // Creamos un ID seguro para el contenedor de la sección
+                    const idContenedor = 'cat-sec-' + limpiarKey(secName);
+                    
+                    // Añadimos el título con el evento onclick para desplegar/plegar
+                    htmlContent += `
+                        <div class="section-group-title" onclick="toggleDesplegable('${idContenedor}')" style="cursor:pointer; user-select:none;">
+                            <span>${secName}</span>
+                            <span id="icon-${idContenedor}" style="transition: transform 0.2s; display: inline-block;">▼</span>
+                        </div>
+                        <div id="${idContenedor}">
                     `;
+                    
+                    estructurado[secName].forEach(key => {
+                        htmlContent += dibujarTarjeta(key);
+                    });
+                    
+                    htmlContent += `</div>`; // Cerramos la "caja" de la sección
+                });
+            } else {
+                if (orden === 'alfa') {
+                    keysFiltradas.sort((a,b) => (catalogoProductos[a].nombrePersonalizado || catalogoProductos[a].nombre || "").localeCompare(catalogoProductos[b].nombrePersonalizado || catalogoProductos[b].nombre || ""));
+                } else if (orden === 'consumos') {
+                    keysFiltradas.sort((a,b) => (catalogoProductos[b].consumos || 0) - (catalogoProductos[a].consumos || 0));
+                    if (busqueda.length === 0) keysFiltradas = keysFiltradas.slice(0, 15);
                 }
-            });
+                
+                keysFiltradas.forEach(key => {
+                    htmlContent += dibujarTarjeta(key);
+                });
+            }
             
             cont.innerHTML = htmlContent; 
         }
@@ -1009,15 +1056,15 @@
 
         function crearListaRapidaHabituales() {
             let keys = Object.keys(catalogoProductos);
-            if(keys.length === 0) { alert("El catálogo está vacío. Sube un ticket primero."); return; }
+            if(keys.length === 0) { alert("El catálogo está vacío."); return; } // Eliminado el mensaje del ticket
             
             keys.sort((a,b) => (catalogoProductos[b].consumos || 0) - (catalogoProductos[a].consumos || 0));
-            let top10 = keys.slice(0, 10);
+            let top15 = keys.slice(0, 15); // Cambiado a 15 productos
 
             const promesa = idListaActual ? Promise.resolve(idListaActual) : crearNuevaLista();
             promesa.then((idDestino) => {
                 let añadidos = 0;
-                top10.forEach(idProducto => {
+                top15.forEach(idProducto => { // Ahora recorre la variable top15
                     if (!datosListaActual || !datosListaActual.productos || !datosListaActual.productos[idProducto]) {
                         db.ref(`mercadona/listas/${idDestino}/productos/${idProducto}`).set({ comprado: false, cantidad: 1 });
                         const cons = catalogoProductos[idProducto].consumos || 0;
@@ -1200,6 +1247,23 @@
             });
         }
 
+        // --- NUEVA FUNCIÓN PARA DESPLEGAR/PLEGAR SECCIONES ---
+        function toggleDesplegable(idContenedor) {
+            const contenedor = document.getElementById(idContenedor);
+            const icono = document.getElementById('icon-' + idContenedor);
+            
+            if (contenedor) {
+                // Alternamos la clase "hidden" que ya existe en tu CSS para ocultar/mostrar
+                contenedor.classList.toggle('hidden');
+                
+                // Giramos la flecha visualmente para que sepas si está abierto o cerrado
+                if (contenedor.classList.contains('hidden')) {
+                    icono.style.transform = 'rotate(-90deg)'; // Flecha apuntando a la izquierda
+                } else {
+                    icono.style.transform = 'rotate(0deg)';   // Flecha apuntando hacia abajo
+                }
+            }
+        }
     </script>
 </body>
 </html>

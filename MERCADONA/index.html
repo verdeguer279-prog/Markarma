@@ -470,14 +470,14 @@
                 
                 document.getElementById('loading-screen').classList.add('hidden');
                 renderizarListaActual();
-                // ELIMINADO: renderizarCatalogo();
-            }, errorAcceso); 
+                renderizarCatalogo(); // Lo restablecemos para que escuche los cambios al instante
+            }, errorAcceso);
 
             db.ref('mercadona/catalogo').on('value', snap => {
                 catalogoProductos = snap.val() || {};
                 document.getElementById('contador-productos').innerText = Object.keys(catalogoProductos).length;
                 renderizarCatalogo();
-                // ELIMINADO: renderizarListaActual();
+                renderizarListaActual(); // Lo restablecemos
                 renderizarHistorial(historialArchivado); 
             }, errorAcceso);
 
@@ -873,23 +873,26 @@
                 seccionesOrdenadas.forEach(secName => {
                     estructurado[secName].sort((a,b) => (catalogoProductos[a].nombrePersonalizado || catalogoProductos[a].nombre || "").localeCompare(catalogoProductos[b].nombrePersonalizado || catalogoProductos[b].nombre || ""));
                     
-                    // Creamos un ID seguro para el contenedor de la sección
                     const idContenedor = 'cat-sec-' + limpiarKey(secName);
                     
-                    // Añadimos el título con el evento onclick para desplegar/plegar
+                    // NUEVO: Miramos si en la memoria esta sección estaba contraída
+                    const estaContraida = window.seccionesContraidas && window.seccionesContraidas[idContenedor];
+                    const claseOculta = estaContraida ? 'hidden' : '';
+                    const rotacionIcono = estaContraida ? 'transform: rotate(-90deg);' : 'transform: rotate(0deg);';
+                    
                     htmlContent += `
                         <div class="section-group-title" onclick="toggleDesplegable('${idContenedor}')" style="cursor:pointer; user-select:none;">
                             <span>${secName}</span>
-                            <span id="icon-${idContenedor}" style="transition: transform 0.2s; display: inline-block;">▼</span>
+                            <span id="icon-${idContenedor}" style="transition: transform 0.2s; display: inline-block; ${rotacionIcono}">▼</span>
                         </div>
-                        <div id="${idContenedor}">
+                        <div id="${idContenedor}" class="${claseOculta}">
                     `;
                     
                     estructurado[secName].forEach(key => {
                         htmlContent += dibujarTarjeta(key);
                     });
                     
-                    htmlContent += `</div>`; // Cerramos la "caja" de la sección
+                    htmlContent += `</div>`; 
                 });
             } else {
                 if (orden === 'alfa') {
@@ -1247,20 +1250,25 @@
             });
         }
 
+        window.seccionesContraidas = window.seccionesContraidas || {}; // Inicializamos la memoria
+
         // --- NUEVA FUNCIÓN PARA DESPLEGAR/PLEGAR SECCIONES ---
         function toggleDesplegable(idContenedor) {
             const contenedor = document.getElementById(idContenedor);
             const icono = document.getElementById('icon-' + idContenedor);
             
             if (contenedor) {
-                // Alternamos la clase "hidden" que ya existe en tu CSS para ocultar/mostrar
                 contenedor.classList.toggle('hidden');
                 
-                // Giramos la flecha visualmente para que sepas si está abierto o cerrado
-                if (contenedor.classList.contains('hidden')) {
-                    icono.style.transform = 'rotate(-90deg)'; // Flecha apuntando a la izquierda
+                const estaOculto = contenedor.classList.contains('hidden');
+                
+                // NUEVO: Guardamos el estado en la memoria para que no se olvide al repintar
+                window.seccionesContraidas[idContenedor] = estaOculto;
+                
+                if (estaOculto) {
+                    icono.style.transform = 'rotate(-90deg)';
                 } else {
-                    icono.style.transform = 'rotate(0deg)';   // Flecha apuntando hacia abajo
+                    icono.style.transform = 'rotate(0deg)';
                 }
             }
         }
@@ -1269,14 +1277,8 @@
             if (event) event.stopPropagation(); // Evita que se abra la ventana de editar al tocar el tick
             
             if (idListaActual) {
-                // Borra el producto de la base de datos
-                db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}`).remove().then(() => {
-                    // Actualizamos la memoria local al instante y forzamos el cambio visual
-                    if (datosListaActual && datosListaActual.productos) {
-                        delete datosListaActual.productos[idProducto];
-                    }
-                    renderizarCatalogo(); // Esto hace que el ✅ vuelva a ser un + instantáneamente
-                });
+                // Firebase se encargará de avisar a la interfaz automáticamente
+                db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}`).remove();
             }
         }
     </script>

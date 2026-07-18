@@ -50,13 +50,13 @@
         .card-ticket-name { font-size: 11px; color: #999; text-transform: uppercase; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
         .badge-card-section { background: #f0f0f0; color: #666; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; border: none; transition: 0.2s; }
         .badge-card-section:active { background: #d0ead2; }
-        .crossed { text-decoration: line-through; color: #aaa; }
+        .crossed { text-decoration: line-through; color: #dc3545 !important; font-weight: bold; }
 
         .btn-add { background: var(--m-green); color: white; border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,122,51,0.2);}
         
         .cart-wrapper { position: relative; display: inline-block; flex-shrink: 0; margin-left: 5px; }
         .btn-cart { background: #f0f0f0; border: 2px solid #ddd; width: 46px; height: 46px; border-radius: 12px; font-size: 22px; cursor: pointer; display: flex; justify-content: center; align-items: center; transition: 0.2s; filter: grayscale(100%); opacity: 0.6; }
-        .btn-cart.active { background: #fff4e5; border-color: var(--m-orange); filter: grayscale(0%); opacity: 1; }
+        .btn-cart.active { background: #ffebee !important; border-color: #dc3545 !important; filter: grayscale(0%); opacity: 1; }
         .cart-badge { position: absolute; top: -6px; right: -6px; background: #dc3545; color: white; font-size: 12px; font-weight: bold; border-radius: 20px; min-width: 20px; height: 20px; display: flex; justify-content: center; align-items: center; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2); pointer-events: none; padding: 0 4px; box-sizing: border-box;}
 
         .qty-vert { display: flex; flex-direction: column; align-items: center; justify-content: space-between; background: #eaf5eb; border: 1px solid var(--m-green); border-radius: 18px; width: 38px; height: 86px; flex-shrink: 0; overflow: hidden; box-shadow: 0 2px 5px rgba(0,122,51,0.1);}
@@ -272,6 +272,7 @@
                     <p style="color: #666;">No hay ninguna lista en curso</p>
                     <button class="primary" onclick="crearNuevaLista()">Crear Lista Vacía</button>
                     <button class="primary" style="background:var(--m-orange); margin-top:10px;" onclick="crearListaRapidaHabituales()">⭐ Crear Lista con Habituales</button>
+                    <button class="primary" style="background:#555; margin-top:10px;" onclick="cargarUltimaCompra()">🔄 Empezar con Última Compra</button>
                 </div>
 
                 <div id="active-list" class="hidden">
@@ -280,8 +281,9 @@
                     </div>
                     
                     <div class="action-row">
-                        <button class="primary" style="background:var(--m-orange); margin:0; flex: 1;" onclick="crearListaRapidaHabituales()">⭐ Habituales</button>
-                        <button class="primary" style="background:#dc3545; margin:0; flex: 1;" onclick="vaciarListaActual()">🗑️ Vaciar</button>
+                        <button class="primary" style="background:#555; margin:0; flex: 1; padding: 10px 5px; font-size: 13px;" onclick="cargarUltimaCompra()">🔄 Última Compra</button>
+                        <button class="primary" style="background:var(--m-orange); margin:0; flex: 1; padding: 10px 5px; font-size: 13px;" onclick="crearListaRapidaHabituales()">⭐ Habituales</button>
+                        <button class="primary" style="background:#dc3545; margin:0; flex: 1; padding: 10px 5px; font-size: 13px;" onclick="vaciarListaActual()">🗑️ Vaciar</button>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap;">
@@ -728,10 +730,9 @@
         }
 
         // ===== LIMPIEZA DE BÚSQUEDA =====
-        function limpiarBusqueda() {
+       function limpiarBusqueda() {
             const buscador = document.getElementById('buscador');
             buscador.value = '';
-            buscador.focus();
             document.getElementById('btn-clear-search').classList.add('hidden');
             renderizarCatalogo();
         }
@@ -816,7 +817,7 @@
             else keys.sort((a,b) => (catalogoProductos[b].consumos || 0) - (catalogoProductos[a].consumos || 0));
 
             let mostrados = 0;
-            let htmlContent = ''; // Creamos el texto primero
+            let htmlContent = ''; 
 
             keys.forEach(key => {
                 const prod = catalogoProductos[key];
@@ -834,15 +835,10 @@
                     
                     let actionBtn = '';
                     if (estaEnLista) {
-                        const qty = datosListaActual.productos[key].cantidad || 1;
-                        actionBtn = `
-                            <div class="qty-vert" onclick="event.stopPropagation()">
-                                <button class="qty-btn-v" onclick="updateQty('${key}', 1, event)">+</button>
-                                <div class="qty-val-v">${qty}</div>
-                                <button class="qty-btn-v" onclick="updateQty('${key}', -1, event)">-</button>
-                            </div>
-                        `;
+                        // Si ya está en la lista, mostramos un check verde fijo y limpio
+                        actionBtn = `<div style="color: var(--m-green); font-size: 22px; padding: 0 10px; flex-shrink: 0; user-select: none;">✅</div>`;
                     } else {
+                        // Si no está, mostramos el botón + estándar
                         actionBtn = `<button class="btn-add" onclick="updateQty('${key}', 1, event)">+</button>`;
                     }
 
@@ -861,7 +857,6 @@
                 }
             });
             
-            // Lo pintamos en el DOM solo UNA vez al final
             cont.innerHTML = htmlContent; 
         }
 
@@ -883,7 +878,7 @@
             document.getElementById('fecha-lista').innerHTML = fCompra ? `📅 Compra real: <b>${fCompra}</b>` : `Borrador del: ${fCreada}`;
             
             const cont = document.getElementById('items-comprando');
-            let htmlContent = ''; // Creamos el texto primero
+            let htmlContent = ''; 
             
             const prods = datosListaActual.productos || {};
             let totalItems = 0;
@@ -897,13 +892,18 @@
             const hayFiltroActivo = Object.keys(seccionesVisibles).length > 0 && 
                                     Object.values(seccionesVisibles).some(v => v === false);
 
+            // --- NUEVO: SEPARAMOS PENDIENTES DE COMPRADOS ---
+            const pendientes = keys.filter(key => !prods[key].comprado);
+            const comprados = keys.filter(key => prods[key].comprado);
+
+            // SOLO PROCESAMOS LAS SECCIONES Y ORDEN PARA LOS PENDIENTES
             if (orden === 'seccion') {
                 let estructurado = {};
-                keys.forEach(key => {
+                pendientes.forEach(key => {
                     const catProd = catalogoProductos[key] || {};
                     const seccion = catProd.seccion || "Sin Sección / Pasillo";
                     if (!estructurado[seccion]) estructurado[seccion] = [];
-                    estructurado[seccion].push({ key: key, datos: prods[key], ordenComprado: prods[key].comprado ? 1 : 0 });
+                    estructurado[seccion].push({ key: key, datos: prods[key] });
                 });
 
                 const ordenSecciones = seccionesPersonalizadas.map(s => s.id);
@@ -928,7 +928,6 @@
                     
                     seccionesMostradas++;
                     htmlContent += `<div class="section-group-title">${secName}</div>`;
-                    estructurado[secName].sort((a, b) => a.ordenComprado - b.ordenComprado);
                     htmlContent += renderizarItemsDeLista(estructurado[secName]);
                 });
 
@@ -940,38 +939,41 @@
                     `;
                 }
                 
-                if (seccionesMostradas === 0 && keys.length > 0) {
+                if (seccionesMostradas === 0 && pendientes.length > 0) {
                     htmlContent += `
                         <div style="text-align: center; padding: 30px 0; color: #999;">
                             <span style="font-size: 30px;">👁️</span>
-                            <p>Todas las secciones están ocultas.</p>
+                            <p>Todas las secciones pendientes están ocultas.</p>
                             <button class="btn-config" onclick="abrirModalFiltroSecciones()">Mostrar secciones</button>
                         </div>
                     `;
                 }
             } else if (orden === 'alfa') {
-                let items = keys.map(key => ({
+                let items = pendientes.map(key => ({
                     key: key,
                     datos: prods[key],
-                    nombre: (catalogoProductos[key]?.nombrePersonalizado || catalogoProductos[key]?.nombre || catalogoProductos[key]?.nombreOriginal || "").toLowerCase(),
-                    ordenComprado: prods[key].comprado ? 1 : 0
+                    nombre: (catalogoProductos[key]?.nombrePersonalizado || catalogoProductos[key]?.nombre || catalogoProductos[key]?.nombreOriginal || "").toLowerCase()
                 }));
-                items.sort((a, b) => {
-                    if (a.ordenComprado !== b.ordenComprado) return a.ordenComprado - b.ordenComprado;
-                    return a.nombre.localeCompare(b.nombre);
-                });
+                items.sort((a, b) => a.nombre.localeCompare(b.nombre));
                 htmlContent += renderizarItemsDeLista(items);
             } else {
-                let items = keys.map(key => ({
+                let items = pendientes.map(key => ({
                     key: key,
-                    datos: prods[key],
-                    ordenComprado: prods[key].comprado ? 1 : 0
+                    datos: prods[key]
                 }));
-                items.sort((a, b) => a.ordenComprado - b.ordenComprado);
                 htmlContent += renderizarItemsDeLista(items);
             }
+
+            // --- NUEVO: AL FINAL DEL TODO AÑADIMOS LOS COMPRADOS JUNTOS ---
+            if (comprados.length > 0) {
+                htmlContent += `<div class="section-group-title" style="background:#ffebee; color:#dc3545; border-left-color:#dc3545; margin-top: 25px;">✅ YA COMPRADOS</div>`;
+                let itemsComprados = comprados.map(key => ({
+                    key: key,
+                    datos: prods[key]
+                }));
+                htmlContent += renderizarItemsDeLista(itemsComprados);
+            }
             
-            // Lo pintamos en el DOM solo UNA vez al final
             cont.innerHTML = htmlContent;
         }
 
@@ -1148,6 +1150,54 @@
             document.getElementById(`tab-${tab}`).classList.add('active');
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.getElementById(`panel-${tab}`).classList.add('active');
+        }
+
+        // --- NUEVA FUNCIÓN PARA CARGAR LA ÚLTIMA COMPRA ---
+        function cargarUltimaCompra() {
+            // Buscamos todas las compras archivadas en el historial
+            const keys = Object.keys(historialArchivado);
+            if (keys.length === 0) {
+                alert("Aún no tienes compras guardadas en el historial.");
+                return;
+            }
+
+            // Ordenamos para encontrar la más reciente (la más nueva será la primera)
+            keys.sort((a, b) => {
+                const fechaA = historialArchivado[a].fechaCompra || historialArchivado[a].fechaCreacion;
+                const fechaB = historialArchivado[b].fechaCompra || historialArchivado[b].fechaCreacion;
+                return new Date(fechaB) - new Date(fechaA);
+            });
+
+            const ultimaListaKey = keys[0]; // Cogemos la última compra
+            const productosUltima = historialArchivado[ultimaListaKey].productos || {};
+            const keysProductos = Object.keys(productosUltima);
+
+            if (keysProductos.length === 0) {
+                alert("La última compra archivada no tenía productos.");
+                return;
+            }
+
+            // Si hay una lista activa la usamos, si no, creamos una nueva
+            const promesa = idListaActual ? Promise.resolve(idListaActual) : crearNuevaLista();
+            
+            promesa.then((idDestino) => {
+                let añadidos = 0;
+                keysProductos.forEach(idProducto => {
+                    // Solo añadimos el producto si no está ya en la lista actual
+                    if (!datosListaActual || !datosListaActual.productos || !datosListaActual.productos[idProducto]) {
+                        db.ref(`mercadona/listas/${idDestino}/productos/${idProducto}`).set({ comprado: false, cantidad: 1 });
+                        const cons = catalogoProductos[idProducto]?.consumos || 0;
+                        db.ref(`mercadona/catalogo/${idProducto}/consumos`).set(cons + 1);
+                        añadidos++;
+                    }
+                });
+                
+                if (añadidos > 0) {
+                    alert(`✅ Se han añadido ${añadidos} productos de tu última compra.`);
+                } else {
+                    alert("ℹ️ Los productos de tu última compra ya estaban en tu lista actual.");
+                }
+            });
         }
 
     </script>

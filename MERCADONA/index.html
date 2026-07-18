@@ -834,7 +834,7 @@
                 const estaEnLista = datosListaActual && datosListaActual.productos && datosListaActual.productos[key];
                 
                 let actionBtn = estaEnLista 
-                    ? `<div style="color: var(--m-green); font-size: 22px; padding: 0 10px; flex-shrink: 0; user-select: none;">✅</div>` 
+                    ? `<div onclick="quitarDelCatalogo('${key}', event)" style="color: var(--m-green); font-size: 22px; padding: 0 10px; flex-shrink: 0; user-select: none; cursor: pointer;" title="Quitar de la lista">✅</div>` 
                     : `<button class="btn-add" onclick="updateQty('${key}', 1, event)">+</button>`;
 
                 return `
@@ -1262,6 +1262,21 @@
                 } else {
                     icono.style.transform = 'rotate(0deg)';   // Flecha apuntando hacia abajo
                 }
+            }
+        }
+        // --- NUEVA FUNCIÓN PARA QUITAR RÁPIDAMENTE UN PRODUCTO DESDE EL CATÁLOGO ---
+        function quitarDelCatalogo(idProducto, event) {
+            if (event) event.stopPropagation(); // Evita que se abra la ventana de editar al tocar el tick
+            
+            if (idListaActual) {
+                // Borra el producto de la base de datos
+                db.ref(`mercadona/listas/${idListaActual}/productos/${idProducto}`).remove().then(() => {
+                    // Actualizamos la memoria local al instante y forzamos el cambio visual
+                    if (datosListaActual && datosListaActual.productos) {
+                        delete datosListaActual.productos[idProducto];
+                    }
+                    renderizarCatalogo(); // Esto hace que el ✅ vuelva a ser un + instantáneamente
+                });
             }
         }
     </script>

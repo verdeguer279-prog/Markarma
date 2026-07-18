@@ -16,8 +16,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
 
     <style>
         :root { --m-green: #007a33; --m-orange: #f29100; --bg: #f4f6f8; --card-bg: #ffffff; }
@@ -154,7 +152,7 @@
     <div id="modal-edicion" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 style="margin-top:0; color:var(--m-green);">Editar Producto</h3>
-            <label style="font-size:12px; font-weight:bold; color:#d9534f;">Nombre Original (Del Ticket PDF)</label>
+            <label style="font-size:12px; font-weight:bold; color:#d9534f;">Nombre Original / Interno</label>  
             <input type="text" id="edit-original" class="modal-input" disabled style="background:#eee; color:#666; font-family:monospace;">
             
             <label style="font-size:12px; font-weight:bold; color:#555;">Tu Descripción / Nombre Visible</label>
@@ -217,15 +215,6 @@
         </div>
     </div>
 
-    <!-- Modal Tickets -->
-    <div id="modal-tickets" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--m-green);">Gestión de Tickets</h3>
-            <p style="font-size: 13px; color: #666; margin-top: 0;">Borra el registro de un ticket si necesitas volver a subirlo para extraer mejor sus productos.</p>
-            <div id="lista-tickets-subidos" style="max-height: 250px; overflow-y: auto; margin-bottom:15px; border: 1px solid #eee; border-radius: 8px; padding: 10px;"></div>
-            <button class="primary" style="background:#888; margin-top:0;" onclick="cerrarModalTickets()">Cerrar</button>
-        </div>
-    </div>
 
     <div id="app" class="hidden">
         <header>
@@ -283,7 +272,6 @@
                     <p style="color: #666;">No hay ninguna lista en curso</p>
                     <button class="primary" onclick="crearNuevaLista()">Crear Lista Vacía</button>
                     <button class="primary" style="background:var(--m-orange); margin-top:10px;" onclick="crearListaRapidaHabituales()">⭐ Crear Lista con Habituales</button>
-                    <button class="primary" style="background:#555; margin-top:10px;" onclick="cargarUltimoTicket(true)">🔄 Empezar con el último ticket</button>
                 </div>
 
                 <div id="active-list" class="hidden">
@@ -292,9 +280,8 @@
                     </div>
                     
                     <div class="action-row">
-                        <button class="primary" style="background:#f29100; margin:0;" onclick="cargarUltimoTicket(false)">🔄 Último Ticket</button>
-                        <button class="primary" style="background:var(--m-orange); margin:0;" onclick="crearListaRapidaHabituales()">⭐ Habituales</button>
-                        <button class="primary" style="background:#dc3545; margin:0;" onclick="vaciarListaActual()">🗑️ Vaciar</button>
+                        <button class="primary" style="background:var(--m-orange); margin:0; flex: 1;" onclick="crearListaRapidaHabituales()">⭐ Habituales</button>
+                        <button class="primary" style="background:#dc3545; margin:0; flex: 1;" onclick="vaciarListaActual()">🗑️ Vaciar</button>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap;">
@@ -310,17 +297,6 @@
                     </div>
 
                     <div id="items-comprando"></div>
-
-                    <div class="upload-area" id="drop-zone" onclick="document.getElementById('file-input').click()">
-                        📄 Toca o arrastra aquí tu ticket (PDF)<br>
-                        <span style="font-size: 12px; font-weight: normal; color: #666;">(Extraerá los productos al instante)</span>
-                        <input type="file" id="file-input" class="hidden" accept="application/pdf" onchange="procesarArchivo(this.files[0])">
-                    </div>
-                    <div id="ticket-status" style="text-align:center; margin-top:10px; font-size:14px; font-weight:bold; word-wrap: break-word;"></div>
-
-                    <div style="text-align: center;">
-                        <button class="primary" style="background: transparent; color: #888; border: 1px solid #ddd; padding: 8px 15px; font-size: 13px; width: auto; margin-top: 15px; border-radius: 20px;" onclick="abrirModalTickets()">⚙️ Gestionar tickets subidos</button>
-                    </div>
 
                     <button class="primary" style="background: #222; margin-top: 25px;" onclick="finalizarLista()">📦 ARCHIVAR COMPRA</button>
                 </div>
@@ -491,8 +467,16 @@
                 
                 document.getElementById('loading-screen').classList.add('hidden');
                 renderizarListaActual();
-                renderizarCatalogo(); 
+                // ELIMINADO: renderizarCatalogo();
             }, errorAcceso); 
+
+            db.ref('mercadona/catalogo').on('value', snap => {
+                catalogoProductos = snap.val() || {};
+                document.getElementById('contador-productos').innerText = Object.keys(catalogoProductos).length;
+                renderizarCatalogo();
+                // ELIMINADO: renderizarListaActual();
+                renderizarHistorial(historialArchivado); 
+            }, errorAcceso);
 
             db.ref('mercadona/catalogo').on('value', snap => {
                 catalogoProductos = snap.val() || {};
@@ -508,43 +492,6 @@
             }, errorAcceso);
         }
 
-        function abrirModalTickets() {
-            document.getElementById('modal-tickets').classList.remove('hidden');
-            cargarTicketsSubidos();
-        }
-
-        function cerrarModalTickets() {
-            document.getElementById('modal-tickets').classList.add('hidden');
-        }
-
-        function cargarTicketsSubidos() {
-            db.ref('mercadona/tickets_subidos').once('value', snap => {
-                const cont = document.getElementById('lista-tickets-subidos');
-                cont.innerHTML = '';
-                const tickets = snap.val();
-                if (!tickets) {
-                    cont.innerHTML = '<p style="color:#999; font-size:14px; text-align:center; padding: 20px 0;">No hay tickets registrados en el historial.</p>';
-                    return;
-                }
-                const keys = Object.keys(tickets);
-                keys.forEach(key => {
-                    cont.innerHTML += `
-                        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #eee;">
-                            <span style="font-size:12px; color:#555; word-break: break-all; padding-right:10px;">📄 ${key}</span>
-                            <button class="btn-discreet-trash" onclick="eliminarRegistroTicket('${key}')">🗑️</button>
-                        </div>
-                    `;
-                });
-            });
-        }
-
-        function eliminarRegistroTicket(key) {
-            if(confirm('¿Seguro que quieres borrar la memoria de este ticket?\n\nAl hacerlo, podrás volver a subir el PDF para extraer sus productos.')) {
-                db.ref(`mercadona/tickets_subidos/${key}`).remove().then(() => {
-                    cargarTicketsSubidos();
-                });
-            }
-        }
 
         function abrirEdicion(id) {
             const p = catalogoProductos[id];
@@ -861,7 +808,6 @@
 
         function renderizarCatalogo() {
             const cont = document.getElementById('items-catalogo');
-            cont.innerHTML = '';
             const busqueda = document.getElementById('buscador').value.toLowerCase().trim();
             const orden = document.getElementById('orden-catalogo').value;
             
@@ -870,6 +816,7 @@
             else keys.sort((a,b) => (catalogoProductos[b].consumos || 0) - (catalogoProductos[a].consumos || 0));
 
             let mostrados = 0;
+            let htmlContent = ''; // Creamos el texto primero
 
             keys.forEach(key => {
                 const prod = catalogoProductos[key];
@@ -899,7 +846,7 @@
                         actionBtn = `<button class="btn-add" onclick="updateQty('${key}', 1, event)">+</button>`;
                     }
 
-                    cont.innerHTML += `
+                    htmlContent += `
                         <div class="card">
                             <div class="card-info" onclick="abrirEdicion('${key}')" style="cursor:pointer;" title="Toca para editar">
                                 <div class="card-title">${nombreVisual}</div>
@@ -913,6 +860,9 @@
                     `;
                 }
             });
+            
+            // Lo pintamos en el DOM solo UNA vez al final
+            cont.innerHTML = htmlContent; 
         }
 
         function cambiarOrdenLista() {
@@ -933,7 +883,7 @@
             document.getElementById('fecha-lista').innerHTML = fCompra ? `📅 Compra real: <b>${fCompra}</b>` : `Borrador del: ${fCreada}`;
             
             const cont = document.getElementById('items-comprando');
-            cont.innerHTML = '';
+            let htmlContent = ''; // Creamos el texto primero
             
             const prods = datosListaActual.productos || {};
             let totalItems = 0;
@@ -943,7 +893,6 @@
             const keys = Object.keys(prods);
             const orden = datosListaActual.orden || 'seccion';
             
-            // Obtener filtro de secciones visibles (todas visibles por defecto)
             const seccionesVisibles = datosListaActual.seccionesVisibles || {};
             const hayFiltroActivo = Object.keys(seccionesVisibles).length > 0 && 
                                     Object.values(seccionesVisibles).some(v => v === false);
@@ -957,7 +906,6 @@
                     estructurado[seccion].push({ key: key, datos: prods[key], ordenComprado: prods[key].comprado ? 1 : 0 });
                 });
 
-                // Ordenar secciones según configuración del usuario
                 const ordenSecciones = seccionesPersonalizadas.map(s => s.id);
                 const seccionesOrdenadas = Object.keys(estructurado).sort((a, b) => {
                     const idxA = ordenSecciones.indexOf(a);
@@ -972,32 +920,28 @@
                 let seccionesOcultas = 0;
 
                 seccionesOrdenadas.forEach(secName => {
-                    // Verificar si esta sección está visible
                     const esVisible = seccionesVisibles[secName] !== false;
-                    
                     if (!esVisible) {
                         seccionesOcultas++;
-                        return; // Saltar sección oculta
+                        return; 
                     }
                     
                     seccionesMostradas++;
-                    cont.innerHTML += `<div class="section-group-title">${secName}</div>`;
+                    htmlContent += `<div class="section-group-title">${secName}</div>`;
                     estructurado[secName].sort((a, b) => a.ordenComprado - b.ordenComprado);
-                    renderizarItemsDeLista(estructurado[secName], cont);
+                    htmlContent += renderizarItemsDeLista(estructurado[secName]);
                 });
 
-                // Mostrar aviso si hay secciones ocultas
                 if (seccionesOcultas > 0 && hayFiltroActivo) {
-                    cont.innerHTML += `
+                    htmlContent += `
                         <div class="section-hidden-msg">
                             👁️ ${seccionesOcultas} sección(es) oculta(s). Toca "Filtrar" para mostrarlas.
                         </div>
                     `;
                 }
                 
-                // Si no hay secciones visibles con productos
                 if (seccionesMostradas === 0 && keys.length > 0) {
-                    cont.innerHTML += `
+                    htmlContent += `
                         <div style="text-align: center; padding: 30px 0; color: #999;">
                             <span style="font-size: 30px;">👁️</span>
                             <p>Todas las secciones están ocultas.</p>
@@ -1016,7 +960,7 @@
                     if (a.ordenComprado !== b.ordenComprado) return a.ordenComprado - b.ordenComprado;
                     return a.nombre.localeCompare(b.nombre);
                 });
-                renderizarItemsDeLista(items, cont);
+                htmlContent += renderizarItemsDeLista(items);
             } else {
                 let items = keys.map(key => ({
                     key: key,
@@ -1024,11 +968,15 @@
                     ordenComprado: prods[key].comprado ? 1 : 0
                 }));
                 items.sort((a, b) => a.ordenComprado - b.ordenComprado);
-                renderizarItemsDeLista(items, cont);
+                htmlContent += renderizarItemsDeLista(items);
             }
+            
+            // Lo pintamos en el DOM solo UNA vez al final
+            cont.innerHTML = htmlContent;
         }
 
-        function renderizarItemsDeLista(itemsArray, contenedor) {
+        function renderizarItemsDeLista(itemsArray) {
+            let htmlLocal = '';
             itemsArray.forEach(item => {
                 const key = item.key;
                 const p = item.datos;
@@ -1036,7 +984,7 @@
                 const nombreVisual = catProd.nombrePersonalizado || catProd.nombre || catProd.nombreOriginal || "Sincronizando...";
                 const qty = p.cantidad || 1;
 
-                contenedor.innerHTML += `
+                htmlLocal += `
                     <div class="card">
                         <div class="card-info" onclick="abrirEdicion('${key}')" style="cursor:pointer;" title="Editar">
                             <div class="card-title ${p.comprado ? 'crossed' : ''}">${nombreVisual}</div>
@@ -1054,6 +1002,7 @@
                     </div>
                 `;
             });
+            return htmlLocal;
         }
 
         function crearListaRapidaHabituales() {
@@ -1201,117 +1150,6 @@
             document.getElementById(`panel-${tab}`).classList.add('active');
         }
 
-        function cargarUltimoTicket(crearListaSiNoExiste) {
-            const promesa = (crearListaSiNoExiste && !idListaActual) ? crearNuevaLista() : Promise.resolve(idListaActual);
-            db.ref('mercadona/ultimo_ticket/productos').once('value', snap => {
-                const prodsUltimo = snap.val();
-                if(!prodsUltimo || prodsUltimo.length === 0) { alert("No hay productos recientes."); return; }
-                promesa.then(idDestino => {
-                    if (!idDestino) return;
-                    prodsUltimo.forEach(nombreProd => {
-                        const safeKey = limpiarKey(nombreProd);
-                        if (catalogoProductos[safeKey]) db.ref(`mercadona/listas/${idDestino}/productos/${safeKey}`).set({ comprado: false, cantidad: 1 });
-                    });
-                });
-            });
-        }
-
-        const dropZone = document.getElementById('drop-zone');
-        const statusEl = document.getElementById('ticket-status');
-
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
-        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); });
-        dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('dragover'); procesarArchivo(e.dataTransfer.files[0]); });
-
-        async function procesarArchivo(file) {
-            if (!file || !idListaActual) return;
-            const safeFileName = limpiarKey(file.name);
-
-            const snap = await db.ref(`mercadona/tickets_subidos/${safeFileName}`).once('value');
-            if (snap.exists()) {
-                document.getElementById('file-input').value = ""; 
-                statusEl.innerText = "";
-                alert(`❌ OPERACIÓN CANCELADA: El ticket "${file.name}" ya ha sido procesado anteriormente.\n\nPuedes borrar su registro desde "Gestionar tickets subidos" si quieres volver a leerlo.`);
-                return;
-            }
-
-            statusEl.style.color = "var(--m-orange)";
-            statusEl.innerText = "🔍 Analizando PDF y extrayendo productos...";
-
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-                let textoCompleto = "";
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    textoCompleto += textContent.items.map(item => item.str).join(' ') + " ";
-                }
-                
-                const extraidos = await extraerYGuardarProductos(textoCompleto);
-
-                if(extraidos && extraidos.length > 0) {
-                    await db.ref(`mercadona/listas/${idListaActual}/ticket_extraido`).set(extraidos);
-                }
-                await db.ref(`mercadona/tickets_subidos/${safeFileName}`).set({ subidoEl: new Date().toISOString() });
-
-                statusEl.style.color = "var(--m-green)";
-                statusEl.innerText = "✅ ¡Ticket analizado y datos guardados al instante!";
-
-            } catch (err) { 
-                console.warn("Fallo lectura texto PDF", err);
-                statusEl.style.color = "red";
-                statusEl.innerText = "❌ Error: No se pudo leer el contenido del PDF.";
-            }
-        }
-
-        async function extraerYGuardarProductos(texto) {
-            const textoLimpio = texto.replace(/\s+/g, ' ');
-            const fechaMatch = textoLimpio.match(/\b(\d{2})\/(\d{2})\/(\d{4})\b/);
-            let fechaTicketIso = "1970-01-01"; 
-            if (fechaMatch) fechaTicketIso = `${fechaMatch[3]}-${fechaMatch[2]}-${fechaMatch[1]}`; 
-
-            const regex = /(\d+)\s+([+A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ0-9\s+%.\-+]{2,})\s+(\d+[,.]\d{2})/g;
-            let match;
-            const extraidos = [];
-            const ignorar = ["MERCADONA", "TOTAL", "IMPORTE", "TARJETA", "FACTURA", "IVA", "BASE", "CUOTA"];
-
-            while ((match = regex.exec(textoLimpio)) !== null) {
-                let nombre = match[2].trim();
-                nombre = nombre.replace(/\s+\d+$/, '');
-
-                if (nombre.length > 3 && !ignorar.some(i => nombre.includes(i))) {
-                    extraidos.push(nombre.toLowerCase());
-                }
-            }
-
-            if (extraidos.length > 0) {
-                extraidos.forEach(limpio => {
-                    const safeKey = limpiarKey(limpio); 
-
-                    if (!catalogoProductos[safeKey]) {
-                        db.ref(`mercadona/catalogo/${safeKey}`).set({ 
-                            nombreOriginal: limpio, 
-                            nombrePersonalizado: limpio.charAt(0).toUpperCase() + limpio.slice(1), 
-                            seccion: "Sin Sección / Pasillo",
-                            consumos: 1 
-                        });
-                    } else {
-                        const consumosActuales = catalogoProductos[safeKey].consumos || 0;
-                        db.ref(`mercadona/catalogo/${safeKey}/consumos`).set(consumosActuales + 1);
-                    }
-                });
-
-                const snapUltimo = await db.ref('mercadona/ultimo_ticket').once('value');
-                const dataUltimo = snapUltimo.val();
-
-                if (!dataUltimo || !dataUltimo.fecha || fechaTicketIso >= dataUltimo.fecha) {
-                    await db.ref('mercadona/ultimo_ticket').set({ fecha: fechaTicketIso, productos: extraidos });
-                }
-            }
-            
-            return extraidos;
-        }
     </script>
 </body>
 </html>

@@ -73,6 +73,15 @@
         flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
     }
     .filter-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* LEYENDA / NOTA DE TURNO */
+    .turno-legend {
+      display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px; padding: 10px 16px; margin-bottom: 20px; font-size: 0.9rem;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-weight: 500; }
+
     .field { display: grid; gap: 8px; }
     
     .row-2-cols {
@@ -263,6 +272,13 @@
             <button id="btnExport" class="btn-ghost button">Exportar a Excel</button>
         </div>
 
+        <!-- NOTA EXPLICATIVA DE LOS CUADRADITOS DE TURNO -->
+        <div class="turno-legend">
+            <span><strong>Leyenda de Turnos:</strong></span>
+            <span class="legend-item">🟨 Día de trabajo</span>
+            <span class="legend-item">🟩 Día libre (Descanso)</span>
+        </div>
+
         <div class="table-container">
             <table id="juicios-table">
               <thead>
@@ -387,8 +403,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+  <script src="https://accounts.google.com/gsi/client"></script>
   <script>
-    // 1. CONFIGURACIÓN FIREBASE (COMPATIBLE CON STRICT RULES)
+    // 1. CONFIGURACIÓN FIREBASE
     const firebaseConfig = {
       apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
       authDomain: "markarma279.firebaseapp.com",
@@ -397,6 +414,7 @@
       messagingSenderId: "280620278315",
       appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
     };
+    const GOOGLE_CALENDAR_CLIENT_ID = "280620278315-imt26j0195hnn0ireeqk8k52g2bj1gu1.apps.googleusercontent.com";
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -428,20 +446,20 @@
     const messageOk = $("#messageOk");
     const messageCancel = $("#messageCancel");
     const dlgMsgClose = $("#dlgMsgClose");
+    let calendarAccessToken = null;
+    let calendarAccessTokenExpiresAt = 0;
 
     // ===============================================
     //  2. LÓGICA DE LOGIN Y MIGRACIÓN AUTOMÁTICA
     // ===============================================
     auth.onAuthStateChanged((user) => {
         if (user) {
-            // Generar ID seguro
             USER_ID = user.email.replace(/\./g, ',');
             console.log("Conectado como:", USER_ID);
             
             loadingScreen.textContent = "Sincronizando datos...";
             cargarDatosConMigracion(); 
         } else {
-            // Si no hay sesión, volver al index
             window.location.href = "index.html";
         }
     });
@@ -451,28 +469,18 @@
         
         userRef.once('value').then(snapshot => {
             if (snapshot.exists()) {
-                // DATOS EXISTENTES: CARGA NORMAL
                 loadingScreen.style.display = 'none';
                 appContainer.style.display = 'block';
                 startApp();
             } else {
-                // CUENTA NUEVA VACÍA: INTENTAR MIGRACIÓN
                 console.log("Cuenta vacía, buscando datos antiguos...");
-                
-                // Opción A: Buscar en 'usuario-demo' (si venía de demo)
-                // Opción B: Buscar en root 'juicios' (si venía de app antigua root)
-                
-                // Primero intentamos root, ya que el archivo antiguo escribía en root
                 db.ref('juicios').once('value').then(rootSnap => {
                     const rootData = rootSnap.val();
                     let dataToCopy = null;
 
-                    // Filtramos para no copiar carpetas de otros usuarios si existieran
                     if (rootData) {
-                        // Si las claves parecen IDs de firebase (-M...) y no emails, copiamos
                         const keys = Object.keys(rootData);
                         const isLegacyData = keys.some(k => k.startsWith('-'));
-                        
                         if (isLegacyData) {
                              dataToCopy = {};
                              keys.forEach(k => {
@@ -489,7 +497,6 @@
                             startApp();
                         });
                     } else {
-                        // Si no hay nada en root, intentamos 'usuario-demo' por si acaso
                         db.ref('juicios/usuario-demo').once('value').then(demoSnap => {
                             if (demoSnap.exists()) {
                                 userRef.set(demoSnap.val()).then(() => {
@@ -498,7 +505,6 @@
                                     startApp();
                                 });
                             } else {
-                                // Nada encontrado, iniciar limpio
                                 loadingScreen.style.display = 'none';
                                 appContainer.style.display = 'block';
                                 startApp();
@@ -515,7 +521,7 @@
     }
 
     // ===============================================
-    //  3. FUNCIONES DE LA APP
+    //  3. FUNCIONES DE LA APP Y TURNO LABORAL
     // ===============================================
     
     function showMessage(title, text, isConfirm = false) {
@@ -539,6 +545,147 @@
         };
       });
     }
+
+    function requestCalendarAccessToken() {
+      if (calendarAccessToken && Date.now() < calendarAccessTokenExpiresAt) {
+        return Promise.resolve(calendarAccessToken);
+      }
+
+      if (!window.google || !google.accounts || !google.accounts.oauth2) {
+        return Promise.reject(new Error("No se pudo cargar el servicio de autorización de Google."));
+      }
+
+      return new Promise((resolve, reject) => {
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: GOOGLE_CALENDAR_CLIENT_ID,
+          scope: "https://www.googleapis.com/auth/calendar.events",
+          callback: (response) => {
+            if (response.error || !response.access_token) {
+              reject(new Error(response.error_description || response.error || "Google no concedió acceso al calendario."));
+              return;
+            }
+
+            calendarAccessToken = response.access_token;
+            calendarAccessTokenExpiresAt = Date.now() + (Number(response.expires_in || 3600) - 60) * 1000;
+            resolve(calendarAccessToken);
+          },
+          error_callback: (error) => {
+            reject(new Error(error.message || "No se pudo autorizar el acceso a Google Calendar."));
+          }
+        });
+
+        tokenClient.requestAccessToken();
+      });
+    }
+
+    function localDateTimeForCalendar(date) {
+      const pad = value => String(value).padStart(2, "0");
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
+    }
+
+    // Función para calcular si una fecha es semana de trabajo o descanso (7 y 7)
+    function calcularTurnoLaboral(fechaObj) {
+      const year = fechaObj.getFullYear();
+      
+      const d = new Date(Date.UTC(fechaObj.getFullYear(), fechaObj.getMonth(), fechaObj.getDate()));
+      const dayNum = d.getUTCDay() || 7;
+      d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+      const semanaNum = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+
+      let esTrabajo = false;
+      if (year === 2026) {
+        esTrabajo = (semanaNum % 2 === 0);
+        if (fechaObj >= new Date(2026, 11, 28)) {
+          esTrabajo = true;
+        }
+      } else if (year === 2027) {
+        esTrabajo = (semanaNum % 2 !== 0);
+      } else {
+        esTrabajo = (semanaNum % 2 === 0);
+      }
+
+      return {
+        esTrabajo: esTrabajo,
+        iconoApp: esTrabajo ? '🟨' : '🟩', 
+        etiquetaCalendar: esTrabajo ? '🟨 [TRABAJO]' : '🟩 [DESCANSO]'
+      };
+    }
+
+    // Función para normalizar el nombre del juzgado al comparar duplicados
+    function limpiarJuzgado(texto) {
+      if (!texto) return '';
+      return texto
+        .replace(/^[🟨🟩\s]+/, '') 
+        .replace(/^\[(TRABAJO|DESCANSO)\]\s*-?\s*/i, '') 
+        .replace(/^juicio\s*(en)?\s*/i, '') 
+        .trim()
+        .toLowerCase();
+    }
+
+    async function saveCalendarEvent(juicio, eventId, accessToken) {
+      const [year, month, day] = juicio.fecha.split("-").map(Number);
+      const [hours, minutes] = juicio.hora.split(":").map(Number);
+      const start = new Date(year, month - 1, day, hours, minutes);
+      const end = new Date(start.getTime() + 60 * 60 * 1000);
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      
+      if (Number.isNaN(start.getTime()) || !timeZone) {
+        throw new Error("No se pudo interpretar la fecha, la hora o la zona horaria del juicio.");
+      }
+
+      const turnoInfo = calcularTurnoLaboral(start);
+      const juzgadoLimpio = juicio.juzgado.replace(/^[🟨🟩\s]+/, '').trim().toUpperCase();
+
+      // 1. Preparar las líneas de la descripción con comprobación de URLs vacías
+      let descLines = [];
+      if (juicio.citacionUrl && juicio.citacionUrl.trim() !== "") {
+        descLines.push(`<a href="${juicio.citacionUrl.trim()}" target="_blank">Ver citación</a>`);
+      }
+      if (juicio.diligenciasUrl && juicio.diligenciasUrl.trim() !== "") {
+        descLines.push(`<a href="${juicio.diligenciasUrl.trim()}" target="_blank">Ver diligencias</a>`);
+      }
+
+      // 2. Definir el objeto 'event' correctamente antes de enviarlo
+      const tipoJuicio = juicio.esPerito ? `Juicio (Perito) en ${juzgadoLimpio}` : `Juicio en ${juzgadoLimpio}`;
+      const eventData = {
+        summary: `${turnoInfo.etiquetaCalendar} - ${tipoJuicio}`,
+        start: { dateTime: localDateTimeForCalendar(start), timeZone },
+        end: { dateTime: localDateTimeForCalendar(end), timeZone }
+      };
+
+      if (descLines.length > 0) {
+        eventData.description = descLines.join('<br>');
+      } else {
+        eventData.description = ""; // Limpia la descripción si no hay enlaces
+      }
+
+      if (juicio.esPerito) {
+        eventData.colorId = '7';
+      }
+
+      const url = eventId
+        ? `https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(eventId)}`
+        : "https://www.googleapis.com/calendar/v3/calendars/primary/events";
+      
+      const response = await fetch(url, {
+        method: eventId ? "PATCH" : "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(eventData)
+      });
+
+      if (!response.ok) {
+        const details = await response.text();
+        throw new Error(`Google Calendar respondió ${response.status}${details ? `: ${details}` : ""}`);
+      }
+
+      const savedEvent = await response.json();
+      return savedEvent.id;
+    }
+  
     
     function renderJuicios(juicios) {
       juiciosBody.innerHTML = '';
@@ -594,13 +741,17 @@
 
     function populateJuzgadoDatalist(juicios) {
         const uniqueJuzgados = new Set();
-        juicios.forEach(j => { if (j.juzgado) uniqueJuzgados.add(j.juzgado); });
+        juicios.forEach(j => { 
+          if (j.juzgado) {
+            const juzgadoLimpio = j.juzgado.replace(/^[🟨🟩\s]+/, '').trim();
+            if (juzgadoLimpio) uniqueJuzgados.add(juzgadoLimpio);
+          }
+        });
         const list = $("#juzgado-list"); list.innerHTML = '';
         uniqueJuzgados.forEach(j => { const op = document.createElement('option'); op.value = j; list.appendChild(op); });
     }
 
     function fetchJuicios() {
-      // USAMOS LA RUTA PERSONALIZADA DEL USUARIO
       db.ref('juicios/' + USER_ID).on('value', (snapshot) => {
         const data = snapshot.val();
         const juicios = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
@@ -636,8 +787,12 @@
           modalTitle.textContent = 'Editar Juicio';
           juicioIdInput.value = id;
           $('#fecha').value = j.fecha; $('#hora').value = j.hora;
-          $('#juzgado').value = j.juzgado; $('#fechaEntrega').value = j.fechaEntrega;
-          $('#mesCobro').value = j.mesCobro; $('#estado').value = j.estado || 'pendiente';
+          
+          const juzgadoLimpio = j.juzgado ? j.juzgado.replace(/^[🟨🟩\s]+/, '').trim() : '';
+          $('#juzgado').value = juzgadoLimpio; 
+          
+          $('#fechaEntrega').value = j.fechaEntrega || '';
+          $('#mesCobro').value = j.mesCobro || ''; $('#estado').value = j.estado || 'pendiente';
           citacionUrlInput.value = j.citacionUrl || ''; diligenciasUrlInput.value = j.diligenciasUrl || '';
           esPeritoCheckbox.checked = j.esPerito === true;
           dlgNuevo.classList.add('open');
@@ -647,7 +802,22 @@
     
     window.deleteJuicio = async (id) => {
         if (await showMessage('Confirmar', '¿Borrar este juicio?', true)) {
-            db.ref('juicios/' + USER_ID + '/' + id).remove();
+            try {
+                const snapshot = await db.ref('juicios/' + USER_ID + '/' + id).once('value');
+                const juicio = snapshot.val();
+
+                if (juicio && juicio.calendarEventId) {
+                    const accessToken = await requestCalendarAccessToken();
+                    await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(juicio.calendarEventId)}`, {
+                        method: 'DELETE',
+                        headers: { Authorization: `Bearer ${accessToken}` }
+                    });
+                }
+                await db.ref('juicios/' + USER_ID + '/' + id).remove();
+            } catch (error) {
+                console.error("No se pudo borrar el evento de Google Calendar:", error);
+                await db.ref('juicios/' + USER_ID + '/' + id).remove();
+            }
         }
     };
     
@@ -658,25 +828,103 @@
     $("#dlgClose").onclick = () => dlgNuevo.classList.remove("open");
     dlgNuevo.onclick = (e) => { if (e.target.id === 'dlgNuevo') dlgNuevo.classList.remove("open"); };
 
+    // --- FORMULARIO DE GUARDADO BLINDADO CONTRA DUPLICADOS Y PÉRDIDA DE URLS ---
     formNuevo.onsubmit = async e => {
       e.preventDefault();
       const fd = new FormData(formNuevo);
       const j = Object.fromEntries(fd.entries());
       j.esPerito = esPeritoCheckbox.checked;
-      if (!j.citacionUrl) delete j.citacionUrl;
-      if (!j.diligenciasUrl) delete j.diligenciasUrl;
+      
+      // Guardar como texto vacío si el campo se borra, para que Firebase sepa que hay que quitarlo
+      j.citacionUrl = j.citacionUrl ? j.citacionUrl.trim() : "";
+      j.diligenciasUrl = j.diligenciasUrl ? j.diligenciasUrl.trim() : "";
       
       const id = juicioIdInput.value;
-      if (id) await db.ref('juicios/' + USER_ID + '/' + id).update(j);
-      else await db.ref('juicios/' + USER_ID).push().set(j);
-      dlgNuevo.classList.remove('open');
+      const submitButton = formNuevo.querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+
+      try {
+        // 1. Calcular el turno y formatear el juzgado con su cuadradito (🟨 o 🟩)
+        const [y, m, d] = j.fecha.split("-").map(Number);
+        const fechaObj = new Date(y, m - 1, d);
+        const turnoInfo = calcularTurnoLaboral(fechaObj);
+        const juzgadoNombreLimpio = j.juzgado.replace(/^[🟨🟩\s]+/, '').trim();
+        j.juzgado = `${turnoInfo.iconoApp} ${juzgadoNombreLimpio}`;
+
+        const accessToken = await requestCalendarAccessToken();
+        let recordRef;
+        let existingCalendarEventId = null;
+
+        // 2. Comprobar rigurosamente duplicados (Misma fecha + misma hora + mismo juzgado limpio)
+        const snapshotExistentes = await db.ref('juicios/' + USER_ID).once('value');
+        const juiciosExistentes = snapshotExistentes.val() || {};
+        let idCoincidente = null;
+
+        for (const [key, item] of Object.entries(juiciosExistentes)) {
+          // Si estamos editando el mismo ID, lo ignoramos como duplicado
+          if (id && key === id) continue;
+
+          const mismaFecha = item.fecha === j.fecha;
+          const mismaHora = item.hora === j.hora;
+          const mismoJuzgado = limpiarJuzgado(item.juzgado) === limpiarJuzgado(j.juzgado);
+
+          if (mismaFecha && mismaHora && mismoJuzgado) {
+            idCoincidente = key;
+            existingCalendarEventId = item.calendarEventId || null;
+            break;
+          }
+        }
+
+        if (id) {
+          // Si estábamos editando un juicio específico
+          recordRef = db.ref('juicios/' + USER_ID + '/' + id);
+          const snapshot = await recordRef.once('value');
+          const existingJuicio = snapshot.val();
+          if (existingJuicio) {
+            existingCalendarEventId = existingJuicio.calendarEventId || existingCalendarEventId;
+          }
+          await recordRef.update(j);
+        } else if (idCoincidente) {
+          // Si se detecta duplicado al crear uno nuevo, SOBRESCRIBIMOS el existente para evitar duplicidad
+          recordRef = db.ref('juicios/' + USER_ID + '/' + idCoincidente);
+          await recordRef.update(j);
+          juicioIdInput.value = idCoincidente;
+        } else {
+          // Crear nuevo registro limpio
+          recordRef = db.ref('juicios/' + USER_ID).push();
+          await recordRef.set(j);
+          juicioIdInput.value = recordRef.key;
+        }
+
+        // 3. Sincronizar con Google Calendar pasándole el eventId correcto y las URLs
+        try {
+          const calendarEventId = await saveCalendarEvent(j, existingCalendarEventId, accessToken);
+          await recordRef.update({ calendarEventId });
+          dlgNuevo.classList.remove('open');
+        } catch (error) {
+          await showMessage(
+            "Cita no sincronizada",
+            `El juicio se guardó en la app, pero no se pudo actualizar Google Calendar. ${error.message}`
+          );
+        }
+      } catch (error) {
+        await showMessage(
+          "Error al guardar",
+          `No se pudo guardar el juicio. ${error.message}`
+        );
+      } finally {
+        submitButton.disabled = false;
+        fetchJuicios();
+      }
     };
     
     $("#show-all").onclick = () => { currentFilter='all'; $$('.filter-buttons button').forEach(b=>b.classList.remove('active')); $("#show-all").classList.add('active'); fetchJuicios(); };
     $("#show-pending").onclick = () => { currentFilter='pending'; $$('.filter-buttons button').forEach(b=>b.classList.remove('active')); $("#show-pending").classList.add('active'); fetchJuicios(); };
     $("#show-peritos").onclick = () => { currentFilter='perito'; $$('.filter-buttons button').forEach(b=>b.classList.remove('active')); $("#show-peritos").classList.add('active'); fetchJuicios(); };
+    
+
     $("#btnExport").onclick = window.exportToExcel;
 
   </script>
 </body>
-</html>
+</html>  

@@ -120,12 +120,49 @@
     }
     .btn-primary { background: var(--accent-gradient); color: #fff; }
     .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(118, 75, 162, 0.5); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
     
     .btn-ghost { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); }
     .btn-ghost:hover { background: rgba(255, 255, 255, 0.1); }
     .btn-ghost.active { background: rgba(255, 255, 255, 0.15); border-color: var(--accent-blue); }
     .btn-danger { background-color: var(--accent-red); color: #fff; }
     
+    /* ESTILOS DE SELECTOR DE ARCHIVO */
+    .file-picker-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .file-name-display {
+        flex: 1;
+        font-size: 0.85rem;
+        color: #ccc;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .file-name-display.has-file {
+        color: #4ade80;
+        font-weight: 600;
+    }
+    .btn-clear-file {
+        background: rgba(220, 53, 69, 0.2);
+        color: #ff6b6b;
+        border: 1px solid rgba(220, 53, 69, 0.4);
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+    }
+    .btn-clear-file:hover {
+        background: var(--accent-red);
+        color: white;
+    }
+
     /* ESTILOS DE TABLA BASE (ESCRITORIO) */
     .table-container { width: 100%; overflow-x: auto; margin-top: 1.5rem; }
     table { width: 100%; border-collapse: collapse; min-width: 1000px; }
@@ -191,7 +228,6 @@
       transform: scale(0.95); transition: transform 0.3s ease-out;
       max-height: 90vh; overflow-y: auto;
     }
-    .modal-overlay.open .modal { transform: scale(1); }
     .modal-header {
       display: flex; justify-content: space-between; align-items: center;
       padding: 1rem 1.5rem; background: rgba(255, 255, 255, 0.05);
@@ -205,8 +241,8 @@
       padding: 1rem 1.5rem; background: rgba(255, 255, 255, 0.05);
       border-top: 1px solid rgba(255, 255, 255, 0.1); border-radius: 0 0 12px 12px;
     }
-    .form-actions-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 20px; }
-    .file-inputs { flex: 1; min-width: 0; }
+    .form-actions-top { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 10px; gap: 20px; }
+    .file-inputs { flex: 1; min-width: 0; display: grid; gap: 12px; }
     
     /* Loading */
     #loading-screen { position: fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-dark); z-index:9999; display:flex; justify-content:center; align-items:center; color:white; font-size:1.2rem; }
@@ -215,8 +251,8 @@
     /* RESPONSIVE */
     @media (max-width: 768px) {
       .wrap { max-width: 100%; margin: 10px auto; padding: 0 15px; }
-      .form-actions-top { flex-direction: column; }
-      .form-actions-top .btn-primary { margin-left: 0; margin-top: 10px; align-self: flex-end; }
+      .form-actions-top { flex-direction: column; align-items: stretch; }
+      .form-actions-top .btn-primary { margin-left: 0; margin-top: 10px; width: 100%; }
       .actions { flex-direction: column; align-items: stretch; }
       .filter-buttons { width: 100%; justify-content: center; }
       .row-2-cols { grid-template-columns: 1fr; }
@@ -369,16 +405,30 @@
             </div>
             <div class="form-actions-top">
                 <div class="file-inputs">
+                    <!-- SELECTOR DE ARCHIVO PARA CITACIÓN -->
                     <div class="field">
-                        <label for="citacionUrl">Citación (URL)</label>
-                        <input id="citacionUrl" name="citacionUrl" type="text" placeholder="Pega aquí la URL de Google Drive" tabindex="8" />
+                        <label>Citación (PDF, JPG, PNG...)</label>
+                        <div class="file-picker-row">
+                            <input type="file" id="fileCitacion" style="display: none;" accept=".pdf,image/*,.doc,.docx" />
+                            <button type="button" class="btn-ghost button" onclick="$('#fileCitacion').click()" tabindex="8">Seleccionar archivo</button>
+                            <span id="labelCitacion" class="file-name-display">Ningún archivo seleccionado</span>
+                            <button type="button" id="btnClearCitacion" class="btn-clear-file hidden" title="Quitar archivo">✕</button>
+                        </div>
+                        <input type="hidden" id="citacionUrl" name="citacionUrl" />
                     </div>
+                    <!-- SELECTOR DE ARCHIVO PARA DILIGENCIAS -->
                     <div class="field">
-                        <label for="diligenciasUrl">Diligencias (URL)</label>
-                        <input id="diligenciasUrl" name="diligenciasUrl" type="text" placeholder="Pega aquí la URL de Google Drive" tabindex="9" />
+                        <label>Diligencias (PDF, JPG, PNG...)</label>
+                        <div class="file-picker-row">
+                            <input type="file" id="fileDiligencias" style="display: none;" accept=".pdf,image/*,.doc,.docx" />
+                            <button type="button" class="btn-ghost button" onclick="$('#fileDiligencias').click()" tabindex="9">Seleccionar archivo</button>
+                            <span id="labelDiligencias" class="file-name-display">Ningún archivo seleccionado</span>
+                            <button type="button" id="btnClearDiligencias" class="btn-clear-file hidden" title="Quitar archivo">✕</button>
+                        </div>
+                        <input type="hidden" id="diligenciasUrl" name="diligenciasUrl" />
                     </div>
                 </div>
-                <button type="submit" class="btn-primary button" tabindex="10">Guardar</button>
+                <button type="submit" id="btnGuardarJuicio" class="btn-primary button" tabindex="10">Guardar</button>
             </div>
           </div>
         </div>
@@ -405,7 +455,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
   <script src="https://accounts.google.com/gsi/client"></script>
   <script>
-    // 1. CONFIGURACIÓN FIREBASE
+    // 1. CONFIGURACIÓN FIREBASE Y GOOGLE APPS SCRIPT
     const firebaseConfig = {
       apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
       authDomain: "markarma279.firebaseapp.com",
@@ -415,6 +465,7 @@
       appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
     };
     const GOOGLE_CALENDAR_CLIENT_ID = "280620278315-imt26j0195hnn0ireeqk8k52g2bj1gu1.apps.googleusercontent.com";
+    const GAS_DRIVE_UPLOAD_URL = "https://script.google.com/macros/s/AKfycbzFWYGjxc_uENqnHsnVVaAcTcAdIeXDtMn8mNXd4NV4PS04KlEArRJ4LW-u2m-h9xSv/exec";
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
@@ -438,6 +489,10 @@
     const diligenciasUrlInput = $("#diligenciasUrl");
     const esPeritoCheckbox = $("#esPerito");
     
+    // Variables para ficheros locales seleccionados
+    let selectedCitacionFile = null;
+    let selectedDiligenciasFile = null;
+    
     let currentFilter = 'all';
 
     const dlgMessage = $("#dlgMessage");
@@ -448,6 +503,102 @@
     const dlgMsgClose = $("#dlgMsgClose");
     let calendarAccessToken = null;
     let calendarAccessTokenExpiresAt = 0;
+
+    // ===============================================
+    //  GESTIÓN DE SELECTORES DE ARCHIVO LOCALES
+    // ===============================================
+    $("#fileCitacion").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        selectedCitacionFile = file;
+        $("#labelCitacion").textContent = file.name;
+        $("#labelCitacion").classList.add("has-file");
+        $("#btnClearCitacion").classList.remove("hidden");
+      }
+    });
+
+    $("#btnClearCitacion").addEventListener("click", function() {
+      selectedCitacionFile = null;
+      $("#fileCitacion").value = "";
+      citacionUrlInput.value = "";
+      $("#labelCitacion").textContent = "Ningún archivo seleccionado";
+      $("#labelCitacion").classList.remove("has-file");
+      this.classList.add("hidden");
+    });
+
+    $("#fileDiligencias").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        selectedDiligenciasFile = file;
+        $("#labelDiligencias").textContent = file.name;
+        $("#labelDiligencias").classList.add("has-file");
+        $("#btnClearDiligencias").classList.remove("hidden");
+      }
+    });
+
+    $("#btnClearDiligencias").addEventListener("click", function() {
+      selectedDiligenciasFile = null;
+      $("#fileDiligencias").value = "";
+      diligenciasUrlInput.value = "";
+      $("#labelDiligencias").textContent = "Ningún archivo seleccionado";
+      $("#labelDiligencias").classList.remove("has-file");
+      this.classList.add("hidden");
+    });
+
+    function resetFileSelectors() {
+      selectedCitacionFile = null;
+      selectedDiligenciasFile = null;
+      $("#fileCitacion").value = "";
+      $("#fileDiligencias").value = "";
+      $("#labelCitacion").textContent = "Ningún archivo seleccionado";
+      $("#labelCitacion").classList.remove("has-file");
+      $("#btnClearCitacion").classList.add("hidden");
+      $("#labelDiligencias").textContent = "Ningún archivo seleccionado";
+      $("#labelDiligencias").classList.remove("has-file");
+      $("#btnClearDiligencias").classList.add("hidden");
+    }
+
+    function fileToBase64(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function uploadFileToDriveGAS(file, fechaJuicio, juzgadoNombre, tipoDoc) {
+      const base64Data = await fileToBase64(file);
+      const juzgadoLimpio = juzgadoNombre.replace(/^[🟨🟩\s]+/, '').replace(/[\/\\?%*:|"<>]/g, '').trim();
+      const extMatch = file.name.match(/\.([^.]+)$/);
+      const extension = extMatch ? extMatch[1] : 'pdf';
+      
+      const formattedFileName = `${fechaJuicio} - ${juzgadoLimpio} - ${tipoDoc}.${extension}`;
+
+      const response = await fetch(GAS_DRIVE_UPLOAD_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8'
+        },
+        body: JSON.stringify({
+          fileName: formattedFileName,
+          mimeType: file.type || 'application/octet-stream',
+          base64: base64Data
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP ${response.status} al conectar con Google Drive.`);
+      }
+
+      const result = await response.json();
+      if (result.estado === 'exito' && result.documentUrl) {
+        return result.documentUrl;
+      } else {
+        throw new Error(result.mensaje || "Error desconocido al guardar en Drive.");
+      }
+    }
 
     // ===============================================
     //  2. LÓGICA DE LOGIN Y MIGRACIÓN AUTOMÁTICA
@@ -583,7 +734,6 @@
       return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
     }
 
-    // Función para calcular si una fecha es semana de trabajo o descanso (7 y 7)
     function calcularTurnoLaboral(fechaObj) {
       const year = fechaObj.getFullYear();
       
@@ -612,7 +762,6 @@
       };
     }
 
-    // Función para normalizar el nombre del juzgado al comparar duplicados
     function limpiarJuzgado(texto) {
       if (!texto) return '';
       return texto
@@ -637,7 +786,6 @@
       const turnoInfo = calcularTurnoLaboral(start);
       const juzgadoLimpio = juicio.juzgado.replace(/^[🟨🟩\s]+/, '').trim().toUpperCase();
 
-      // 1. Preparar las líneas de la descripción con comprobación de URLs vacías
       let descLines = [];
       if (juicio.citacionUrl && juicio.citacionUrl.trim() !== "") {
         descLines.push(`<a href="${juicio.citacionUrl.trim()}" target="_blank">Ver citación</a>`);
@@ -646,7 +794,6 @@
         descLines.push(`<a href="${juicio.diligenciasUrl.trim()}" target="_blank">Ver diligencias</a>`);
       }
 
-      // 2. Definir el objeto 'event' correctamente antes de enviarlo
       const tipoJuicio = juicio.esPerito ? `Juicio (Perito) en ${juzgadoLimpio}` : `Juicio en ${juzgadoLimpio}`;
       const eventData = {
         summary: `${turnoInfo.etiquetaCalendar} - ${tipoJuicio}`,
@@ -657,7 +804,7 @@
       if (descLines.length > 0) {
         eventData.description = descLines.join('<br>');
       } else {
-        eventData.description = ""; // Limpia la descripción si no hay enlaces
+        eventData.description = "";
       }
 
       if (juicio.esPerito) {
@@ -686,7 +833,6 @@
       return savedEvent.id;
     }
   
-    
     function renderJuicios(juicios) {
       juiciosBody.innerHTML = '';
       const filteredJuicios = juicios.filter(j => {
@@ -784,6 +930,7 @@
       db.ref('juicios/' + USER_ID + '/' + id).once('value', (s) => {
         const j = s.val();
         if (j) {
+          resetFileSelectors();
           modalTitle.textContent = 'Editar Juicio';
           juicioIdInput.value = id;
           $('#fecha').value = j.fecha; $('#hora').value = j.hora;
@@ -793,75 +940,149 @@
           
           $('#fechaEntrega').value = j.fechaEntrega || '';
           $('#mesCobro').value = j.mesCobro || ''; $('#estado').value = j.estado || 'pendiente';
-          citacionUrlInput.value = j.citacionUrl || ''; diligenciasUrlInput.value = j.diligenciasUrl || '';
           esPeritoCheckbox.checked = j.esPerito === true;
+
+          citacionUrlInput.value = j.citacionUrl || '';
+          if (j.citacionUrl) {
+            $("#labelCitacion").textContent = "Documento guardado en Drive ✓";
+            $("#labelCitacion").classList.add("has-file");
+            $("#btnClearCitacion").classList.remove("hidden");
+          }
+
+          diligenciasUrlInput.value = j.diligenciasUrl || '';
+          if (j.diligenciasUrl) {
+            $("#labelDiligencias").textContent = "Documento guardado en Drive ✓";
+            $("#labelDiligencias").classList.add("has-file");
+            $("#btnClearDiligencias").classList.remove("hidden");
+          }
+
           dlgNuevo.classList.add('open');
         }
       });
     };
     
+    // BORRADO CON SINCRONIZACIÓN EN GOOGLE DRIVE
     window.deleteJuicio = async (id) => {
-        if (await showMessage('Confirmar', '¿Borrar este juicio?', true)) {
-            try {
-                const snapshot = await db.ref('juicios/' + USER_ID + '/' + id).once('value');
-                const juicio = snapshot.val();
+    if (await showMessage('Confirmar', '¿Borrar este juicio?', true)) {
+        try {
+            const snapshot = await db.ref('juicios/' + USER_ID + '/' + id).once('value');
+            const juicio = snapshot.val();
 
-                if (juicio && juicio.calendarEventId) {
-                    const accessToken = await requestCalendarAccessToken();
-                    await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(juicio.calendarEventId)}`, {
-                        method: 'DELETE',
-                        headers: { Authorization: `Bearer ${accessToken}` }
+            if (juicio) {
+                // 1. Borrar archivos de Google Drive (verificando respuesta)
+                try {
+                    const response = await fetch(GAS_DRIVE_UPLOAD_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({
+                            action: "delete",
+                            fecha: juicio.fecha,
+                            juzgado: juicio.juzgado
+                        })
                     });
+                    const result = await response.json();
+                    if (result.estado !== 'exito') {
+                        await showMessage(
+                            "Aviso",
+                            `El juicio se ha borrado, pero Google Drive devolvió un error al intentar borrar los archivos: ${result.mensaje || 'desconocido'}`
+                        );
+                    }
+                } catch (driveError) {
+                    console.error("No se pudieron borrar los archivos de Drive:", driveError);
+                    await showMessage(
+                        "Aviso",
+                        `El juicio se ha borrado, pero no se pudo contactar con Google Drive para borrar los archivos: ${driveError.message}`
+                    );
                 }
-                await db.ref('juicios/' + USER_ID + '/' + id).remove();
-            } catch (error) {
-                console.error("No se pudo borrar el evento de Google Calendar:", error);
-                await db.ref('juicios/' + USER_ID + '/' + id).remove();
+
+                // 2. Borrar de Google Calendar
+                if (juicio.calendarEventId) {
+                    try {
+                        const accessToken = await requestCalendarAccessToken();
+                        await fetch(`https://www.googleapis.com/calendar/v3/calendars/primary/events/${encodeURIComponent(juicio.calendarEventId)}`, {
+                            method: 'DELETE',
+                            headers: { Authorization: `Bearer ${accessToken}` }
+                        });
+                    } catch (error) {
+                        console.error("No se pudo borrar el evento de Google Calendar:", error);
+                    }
+                }
             }
+
+            // 3. Borrar de Firebase (siempre, aunque Drive falle)
+            await db.ref('juicios/' + USER_ID + '/' + id).remove();
+        } catch (error) {
+            console.error("Error general al borrar:", error);
+            await db.ref('juicios/' + USER_ID + '/' + id).remove();
         }
-    };
+    }
+};
     
     $("#btnNuevo").onclick = () => {
-      formNuevo.reset(); juicioIdInput.value = ''; esPeritoCheckbox.checked = false;
-      modalTitle.textContent = 'Añadir Nuevo Juicio'; dlgNuevo.classList.add("open");
+      formNuevo.reset();
+      resetFileSelectors();
+      juicioIdInput.value = '';
+      citacionUrlInput.value = '';
+      diligenciasUrlInput.value = '';
+      esPeritoCheckbox.checked = false;
+      modalTitle.textContent = 'Añadir Nuevo Juicio';
+      dlgNuevo.classList.add("open");
     };
     $("#dlgClose").onclick = () => dlgNuevo.classList.remove("open");
     dlgNuevo.onclick = (e) => { if (e.target.id === 'dlgNuevo') dlgNuevo.classList.remove("open"); };
 
-    // --- FORMULARIO DE GUARDADO BLINDADO CONTRA DUPLICADOS Y PÉRDIDA DE URLS ---
     formNuevo.onsubmit = async e => {
       e.preventDefault();
+      
+      const submitButton = $("#btnGuardarJuicio");
+      const originalBtnText = submitButton.textContent;
+      submitButton.disabled = true;
+
+      // 1. SOLICITAR TOKEN DE CALENDARIO PRIMERO (Evita bloqueo de ventana emergente)
+      let accessToken = null;
+      try {
+        accessToken = await requestCalendarAccessToken();
+      } catch (error) {
+        console.warn("Permiso de Calendar denegado o fallido:", error);
+        // Continuamos con el guardado aunque falle el calendario
+      }
+
       const fd = new FormData(formNuevo);
       const j = Object.fromEntries(fd.entries());
       j.esPerito = esPeritoCheckbox.checked;
       
-      // Guardar como texto vacío si el campo se borra, para que Firebase sepa que hay que quitarlo
-      j.citacionUrl = j.citacionUrl ? j.citacionUrl.trim() : "";
-      j.diligenciasUrl = j.diligenciasUrl ? j.diligenciasUrl.trim() : "";
+      j.citacionUrl = citacionUrlInput.value ? citacionUrlInput.value.trim() : "";
+      j.diligenciasUrl = diligenciasUrlInput.value ? diligenciasUrlInput.value.trim() : "";
       
       const id = juicioIdInput.value;
-      const submitButton = formNuevo.querySelector('button[type="submit"]');
-      submitButton.disabled = true;
 
       try {
-        // 1. Calcular el turno y formatear el juzgado con su cuadradito (🟨 o 🟩)
+        if (selectedCitacionFile) {
+          submitButton.textContent = "Subiendo citación...";
+          j.citacionUrl = await uploadFileToDriveGAS(selectedCitacionFile, j.fecha, j.juzgado, "citacion");
+        }
+
+        if (selectedDiligenciasFile) {
+          submitButton.textContent = "Subiendo diligencias...";
+          j.diligenciasUrl = await uploadFileToDriveGAS(selectedDiligenciasFile, j.fecha, j.juzgado, "diligencias");
+        }
+
+        submitButton.textContent = "Guardando juicio...";
+
         const [y, m, d] = j.fecha.split("-").map(Number);
         const fechaObj = new Date(y, m - 1, d);
         const turnoInfo = calcularTurnoLaboral(fechaObj);
         const juzgadoNombreLimpio = j.juzgado.replace(/^[🟨🟩\s]+/, '').trim();
         j.juzgado = `${turnoInfo.iconoApp} ${juzgadoNombreLimpio}`;
 
-        const accessToken = await requestCalendarAccessToken();
         let recordRef;
         let existingCalendarEventId = null;
 
-        // 2. Comprobar rigurosamente duplicados (Misma fecha + misma hora + mismo juzgado limpio)
         const snapshotExistentes = await db.ref('juicios/' + USER_ID).once('value');
         const juiciosExistentes = snapshotExistentes.val() || {};
         let idCoincidente = null;
 
         for (const [key, item] of Object.entries(juiciosExistentes)) {
-          // Si estamos editando el mismo ID, lo ignoramos como duplicado
           if (id && key === id) continue;
 
           const mismaFecha = item.fecha === j.fecha;
@@ -876,7 +1097,6 @@
         }
 
         if (id) {
-          // Si estábamos editando un juicio específico
           recordRef = db.ref('juicios/' + USER_ID + '/' + id);
           const snapshot = await recordRef.once('value');
           const existingJuicio = snapshot.val();
@@ -885,35 +1105,40 @@
           }
           await recordRef.update(j);
         } else if (idCoincidente) {
-          // Si se detecta duplicado al crear uno nuevo, SOBRESCRIBIMOS el existente para evitar duplicidad
           recordRef = db.ref('juicios/' + USER_ID + '/' + idCoincidente);
           await recordRef.update(j);
           juicioIdInput.value = idCoincidente;
         } else {
-          // Crear nuevo registro limpio
           recordRef = db.ref('juicios/' + USER_ID).push();
           await recordRef.set(j);
           juicioIdInput.value = recordRef.key;
         }
 
-        // 3. Sincronizar con Google Calendar pasándole el eventId correcto y las URLs
-        try {
-          const calendarEventId = await saveCalendarEvent(j, existingCalendarEventId, accessToken);
-          await recordRef.update({ calendarEventId });
-          dlgNuevo.classList.remove('open');
-        } catch (error) {
-          await showMessage(
-            "Cita no sincronizada",
-            `El juicio se guardó en la app, pero no se pudo actualizar Google Calendar. ${error.message}`
-          );
+        if (accessToken) {
+          try {
+            const calendarEventId = await saveCalendarEvent(j, existingCalendarEventId, accessToken);
+            await recordRef.update({ calendarEventId });
+            resetFileSelectors();
+            dlgNuevo.classList.remove('open');
+          } catch (error) {
+            await showMessage(
+              "Cita no sincronizada",
+              `El juicio y los archivos se guardaron correctamente, pero no se pudo actualizar Google Calendar. ${error.message}`
+            );
+          }
+        } else {
+            // Si no hubo token, cerramos el modal de todos modos porque los datos se guardaron
+            resetFileSelectors();
+            dlgNuevo.classList.remove('open');
         }
       } catch (error) {
         await showMessage(
           "Error al guardar",
-          `No se pudo guardar el juicio. ${error.message}`
+          `No se pudo completar el guardado: ${error.message}`
         );
       } finally {
         submitButton.disabled = false;
+        submitButton.textContent = originalBtnText;
         fetchJuicios();
       }
     };
@@ -922,9 +1147,8 @@
     $("#show-pending").onclick = () => { currentFilter='pending'; $$('.filter-buttons button').forEach(b=>b.classList.remove('active')); $("#show-pending").classList.add('active'); fetchJuicios(); };
     $("#show-peritos").onclick = () => { currentFilter='perito'; $$('.filter-buttons button').forEach(b=>b.classList.remove('active')); $("#show-peritos").classList.add('active'); fetchJuicios(); };
     
-
     $("#btnExport").onclick = window.exportToExcel;
 
-  </script>
+  </script>>
 </body>
 </html>

@@ -545,6 +545,20 @@
     </div>
   </div>
 
+  <div id="dlgVisor" class="modal-overlay">
+    <div class="modal" style="width: 96%; max-width: 900px; height: 90vh; display: flex; flex-direction: column;">
+      <div class="modal-header" style="padding: 10px 14px;">
+        <strong id="visorTitle">Documento</strong>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <a id="visorExternal" href="#" target="_blank" rel="noopener" class="btn-ghost button" style="padding: 5px 10px; font-size: 0.8rem; text-decoration:none;">Abrir fuera</a>
+          <button id="dlgVisorClose" class="btn-ghost close-btn button" style="padding: 2px 8px;">✕</button>
+        </div>
+      </div>
+      <div class="modal-body" style="padding: 0; flex: 1; overflow: hidden;">
+        <iframe id="visorFrame" src="" style="width: 100%; height: 100%; border: none; background: #111;"></iframe>
+      </div>
+    </div>
+  </div>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
@@ -597,8 +611,8 @@
     const dlgMsgClose = $("#dlgMsgClose");
 
     // Memorización persistente del token
-    let calendarAccessToken = localStorage.getItem("gcal_token_verdeos79") || null;
-    let calendarAccessTokenExpiresAt = Number(localStorage.getItem("gcal_token_exp_verdeos79")) || 0;
+    let calendarAccessToken = localStorage.getItem("gcal_token_verdegue279") || null;
+    let calendarAccessTokenExpiresAt = Number(localStorage.getItem("gcal_token_exp_verdegue279")) || 0;
 
     function isMobileView() {
       return window.innerWidth <= 768;
@@ -915,6 +929,54 @@
       return savedEvent.id;
     }
   
+    function obtenerEmailActivo() {
+      return (auth.currentUser && auth.currentUser.email) ? auth.currentUser.email : CUENTA_FIJA;
+    }
+
+    function formatearEnlaceDrive(url) {
+      if (!url) return '';
+      const email = obtenerEmailActivo();
+      if (!url.includes('drive.google.com')) return url;
+      try {
+        const u = new URL(url);
+        u.searchParams.set('authuser', email);
+        return u.toString();
+      } catch (e) {
+        const sep = url.includes('?') ? '&' : '?';
+        return `${url}${sep}authuser=${encodeURIComponent(email)}`;
+      }
+    }
+
+    function obtenerUrlPreviewDrive(url) {
+      if (!url) return '';
+      const email = obtenerEmailActivo();
+      const matchD = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      const matchId = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+      const fileId = matchD ? matchD[1] : (matchId ? matchId[1] : null);
+      if (fileId) {
+        return `https://drive.google.com/file/d/${fileId}/preview?authuser=${encodeURIComponent(email)}`;
+      }
+      return formatearEnlaceDrive(url);
+    }
+
+    window.abrirDocumento = (url, titulo) => {
+      if (!url) return;
+      $("#visorTitle").textContent = titulo || "Documento";
+      $("#visorExternal").href = formatearEnlaceDrive(url);
+      $("#visorFrame").src = obtenerUrlPreviewDrive(url);
+      $("#dlgVisor").classList.add("open");
+    };
+
+    $("#dlgVisorClose").onclick = () => {
+      $("#dlgVisor").classList.remove("open");
+      $("#visorFrame").src = "";
+    };
+    $("#dlgVisor").onclick = (e) => {
+      if (e.target.id === 'dlgVisor') {
+        $("#dlgVisor").classList.remove("open");
+        $("#visorFrame").src = "";
+      }
+    };
     function renderJuicios(juicios) {
       juiciosBody.innerHTML = '';
       const filteredJuicios = juicios.filter(j => {
@@ -958,16 +1020,23 @@
             ? `${juzgadoNombreLimpio} <span class="badge-perito" title="Citado como Perito">PERITO</span>` 
             : juzgadoNombreLimpio;
 
-        let citacionBtn = juicio.citacionUrl ? `<a href="${juicio.citacionUrl}" target="_blank" rel="noopener" class="action-item has-link button">Citación</a>` : `<button class="action-item button" onclick="editJuicio('${juicio.id}')">Citación</button>`;
-        let diligenciasBtn = juicio.diligenciasUrl ? `<a href="${juicio.diligenciasUrl}" target="_blank" rel="noopener" class="action-item has-link button">Diligencias</a>` : `<button class="action-item button" onclick="editJuicio('${juicio.id}')">Diligencias</button>`;
+        const urlCitacion = formatearEnlaceDrive(juicio.citacionUrl);
+        const urlDiligencias = formatearEnlaceDrive(juicio.diligenciasUrl);
 
-        // Móvil: fecha con año corto DD/MM/AA en 2 líneas
+        let citacionBtn = urlCitacion
+          ? `<a href="${urlCitacion}" target="_blank" rel="noopener" class="action-item has-link button">Citación</a>`
+          : `<button class="action-item button" onclick="editJuicio('${juicio.id}')">Citación</button>`;
+        let diligenciasBtn = urlDiligencias
+          ? `<a href="${urlDiligencias}" target="_blank" rel="noopener" class="action-item has-link button">Diligencias</a>`
+          : `<button class="action-item button" onclick="editJuicio('${juicio.id}')">Diligencias</button>`;
+
+        // Móvil: fecha con año corto DD/MM/AA y apertura en visor integrado (sin selector de cuenta)
         const fechaConAno = `${String(d).padStart(2,'0')}/${String(m).padStart(2,'0')}/${String(y).slice(-2)}`;
         const mobileCitacion = juicio.citacionUrl
-          ? `<a href="${juicio.citacionUrl}" target="_blank" rel="noopener" class="btn-doc-mobile active-link">Citación</a>`
+          ? `<button type="button" class="btn-doc-mobile active-link" onclick="abrirDocumento('${juicio.citacionUrl}', 'Citación - ${juzgadoNombreLimpio.replace(/'/g, "\\'")}')">Citación</button>`
           : `<span class="btn-doc-mobile" style="opacity:0.4;">Citación</span>`;
         const mobileDiligencias = juicio.diligenciasUrl
-          ? `<a href="${juicio.diligenciasUrl}" target="_blank" rel="noopener" class="btn-doc-mobile active-link">Diligencias</a>`
+          ? `<button type="button" class="btn-doc-mobile active-link" onclick="abrirDocumento('${juicio.diligenciasUrl}', 'Diligencias - ${juzgadoNombreLimpio.replace(/'/g, "\\'")}')">Diligencias</button>`
           : `<span class="btn-doc-mobile" style="opacity:0.4;">Diligencias</span>`;
 
         tr.innerHTML = `

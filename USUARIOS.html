@@ -3,301 +3,390 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Buscador · Titular-Usuario-Descripción-Resultado</title>
+  <title>GAD · Buscador de Contraseñas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
   <style>
     :root {
-      --bg-dark: #1a1a2e;
-      --card-bg: #282844;
-      --text-light: #e9e9f0;
-      --accent-blue: #007BFF;
-      --accent-gradient: linear-gradient(135deg, #667eea, #764ba2);
-      --accent-red: #d32f2f;
-      --accent-green: #28a745;
-      --google-red: #db4437; /* Color para botón Google */
+      --bg-canvas: #0b0f19;
+      --bg-surface: #111827;
+      --bg-elevated: #182234;
+      --bg-hover: #1e2b42;
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --border-strong: rgba(148, 163, 184, 0.28);
+
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+
+      --primary: #3b82f6;
+      --accent-indigo: #6366f1;
+      --accent-amber: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.45);
+      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.65);
     }
+
+    html { box-sizing: border-box; overflow-x: hidden; }
+    *, *::before, *::after { box-sizing: inherit; }
+
     body {
-      font-family: 'Poppins', sans-serif;
-      background: var(--bg-dark);
-      color: var(--text-light);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.14), transparent 42%),
+        radial-gradient(circle at 85% 12%, rgba(99, 102, 241, 0.12), transparent 40%),
+        var(--bg-canvas);
+      color: var(--text-primary);
       margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      min-height: 100vh;
+      padding-bottom: 56px;
+      -webkit-font-smoothing: antialiased;
     }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
+
     .wrap {
-      max-width: 940px;
+      max-width: 1060px;
       margin: 32px auto;
-      padding: 0 16px;
-      box-sizing: border-box;
+      padding: 0 18px;
     }
+
     header {
       display: flex;
-      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 2rem;
+      gap: 18px;
       flex-wrap: wrap;
-      text-align: center;
+      margin-bottom: 24px;
+      padding: 20px 24px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
     }
+
     .header-left {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-        width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      flex-wrap: wrap;
     }
-    .logo-box {
-      height: 108px;
-      width: 108px;
-      background: transparent;
-      border-radius: 50%;
+
+    /* Logo directo sobre el contenedor, sin bordes ni círculos */
+    .logo-container {
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
+      background: transparent;
+      padding: 0;
     }
-    .logo-box img { max-height: 96px; max-width: 96px; }
-    .title h1 { margin: 0; font-size: clamp(1.4rem, 4vw, 2rem); }
-    .title p { margin: 4px 0 0; font-size: clamp(.85rem, 2vw, .95rem); color: #ccc; }
+
+    .logo-container img {
+      max-height: 72px;
+      max-width: 140px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    .title h1 {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .title p {
+      margin: 3px 0 0;
+      font-size: 0.86rem;
+      color: var(--text-secondary);
+    }
+
     .card {
-      background: var(--card-bg);
-      border-radius: 12px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
       padding: 24px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-      box-sizing: border-box;
+      box-shadow: var(--shadow-md);
     }
-    .grid { display: grid; gap: 16px; }
-    .field { display: grid; gap: 8px; }
-    label { font-size: 0.9rem; color: #aaa; }
-    input[type="text"], input[type="password"], textarea, input[type="email"] {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-light);
-      padding: 12px;
-      border-radius: 8px;
-      box-sizing: border-box;
-      transition: all 0.3s ease;
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
     }
-    input[type="text"]:focus, input[type="password"]:focus, textarea:focus, input[type="email"]:focus {
-      outline: none;
-      border-color: var(--accent-blue);
-      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3);
-    }
-    button {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: transform 0.2s, box-shadow 0.2s;
-      box-sizing: border-box;
-    }
-    .btn-primary {
-      background: var(--accent-gradient);
-      color: #fff;
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(118, 75, 162, 0.5);
-    }
-    /* Estilo botón Google */
-    .btn-google {
-      background: white;
-      color: #333;
-      border: 1px solid #ddd;
+
+    .span-full { grid-column: 1 / -1; }
+
+    .field {
       display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    textarea {
+      width: 100%;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.92rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+    }
+
+    input[readonly] {
+      background: rgba(15, 23, 42, 0.7);
+      color: #fbbf24;
+      font-weight: 700;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    button, .btn-link {
+      font-family: inherit;
+      padding: 10px 15px;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.88rem;
+      text-decoration: none;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
-      width: 100%;
+      gap: 8px;
+      transition: transform 0.15s ease, background-color 0.2s ease, border-color 0.2s ease;
     }
-    .btn-google:hover {
-      background: #f1f1f1;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: var(--text-light);
-    }
-    .btn-ghost:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-    .btn-menu-principal {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: transform 0.2s, box-shadow 0.2s;
-        background: var(--card-bg);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: var(--text-light);
-        text-decoration: none;
-        display: inline-block;
-        white-space: nowrap;
-        box-sizing: border-box;
-    }
-    .btn-menu-principal:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-        background: rgba(255, 255, 255, 0.1);
-    }
-    .btn-logout-red, .btn-delete-red {
-      background: var(--accent-red);
+
+    button:active, .btn-link:active { transform: scale(0.98); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent-indigo));
       color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
     }
-    .btn-logout-red:hover, .btn-delete-red:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(211, 47, 47, 0.5);
-      background: #b71c1c;
-    }
+    .btn-primary:hover { filter: brightness(1.08); }
+
     .btn-success {
-      background: var(--accent-green);
-      color: #fff;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(16, 185, 129, 0.16);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.35);
     }
-    .btn-success:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 10px rgba(40, 167, 69, 0.5);
-      background: #1e7e34;
+    .btn-success:hover { background: rgba(16, 185, 129, 0.25); }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
     }
-    table { 
-      width: 100%; 
-      border-collapse: collapse; 
-      margin-top: 1.5rem;
-      box-sizing: border-box;
+    .btn-ghost:hover { background: rgba(255, 255, 255, 0.09); }
+
+    .btn-warn {
+      background: rgba(245, 158, 11, 0.14);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.32);
     }
+    .btn-warn:hover { background: rgba(245, 158, 11, 0.24); }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.16);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+    .btn-danger:hover { background: rgba(239, 68, 68, 0.26); }
+
+    .btn-google {
+      background: #fff;
+      color: #0f172a;
+      width: 100%;
+      padding: 12px 18px;
+      font-weight: 700;
+    }
+    .btn-google:hover { background: #f1f5f9; }
+
+    /* TABLE */
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 18px;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
     th, td {
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 12px;
+      padding: 12px 14px;
       text-align: left;
-      box-sizing: border-box;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
     }
+
     th {
-      background: rgba(255, 255, 255, 0.05);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       white-space: nowrap;
     }
+
+    tbody tr:hover { background: var(--bg-hover); }
+
+    .secret-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-action {
+      padding: 6px 9px;
+      font-size: 0.82rem;
+      flex-shrink: 0;
+    }
+
+    /* LOGIN CARD */
+    .login-container {
+      text-align: center;
+      padding: 36px 28px;
+      border-radius: var(--radius-lg);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-lg);
+      max-width: 390px;
+      margin: 40px auto;
+    }
+
+    .error-banner {
+      display: none;
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      font-size: 0.84rem;
+    }
+
+    /* MODALS */
     .modal-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: flex;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(6px);
+      display: none;
       justify-content: center;
       align-items: center;
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s, visibility 0.3s;
+      padding: 16px;
       z-index: 1000;
     }
-    .modal-overlay.open { visibility: visible; opacity: 1; }
+
+    .modal-overlay.open { display: flex; }
+
     .modal {
-      background: var(--card-bg);
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-      width: 90%;
-      max-width: 450px;
-      transform: scale(0.95);
-      transition: transform 0.3s ease-out;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-lg);
+      width: 100%;
+      max-width: 420px;
+      overflow: hidden;
     }
-    .modal-overlay.open .modal { transform: scale(1); }
+
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 1.5rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px 12px 0 0;
+      padding: 16px 20px;
+      background: var(--bg-elevated);
+      border-bottom: 1px solid var(--border-subtle);
     }
-    .close-btn {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      color: #aaa;
-      cursor: pointer;
-    }
-    .modal-body { padding: 1.5rem; }
-    .form-fields {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
-    .password-fields {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 15px;
-    }
+
+    .modal-body { padding: 20px; }
+
     .modal-actions {
       display: flex;
       justify-content: flex-end;
       gap: 10px;
-      padding: 1rem 1.5rem;
-      background: rgba(255, 255, 255, 0.05);
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 0 0 12px 12px;
+      padding: 14px 20px;
+      background: var(--bg-elevated);
+      border-top: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
     }
-    .login-container {
+
+    .pin-display-input {
       text-align: center;
-      margin-top: 50px;
-      padding: 24px;
-      border-radius: 12px;
-      background: var(--card-bg);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-      max-width: 350px;
-      margin-left: auto;
-      margin-right: auto;
+      font-size: 1.3rem !important;
+      letter-spacing: 0.28em;
     }
-    .login-field {
+
+    .numpad {
       display: grid;
+      grid-template-columns: repeat(3, 1fr);
       gap: 10px;
-      margin-bottom: 15px;
+      margin-top: 12px;
     }
-    .alert-icon {
-        font-size: 2rem;
-        color: var(--accent-red);
-        margin-right: 1rem;
+
+    .numpad-btn {
+      padding: 14px 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
     }
-    .modal-body.alert-content {
-        display: flex;
-        align-items: center;
+
+    .numpad-btn:hover {
+      background: var(--bg-hover);
+      border-color: var(--border-strong);
     }
-    @media (max-width: 600px) {
-      .wrap { margin: 16px auto; padding: 0 10px; }
-      header { flex-direction: column; text-align: center; }
-      .title { margin-top: 10px; }
+
+    @media (max-width: 680px) {
       .grid { grid-template-columns: 1fr; }
-      button { width: 100%; margin-bottom: 8px; }
-      .login-container { margin: 2rem auto; }
-      table, thead, tbody, th, td, tr {
-        display: block;
-      }
-      thead tr { position: absolute; top: -9999px; left: -9999px; }
-      td {
-        border: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        position: relative;
-        padding-left: 50%;
-        text-align: right;
-      }
-      td:before {
-        content: attr(data-label);
-        position: absolute;
-        left: 0;
-        width: 50%;
-        padding-left: 10px;
-        font-weight: bold;
-        text-align: left;
-      }
-      .password-fields {
-        grid-template-columns: 1fr;
-      }
+      header { flex-direction: column; text-align: center; }
+      .header-left { justify-content: center; }
+      .action-bar button { flex: 1 1 45%; }
     }
   </style>
 </head>
@@ -305,131 +394,232 @@
   <div class="wrap">
     <header>
       <div class="header-left">
-        <div class="logo-box"><img id="logo" alt="Mi logo de Gad" src="logogad.png" /></div>
+        <div class="logo-container">
+          <img id="logo" alt="Logo GAD" src="logogad.png" onerror="this.src='https://placehold.co/120x60/111827/f8fafc?text=GAD'" />
+        </div>
         <div class="title">
-          <h1>Buscador de contraseñas</h1>
-          <p>Puedes buscar por titular, usuario y descripción.</p>
+          <h1>Buscador de Contraseñas</h1>
+          <p>Ocultas por defecto · Desbloqueo automático de 30 segundos con PIN</p>
         </div>
       </div>
-      <a href="index.html" class="btn-menu-principal">MENÚ PRINCIPAL</a>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <a href="index.html" class="btn-link btn-ghost"><i class="fas fa-home"></i> Menú principal</a>
+      </div>
     </header>
 
     <div id="app-content" hidden>
-        <section class="card grid">
+      <section class="card">
+        <div class="grid">
           <div class="field">
-            <label for="titular">Titular (buscar)</label>
-            <input id="titular" type="text" placeholder="Escriba para filtrar por Titular" list="titularesListBusqueda" />
+            <label for="titular">Titular</label>
+            <input id="titular" type="text" placeholder="Filtrar por titular..." list="titularesListBusqueda" autocomplete="off" />
             <datalist id="titularesListBusqueda"></datalist>
           </div>
+
           <div class="field">
-            <label for="usuario">Usuario (buscar)</label>
-            <input id="usuario" type="text" placeholder="Escriba para filtrar por Usuario" />
+            <label for="usuario">Usuario</label>
+            <input id="usuario" type="text" placeholder="Filtrar por usuario..." autocomplete="off" />
           </div>
+
           <div class="field">
-            <label for="descripcionBusqueda">Descripción (buscar)</label>
-            <input id="descripcionBusqueda" type="text" placeholder="Escriba para filtrar por Descripción" list="descripcionesListBusqueda" />
+            <label for="descripcionBusqueda">Descripción</label>
+            <input id="descripcionBusqueda" type="text" placeholder="Filtrar por descripción..." list="descripcionesListBusqueda" autocomplete="off" />
             <datalist id="descripcionesListBusqueda"></datalist>
           </div>
+
           <div class="field">
-            <label for="resultado">Contraseña 1</label>
-            <input id="resultado" type="text" placeholder="Resultado" readonly />
-          </div>
-          <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-            <button id="btnBuscar" class="btn-primary">Buscar</button>
-            <button id="btnLimpiar" class="btn-success">Limpiar</button>
-            <button id="btnNuevo" class="btn-primary">Introduzca nuevos datos</button>
-            <button id="btnLogout" class="btn-logout-red">Cerrar sesión</button>
+            <label for="resultado">Contraseña seleccionada</label>
+            <div class="secret-cell">
+              <button type="button" id="btnRevealSelected" class="btn-warn icon-action" title="Ver u ocultar con PIN">
+                <i class="fas fa-eye"></i>
+              </button>
+              <input id="resultado" type="text" class="mono" placeholder="••••••••" readonly autocomplete="off" />
+              <button type="button" id="btnCopySelected" class="btn-ghost icon-action" title="Copiar contraseña">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
           </div>
 
-          <div id="results" hidden>
-            <table>
-              <thead>
-                <tr>
-                    <th>Titular</th>
-                    <th>Usuario</th>
-                    <th>Descripción</th>
-                    <th>Contraseña</th>
-                    <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="tbody"></tbody>
-            </table>
+          <div class="span-full action-bar">
+            <button type="button" id="btnBuscar" class="btn-primary"><i class="fas fa-search"></i> Buscar</button>
+            <button type="button" id="btnLimpiar" class="btn-success"><i class="fas fa-eraser"></i> Limpiar</button>
+            <button type="button" id="btnNuevo" class="btn-primary"><i class="fas fa-plus"></i> Nuevo registro</button>
+            <button type="button" id="btnUnlockPin" class="btn-warn"><i class="fas fa-lock-open"></i> Introducir PIN</button>
+            <button type="button" id="btnChangePin" class="btn-ghost"><i class="fas fa-key"></i> Cambiar PIN</button>
+            <button type="button" id="btnLogout" class="btn-danger"><i class="fas fa-right-from-bracket"></i> Cerrar sesión</button>
           </div>
-        </section>
+        </div>
+
+        <div id="results" class="table-wrap" hidden>
+          <table>
+            <thead>
+              <tr>
+                <th>Titular</th>
+                <th>Usuario</th>
+                <th>Descripción</th>
+                <th>Contraseña</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </section>
     </div>
 
-    <div id="login-container">
-        <h2>Inicie sesión para continuar</h2>
-        <p style="color: #aaa; margin-bottom: 20px;">Utilice su cuenta de Google para acceder.</p>
-        
-        <button id="btnGoogleLogin" class="btn-google">
-             <svg width="18" height="18" viewBox="0 0 18 18">
-                <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"></path>
-                <path d="M9 18c2.43 0 4.467-.806 5.956-2.18L12.048 13.562c-.806.54-1.836.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"></path>
-                <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"></path>
-                <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"></path>
-             </svg>
-             Iniciar sesión con Google
-        </button>
+    <div id="login-container" class="login-container">
+      <h2 style="margin:0 0 8px;">Acceso Restringido</h2>
+      <p style="color:var(--text-secondary); font-size:0.88rem; margin:0 0 22px;">
+        Inicia sesión con la cuenta autorizada de administrador.
+      </p>
+      <button type="button" id="btnGoogleLogin" class="btn-google">
+        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="18" height="18">
+        Iniciar sesión con Google
+      </button>
+      <div id="loginError" class="error-banner"></div>
     </div>
-
   </div>
 
+  <!-- MODAL INTRODUCIR PIN -->
+  <div id="dlgEnterPin" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <strong id="enterPinTitle">Introducir PIN</strong>
+        <button type="button" id="enterPinClose" class="btn-ghost icon-action"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p id="enterPinDesc" style="margin:0 0 12px; font-size:0.86rem; color:var(--text-secondary);">
+          Escribe o pulsa tu PIN. Entra automáticamente al completarlo (30 segundos).
+        </p>
+        <input
+          id="enterPinInput"
+          type="password"
+          class="mono pin-display-input"
+          inputmode="numeric"
+          pattern="[0-9]*"
+          maxlength="8"
+          autocomplete="off"
+          data-lpignore="true"
+        />
+
+        <div class="numpad" aria-label="Teclado numérico">
+          <button type="button" class="numpad-btn mono" data-digit="1">1</button>
+          <button type="button" class="numpad-btn mono" data-digit="2">2</button>
+          <button type="button" class="numpad-btn mono" data-digit="3">3</button>
+          <button type="button" class="numpad-btn mono" data-digit="4">4</button>
+          <button type="button" class="numpad-btn mono" data-digit="5">5</button>
+          <button type="button" class="numpad-btn mono" data-digit="6">6</button>
+          <button type="button" class="numpad-btn mono" data-digit="7">7</button>
+          <button type="button" class="numpad-btn mono" data-digit="8">8</button>
+          <button type="button" class="numpad-btn mono" data-digit="9">9</button>
+          <button type="button" class="numpad-btn" id="numpadClear" title="Borrar todo"><i class="fas fa-trash"></i></button>
+          <button type="button" class="numpad-btn mono" data-digit="0">0</button>
+          <button type="button" class="numpad-btn" id="numpadBack" title="Retroceder"><i class="fas fa-delete-left"></i></button>
+        </div>
+
+        <div id="enterPinError" class="error-banner"></div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="enterPinCancel" class="btn-ghost">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CAMBIAR PIN -->
+  <div id="dlgChangePin" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <strong>Cambiar PIN</strong>
+        <button type="button" id="changePinClose" class="btn-ghost icon-action"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="formChangePin">
+        <div class="modal-body" style="display:grid; gap:14px;">
+          <div class="field">
+            <label for="oldPinInput">PIN actual</label>
+            <input id="oldPinInput" type="password" class="mono" inputmode="numeric" pattern="[0-9]*" maxlength="8" autocomplete="off" data-lpignore="true" required />
+          </div>
+          <div class="field">
+            <label for="newPinInput">Nuevo PIN (4 a 8 dígitos)</label>
+            <input id="newPinInput" type="password" class="mono" inputmode="numeric" pattern="[0-9]{4,8}" maxlength="8" autocomplete="off" data-lpignore="true" required />
+          </div>
+          <div class="field">
+            <label for="confirmNewPinInput">Confirmar nuevo PIN</label>
+            <input id="confirmNewPinInput" type="password" class="mono" inputmode="numeric" pattern="[0-9]{4,8}" maxlength="8" autocomplete="off" data-lpignore="true" required />
+          </div>
+          <div id="changePinError" class="error-banner"></div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="changePinCancel" class="btn-ghost">Cancelar</button>
+          <button type="submit" class="btn-primary">Guardar nuevo PIN</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL NUEVO / EDITAR REGISTRO -->
   <div id="dlgNuevo" class="modal-overlay">
     <div class="modal">
       <div class="modal-header">
-        <strong id="modalTitle">Introduzca nuevos datos</strong>
-        <button id="dlgClose" class="btn-ghost close-btn">✕</button>
+        <strong id="modalTitle">Nuevo registro</strong>
+        <button type="button" id="dlgClose" class="btn-ghost icon-action"><i class="fas fa-times"></i></button>
       </div>
-      <form id="formNuevo">
-        <div class="modal-body">
-          <div class="form-fields">
+      <form id="formNuevo" autocomplete="off">
+        <div class="modal-body" style="display:grid; gap:14px;">
+          <div class="field">
             <label for="nuevoTitular">Titular</label>
-            <input id="nuevoTitular" name="titular" type="text" required list="titularesList" />
+            <input id="nuevoTitular" name="titular" type="text" required list="titularesList" autocomplete="off" />
             <datalist id="titularesList"></datalist>
-
+          </div>
+          <div class="field">
             <label for="nuevoUsuario">Usuario</label>
-            <input id="nuevoUsuario" name="usuario" type="text" required />
-            
+            <input id="nuevoUsuario" name="usuario" type="text" required autocomplete="off" />
+          </div>
+          <div class="field">
             <label for="nuevaDescripcion">Descripción</label>
-            <input id="nuevaDescripcion" name="descripcion" type="text" required list="descripcionesList" />
+            <input id="nuevaDescripcion" name="descripcion" type="text" required list="descripcionesList" autocomplete="off" />
             <datalist id="descripcionesList"></datalist>
-
-            <div class="password-fields">
-              <div class="field">
-                <label for="nuevoResultado">Contraseña</label>
-                <input id="nuevoResultado" name="resultado" type="text" required />
-              </div>
-            </div>
+          </div>
+          <div class="field">
+            <label for="nuevoResultado">Contraseña</label>
+            <input
+              id="nuevoResultado"
+              name="resultado"
+              type="text"
+              class="mono"
+              required
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              data-lpignore="true"
+            />
           </div>
         </div>
         <div class="modal-actions">
-          <button type="button" id="btnEliminarRegistro" class="btn-delete-red" hidden>Eliminar registro</button>
-          <button type="reset" class="btn-success">Limpiar</button>
+          <button type="button" id="btnEliminarRegistro" class="btn-danger" hidden>Eliminar</button>
+          <button type="reset" class="btn-ghost">Limpiar</button>
           <button type="submit" class="btn-primary">Guardar</button>
         </div>
       </form>
     </div>
   </div>
 
+  <!-- MODAL MENSAJE -->
   <div id="dlgMessage" class="modal-overlay">
     <div class="modal">
       <div class="modal-header">
         <strong id="messageTitle"></strong>
       </div>
-      <div id="messageBody" class="modal-body">
-        <p id="messageText"></p>
+      <div class="modal-body">
+        <p id="messageText" style="margin:0;"></p>
       </div>
       <div class="modal-actions">
-        <button id="messageOk" class="btn-primary">Aceptar</button>
-        <button id="messageCancel" class="btn-ghost" hidden>Cancelar</button>
+        <button type="button" id="messageCancel" class="btn-ghost" hidden>Cancelar</button>
+        <button type="button" id="messageOk" class="btn-primary">Aceptar</button>
       </div>
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
@@ -441,290 +631,578 @@
       appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
     };
 
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
     const googleProvider = new firebase.auth.GoogleAuthProvider();
-    
-    const $ = sel => document.querySelector(sel);
-    const titular = $("#titular"), usuario = $("#usuario"), descripcionBusqueda = $("#descripcionBusqueda"), resultado = $("#resultado"), tbody = $("#tbody"), results = $("#results");
+    googleProvider.setCustomParameters({ prompt: "select_account" });
+    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+    const ADMIN_EMAIL = "verdeguer279@gmail.com";
+    const BASE_PATH = "passwords/euq9uxFJrAft9m1cNob0PZ1fo7q1";
+    const vaultRef = db.ref(BASE_PATH);
+    const pinConfigRef = db.ref(BASE_PATH + "/security/pinConfig");
+
+    const UNLOCK_DURATION_MS = 30000;
+    const STANDARD_MASK = "••••••••";
+
+    const $ = (sel) => document.querySelector(sel);
+    const titular = $("#titular");
+    const usuario = $("#usuario");
+    const descripcionBusqueda = $("#descripcionBusqueda");
+    const resultadoInput = $("#resultado");
+    const tbody = $("#tbody");
+    const results = $("#results");
     const appContent = $("#app-content");
     const loginContainer = $("#login-container");
-    const btnGoogleLogin = $("#btnGoogleLogin");
-    const btnLogout = $("#btnLogout");
-    
-    const dlgMessage = $("#dlgMessage"), messageTitle = $("#messageTitle"), messageText = $("#messageText"), messageBody = $("#messageBody"), messageOk = $("#messageOk"), messageCancel = $("#messageCancel");
+    const loginError = $("#loginError");
 
     let allUserPasswords = [];
+    let pinConfig = null;
+    let pinUnlockedUntil = 0;
+    let lockTimerId = null;
+    let revealedRowKeys = new Set();
+    let selectedActualSecret = "";
+    let selectedRevealed = false;
+    let listenersAttached = false;
 
-    function normalize(s) { return (s || "").toString().trim().toLowerCase(); }
+    function escapeHTML(val) {
+      return String(val ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
 
-    function showMessage(title, text, isConfirm = false, isAlert = false) {
+    function normalize(s) {
+      return String(s ?? "").trim().toLowerCase();
+    }
+
+    function isUnlocked() {
+      return Date.now() < pinUnlockedUntil;
+    }
+
+    function lockSecretsNow() {
+      pinUnlockedUntil = 0;
+      revealedRowKeys.clear();
+      selectedRevealed = false;
+      if (lockTimerId) {
+        clearTimeout(lockTimerId);
+        lockTimerId = null;
+      }
+      if (selectedActualSecret) {
+        resultadoInput.value = STANDARD_MASK;
+      }
+      doSearch();
+    }
+
+    function grantUnlockFor30Seconds() {
+      pinUnlockedUntil = Date.now() + UNLOCK_DURATION_MS;
+      if (lockTimerId) clearTimeout(lockTimerId);
+      lockTimerId = setTimeout(() => {
+        lockSecretsNow();
+      }, UNLOCK_DURATION_MS);
+    }
+
+    async function sha256Hex(text) {
+      const enc = new TextEncoder().encode(text);
+      const buf = await crypto.subtle.digest("SHA-256", enc);
+      return Array.from(new Uint8Array(buf))
+        .map((b) => b.toString(16).padStart(2, "0"))
+        .join("");
+    }
+
+    function generateSaltHex() {
+      const arr = new Uint8Array(16);
+      crypto.getRandomValues(arr);
+      return Array.from(arr).map((b) => b.toString(16).padStart(2, "0")).join("");
+    }
+
+    function showMessage(title, text, isConfirm = false) {
       return new Promise((resolve) => {
-        messageTitle.textContent = title;
-        messageText.innerHTML = text;
-        messageBody.classList.toggle('alert-content', isAlert);
-        messageCancel.hidden = !isConfirm;
-        dlgMessage.classList.add("open");
+        $("#messageTitle").textContent = title;
+        $("#messageText").textContent = text;
+        $("#messageCancel").hidden = !isConfirm;
+        $("#dlgMessage").classList.add("open");
 
-        messageOk.onclick = () => {
-          dlgMessage.classList.remove("open");
+        $("#messageOk").onclick = () => {
+          $("#dlgMessage").classList.remove("open");
           resolve(true);
         };
-        messageCancel.onclick = () => {
-          dlgMessage.classList.remove("open");
+        $("#messageCancel").onclick = () => {
+          $("#dlgMessage").classList.remove("open");
           resolve(false);
         };
       });
     }
 
-    // Este listener se dispara automáticamente si el usuario ya tiene sesión iniciada
-    auth.onAuthStateChanged((user) => {
-      if (user) {
-        appContent.hidden = false;
-        loginContainer.hidden = true;
-        
-        // FORZAMOS A LEER SIEMPRE LA CARPETA ANTIGUA
-const userPasswordsRef = db.ref('passwords/euq9uxFJrAft9m1cNob0PZ1fo7q1');
+    function openEnterPinModal() {
+      return new Promise((resolve) => {
+        const modal = $("#dlgEnterPin");
+        const input = $("#enterPinInput");
+        const errBox = $("#enterPinError");
+        const hasExistingPin = Boolean(pinConfig && pinConfig.salt && pinConfig.hash);
+        const targetLength = hasExistingPin ? (pinConfig.pinLength || 4) : 4;
 
-        userPasswordsRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-            allUserPasswords = [];
-            if (data) {
-                Object.keys(data).forEach(key => {
-                    allUserPasswords.push({ key: key, ...data[key] });
-                });
+        errBox.style.display = "none";
+        errBox.textContent = "";
+        input.value = "";
+        input.maxLength = hasExistingPin ? targetLength : 8;
+
+        $("#enterPinTitle").textContent = hasExistingPin ? "Introducir PIN" : "Crear PIN (4 dígitos)";
+        $("#enterPinDesc").textContent = hasExistingPin
+          ? `Introduce tu PIN de ${targetLength} dígitos. Entrará automáticamente (30 s).`
+          : "Escribe 4 números para crear tu PIN inicial. Se activará 30 segundos.";
+
+        let checking = false;
+
+        const finish = (ok) => {
+          modal.classList.remove("open");
+          input.oninput = null;
+          $("#enterPinClose").onclick = null;
+          $("#enterPinCancel").onclick = null;
+          resolve(ok);
+        };
+
+        $("#enterPinClose").onclick = () => finish(false);
+        $("#enterPinCancel").onclick = () => finish(false);
+
+        const evaluatePin = async () => {
+          if (checking) return;
+          const clean = input.value.replace(/\D/g, "");
+          input.value = clean;
+
+          if (!hasExistingPin) {
+            if (clean.length < 4) return;
+            checking = true;
+            try {
+              const salt = generateSaltHex();
+              const hash = await sha256Hex(`${salt}:${clean}`);
+              await pinConfigRef.set({ salt, hash, pinLength: clean.length });
+              pinConfig = { salt, hash, pinLength: clean.length };
+              grantUnlockFor30Seconds();
+              finish(true);
+            } catch (err) {
+              console.error(err);
+              errBox.textContent = "Error al guardar el PIN.";
+              errBox.style.display = "block";
+              checking = false;
             }
-            allUserPasswords.sort((a, b) => {
-                const titularA = a.titular || '';
-                const titularB = b.titular || '';
-                const normalizedA = normalize(titularA);
-                const normalizedB = normalize(titularB);
-
-                if (normalizedA === 'rafa') return -1;
-                if (normalizedB === 'rafa') return 1;
-
-                return normalizedA.localeCompare(normalizedB);
-            });
-            doSearch();
-            populateDatalists();
-        });
-
-        function populateDatalists() {
-            const titularesSet = new Set();
-            const descripcionesSet = new Set();
-            
-            allUserPasswords.forEach(item => {
-                if (item.titular) titularesSet.add(item.titular);
-                if (item.descripcion) descripcionesSet.add(item.descripcion);
-            });
-            
-            const titularesList = $("#titularesList");
-            const descripcionesList = $("#descripcionesList");
-            const titularesListBusqueda = $("#titularesListBusqueda");
-            const descripcionesListBusqueda = $("#descripcionesListBusqueda");
-
-            titularesList.innerHTML = "";
-            descripcionesList.innerHTML = "";
-            titularesListBusqueda.innerHTML = "";
-            descripcionesListBusqueda.innerHTML = "";
-
-            titularesSet.forEach(titular => {
-                const option = document.createElement("option");
-                option.value = titular;
-                titularesList.appendChild(option);
-                titularesListBusqueda.appendChild(option.cloneNode(true));
-            });
-
-            descripcionesSet.forEach(descripcion => {
-                const option = document.createElement("option");
-                option.value = descripcion;
-                descripcionesList.appendChild(option);
-                descripcionesListBusqueda.appendChild(option.cloneNode(true));
-            });
-        }
-
-        function doSearch() {
-            const f1 = normalize(titular.value);
-            const f2 = normalize(usuario.value);
-            const f3 = normalize(descripcionBusqueda.value);
-            
-            const matches = allUserPasswords.filter(r =>
-                (f1 === "" || normalize(r.titular).includes(f1)) &&
-                (f2 === "" || normalize(r.usuario).includes(f2)) &&
-                (f3 === "" || normalize(r.descripcion).includes(f3))
-            );
-            
-            tbody.innerHTML = "";
-            matches.forEach(r => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td data-label="Titular">${r.titular}</td>
-                    <td data-label="Usuario" data-copiable="true">${r.usuario}</td>
-                    <td data-label="Descripción">${r.descripcion}</td>
-                    <td data-label="Contraseña">${r.resultado}</td>
-                    <td data-label="Acciones">
-                        <button class="btn-primary" onclick="editPassword('${r.key}')">Editar</button>
-                    </td>
-                `;
-                tr.onclick = () => { resultado.value = r.resultado; };
-                tbody.appendChild(tr);
-            });
-            results.hidden = matches.length === 0;
-            if (matches.length === 1) { resultado.value = matches[0].resultado; }
-        }
-
-        function copyToClipboard(text) {
-          navigator.clipboard.writeText(text).then(() => {
-            const message = document.createElement('div');
-            message.textContent = 'Copiado al portapapeles';
-            message.style.cssText = `
-              position: fixed;
-              bottom: 20px;
-              left: 50%;
-              transform: translateX(-50%);
-              background: #333;
-              color: white;
-              padding: 10px 20px;
-              border-radius: 5px;
-              z-index: 1001;
-              opacity: 0;
-              transition: opacity 0.5s ease-in-out;
-            `;
-            document.body.appendChild(message);
-            setTimeout(() => {
-              message.style.opacity = 1;
-            }, 10);
-            setTimeout(() => {
-              message.style.opacity = 0;
-              setTimeout(() => message.remove(), 500);
-            }, 2000);
-          }).catch(err => {
-            console.error('Error al copiar el texto: ', err);
-          });
-        }
-        
-        tbody.addEventListener('contextmenu', (e) => {
-          const target = e.target.closest('td[data-copiable="true"]');
-          if (target) {
-            e.preventDefault();
-            copyToClipboard(target.textContent);
+            return;
           }
-        });
-        
-        titular.oninput = doSearch;
-        usuario.oninput = doSearch;
-        descripcionBusqueda.oninput = doSearch;
 
-        $("#btnBuscar").onclick = doSearch;
-        
-        $("#btnLimpiar").onclick = () => {
-            titular.value = ""; 
-            usuario.value = ""; 
-            descripcionBusqueda.value = ""; 
-            resultado.value = ""; 
-            doSearch();
+          if (clean.length < targetLength) return;
+          checking = true;
+          try {
+            const candidateHash = await sha256Hex(`${pinConfig.salt}:${clean}`);
+            if (candidateHash === pinConfig.hash) {
+              grantUnlockFor30Seconds();
+              finish(true);
+            } else {
+              errBox.textContent = "PIN incorrecto.";
+              errBox.style.display = "block";
+              input.value = "";
+              checking = false;
+            }
+          } catch (err) {
+            console.error(err);
+            errBox.textContent = "Error al comprobar el PIN.";
+            errBox.style.display = "block";
+            checking = false;
+          }
         };
 
-        const dlg = $("#dlgNuevo"), formNuevo = $("#formNuevo"), dlgClose = $("#dlgClose"), modalTitle = $("#modalTitle");
-        const btnEliminarRegistro = $("#btnEliminarRegistro");
+        input.oninput = evaluatePin;
+        window.__triggerPinEval = evaluatePin;
 
-        $("#btnNuevo").onclick = () => {
-          formNuevo.reset();
-          modalTitle.textContent = "Introduzca nuevos datos";
-          btnEliminarRegistro.hidden = true;
-          formNuevo.onsubmit = saveNewPassword;
-          dlg.classList.add("open");
-        };
+        modal.classList.add("open");
+        setTimeout(() => input.focus(), 50);
+      });
+    }
 
-        dlgClose.onclick = () => dlg.classList.remove("open");
-
-        function saveNewPassword(e) {
-            e.preventDefault();
-            const fd = new FormData(formNuevo);
-            const nuevo = Object.fromEntries(fd.entries());
-            
-            userPasswordsRef.push(nuevo).then(() => {
-                dlg.classList.remove("open");
-            }).catch(error => {
-                console.error("Error al guardar los datos: ", error);
-                showMessage("Error", "Hubo un error al guardar los datos.");
-            });
+    document.querySelectorAll(".numpad-btn[data-digit]").forEach((btn) => {
+      btn.onclick = () => {
+        const input = $("#enterPinInput");
+        if (input.value.length < input.maxLength) {
+          input.value += btn.getAttribute("data-digit");
+          if (typeof window.__triggerPinEval === "function") {
+            window.__triggerPinEval();
+          }
         }
-        
-        function editPassword(key) {
-            const passwordRef = db.ref('passwords/' + user.uid + '/' + key);
-            passwordRef.once('value').then(snapshot => {
-                const data = snapshot.val();
-                
-                $("#nuevoTitular").value = data.titular;
-                $("#nuevoUsuario").value = data.usuario;
-                $("#nuevaDescripcion").value = data.descripcion;
-                $("#nuevoResultado").value = data.resultado;
-                
-                modalTitle.textContent = "Editar datos";
-                btnEliminarRegistro.hidden = false;
-                
-                formNuevo.onsubmit = (e) => {
-                    e.preventDefault();
-                    const fd = new FormData(formNuevo);
-                    const updatedData = Object.fromEntries(fd.entries());
-                    
-                    passwordRef.update(updatedData).then(() => {
-                        dlg.classList.remove("open");
-                        showMessage("Éxito", "Los datos se han actualizado correctamente.");
-                    }).catch(error => {
-                        console.error("Error al actualizar los datos: ", error);
-                        showMessage("Error", "Hubo un error al actualizar los datos.");
-                    });
-                };
-                
-                btnEliminarRegistro.onclick = async () => {
-                    const alertIcon = '<div class="alert-icon">❌</div>';
-                    const confirmResult = await showMessage("Confirmar eliminación", `${alertIcon} ¿Estás seguro de que quieres eliminar el registro para **${data.titular}**? Esta acción no se puede deshacer.`, true, true);
-                    if (confirmResult) {
-                        passwordRef.remove().then(() => {
-                            dlg.classList.remove("open");
-                            showMessage("Registro eliminado", "El registro se ha eliminado correctamente.");
-                        }).catch(error => {
-                            console.error("Error al eliminar el registro: ", error);
-                            showMessage("Error", "Hubo un error al intentar eliminar el registro.");
-                        });
-                    }
-                };
-                
-                dlg.classList.add("open");
-            });
+      };
+    });
+
+    $("#numpadClear").onclick = () => {
+      $("#enterPinInput").value = "";
+      $("#enterPinError").style.display = "none";
+      $("#enterPinInput").focus();
+    };
+
+    $("#numpadBack").onclick = () => {
+      const input = $("#enterPinInput");
+      input.value = input.value.slice(0, -1);
+      $("#enterPinError").style.display = "none";
+      input.focus();
+    };
+
+    $("#btnChangePin").onclick = async () => {
+      if (!pinConfig || !pinConfig.hash) {
+        const created = await openEnterPinModal();
+        if (created) await showMessage("PIN creado", "Tu PIN inicial se ha guardado.");
+        return;
+      }
+
+      const modal = $("#dlgChangePin");
+      const errBox = $("#changePinError");
+      errBox.style.display = "none";
+      $("#oldPinInput").value = "";
+      $("#newPinInput").value = "";
+      $("#confirmNewPinInput").value = "";
+
+      const closeChange = () => {
+        modal.classList.remove("open");
+        $("#formChangePin").onsubmit = null;
+        $("#changePinClose").onclick = null;
+        $("#changePinCancel").onclick = null;
+      };
+
+      $("#changePinClose").onclick = closeChange;
+      $("#changePinCancel").onclick = closeChange;
+
+      $("#formChangePin").onsubmit = async (e) => {
+        e.preventDefault();
+        const oldVal = $("#oldPinInput").value.trim();
+        const newVal = $("#newPinInput").value.trim();
+        const confVal = $("#confirmNewPinInput").value.trim();
+
+        if (!/^\d{4,8}$/.test(newVal)) {
+          errBox.textContent = "El nuevo PIN debe tener entre 4 y 8 dígitos.";
+          errBox.style.display = "block";
+          return;
         }
-        window.editPassword = editPassword;
+        if (newVal !== confVal) {
+          errBox.textContent = "La confirmación del nuevo PIN no coincide.";
+          errBox.style.display = "block";
+          return;
+        }
 
+        const oldHash = await sha256Hex(`${pinConfig.salt}:${oldVal}`);
+        if (oldHash !== pinConfig.hash) {
+          errBox.textContent = "El PIN actual no es correcto.";
+          errBox.style.display = "block";
+          return;
+        }
 
-        btnLogout.onclick = () => {
-          auth.signOut().then(() => {
-            console.log("Sesión cerrada correctamente.");
-          }).catch((error) => {
-            console.error("Error al cerrar sesión:", error);
-            showMessage("Error", "Hubo un problema al intentar cerrar la sesión.");
-          });
-        };
-      } else {
+        const newSalt = generateSaltHex();
+        const newHash = await sha256Hex(`${newSalt}:${newVal}`);
+        await pinConfigRef.set({ salt: newSalt, hash: newHash, pinLength: newVal.length });
+        pinConfig = { salt: newSalt, hash: newHash, pinLength: newVal.length };
+        grantUnlockFor30Seconds();
+        closeChange();
+        await showMessage("PIN actualizado", "Tu PIN se ha cambiado correctamente.");
+      };
+
+      modal.classList.add("open");
+      setTimeout(() => $("#oldPinInput").focus(), 50);
+    };
+
+    $("#btnUnlockPin").onclick = async () => {
+      if (isUnlocked()) {
+        grantUnlockFor30Seconds();
+        await showMessage("Desbloqueado", "El acceso con PIN sigue activo durante 30 segundos más.");
+        return;
+      }
+      await openEnterPinModal();
+    };
+
+    function setSelectedSecret(secret) {
+      selectedActualSecret = secret || "";
+      selectedRevealed = false;
+      resultadoInput.value = selectedActualSecret ? STANDARD_MASK : "";
+    }
+
+    $("#btnRevealSelected").onclick = async () => {
+      if (!selectedActualSecret) return;
+      if (selectedRevealed && isUnlocked()) {
+        selectedRevealed = false;
+        resultadoInput.value = STANDARD_MASK;
+        return;
+      }
+      if (!isUnlocked()) {
+        const ok = await openEnterPinModal();
+        if (!ok) return;
+      }
+      selectedRevealed = true;
+      resultadoInput.value = selectedActualSecret;
+    };
+
+    $("#btnCopySelected").onclick = async () => {
+      if (!selectedActualSecret) return;
+      if (!isUnlocked()) {
+        const ok = await openEnterPinModal();
+        if (!ok) return;
+      }
+      await navigator.clipboard.writeText(selectedActualSecret);
+      await showMessage("Copiado", "Contraseña copiada al portapapeles.");
+    };
+
+    auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        lockSecretsNow();
         appContent.hidden = true;
         loginContainer.hidden = false;
+        return;
+      }
+
+      const email = (user.email || "").trim().toLowerCase();
+      if (email !== ADMIN_EMAIL) {
+        lockSecretsNow();
+        try { await auth.signOut(); } catch (_) {}
+        appContent.hidden = true;
+        loginContainer.hidden = false;
+        loginError.textContent = "Acceso denegado: solo verdeguer279@gmail.com está autorizado.";
+        loginError.style.display = "block";
+        return;
+      }
+
+      loginError.style.display = "none";
+      loginContainer.hidden = true;
+      appContent.hidden = false;
+
+      if (!listenersAttached) {
+        listenersAttached = true;
+
+        pinConfigRef.on("value", (snap) => {
+          pinConfig = snap.val() || null;
+        });
+
+        vaultRef.on("value", (snapshot) => {
+          const data = snapshot.val() || {};
+          allUserPasswords = [];
+          Object.entries(data).forEach(([key, val]) => {
+            if (key === "security" || !val || typeof val !== "object") return;
+            allUserPasswords.push({ key, ...val });
+          });
+
+          allUserPasswords.sort((a, b) => {
+            const normA = normalize(a.titular);
+            const normB = normalize(b.titular);
+            if (normA === "rafa") return -1;
+            if (normB === "rafa") return 1;
+            return normA.localeCompare(normB);
+          });
+
+          doSearch();
+          populateDatalists();
+        });
       }
     });
 
-    // Nueva lógica de Login con Google
-    btnGoogleLogin.onclick = () => {
-        auth.signInWithPopup(googleProvider)
-            .then((result) => {
-                // El login fue exitoso, onAuthStateChanged se disparará.
-                console.log("Login exitoso con Google:", result.user);
-            })
-            .catch((error) => {
-                console.error("Error al iniciar sesión con Google:", error);
-                showMessage("Error de Autenticación", "No se pudo iniciar sesión con Google: " + error.message);
-            });
+    function populateDatalists() {
+      const titularesSet = new Set();
+      const descripcionesSet = new Set();
+      allUserPasswords.forEach((item) => {
+        if (item.titular) titularesSet.add(item.titular);
+        if (item.descripcion) descripcionesSet.add(item.descripcion);
+      });
+
+      const fillList = (id, set) => {
+        const el = $(id);
+        el.innerHTML = "";
+        [...set].sort().forEach((val) => {
+          const opt = document.createElement("option");
+          opt.value = val;
+          el.appendChild(opt);
+        });
+      };
+
+      fillList("#titularesList", titularesSet);
+      fillList("#titularesListBusqueda", titularesSet);
+      fillList("#descripcionesList", descripcionesSet);
+      fillList("#descripcionesListBusqueda", descripcionesSet);
+    }
+
+    function doSearch() {
+      if (!isUnlocked()) {
+        revealedRowKeys.clear();
+        selectedRevealed = false;
+        if (selectedActualSecret) resultadoInput.value = STANDARD_MASK;
+      }
+
+      const f1 = normalize(titular.value);
+      const f2 = normalize(usuario.value);
+      const f3 = normalize(descripcionBusqueda.value);
+
+      const matches = allUserPasswords.filter((r) =>
+        (!f1 || normalize(r.titular).includes(f1)) &&
+        (!f2 || normalize(r.usuario).includes(f2)) &&
+        (!f3 || normalize(r.descripcion).includes(f3))
+      );
+
+      tbody.innerHTML = "";
+      matches.forEach((r) => {
+        const isShown = isUnlocked() && revealedRowKeys.has(r.key);
+        const displayPass = isShown ? escapeHTML(r.resultado || "") : STANDARD_MASK;
+        const eyeIcon = isShown ? "fa-eye-slash" : "fa-eye";
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${escapeHTML(r.titular || "-")}</strong></td>
+          <td class="mono">${escapeHTML(r.usuario || "-")}</td>
+          <td>${escapeHTML(r.descripcion || "-")}</td>
+          <td class="mono">
+            <div class="secret-cell">
+              <button type="button" class="btn-warn icon-action" onclick="event.stopPropagation(); toggleRowSecret('${escapeHTML(r.key)}')" title="Ver u ocultar">
+                <i class="fas ${eyeIcon}"></i>
+              </button>
+              <span>${displayPass}</span>
+            </div>
+          </td>
+          <td onclick="event.stopPropagation()">
+            <button type="button" class="btn-primary icon-action" onclick="editPassword('${escapeHTML(r.key)}')" title="Editar">
+              <i class="fas fa-pen"></i>
+            </button>
+          </td>
+        `;
+        tr.style.cursor = "pointer";
+        tr.onclick = () => setSelectedSecret(r.resultado || "");
+        tbody.appendChild(tr);
+      });
+
+      results.hidden = matches.length === 0;
+      if (matches.length === 1) {
+        setSelectedSecret(matches[0].resultado || "");
+      }
+    }
+
+    window.toggleRowSecret = async (key) => {
+      if (isUnlocked() && revealedRowKeys.has(key)) {
+        revealedRowKeys.delete(key);
+        doSearch();
+        return;
+      }
+      if (!isUnlocked()) {
+        const ok = await openEnterPinModal();
+        if (!ok) return;
+      }
+      revealedRowKeys.add(key);
+      doSearch();
     };
+
+    titular.oninput = doSearch;
+    usuario.oninput = doSearch;
+    descripcionBusqueda.oninput = doSearch;
+    $("#btnBuscar").onclick = doSearch;
+
+    $("#btnLimpiar").onclick = () => {
+      titular.value = "";
+      usuario.value = "";
+      descripcionBusqueda.value = "";
+      setSelectedSecret("");
+      revealedRowKeys.clear();
+      doSearch();
+    };
+
+    const dlg = $("#dlgNuevo");
+    const formNuevo = $("#formNuevo");
+
+    $("#btnNuevo").onclick = () => {
+      formNuevo.reset();
+      $("#modalTitle").textContent = "Nuevo registro";
+      $("#btnEliminarRegistro").hidden = true;
+      formNuevo.onsubmit = async (e) => {
+        e.preventDefault();
+        const fd = new FormData(formNuevo);
+        await vaultRef.push({
+          titular: (fd.get("titular") || "").trim(),
+          usuario: (fd.get("usuario") || "").trim(),
+          descripcion: (fd.get("descripcion") || "").trim(),
+          resultado: (fd.get("resultado") || "").trim()
+        });
+        dlg.classList.remove("open");
+      };
+      dlg.classList.add("open");
+    };
+
+    $("#dlgClose").onclick = () => dlg.classList.remove("open");
+
+    window.editPassword = async (key) => {
+      if (!isUnlocked()) {
+        const ok = await openEnterPinModal();
+        if (!ok) return;
+      }
+
+      const itemRef = vaultRef.child(key);
+      const snap = await itemRef.once("value");
+      const data = snap.val();
+      if (!data) return;
+
+      $("#nuevoTitular").value = data.titular || "";
+      $("#nuevoUsuario").value = data.usuario || "";
+      $("#nuevaDescripcion").value = data.descripcion || "";
+      $("#nuevoResultado").value = data.resultado || "";
+
+      $("#modalTitle").textContent = "Editar registro";
+      $("#btnEliminarRegistro").hidden = false;
+
+      formNuevo.onsubmit = async (e) => {
+        e.preventDefault();
+        if (!isUnlocked()) {
+          const ok = await openEnterPinModal();
+          if (!ok) return;
+        }
+        const fd = new FormData(formNuevo);
+        await itemRef.update({
+          titular: (fd.get("titular") || "").trim(),
+          usuario: (fd.get("usuario") || "").trim(),
+          descripcion: (fd.get("descripcion") || "").trim(),
+          resultado: (fd.get("resultado") || "").trim()
+        });
+        dlg.classList.remove("open");
+        await showMessage("Guardado", "Registro actualizado correctamente.");
+      };
+
+      $("#btnEliminarRegistro").onclick = async () => {
+        if (!isUnlocked()) {
+          const okPin = await openEnterPinModal();
+          if (!okPin) return;
+        }
+        const ok = await showMessage("Confirmar eliminación", `¿Eliminar el registro de "${data.titular || "este elemento"}"?`, true);
+        if (ok) {
+          await itemRef.remove();
+          revealedRowKeys.delete(key);
+          dlg.classList.remove("open");
+        }
+      };
+
+      dlg.classList.add("open");
+    };
+
+    $("#btnGoogleLogin").onclick = async () => {
+      loginError.style.display = "none";
+      try {
+        await auth.signInWithPopup(googleProvider);
+      } catch (err) {
+        console.error(err);
+        loginError.textContent = "No se pudo completar el inicio de sesión con Google.";
+        loginError.style.display = "block";
+      }
+    };
+
+    $("#btnLogout").onclick = async () => {
+      lockSecretsNow();
+      await auth.signOut();
+    };
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        dlg.classList.remove("open");
+        $("#dlgEnterPin").classList.remove("open");
+        $("#dlgChangePin").classList.remove("open");
+        $("#dlgMessage").classList.remove("open");
+      }
+    });
   </script>
 </body>
 </html>

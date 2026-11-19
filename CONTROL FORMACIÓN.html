@@ -3,786 +3,1707 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GAD - Gestión de Cursos y Pagos</title>
+  <title>GAD · Control de Cursos y Pagos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"> 
-  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    /* ESTILOS IDÉNTICOS (MANTENIDOS) */
     :root {
-      --bg-dark: #1a1a2e;
-      --card-bg: #282844;
-      --text-light: #e9e9f0;
-      --accent-blue: #667eea;
-      --accent-purple: #764ba2;
-      --accent-gradient: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
-      --accent-red: #dc3545;
-      --accent-green: #28a745;
-      --accent-orange: #ff9800;
-      --accent-cyan: #00bcd4;
-      --header-bg: #3e3e5c;
-    }
-    
-    html { box-sizing: border-box; overflow-x: hidden; }
-    *, *::before, *::after { box-sizing: inherit; }
-    
-    body { 
-      font-family: 'Poppins', sans-serif; 
-      background: linear-gradient(135deg,#667eea,#764ba2); 
-      color: var(--text-light); 
-      margin:0; 
-      padding-bottom: 50px;
-    }
-    .container { max-width:1600px; margin:30px auto; padding:0 16px; }
-    h1 { text-align:center; margin-bottom:20px; font-size:2.2rem; font-weight:700; color:#fff; }
-    
-    .card { background-color: rgba(0,0,0,0.55); border-radius:12px; padding:25px; margin-bottom:25px; box-shadow:0 6px 16px rgba(0,0,0,0.3); }
+      --bg-canvas: #0b0f19;
+      --bg-surface: #111827;
+      --bg-elevated: #182234;
+      --bg-hover: #1e2b42;
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --border-strong: rgba(148, 163, 184, 0.28);
 
-    .toggle-form-container { 
-        text-align:center; margin-bottom:15px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --accent-indigo: #6366f1;
+      --accent-cyan: #06b6d4;
+      --accent-amber: #f59e0b;
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.14);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.14);
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+      --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.65);
     }
 
-    #btnToggleForm, #btnMainMenu, #btnStats { padding:12px 20px; font-size:0.95rem; border:none; border-radius:8px; cursor:pointer; font-weight:600; transition:0.3s; }
-    #btnToggleForm { background-image: var(--accent-gradient); color: var(--text-light); }
-    #btnMainMenu { background-color: var(--accent-orange); color: #333; }
-    #btnStats { background-color: var(--accent-cyan); color: #fff; }
-    #btnStats:hover, #btnToggleForm:hover, #btnMainMenu:hover { transform: scale(1.05); filter: brightness(1.1); }
-
-    /* MODALES */
-    #data-entry-form, #stats-modal { 
-        position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 1001; 
-        display: none; opacity: 0; transition: opacity .3s ease;
-        overflow-y: auto; align-items: flex-start; justify-content: center;
-        padding: 20px 10px;
-    }
-    #data-entry-form.visible, #stats-modal.visible { display: flex; opacity: 1; }
-    
-    .modal-content-wrapper {
-        background-color: var(--card-bg); border-radius: 12px; padding: 25px;
-        width: 100%; max-width: 1000px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        margin-bottom: 50px;
-    }
-    
-    /* ESTILOS ESTADÍSTICAS */
-    .stats-wrapper { max-width: 1500px !important; }
-    .stats-header { 
-        display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; 
-        border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; flex-wrap: wrap; gap: 20px;
-    }
-    .stats-filters { display: flex; gap: 15px; align-items: center; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; }
-    .stats-filters label { margin-right: 5px; font-weight: bold; color: #ccc; }
-    .stats-filters select { 
-        background: #fff; color: #333; padding: 8px 12px; border-radius: 6px; border: none; font-weight: 600; min-width: 120px; 
+    html {
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
 
-    .kpi-row { 
-        display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; 
+    *, *::before, *::after {
+      box-sizing: inherit;
     }
-    .kpi-card { 
-        background: linear-gradient(145deg, #2d2d44, #363652); padding: 20px; border-radius: 12px; 
-        text-align: center; border: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        position: relative; overflow: hidden;
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(59, 130, 246, 0.14), transparent 42%),
+        radial-gradient(circle at 88% 8%, rgba(6, 182, 212, 0.11), transparent 38%),
+        var(--bg-canvas);
+      color: var(--text-primary);
+      margin: 0;
+      min-height: 100vh;
+      padding-bottom: 64px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
-    .kpi-value { font-size: 2.2rem; font-weight: 800; color: #fff; margin: 10px 0; letter-spacing: -1px; }
-    .kpi-label { font-size: 0.85rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-    .kpi-sub { font-size: 0.9rem; color: #ffd54f; font-weight: 600; margin-top: 5px; }
 
-    .dashboard-content { display: grid; grid-template-columns: 350px 1fr; gap: 25px; }
-    .chart-box { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); height: 400px; }
-    .renta-analysis { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); overflow-x: auto; }
-    
-    .pro-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-    .pro-table th { text-align: left; padding: 12px; color: #ccc; border-bottom: 2px solid rgba(255,255,255,0.1); font-weight: 600; }
-    .pro-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-    .pro-table .money { text-align: right; font-family: 'Courier New', monospace; font-weight: 700; color: #ffd54f; }
-    .pro-table .status-ok { color: var(--accent-green); }
-    .pro-table .status-wait { color: var(--accent-orange); }
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-variant-numeric: tabular-nums;
+    }
 
-    /* Form Grid */
-    .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; align-items: end; margin-bottom: 15px; } 
-    .form-group { display: flex; flex-direction: column; }
-    .form-group label { margin-bottom: 5px; color: #ccc; font-size: 0.85rem; }
-    
+    .container {
+      max-width: 1560px;
+      margin: 0 auto;
+      padding: 28px 20px 0;
+    }
+
+    /* TOP BAR */
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, rgba(24, 34, 52, 0.88), rgba(17, 24, 39, 0.92));
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      backdrop-filter: blur(12px);
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--accent-cyan));
+      color: #fff;
+      font-size: 1.2rem;
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.55rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-subtitle {
+      margin: 2px 0 0;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      font-family: inherit;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.16s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      border-color: var(--border-subtle);
+      padding: 10px 15px;
+      font-size: 0.9rem;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: var(--border-strong);
+    }
+
+    .btn-secondary {
+      background: rgba(6, 182, 212, 0.14);
+      color: #67e8f9;
+      border-color: rgba(6, 182, 212, 0.32);
+      padding: 10px 16px;
+      font-size: 0.9rem;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(6, 182, 212, 0.22);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent-indigo));
+      color: #fff;
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      box-shadow: 0 6px 18px rgba(59, 130, 246, 0.35);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #052e16;
+      padding: 9px 14px;
+      font-size: 0.875rem;
+      font-weight: 700;
+    }
+
+    .btn-success:hover {
+      filter: brightness(1.06);
+    }
+
+    /* SUMMARY STRIP */
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .mini-stat {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .mini-stat-label {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      font-weight: 700;
+    }
+
+    .mini-stat-value {
+      margin-top: 6px;
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+
+    /* MAIN CARD */
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .list-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+
+    .list-title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .list-title-group h2 {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .count-badge {
+      background: rgba(59, 130, 246, 0.15);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     input, select, textarea {
-      padding: 10px; border-radius: 6px; border: 1px solid #555; background-color: #fff; 
-      color: #333; width: 100%; font-size: 1rem;
+      font-family: inherit;
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      font-size: 0.92rem;
+      width: 100%;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
-    
-    #importeNetoCobrado { background-color: #d4edda; color: #155724; font-weight: 800; border: 2px solid #28a745; font-size: 1.1rem; }
-    
-    .nav-actions { display: flex; justify-content: space-between; margin-top: 20px; flex-wrap: wrap; gap: 10px; }
-    .form-actions { display: flex; gap: 10px; }
-    button { padding: 10px 15px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; }
-    #btnSubmitCourse { background: var(--accent-green); color: white; }
-    #btnCancelEdit { background: var(--accent-red); color: white; }
 
-    /* TABLA LISTADO */
-    .table-container { width: 100%; overflow-x: auto; }
-    .courses-table { width: 100%; border-collapse: collapse; min-width: 1000px; } 
-    .courses-table th { background: var(--header-bg); color: #ffd54f; padding: 12px; text-align: left; }
-    .courses-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    
-    .status-cobrado { color: var(--accent-green); font-weight:700; background: rgba(40, 167, 69, 0.1); padding: 4px 8px; border-radius: 4px; }
-    .status-pendiente { color: var(--accent-red); font-weight:700; background: rgba(220, 53, 69, 0.1); padding: 4px 8px; border-radius: 4px; }
-    tr.row-alert { background-color: rgba(220, 53, 69, 0.15) !important; border-left: 4px solid #f44336; }
-
-    .action-btns { display: flex; gap: 5px; }
-    .action-btns button { padding: 6px 10px; font-size: 0.8rem; }
-    .edit-btn { background: #2196f3; color: white; }
-    .delete-btn { background: #f44336; color: white; }
-    .obs-btn { background: #ff9800; color: white; }
-    .obs-btn.alert-btn { background: #d32f2f !important; color: white; border: 1px solid #ff5252; animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-
-    /* ANCHOS PC */
-    .courses-table th:nth-child(1) { width: 3%; }
-    .courses-table th:nth-child(2) { width: 10%; white-space: nowrap; } 
-    .courses-table th:nth-child(3) { width: 15%; }
-    .courses-table th:nth-child(4) { width: 10%; }
-    .courses-table th:nth-child(5) { width: 10%; }
-    .courses-table th:nth-child(6) { width: 6%; }
-    .courses-table th:nth-child(7) { width: 9%; }
-    .courses-table th:nth-child(8) { width: 8%; }
-    .courses-table th:nth-child(9) { width: 7%; }
-    .courses-table th:nth-child(10) { width: 6%; }
-    .courses-table th:nth-child(11) { width: 16%; min-width: 140px; }
-    .courses-table td { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
-
-    @media (max-width: 900px) {
-        .form-grid { grid-template-columns: 1fr 1fr; }
-        .kpi-row { grid-template-columns: 1fr 1fr; }
-        .dashboard-content { grid-template-columns: 1fr; }
-        .chart-box { height: 300px; }
+    input::placeholder, textarea::placeholder {
+      color: var(--text-muted);
     }
-    
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18);
+    }
+
+    .filter-control {
+      width: auto;
+      min-width: 145px;
+      padding: 8px 12px;
+      font-size: 0.86rem;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      min-width: 220px;
+    }
+
+    .search-input-wrap i {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      pointer-events: none;
+    }
+
+    .search-input-wrap input {
+      padding-left: 34px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      font-size: 0.86rem;
+    }
+
+    /* TABLE */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .courses-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1060px;
+      font-size: 0.88rem;
+    }
+
+    .courses-table thead th {
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      padding: 13px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-strong);
+      white-space: nowrap;
+    }
+
+    .courses-table tbody tr {
+      background: rgba(17, 24, 39, 0.55);
+      transition: background-color 0.16s ease;
+    }
+
+    .courses-table tbody tr:nth-child(even) {
+      background: rgba(24, 34, 52, 0.45);
+    }
+
+    .courses-table tbody tr:hover {
+      background: var(--bg-hover);
+    }
+
+    .courses-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      vertical-align: middle;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 240px;
+    }
+
+    tr.row-alert {
+      background: rgba(239, 68, 68, 0.08) !important;
+      box-shadow: inset 3px 0 0 var(--danger);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .status-cobrado {
+      color: #34d399;
+      background: var(--success-bg);
+      border: 1px solid rgba(16, 185, 129, 0.28);
+    }
+
+    .status-pendiente {
+      color: #f87171;
+      background: var(--danger-bg);
+      border: 1px solid rgba(239, 68, 68, 0.28);
+    }
+
+    .action-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .action-btns button {
+      padding: 7px 10px;
+      font-size: 0.8rem;
+      border-radius: 7px;
+    }
+
+    .obs-btn {
+      background: rgba(245, 158, 11, 0.14);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.3);
+    }
+
+    .obs-btn:hover {
+      background: rgba(245, 158, 11, 0.24);
+    }
+
+    .obs-btn.alert-btn {
+      background: rgba(239, 68, 68, 0.22);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.5);
+      animation: pulseAlert 2s infinite;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.35); }
+      50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+    }
+
+    .edit-btn {
+      background: rgba(59, 130, 246, 0.16);
+      color: #93c5fd;
+      border-color: rgba(59, 130, 246, 0.32);
+    }
+
+    .edit-btn:hover {
+      background: rgba(59, 130, 246, 0.28);
+    }
+
+    .delete-btn {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .delete-btn:hover {
+      background: rgba(239, 68, 68, 0.26);
+    }
+
+    /* MODALS */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.22s ease;
+      overflow-y: auto;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 28px 14px;
+    }
+
+    .modal-backdrop.visible {
+      display: flex;
+      opacity: 1;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-lg);
+      padding: 26px;
+      width: 100%;
+      max-width: 980px;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 32px;
+    }
+
+    .modal-card.wide {
+      max-width: 1460px;
+    }
+
+    .modal-card.narrow {
+      max-width: 520px;
+      margin-top: 8vh;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-header h2, .modal-header h3 {
+      margin: 0;
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .close-icon-btn {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      font-size: 1rem;
+    }
+
+    .close-icon-btn:hover {
+      background: rgba(239, 68, 68, 0.16);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    /* FORM */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    .span-2 { grid-column: span 2; }
+    .span-full { grid-column: 1 / -1; }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    #importeNetoCobrado {
+      background: rgba(16, 185, 129, 0.14);
+      color: #6ee7b7;
+      border: 1.5px solid rgba(16, 185, 129, 0.55);
+      font-weight: 800;
+      font-size: 1.05rem;
+    }
+
+    .alert-toggle-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: var(--radius-sm);
+    }
+
+    .alert-toggle-box input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--danger);
+      cursor: pointer;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 22px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    /* STATS */
+    .stats-filters {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .kpi-card {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+
+    .kpi-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      font-weight: 700;
+    }
+
+    .kpi-value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      margin: 8px 0 4px;
+    }
+
+    .kpi-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .dashboard-content {
+      display: grid;
+      grid-template-columns: 380px minmax(0, 1fr);
+      gap: 20px;
+    }
+
+    .chart-box, .renta-analysis {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+
+    .chart-box {
+      height: 390px;
+    }
+
+    .pro-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .pro-table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--text-secondary);
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border-strong);
+    }
+
+    .pro-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .pro-table .money {
+      text-align: right;
+      font-weight: 700;
+      color: #fbbf24;
+    }
+
+    /* LOADING */
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: var(--bg-canvas);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 14px;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .spinner {
+      width: 38px;
+      height: 38px;
+      border: 3px solid rgba(59, 130, 246, 0.22);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    #app-container {
+      display: none;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .summary-strip, .kpi-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .dashboard-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 768px) {
-        .container { padding: 0 10px; margin-top: 15px; }
-        .form-grid { grid-template-columns: 1fr; }
-        .toggle-form-container { flex-direction: column; }
-        #btnToggleForm, #btnMainMenu, #btnStats { width: 100%; }
-        .kpi-row { grid-template-columns: 1fr; }
-        
-        .courses-table thead { display: none; }
-        .courses-table, .courses-table tbody, .courses-table tr, .courses-table td { display: block; width: 100%; }
-        
-        .courses-table tr {
-            background: #2d2d44; margin-bottom: 15px; border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05);
-            position: relative; padding: 0; overflow: visible;
-        }
+      .container {
+        padding: 14px 12px 0;
+      }
+      .top-header {
+        padding: 16px;
+      }
+      .toolbar-actions, .toolbar-actions button {
+        width: 100%;
+      }
+      .summary-strip, .kpi-row, .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .span-2 {
+        grid-column: span 1;
+      }
+      .filter-bar, .filter-control, .search-input-wrap {
+        width: 100%;
+      }
 
-        .courses-table td:nth-child(3) { padding: 15px 15px 5px 15px; font-size: 1.1rem; font-weight: 700; color: #fff; border-bottom: none; width: 70% !important; white-space: normal; }
-        .courses-table td:nth-child(2) { padding: 0 15px 15px 15px; font-size: 0.9rem; color: #aaa; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .courses-table td:nth-child(7) { position: absolute; top: 15px; right: 15px; width: auto !important; text-align: right; padding: 0; font-weight: 800; font-size: 1.1rem; color: #ffd54f; border: none; background: transparent; z-index: 10; }
-        .courses-table tr::after { content: '▼'; position: absolute; bottom: 10px; right: 15px; color: rgba(255,255,255,0.3); font-size: 1.2rem; transition: transform 0.3s; }
-        .courses-table tr.expanded::after { transform: rotate(180deg); }
-
-        .courses-table td:nth-child(1), .courses-table td:nth-child(4), .courses-table td:nth-child(5),
-        .courses-table td:nth-child(6), .courses-table td:nth-child(8), .courses-table td:nth-child(9),
-        .courses-table td:nth-child(10), .courses-table td:nth-child(11) {
-            display: none; padding: 8px 15px; font-size: 0.95rem; white-space: normal;
-            border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(0,0,0,0.1);
-        }
-
-        .courses-table td:nth-child(4)::before { content: "Pagador: "; font-weight: bold; color: #888; }
-        .courses-table td:nth-child(5)::before { content: "Lugar: "; font-weight: bold; color: #888; }
-        .courses-table td:nth-child(6)::before { content: "Horas: "; font-weight: bold; color: #888; }
-        .courses-table td:nth-child(8)::before { content: "Estado: "; font-weight: bold; color: #888; }
-        .courses-table td:nth-child(9)::before { content: "Fecha Cobro: "; font-weight: bold; color: #888; }
-        .courses-table td:nth-child(10)::before { content: "Renta: "; font-weight: bold; color: #888; }
-
-        .courses-table tr.expanded td { display: block; }
-        .courses-table td:nth-child(11) { background: transparent; padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); }
-        .courses-table tr.expanded .action-btns { display: flex; width: 100%; gap: 10px; }
-        .courses-table tr.expanded .action-btns button { flex: 1; padding: 12px; font-size: 1rem; border-radius: 8px; }
+      /* Mobile cards */
+      .table-container {
+        border: none;
+        overflow: visible;
+      }
+      .courses-table {
+        min-width: 0;
+      }
+      .courses-table thead {
+        display: none;
+      }
+      .courses-table, .courses-table tbody, .courses-table tr, .courses-table td {
+        display: block;
+        width: 100%;
+        max-width: none;
+      }
+      .courses-table tr {
+        background: var(--bg-elevated) !important;
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--radius-md);
+        margin-bottom: 12px;
+        padding: 12px 14px;
+        position: relative;
+        cursor: pointer;
+      }
+      .courses-table td {
+        border: none;
+        padding: 4px 0;
+        white-space: normal;
+        overflow: visible;
+      }
+      .courses-table td:nth-child(3) {
+        font-size: 1rem;
+        font-weight: 700;
+        padding-right: 92px;
+      }
+      .courses-table td:nth-child(2) {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        margin-bottom: 6px;
+      }
+      .courses-table td:nth-child(7) {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        width: auto;
+        font-weight: 800;
+        color: #fbbf24;
+      }
+      .courses-table td:nth-child(1),
+      .courses-table td:nth-child(4),
+      .courses-table td:nth-child(5),
+      .courses-table td:nth-child(6),
+      .courses-table td:nth-child(8),
+      .courses-table td:nth-child(9),
+      .courses-table td:nth-child(10),
+      .courses-table td:nth-child(11) {
+        display: none;
+      }
+      .courses-table tr.expanded td {
+        display: block;
+        padding: 6px 0;
+        border-top: 1px solid var(--border-subtle);
+      }
+      .courses-table tr.expanded td:nth-child(4)::before { content: "Pagador: "; color: var(--text-secondary); font-weight: 600; }
+      .courses-table tr.expanded td:nth-child(5)::before { content: "Lugar: "; color: var(--text-secondary); font-weight: 600; }
+      .courses-table tr.expanded td:nth-child(6)::before { content: "Horas: "; color: var(--text-secondary); font-weight: 600; }
+      .courses-table tr.expanded td:nth-child(8)::before { content: "Estado: "; color: var(--text-secondary); font-weight: 600; }
+      .courses-table tr.expanded td:nth-child(9)::before { content: "Cobro: "; color: var(--text-secondary); font-weight: 600; }
+      .courses-table tr.expanded td:nth-child(10)::before { content: "Renta: "; color: var(--text-secondary); font-weight: 600; }
+      .courses-table tr.expanded .action-btns {
+        display: flex;
+        gap: 8px;
+        padding-top: 6px;
+      }
+      .courses-table tr.expanded .action-btns button {
+        flex: 1;
+        padding: 10px;
+      }
     }
-
-    .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); align-items:center; justify-content:center; z-index:2000; }
-    .modal-content { background:#fff; color:#333; padding:20px; border-radius:10px; max-width:500px; width:90%; position: relative;}
-    .close-modal { position: absolute; top:10px; right:10px; background:#ddd; color:#333; border:none; border-radius:50%; width:30px; height:30px; cursor:pointer; font-weight: bold;}
-    
-    #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 9999; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 1.2rem; flex-direction: column; gap: 15px; }
-    #app-container { display: none; }
   </style>
 </head>
 <body>
 
-<div id="loading-overlay">Cargando base de datos segura...</div>
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div>Cargando base de datos segura...</div>
+</div>
 
 <div class="container" id="app-container">
-  <h1>Control de Cursos</h1>
-
-  <div class="toggle-form-container">
-    <button id="btnMainMenu" onclick="window.location.href='index.html'"><i class="fas fa-home"></i> Inicio</button>
-    <button id="btnStats" onclick="openStats()"><i class="fas fa-chart-line"></i> Estadísticas y Renta</button>
-    <button id="btnToggleForm"><i class="fas fa-plus-circle"></i> Nuevo Curso</button>
-  </div>
-
-  <div class="card" style="padding: 10px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; padding: 0 10px;">
-        <h2 style="margin:0; font-size:1.2rem;">Listado General</h2>
-        <div>
-            <select id="filterListYear" onchange="render()" style="width: auto; padding: 5px; margin-right: 10px;">
-                <option value="">Todos los Años</option>
-            </select>
-            <button onclick="exportToExcel()" style="background:var(--accent-green); color:white; padding:5px 10px; font-size:0.9rem;"><i class="fas fa-file-excel"></i> Excel</button>
-        </div>
+  <header class="top-header">
+    <div class="brand-title">
+      <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+      <div>
+        <h1>Control de Cursos</h1>
+        <p class="brand-subtitle">Gestión de impartición, cobros e imputación fiscal</p>
+      </div>
     </div>
-    
+
+    <div class="toolbar-actions">
+      <button class="btn-ghost" onclick="window.location.href='index.html'">
+        <i class="fas fa-home"></i> Inicio
+      </button>
+      <button class="btn-secondary" onclick="openStats()">
+        <i class="fas fa-chart-line"></i> Estadísticas y Renta
+      </button>
+      <button class="btn-primary" id="btnToggleForm">
+        <i class="fas fa-plus"></i> Nuevo Curso
+      </button>
+    </div>
+  </header>
+
+  <section class="summary-strip" aria-label="Resumen del filtro actual">
+    <div class="mini-stat">
+      <div class="mini-stat-label">Cursos mostrados</div>
+      <div class="mini-stat-value mono" id="quickCount">0</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-stat-label">Horas acumuladas</div>
+      <div class="mini-stat-value mono" id="quickHours">0,00 h</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-stat-label">Importe neto total</div>
+      <div class="mini-stat-value mono" style="color:#34d399;" id="quickNeto">0,00 €</div>
+    </div>
+    <div class="mini-stat">
+      <div class="mini-stat-label">Pendiente de cobro</div>
+      <div class="mini-stat-value mono" style="color:#f87171;" id="quickPending">0,00 €</div>
+    </div>
+  </section>
+
+  <main class="card">
+    <div class="list-toolbar">
+      <div class="list-title-group">
+        <h2>Listado General</h2>
+        <span class="count-badge mono" id="badgeTotal">0</span>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-input-wrap">
+          <i class="fas fa-search"></i>
+          <input type="search" id="searchQuery" placeholder="Buscar curso, pagador, lugar..." oninput="render()">
+        </div>
+
+        <select id="filterListYear" class="filter-control" onchange="render()">
+          <option value="">Todos los años</option>
+        </select>
+
+        <select id="filterStatus" class="filter-control" onchange="render()">
+          <option value="ALL">Todos los estados</option>
+          <option value="COBRADO">Cobrado</option>
+          <option value="PENDIENTE">Pendiente</option>
+        </select>
+
+        <button class="btn-success" onclick="exportToExcel()">
+          <i class="fas fa-file-excel"></i> Exportar CSV
+        </button>
+      </div>
+    </div>
+
     <div class="table-container">
-        <table class="courses-table">
+      <table class="courses-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Inicio</th>
+            <th>Curso</th>
+            <th>Pagador</th>
+            <th>Lugar</th>
+            <th>Horas</th>
+            <th>Neto</th>
+            <th>Estado</th>
+            <th>Cobro</th>
+            <th>Renta</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="coursesTableBody"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL ESTADÍSTICAS -->
+<div id="stats-modal" class="modal-backdrop">
+  <div class="modal-card wide">
+    <div class="modal-header">
+      <h2><i class="fas fa-chart-pie" style="color:var(--accent-cyan);"></i> Análisis Financiero y Renta</h2>
+      <div class="stats-filters">
+        <select id="statsYear" class="filter-control" onchange="calculateStats()">
+          <option value="ALL">Todos los años</option>
+        </select>
+        <select id="statsPayer" class="filter-control" onchange="calculateStats()">
+          <option value="ALL">Todos los pagadores</option>
+        </select>
+        <button class="close-icon-btn" onclick="closeStatsModal()" aria-label="Cerrar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="kpi-row">
+      <div class="kpi-card">
+        <div class="kpi-label">Cursos realizados</div>
+        <div class="kpi-value mono" style="color:#60a5fa;" id="statCourses">0</div>
+        <div class="kpi-sub">Según filtro seleccionado</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Horas impartidas</div>
+        <div class="kpi-value mono" style="color:#fbbf24;" id="statHoras">0,00 h</div>
+        <div class="kpi-sub">Carga lectiva total</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Total neto generado</div>
+        <div class="kpi-value mono" style="color:#34d399;" id="statNetoTotal">0,00 €</div>
+        <div class="kpi-sub">Base - IRPF + KM</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Pendiente de cobro</div>
+        <div class="kpi-value mono" style="color:#f87171;" id="statPending">0,00 €</div>
+        <div class="kpi-sub">Aún no cobrado</div>
+      </div>
+    </div>
+
+    <div class="dashboard-content">
+      <div class="chart-box">
+        <canvas id="mainChart"></canvas>
+      </div>
+
+      <div class="renta-analysis">
+        <h3 style="margin:0 0 8px; font-size:1.02rem; color:#fbbf24;">
+          <i class="fas fa-file-invoice-dollar"></i> Desglose por Ejercicio Fiscal (Cobro)
+        </h3>
+        <p style="color:var(--text-secondary); font-size:0.84rem; margin:0 0 14px;">
+          Los cobros se imputan al año natural en que se perciben y se declaran en la campaña de Renta del año siguiente.
+        </p>
+        <table class="pro-table">
           <thead>
-            <tr><th>#</th><th>Inicio</th><th>Curso</th><th>Pagador</th><th>Lugar</th><th>Horas</th><th>Importe</th><th>Estado</th><th>Cobro</th><th>Renta</th><th>Acciones</th></tr>
+            <tr>
+              <th>Concepto</th>
+              <th style="text-align:right;">Importe Neto</th>
+              <th>Ejercicio Fiscal</th>
+              <th>Campaña Renta</th>
+            </tr>
           </thead>
-          <tbody id="coursesTableBody"></tbody>
+          <tbody id="statsTableBody"></tbody>
         </table>
+      </div>
     </div>
   </div>
 </div>
 
-<div id="stats-modal">
-    <div class="modal-content-wrapper stats-wrapper">
-        <div class="stats-header">
-            <h2 style="margin:0; color:#00bcd4;"><i class="fas fa-chart-pie"></i> Análisis Financiero</h2>
-            <div class="stats-filters">
-                <label>Filtrar por año de realización:</label>
-                <select id="statsYear" onchange="calculateStats()">
-                    <option value="ALL">Todos los Años</option>
-                </select>
-                <select id="statsPayer" onchange="calculateStats()">
-                    <option value="ALL">Todos los Pagadores</option>
-                </select>
-            </div>
-            <button onclick="document.getElementById('stats-modal').classList.remove('visible')" style="background:transparent; color:#fff; font-size:1.5rem; border:none; cursor:pointer;"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <div class="kpi-row">
-            <div class="kpi-card" style="border-bottom: 4px solid var(--accent-blue);">
-                <div class="kpi-label">Cursos Realizados</div>
-                <div class="kpi-value" id="statCourses">0</div>
-                <div class="kpi-sub">En el año seleccionado</div>
-            </div>
-            <div class="kpi-card" style="border-bottom: 4px solid var(--accent-orange);">
-                <div class="kpi-label">Horas Impartidas</div>
-                <div class="kpi-value" id="statHoras">0 h</div>
-                <div class="kpi-sub" style="color:#aaa;">(Total trabajo realizado)</div>
-            </div>
-            <div class="kpi-card" style="border-bottom: 4px solid var(--accent-green);">
-                <div class="kpi-label">Total Generado</div>
-                <div class="kpi-value" id="statNetoTotal">0,00 €</div>
-                <div class="kpi-sub">Valor total de los cursos</div>
-            </div>
-            <div class="kpi-card" style="border-bottom: 4px solid var(--accent-red);">
-                <div class="kpi-label">Pendiente de Cobro</div>
-                <div class="kpi-value" id="statPending" style="color:#ef5350;">0,00 €</div>
-                <div class="kpi-sub">Aún no pagado</div>
-            </div>
+<!-- MODAL FORMULARIO -->
+<div id="data-entry-form" class="modal-backdrop">
+  <div class="modal-card">
+    <div class="modal-header">
+      <h2 id="formModalTitle"><i class="fas fa-pen-to-square" style="color:#fbbf24;"></i> Nuevo Curso</h2>
+      <button class="close-icon-btn" onclick="closeFormModal()" aria-label="Cerrar">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <form id="courseForm">
+      <input type="hidden" id="courseKey">
+      <div class="form-grid">
+        <div class="form-group span-full">
+          <label for="nombreCurso">Nombre del curso</label>
+          <input type="text" id="nombreCurso" required placeholder="Ej. Documentoscopia y tráfico internacional">
         </div>
 
-        <div class="dashboard-content">
-            <div class="chart-box">
-                <canvas id="mainChart"></canvas>
-            </div>
-            
-            <div class="renta-analysis">
-                <h3 style="color:#ffd54f; margin-top:0; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
-                    <i class="fas fa-file-invoice-dollar"></i> Desglose por Ejercicio Fiscal (Cobro)
-                </h3>
-                <p id="fiscalNotice" style="color:#ccc; font-size:0.9rem; margin-bottom:15px; font-style:italic;">
-                    * El dinero se declara en la Renta del año siguiente al que se cobra.
-                </p>
-                <table class="pro-table">
-                    <thead>
-                        <tr>
-                            <th>Concepto</th>
-                            <th style="text-align:right">Importe Neto</th>
-                            <th>Ejercicio Fiscal</th>
-                            <th>Declaración Renta</th>
-                        </tr>
-                    </thead>
-                    <tbody id="statsTableBody"></tbody>
-                </table>
-            </div>
+        <div class="form-group">
+          <label for="inicio">Fecha inicio</label>
+          <input type="date" id="inicio" required>
         </div>
-    </div>
+
+        <div class="form-group">
+          <label for="fin">Fecha fin</label>
+          <input type="date" id="fin" required>
+        </div>
+
+        <div class="form-group">
+          <label for="pagador">Pagador / Entidad</label>
+          <input type="text" id="pagador" list="pagadoresListForm" required>
+          <datalist id="pagadoresListForm"></datalist>
+        </div>
+
+        <div class="form-group">
+          <label for="tipoCurso">Tipo de curso</label>
+          <input type="text" id="tipoCurso" list="tipoCursosListForm">
+          <datalist id="tipoCursosListForm"></datalist>
+        </div>
+
+        <div class="form-group">
+          <label for="horas">Horas</label>
+          <input type="text" id="horas" value="0,00" onblur="formatNumericDisplay(this); calculateFromHours();">
+        </div>
+
+        <div class="form-group">
+          <label for="precioHoraBruto">Precio / Hora (€)</label>
+          <input type="text" id="precioHoraBruto" value="0,00" onblur="formatNumericDisplay(this); calculateFromPrice();">
+        </div>
+
+        <div class="form-group">
+          <label for="importeBase">Importe Base (€)</label>
+          <input type="text" id="importeBase" value="0,00" onblur="formatNumericDisplay(this); calculateFromBase();">
+        </div>
+
+        <div class="form-group">
+          <label for="kilometraje">Kilometraje (€)</label>
+          <input type="text" id="kilometraje" value="0,00" onblur="formatNumericDisplay(this); calculateTotals();">
+        </div>
+
+        <div class="form-group">
+          <label for="irpf">IRPF (%)</label>
+          <input type="text" id="irpf" value="0,00" onblur="formatNumericDisplay(this); calculateTotals();">
+        </div>
+
+        <div class="form-group">
+          <label for="importeNetoCobrado">Total Neto (€)</label>
+          <input type="text" id="importeNetoCobrado" class="mono" readonly value="0,00">
+        </div>
+
+        <div class="form-group">
+          <label for="cobrado">Estado de cobro</label>
+          <select id="cobrado">
+            <option value="PENDIENTE">PENDIENTE</option>
+            <option value="COBRADO">COBRADO</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="fechaCobro">Fecha de cobro</label>
+          <input type="text" id="fechaCobro" placeholder="YYYY-MM-DD o DD/MM/YYYY">
+        </div>
+
+        <div class="form-group">
+          <label for="lugarCelebracion">Lugar de celebración</label>
+          <input type="text" id="lugarCelebracion">
+        </div>
+
+        <div class="form-group">
+          <label for="renta">Campaña Renta (Año)</label>
+          <input type="number" id="renta" min="2000" max="2099" placeholder="Ej. 2027">
+        </div>
+
+        <div class="form-group span-full">
+          <label for="observaciones">Observaciones</label>
+          <textarea id="observaciones" rows="3" placeholder="Notas, incidencias, datos de factura..."></textarea>
+        </div>
+
+        <div class="form-group span-full">
+          <div class="alert-toggle-box">
+            <input type="checkbox" id="alerta">
+            <label for="alerta" style="margin:0; color:#fca5a5; cursor:pointer;">
+              Marcar incidencia o alerta en este curso
+            </label>
+          </div>
+        </div>
+
+        <input type="hidden" id="importeBruto" value="0,00">
+        <input type="hidden" id="importeHoraNeto" value="0,00">
+        <input type="hidden" id="horario">
+        <input type="hidden" id="asistentes">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-ghost" onclick="closeFormModal()">Cancelar</button>
+        <button type="submit" class="btn-success" id="btnSubmitCourse">
+          <i class="fas fa-check"></i> Guardar Curso
+        </button>
+      </div>
+    </form>
   </div>
-
-<div id="data-entry-form">
-    <div class="modal-content-wrapper">
-        <h2 style="color:#ffd54f; margin-bottom:20px;">Editar/Crear Curso</h2>
-        <form id="courseForm">
-        <input type="hidden" id="courseKey">
-        <div class="form-grid">
-            <div class="form-group" style="grid-column: 1/-1;"><label>Nombre del Curso</label><input type="text" id="nombreCurso" required placeholder="Nombre del curso..."></div>
-            <div class="form-group"><label>Inicio</label><input type="date" id="inicio" required></div>
-            <div class="form-group"><label>Fin</label><input type="date" id="fin" required></div>
-            <div class="form-group"><label>Pagador</label><input type="text" id="pagador" list="pagadoresListForm" required><datalist id="pagadoresListForm"></datalist></div>
-            <div class="form-group"><label>Tipo</label><input type="text" id="tipoCurso" list="tipoCursosListForm"><datalist id="tipoCursosListForm"></datalist></div>
-            <div class="form-group"><label>Horas</label><input type="text" id="horas" onblur="formatNumericDisplay(this); calculateFromHours();"></div>
-            <div class="form-group"><label>Precio/Hora</label><input type="text" id="precioHoraBruto" onblur="formatNumericDisplay(this); calculateFromPrice();"></div>
-            <div class="form-group"><label>Base (€)</label><input type="text" id="importeBase" onblur="formatNumericDisplay(this); calculateFromBase();"></div>
-            <div class="form-group"><label>KM (€)</label><input type="text" id="kilometraje" onblur="formatNumericDisplay(this); calculateTotals();"></div>
-            <div class="form-group"><label>IRPF (%)</label><input type="text" id="irpf" onblur="formatNumericDisplay(this); calculateTotals();"></div>
-            <div class="form-group"><label>Total Neto (€)</label><input type="text" id="importeNetoCobrado" readonly></div>
-            <div class="form-group"><label>Estado</label><select id="cobrado"><option value="PENDIENTE">PENDIENTE</option><option value="COBRADO">COBRADO</option></select></div>
-            <div class="form-group"><label>Fecha Cobro</label><input type="text" id="fechaCobro"></div>
-            <div class="form-group"><label>Lugar</label><input type="text" id="lugarCelebracion"></div>
-            <div class="form-group"><label>Renta (Año)</label><input type="number" id="renta"></div>
-            <div class="form-group" style="grid-column: 1/-1;"><label>Observaciones</label><textarea id="observaciones"></textarea></div>
-            <div class="form-group" style="grid-column: 1/-1;">
-               <div style="display:flex; align-items:center; gap:10px;">
-                   <input type="checkbox" id="alerta" style="width:20px; height:20px;"> 
-                   <label for="alerta" style="margin:0; color:#fff;">Marcar incidencia</label>
-               </div>
-            </div>
-            <input type="hidden" id="importeBruto">
-            <input type="hidden" id="importeHoraNeto">
-            <input type="hidden" id="horario">
-            <input type="hidden" id="asistentes">
-        </div>
-        <div class="nav-actions">
-            <button type="button" onclick="closeFormModal()" style="background:#555; color:white;">Cancelar</button>
-            <button type="submit" id="btnSubmitCourse">Guardar</button>
-        </div>
-        </form>
-    </div>
 </div>
 
-<div id="obsModal" class="modal">
-  <div class="modal-content">
-    <button class="close-modal" onclick="closeObsModal()">X</button>
-    <h3>Detalles</h3>
-    <div id="obsText"></div>
+<!-- MODAL DETALLES -->
+<div id="obsModal" class="modal-backdrop">
+  <div class="modal-card narrow">
+    <div class="modal-header">
+      <h3><i class="fas fa-circle-info" style="color:#fbbf24;"></i> Detalles del Curso</h3>
+      <button class="close-icon-btn" onclick="closeObsModal()" aria-label="Cerrar">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div id="obsText" style="color:var(--text-primary); font-size:0.92rem;"></div>
   </div>
 </div>
 
 <script>
 const firebaseConfig = {
-    apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
-    authDomain: "markarma279.firebaseapp.com",
-    databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "markarma279",
-    messagingSenderId: "280620278315",
-    appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
+  apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
+  authDomain: "markarma279.firebaseapp.com",
+  databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "markarma279",
+  messagingSenderId: "280620278315",
+  appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
 };
 
 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const auth = firebase.auth();
-auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
 
 let USER_ID = null;
 let userDataRef = null;
 let courses = [];
-let masterCompanies = []; 
+let masterCompanies = [];
 let masterTiposCurso = [];
 let chartInstance = null;
 
 const tbody = document.getElementById('coursesTableBody');
 const formModal = document.getElementById('data-entry-form');
+const statsModal = document.getElementById('stats-modal');
+const obsModal = document.getElementById('obsModal');
 const filterListYear = document.getElementById('filterListYear');
 
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function toNumber(val) {
+  if (typeof val === "number") return Number.isFinite(val) ? val : 0;
+  const cleaned = String(val ?? "").replace(/\s+/g, "").replace(",", ".");
+  const parsed = parseFloat(cleaned);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function formatEuro(val) {
+  return toNumber(val).toLocaleString("es-ES", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " €";
+}
+
+function formatHours(val) {
+  return toNumber(val).toLocaleString("es-ES", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }) + " h";
+}
+
 auth.onAuthStateChanged((user) => {
-    if (user) {
-        USER_ID = user.email.replace(/\./g, ',');
-        userDataRef = db.ref('formacion/' + USER_ID);
-        cargarDatos();
-    } else {
-        window.location.href = "index.html";
-    }
+  if (user && user.email) {
+    USER_ID = user.email.replace(/\./g, ",");
+    userDataRef = db.ref("formacion/" + USER_ID);
+    cargarDatos();
+  } else {
+    window.location.href = "index.html";
+  }
 });
 
-function cargarDatos() {
-    userDataRef.child('cursos').once('value').then(snapshot => {
-        if (!snapshot.exists()) {
-            db.ref('FORMACION').once('value').then(old => {
-                if(old.exists()) {
-                    userDataRef.child('cursos').set(old.val()).then(() => location.reload());
-                } else {
-                    document.getElementById('loading-overlay').style.display = 'none';
-                    document.getElementById('app-container').style.display = 'block';
-                    load();
-                }
-            });
-        } else {
-            document.getElementById('loading-overlay').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-            load();
-        }
-    });
+async function cargarDatos() {
+  try {
+    const snap = await userDataRef.child("cursos").once("value");
+    if (!snap.exists()) {
+      const oldSnap = await db.ref("FORMACION").once("value");
+      if (oldSnap.exists()) {
+        await userDataRef.child("cursos").set(oldSnap.val());
+        window.location.reload();
+        return;
+      }
+    }
+    document.getElementById("loading-overlay").style.display = "none";
+    document.getElementById("app-container").style.display = "block";
+    await load();
+  } catch (err) {
+    console.error("Error cargando datos:", err);
+    document.getElementById("loading-overlay").innerHTML =
+      `<div style="color:#f87171;">Error al cargar la base de datos. Revisa la conexión o permisos.</div>`;
+  }
 }
 
 async function load() {
-    const snap = await userDataRef.child('cursos').once('value');
-    const data = snap.val();
-    courses = [];
-    if(data) {
-        for(let key in data) {
-            courses.push({key, ...data[key]});
-        }
-    }
-    courses.sort((a,b) => new Date(b.inicio) - new Date(a.inicio));
-    
-    const compSnap = await userDataRef.child('empresas').once('value');
-    masterCompanies = compSnap.val() || [];
-    const typeSnap = await userDataRef.child('tipos').once('value');
-    masterTiposCurso = typeSnap.val() || [];
-    
-    const payers = new Set(courses.map(c => c.empresa || c.pagador).filter(p=>p));
-    document.getElementById('pagadoresListForm').innerHTML = [...payers].map(p=>`<option value="${p}">`).join('');
-    document.getElementById('tipoCursosListForm').innerHTML = masterTiposCurso.map(t=>`<option value="${t}">`).join('');
+  const [snap, compSnap, typeSnap] = await Promise.all([
+    userDataRef.child("cursos").once("value"),
+    userDataRef.child("empresas").once("value"),
+    userDataRef.child("tipos").once("value")
+  ]);
 
-    const years = new Set(courses.map(c => c.inicio ? c.inicio.split('-')[0] : '').filter(y=>y.match(/\d{4}/)));
-    const sortedYears = [...years].sort((a,b)=>b-a);
-    
-    const options = '<option value="">Todos los Años</option>' + sortedYears.map(y=>`<option value="${y}">${y}</option>`).join('');
-    filterListYear.innerHTML = options;
-    
-    document.getElementById('statsYear').innerHTML = '<option value="ALL">Todos los Años</option>' + sortedYears.map(y=>`<option value="${y}">${y}</option>`).join('');
-    document.getElementById('statsPayer').innerHTML = '<option value="ALL">Todos los Pagadores</option>' + [...payers].sort().map(p=>`<option value="${p}">${p}</option>`).join('');
+  const data = snap.val() || {};
+  courses = Object.entries(data).map(([key, val]) => ({ key, ...(val || {}) }));
+  courses.sort((a, b) => new Date(b.inicio || 0) - new Date(a.inicio || 0));
 
-    render();
+  masterCompanies = Array.isArray(compSnap.val()) ? compSnap.val() : Object.values(compSnap.val() || {});
+  masterTiposCurso = Array.isArray(typeSnap.val()) ? typeSnap.val() : Object.values(typeSnap.val() || {});
+
+  const payers = new Set([
+    ...courses.map(c => (c.empresa || c.pagador || "").trim()).filter(Boolean),
+    ...masterCompanies.map(x => String(x || "").trim()).filter(Boolean)
+  ]);
+
+  const types = new Set([
+    ...courses.map(c => (c.tipoCurso || "").trim()).filter(Boolean),
+    ...masterTiposCurso.map(x => String(x || "").trim()).filter(Boolean)
+  ]);
+
+  document.getElementById("pagadoresListForm").innerHTML =
+    [...payers].sort().map(p => `<option value="${escapeHTML(p)}"></option>`).join("");
+
+  document.getElementById("tipoCursosListForm").innerHTML =
+    [...types].sort().map(t => `<option value="${escapeHTML(t)}"></option>`).join("");
+
+  const years = new Set(
+    courses
+      .map(c => (c.inicio && typeof c.inicio === "string" ? c.inicio.slice(0, 4) : ""))
+      .filter(y => /^\d{4}$/.test(y))
+  );
+  const sortedYears = [...years].sort((a, b) => Number(b) - Number(a));
+
+  const currentListYear = filterListYear.value;
+  filterListYear.innerHTML =
+    `<option value="">Todos los años</option>` +
+    sortedYears.map(y => `<option value="${y}">${y}</option>`).join("");
+  if (sortedYears.includes(currentListYear)) filterListYear.value = currentListYear;
+
+  const currentStatsYear = document.getElementById("statsYear").value;
+  document.getElementById("statsYear").innerHTML =
+    `<option value="ALL">Todos los años</option>` +
+    sortedYears.map(y => `<option value="${y}">${y}</option>`).join("");
+  if (currentStatsYear === "ALL" || sortedYears.includes(currentStatsYear)) {
+    document.getElementById("statsYear").value = currentStatsYear;
+  }
+
+  const currentStatsPayer = document.getElementById("statsPayer").value;
+  document.getElementById("statsPayer").innerHTML =
+    `<option value="ALL">Todos los pagadores</option>` +
+    [...payers].sort().map(p => `<option value="${escapeHTML(p)}">${escapeHTML(p)}</option>`).join("");
+  if ([...payers].includes(currentStatsPayer)) {
+    document.getElementById("statsPayer").value = currentStatsPayer;
+  }
+
+  render();
 }
 
-window.openStats = () => {
-    document.getElementById('stats-modal').classList.add('visible');
-    calculateStats();
-};
+function getFilteredCourses() {
+  const year = filterListYear.value;
+  const status = document.getElementById("filterStatus").value;
+  const q = (document.getElementById("searchQuery").value || "").trim().toLowerCase();
 
-// --- LÓGICA ESTADÍSTICA CORREGIDA ---
-window.calculateStats = () => {
-    const yearFilter = document.getElementById('statsYear').value;
-    const payerFilter = document.getElementById('statsPayer').value;
-    
-    // 1. Filtrar cursos REALIZADOS en el año seleccionado
-    const filtered = courses.filter(c => {
-        const startYear = c.inicio ? c.inicio.split('-')[0] : '';
-        if (yearFilter !== 'ALL' && startYear !== yearFilter) return false;
-        if (payerFilter !== 'ALL' && (c.empresa || c.pagador) !== payerFilter) return false;
-        return true;
-    });
-
-    let totalCourses = filtered.length;
-    let totalHoras = 0;
-    let totalGenerado = 0; 
-    let totalPendiente = 0;
-    
-    // Objeto para agrupar por año de cobro real
-    const moneyByPaymentYear = {};
-
-    filtered.forEach(c => {
-        const horas = parseFloat(c.horas || 0);
-        const neto = parseFloat(c.importeNeto || 0);
-        
-        totalHoras += horas;
-        totalGenerado += neto; 
-        
-        if (c.cobrado !== 'COBRADO') {
-            totalPendiente += neto;
-        } else {
-            // Determinar año real de cobro para el desglose fiscal
-            let payYear = null;
-            
-            // Prioridad 1: Fecha de cobro explícita
-            if (c.fechaCobro) {
-                const match = c.fechaCobro.match(/(\d{4})/);
-                if(match) payYear = match[0];
-                else if (c.fechaCobro.includes('/')) payYear = '20' + c.fechaCobro.split('/').pop();
-            } 
-            
-            // Prioridad 2: Renta (si dice renta 2026 -> Ejercicio 2025 -> Cobrado en 2025)
-            // OJO: La gente suele poner "Renta 2026" para referirse a la declaración que se hace en 2026
-            // correspondiente al ejercicio 2025.
-            if (!payYear && c.renta) {
-                // Asumimos que el usuario pone el año de la campaña de renta.
-                // Ejercicio = Campaña - 1
-                payYear = (parseInt(c.renta) - 1).toString();
-            }
-            
-            // Prioridad 3: Fecha inicio curso (asumimos cobrado en el mismo año)
-            if (!payYear) {
-                payYear = c.inicio.split('-')[0];
-            }
-
-            if (!moneyByPaymentYear[payYear]) moneyByPaymentYear[payYear] = 0;
-            moneyByPaymentYear[payYear] += neto;
-        }
-    });
-
-    // KPIS
-    document.getElementById('statCourses').textContent = totalCourses;
-    document.getElementById('statHoras').textContent = totalHoras.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' h';
-    document.getElementById('statNetoTotal').textContent = totalGenerado.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
-    document.getElementById('statPending').textContent = totalPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2}) + ' €';
-
-    // TABLA FISCAL
-    const tbodyStats = document.getElementById('statsTableBody');
-    tbodyStats.innerHTML = '';
-    
-    // Ordenar años de cobro
-    const sortedPayYears = Object.keys(moneyByPaymentYear).sort();
-    
-    sortedPayYears.forEach(year => {
-        const amount = moneyByPaymentYear[year];
-        const rentaYear = parseInt(year) + 1;
-        tbodyStats.innerHTML += `
-            <tr>
-                <td>Cobrado en <strong>${year}</strong></td>
-                <td class="money status-ok">${amount.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-                <td>Ejercicio Fiscal ${year}</td>
-                <td>Declaración Renta ${rentaYear}</td>
-            </tr>
-        `;
-    });
-
-    if (totalPendiente > 0) {
-        tbodyStats.innerHTML += `
-            <tr>
-                <td>Pendiente de Cobro</td>
-                <td class="money status-wait">${totalPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2})} €</td>
-                <td>-</td>
-                <td>-</td>
-            </tr>
-        `;
+  return courses.filter(c => {
+    const start = String(c.inicio || "");
+    if (year && !start.startsWith(year)) return false;
+    if (status !== "ALL" && (c.cobrado || "PENDIENTE") !== status) return false;
+    if (q) {
+      const hay = [
+        c.nombreCurso,
+        c.tituloCurso,
+        c.empresa,
+        c.pagador,
+        c.lugarCelebracion,
+        c.tipoCurso,
+        c.observaciones
+      ].map(x => String(x || "").toLowerCase()).join(" ");
+      if (!hay.includes(q)) return false;
     }
+    return true;
+  });
+}
 
-    // GRÁFICA
-    const ctx = document.getElementById('mainChart').getContext('2d');
-    if(chartInstance) chartInstance.destroy();
+function updateSummaryStrip(list) {
+  let horas = 0;
+  let neto = 0;
+  let pendiente = 0;
 
-    const labels = sortedPayYears.map(y => `Cobrado en ${y}`);
-    const data = sortedPayYears.map(y => moneyByPaymentYear[y]);
-    
-    if (totalPendiente > 0) {
-        labels.push('Pendiente');
-        data.push(totalPendiente);
-    }
+  list.forEach(c => {
+    const h = toNumber(c.horas);
+    const n = toNumber(c.importeNeto);
+    horas += h;
+    neto += n;
+    if (c.cobrado !== "COBRADO") pendiente += n;
+  });
 
-    chartInstance = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: labels,
-            datasets: [{
-                data: data,
-                backgroundColor: ['#4caf50', '#2196f3', '#ff9800', '#f44336'],
-                borderWidth: 0
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { position: 'right', labels: { color: '#fff' } },
-                title: { display: true, text: 'Distribución Real del Cobro', color: '#fff' }
-            }
-        }
-    });
-};
+  document.getElementById("quickCount").textContent = String(list.length);
+  document.getElementById("quickHours").textContent = formatHours(horas);
+  document.getElementById("quickNeto").textContent = formatEuro(neto);
+  document.getElementById("quickPending").textContent = formatEuro(pendiente);
+  document.getElementById("badgeTotal").textContent = String(list.length);
+}
 
 function render() {
-    const y = filterListYear.value;
-    const filtered = courses.filter(c => (y === '' || c.inicio.startsWith(y)));
+  const filtered = getFilteredCourses();
+  updateSummaryStrip(filtered);
 
-    if(filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding:20px;">Sin resultados</td></tr>'; return; }
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; padding:32px; color:var(--text-secondary);">No hay cursos que coincidan con el filtro</td></tr>`;
+    return;
+  }
 
-    tbody.innerHTML = filtered.map((c, i) => {
-        const statusClass = c.cobrado === 'COBRADO' ? 'status-cobrado' : 'status-pendiente';
-        const importe = parseFloat(c.importeNeto).toFixed(2).replace('.', ',');
-        const rowClass = c.alerta ? 'row-alert' : '';
-        const alertBtnClass = c.alerta ? 'alert-btn' : '';
-        
-        return `<tr onclick="this.classList.toggle('expanded')" class="${rowClass}">
-            <td>${i+1}</td>
-            <td>${c.inicio}</td>
-            <td>${c.nombreCurso || c.tituloCurso}</td>
-            <td>${c.empresa || c.pagador}</td>
-            <td>${c.lugarCelebracion}</td>
-            <td>${c.horas}</td>
-            <td>${importe} €</td>
-            <td><span class="${statusClass}">${c.cobrado}</span></td>
-            <td>${c.fechaCobro || ''}</td>
-            <td>${c.renta || ''}</td>
-            <td>
-                <div class="action-btns">
-                    <button class="obs-btn ${alertBtnClass}" onclick="event.stopPropagation(); showObs('${c.key}')" title="Ver Detalles"><i class="fas fa-eye"></i></button>
-                    <button class="edit-btn" onclick="event.stopPropagation(); editCourse('${c.key}')" title="Editar"><i class="fas fa-edit"></i></button>
-                    <button class="delete-btn" onclick="event.stopPropagation(); delCourse('${c.key}')" title="Eliminar"><i class="fas fa-trash"></i></button>
-                </div>
-            </td>
-        </tr>`;
-    }).join('');
+  tbody.innerHTML = filtered.map((c, idx) => {
+    const isCobrado = c.cobrado === "COBRADO";
+    const statusClass = isCobrado ? "status-cobrado" : "status-pendiente";
+    const statusIcon = isCobrado ? "fa-check-circle" : "fa-clock";
+    const rowClass = c.alerta ? "row-alert" : "";
+    const alertBtnClass = c.alerta ? "alert-btn" : "";
+    const cursoNombre = escapeHTML(c.nombreCurso || c.tituloCurso || "Sin título");
+    const pagadorNombre = escapeHTML(c.empresa || c.pagador || "-");
+    const lugarNombre = escapeHTML(c.lugarCelebracion || "-");
+
+    return `
+      <tr onclick="this.classList.toggle('expanded')" class="${rowClass}">
+        <td class="mono">${idx + 1}</td>
+        <td class="mono">${escapeHTML(c.inicio || "-")}</td>
+        <td title="${cursoNombre}"><strong>${cursoNombre}</strong></td>
+        <td title="${pagadorNombre}">${pagadorNombre}</td>
+        <td title="${lugarNombre}">${lugarNombre}</td>
+        <td class="mono">${toNumber(c.horas).toLocaleString("es-ES", { minimumFractionDigits: 2 })}</td>
+        <td class="mono" style="font-weight:700; color:#fbbf24;">${formatEuro(c.importeNeto)}</td>
+        <td><span class="status-badge ${statusClass}"><i class="fas ${statusIcon}"></i> ${escapeHTML(c.cobrado || "PENDIENTE")}</span></td>
+        <td class="mono">${escapeHTML(c.fechaCobro || "-")}</td>
+        <td class="mono">${escapeHTML(c.renta || "-")}</td>
+        <td onclick="event.stopPropagation()">
+          <div class="action-btns">
+            <button class="obs-btn ${alertBtnClass}" onclick="showObs('${escapeHTML(c.key)}')" title="Ver detalles"><i class="fas fa-eye"></i></button>
+            <button class="edit-btn" onclick="editCourse('${escapeHTML(c.key)}')" title="Editar"><i class="fas fa-pen"></i></button>
+            <button class="delete-btn" onclick="delCourse('${escapeHTML(c.key)}')" title="Eliminar"><i class="fas fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
 }
 
-document.getElementById('btnToggleForm').onclick = () => {
-    document.getElementById('courseForm').reset();
-    document.getElementById('courseKey').value = '';
-    formModal.classList.add('visible');
-};
+function openStats() {
+  statsModal.classList.add("visible");
+  calculateStats();
+}
 
-function closeFormModal() { formModal.classList.remove('visible'); }
+function closeStatsModal() {
+  statsModal.classList.remove("visible");
+}
 
-function getVal(id) { return parseFloat(document.getElementById(id).value.replace(',','.')) || 0; }
-function setVal(id, val) { document.getElementById(id).value = val.toFixed(2).replace('.', ','); }
+function resolvePaymentYear(c) {
+  if (c.fechaCobro) {
+    const isoMatch = String(c.fechaCobro).match(/\b(20\d{2})\b/);
+    if (isoMatch) return isoMatch[1];
+    const slashMatch = String(c.fechaCobro).match(/\/(\d{2})$/);
+    if (slashMatch) return "20" + slashMatch[1];
+  }
+  if (c.renta && /^\d{4}$/.test(String(c.renta).trim())) {
+    return String(parseInt(c.renta, 10) - 1);
+  }
+  if (c.inicio && /^\d{4}/.test(String(c.inicio))) {
+    return String(c.inicio).slice(0, 4);
+  }
+  return null;
+}
 
-window.formatNumericDisplay = (el) => { el.value = parseFloat(el.value.replace(',','.')).toFixed(2).replace('.',','); }
+function calculateStats() {
+  const yearFilter = document.getElementById("statsYear").value;
+  const payerFilter = document.getElementById("statsPayer").value;
 
-window.calculateTotals = () => {
-    const base = getVal('importeBase');
-    const km = getVal('kilometraje');
-    const irpf = getVal('irpf');
-    const h = getVal('horas');
-    
-    const bruto = base + km;
-    const ret = base * (irpf/100);
-    const neto = (base - ret) + km;
-    
-    setVal('importeBruto', bruto);
-    setVal('importeNetoCobrado', neto);
-    if(h>0) setVal('precioHoraBruto', base/h);
-};
+  const filtered = courses.filter(c => {
+    const startYear = c.inicio ? String(c.inicio).slice(0, 4) : "";
+    if (yearFilter !== "ALL" && startYear !== yearFilter) return false;
+    if (payerFilter !== "ALL" && (c.empresa || c.pagador || "") !== payerFilter) return false;
+    return true;
+  });
 
-window.calculateFromHours = () => {
-    const h = getVal('horas');
-    const p = getVal('precioHoraBruto');
-    if(h>0 && p>0) setVal('importeBase', h*p);
-    calculateTotals();
-};
+  let totalHoras = 0;
+  let totalGenerado = 0;
+  let totalPendiente = 0;
+  const moneyByPaymentYear = {};
 
-window.calculateFromPrice = calculateFromHours; 
-window.calculateFromBase = calculateTotals; 
+  filtered.forEach(c => {
+    const horas = toNumber(c.horas);
+    const neto = toNumber(c.importeNeto);
+    totalHoras += horas;
+    totalGenerado += neto;
 
-document.getElementById('courseForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const key = document.getElementById('courseKey').value;
-    const data = {
-        nombreCurso: document.getElementById('nombreCurso').value,
-        inicio: document.getElementById('inicio').value,
-        fin: document.getElementById('fin').value,
-        empresa: document.getElementById('pagador').value,
-        pagador: document.getElementById('pagador').value,
-        tipoCurso: document.getElementById('tipoCurso').value,
-        horas: getVal('horas'),
-        precioHoraBruto: getVal('precioHoraBruto'),
-        importeBase: getVal('importeBase'),
-        kilometraje: getVal('kilometraje'),
-        irpf: getVal('irpf'),
-        importeBruto: getVal('importeBruto'),
-        importeNeto: getVal('importeNetoCobrado'),
-        cobrado: document.getElementById('cobrado').value,
-        fechaCobro: document.getElementById('fechaCobro').value,
-        lugarCelebracion: document.getElementById('lugarCelebracion').value,
-        renta: document.getElementById('renta').value,
-        observaciones: document.getElementById('observaciones').value,
-        alerta: document.getElementById('alerta').checked
-    };
-
-    if(key) await userDataRef.child('cursos').child(key).update(data);
-    else await userDataRef.child('cursos').push(data);
-    
-    closeFormModal();
-    load();
-};
-
-window.editCourse = (key) => {
-    const c = courses.find(x => x.key === key);
-    document.getElementById('courseKey').value = key;
-    document.getElementById('nombreCurso').value = c.nombreCurso || c.tituloCurso;
-    document.getElementById('inicio').value = c.inicio;
-    document.getElementById('fin').value = c.fin;
-    document.getElementById('pagador').value = c.empresa || c.pagador;
-    document.getElementById('tipoCurso').value = c.tipoCurso;
-    setVal('horas', parseFloat(c.horas));
-    setVal('precioHoraBruto', parseFloat(c.precioHoraBruto));
-    setVal('importeBase', parseFloat(c.importeBase));
-    setVal('kilometraje', parseFloat(c.kilometraje));
-    setVal('irpf', parseFloat(c.irpf));
-    setVal('importeBruto', parseFloat(c.importeBruto));
-    setVal('importeNetoCobrado', parseFloat(c.importeNeto));
-    document.getElementById('cobrado').value = c.cobrado;
-    document.getElementById('fechaCobro').value = c.fechaCobro || '';
-    document.getElementById('lugarCelebracion').value = c.lugarCelebracion || '';
-    document.getElementById('renta').value = c.renta || '';
-    document.getElementById('observaciones').value = c.observaciones || '';
-    document.getElementById('alerta').checked = c.alerta || false;
-    formModal.classList.add('visible');
-};
-
-window.delCourse = (key) => {
-    if(confirm('¿Borrar curso?')) {
-        userDataRef.child('cursos').child(key).remove().then(load);
+    if (c.cobrado !== "COBRADO") {
+      totalPendiente += neto;
+    } else {
+      const payYear = resolvePaymentYear(c) || "Sin año";
+      moneyByPaymentYear[payYear] = (moneyByPaymentYear[payYear] || 0) + neto;
     }
-};
+  });
 
-window.showObs = (key) => {
-    const c = courses.find(x => x.key === key);
-    document.getElementById('obsText').innerHTML = `
-        <p><strong>Observaciones:</strong> ${c.observaciones || 'Ninguna'}</p>
-        <hr>
-        <small>ID: ${key}</small>
+  document.getElementById("statCourses").textContent = String(filtered.length);
+  document.getElementById("statHoras").textContent = formatHours(totalHoras);
+  document.getElementById("statNetoTotal").textContent = formatEuro(totalGenerado);
+  document.getElementById("statPending").textContent = formatEuro(totalPendiente);
+
+  const tbodyStats = document.getElementById("statsTableBody");
+  const sortedPayYears = Object.keys(moneyByPaymentYear).sort();
+
+  tbodyStats.innerHTML = sortedPayYears.map(year => {
+    const amount = moneyByPaymentYear[year];
+    const rentaYear = /^\d{4}$/.test(year) ? String(parseInt(year, 10) + 1) : "-";
+    return `
+      <tr>
+        <td>Cobrado en <strong>${escapeHTML(year)}</strong></td>
+        <td class="money mono" style="color:#34d399;">${formatEuro(amount)}</td>
+        <td>Ejercicio ${escapeHTML(year)}</td>
+        <td>Renta ${escapeHTML(rentaYear)}</td>
+      </tr>
     `;
-    document.getElementById('obsModal').style.display = 'flex';
+  }).join("");
+
+  if (totalPendiente > 0) {
+    tbodyStats.innerHTML += `
+      <tr>
+        <td>Pendiente de cobro</td>
+        <td class="money mono" style="color:#f87171;">${formatEuro(totalPendiente)}</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+    `;
+  }
+
+  if (!tbodyStats.innerHTML) {
+    tbodyStats.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-secondary);">Sin movimientos en este filtro</td></tr>`;
+  }
+
+  const ctx = document.getElementById("mainChart").getContext("2d");
+  if (chartInstance) chartInstance.destroy();
+
+  const labels = sortedPayYears.map(y => `Cobrado ${y}`);
+  const data = sortedPayYears.map(y => moneyByPaymentYear[y]);
+
+  if (totalPendiente > 0) {
+    labels.push("Pendiente");
+    data.push(totalPendiente);
+  }
+
+  chartInstance = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: labels.length ? labels : ["Sin datos"],
+      datasets: [{
+        data: data.length ? data : [1],
+        backgroundColor: ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "bottom", labels: { color: "#cbd5e1", padding: 14 } },
+        title: { display: true, text: "Distribución por Ejercicio de Cobro", color: "#f8fafc", font: { size: 14 } }
+      }
+    }
+  });
+}
+
+document.getElementById("btnToggleForm").onclick = () => {
+  document.getElementById("courseForm").reset();
+  document.getElementById("courseKey").value = "";
+  document.getElementById("formModalTitle").innerHTML = `<i class="fas fa-plus-circle" style="color:#34d399;"></i> Nuevo Curso`;
+  ["horas", "precioHoraBruto", "importeBase", "kilometraje", "irpf", "importeNetoCobrado", "importeBruto", "importeHoraNeto"]
+    .forEach(id => setVal(id, 0));
+  formModal.classList.add("visible");
 };
-window.closeObsModal = () => document.getElementById('obsModal').style.display = 'none';
 
-window.exportToExcel = () => {
-    const headers = [
-        "Inicio", "Fin", "Nombre Curso", "Tipo", "Pagador", "Lugar", 
-        "Horas", "Precio Hora", "Importe Base", "Kilometraje", 
-        "Importe Bruto", "IRPF %", "Importe Neto", 
-        "Estado", "Fecha Cobro", "Renta", "Observaciones"
-    ];
+function closeFormModal() {
+  formModal.classList.remove("visible");
+}
 
-    let csvContent = headers.join(";") + "\n";
+function getVal(id) {
+  return toNumber(document.getElementById(id).value);
+}
 
-    courses.forEach(c => {
-        const fmtNum = (val) => {
-            let n = parseFloat(val);
-            if (isNaN(n)) return "0,00";
-            return n.toFixed(2).replace('.', ','); 
-        };
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = toNumber(val).toFixed(2).replace(".", ",");
+}
 
-        const txt = (val) => `"${(val || "").replace(/"/g, '""')}"`;
+function formatNumericDisplay(el) {
+  el.value = toNumber(el.value).toFixed(2).replace(".", ",");
+}
 
-        let row = [
-            c.inicio || "",
-            c.fin || "",
-            txt(c.nombreCurso || c.tituloCurso),
-            txt(c.tipoCurso),
-            txt(c.empresa || c.pagador),
-            txt(c.lugarCelebracion),
-            fmtNum(c.horas),
-            fmtNum(c.precioHoraBruto),
-            fmtNum(c.importeBase),
-            fmtNum(c.kilometraje),
-            fmtNum(c.importeBruto),
-            fmtNum(c.irpf),
-            fmtNum(c.importeNeto),
-            txt(c.cobrado),
-            txt(c.fechaCobro),
-            c.renta || "",
-            txt(c.observaciones)
-        ];
-        
-        csvContent += row.join(";") + "\n";
-    });
+function calculateTotals() {
+  const base = getVal("importeBase");
+  const km = getVal("kilometraje");
+  const irpf = getVal("irpf");
+  const h = getVal("horas");
 
-    const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", `Cursos_Completo_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const bruto = base + km;
+  const ret = base * (irpf / 100);
+  const neto = (base - ret) + km;
+
+  setVal("importeBruto", bruto);
+  setVal("importeNetoCobrado", neto);
+  if (h > 0) {
+    setVal("precioHoraBruto", base / h);
+    setVal("importeHoraNeto", (base - ret) / h);
+  }
+}
+
+function calculateFromHours() {
+  const h = getVal("horas");
+  const p = getVal("precioHoraBruto");
+  if (h > 0 && p > 0) {
+    setVal("importeBase", h * p);
+  }
+  calculateTotals();
+}
+
+function calculateFromPrice() {
+  calculateFromHours();
+}
+
+function calculateFromBase() {
+  calculateTotals();
+}
+
+document.getElementById("courseForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const key = document.getElementById("courseKey").value;
+  const pagadorVal = document.getElementById("pagador").value.trim();
+  const tipoVal = document.getElementById("tipoCurso").value.trim();
+
+  const payload = {
+    nombreCurso: document.getElementById("nombreCurso").value.trim(),
+    inicio: document.getElementById("inicio").value,
+    fin: document.getElementById("fin").value,
+    empresa: pagadorVal,
+    pagador: pagadorVal,
+    tipoCurso: tipoVal,
+    horas: getVal("horas"),
+    precioHoraBruto: getVal("precioHoraBruto"),
+    importeBase: getVal("importeBase"),
+    kilometraje: getVal("kilometraje"),
+    irpf: getVal("irpf"),
+    importeBruto: getVal("importeBruto"),
+    importeHoraNeto: getVal("importeHoraNeto"),
+    importeNeto: getVal("importeNetoCobrado"),
+    cobrado: document.getElementById("cobrado").value,
+    fechaCobro: document.getElementById("fechaCobro").value.trim(),
+    lugarCelebracion: document.getElementById("lugarCelebracion").value.trim(),
+    renta: document.getElementById("renta").value.trim(),
+    observaciones: document.getElementById("observaciones").value.trim(),
+    alerta: document.getElementById("alerta").checked
+  };
+
+  if (key) {
+    await userDataRef.child("cursos").child(key).update(payload);
+  } else {
+    await userDataRef.child("cursos").push(payload);
+  }
+
+  closeFormModal();
+  await load();
 };
+
+function editCourse(key) {
+  const c = courses.find(x => x.key === key);
+  if (!c) return;
+
+  document.getElementById("courseKey").value = key;
+  document.getElementById("formModalTitle").innerHTML = `<i class="fas fa-pen-to-square" style="color:#60a5fa;"></i> Editar Curso`;
+  document.getElementById("nombreCurso").value = c.nombreCurso || c.tituloCurso || "";
+  document.getElementById("inicio").value = c.inicio || "";
+  document.getElementById("fin").value = c.fin || "";
+  document.getElementById("pagador").value = c.empresa || c.pagador || "";
+  document.getElementById("tipoCurso").value = c.tipoCurso || "";
+
+  setVal("horas", c.horas);
+  setVal("precioHoraBruto", c.precioHoraBruto);
+  setVal("importeBase", c.importeBase);
+  setVal("kilometraje", c.kilometraje);
+  setVal("irpf", c.irpf);
+  setVal("importeBruto", c.importeBruto);
+  setVal("importeHoraNeto", c.importeHoraNeto);
+  setVal("importeNetoCobrado", c.importeNeto);
+
+  document.getElementById("cobrado").value = c.cobrado || "PENDIENTE";
+  document.getElementById("fechaCobro").value = c.fechaCobro || "";
+  document.getElementById("lugarCelebracion").value = c.lugarCelebracion || "";
+  document.getElementById("renta").value = c.renta || "";
+  document.getElementById("observaciones").value = c.observaciones || "";
+  document.getElementById("alerta").checked = Boolean(c.alerta);
+
+  formModal.classList.add("visible");
+}
+
+async function delCourse(key) {
+  if (confirm("¿Eliminar este curso de forma permanente?")) {
+    await userDataRef.child("cursos").child(key).remove();
+    await load();
+  }
+}
+
+function showObs(key) {
+  const c = courses.find(x => x.key === key);
+  if (!c) return;
+
+  document.getElementById("obsText").innerHTML = `
+    <p><strong>Curso:</strong> ${escapeHTML(c.nombreCurso || c.tituloCurso || "-")}</p>
+    <p><strong>Pagador:</strong> ${escapeHTML(c.empresa || c.pagador || "-")}</p>
+    <p><strong>Observaciones:</strong><br>${escapeHTML(c.observaciones || "Ninguna")}</p>
+    <hr style="border-color:var(--border-subtle); margin:12px 0;">
+    <small style="color:var(--text-muted);" class="mono">ID: ${escapeHTML(key)}</small>
+  `;
+  obsModal.classList.add("visible");
+}
+
+function closeObsModal() {
+  obsModal.classList.remove("visible");
+}
+
+function exportToExcel() {
+  const headers = [
+    "Inicio", "Fin", "Nombre Curso", "Tipo", "Pagador", "Lugar",
+    "Horas", "Precio Hora", "Importe Base", "Kilometraje",
+    "Importe Bruto", "IRPF %", "Importe Neto",
+    "Estado", "Fecha Cobro", "Renta", "Observaciones"
+  ];
+
+  const fmtNum = (val) => toNumber(val).toFixed(2).replace(".", ",");
+  const txt = (val) => `"${String(val ?? "").replace(/"/g, '""')}"`;
+
+  const rows = getFilteredCourses().map(c => [
+    txt(c.inicio || ""),
+    txt(c.fin || ""),
+    txt(c.nombreCurso || c.tituloCurso || ""),
+    txt(c.tipoCurso || ""),
+    txt(c.empresa || c.pagador || ""),
+    txt(c.lugarCelebracion || ""),
+    fmtNum(c.horas),
+    fmtNum(c.precioHoraBruto),
+    fmtNum(c.importeBase),
+    fmtNum(c.kilometraje),
+    fmtNum(c.importeBruto),
+    fmtNum(c.irpf),
+    fmtNum(c.importeNeto),
+    txt(c.cobrado || "PENDIENTE"),
+    txt(c.fechaCobro || ""),
+    txt(c.renta || ""),
+    txt(c.observaciones || "")
+  ].join(";"));
+
+  const csvContent = headers.join(";") + "\n" + rows.join("\n");
+  const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `Cursos_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+// Cerrar modales con Escape o clic fuera del panel
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeFormModal();
+    closeStatsModal();
+    closeObsModal();
+  }
+});
+
+[formModal, statsModal, obsModal].forEach(modal => {
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) modal.classList.remove("visible");
+  });
+});
 </script>
 </body>
 </html>

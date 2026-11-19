@@ -303,22 +303,45 @@
     /* BUTTON GRID */
     .button-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(6, 1fr);
       gap: 16px;
     }
 
     .button-wrapper {
       position: relative;
       min-height: 82px;
+      min-width: 0;
     }
 
-    .button-wrapper.long {
+    .button-wrapper.w-1-3 {
       grid-column: span 2;
     }
 
+    .button-wrapper.w-1-2 {
+      grid-column: span 3;
+    }
+
+    .button-wrapper.w-2-3 {
+      grid-column: span 4;
+    }
+
+    .button-wrapper.w-full {
+      grid-column: span 6;
+    }
+
     @media (max-width: 768px) {
-      .button-wrapper.long {
+      .button-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .button-wrapper.w-1-3,
+      .button-wrapper.w-1-2,
+      .button-wrapper.w-2-3 {
         grid-column: span 1;
+      }
+
+      .button-wrapper.w-full {
+        grid-column: span 2;
       }
     }
 
@@ -432,7 +455,7 @@
       padding: 26px;
       border-radius: var(--radius-lg);
       width: 100%;
-      max-width: 460px;
+      max-width: 480px;
       position: relative;
       border: 1px solid var(--border-strong);
       box-shadow: var(--shadow-lg);
@@ -495,30 +518,52 @@
       border-color: var(--primary);
     }
 
+    .button-file-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .btn-file-choice {
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.84rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-file-choice:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: var(--primary);
+    }
+
     #drop-area {
+      box-sizing: border-box;
+      max-width: 100%;
+      min-width: 0;
       border: 1.5px dashed var(--border-strong);
       background: rgba(255, 255, 255, 0.02);
-      padding: 18px;
+      padding: 16px;
       text-align: center;
       border-radius: var(--radius-sm);
       cursor: pointer;
       margin-bottom: 18px;
       color: var(--text-secondary);
+      overflow-wrap: anywhere;
+      word-break: break-word;
       transition: border-color 0.2s ease, background-color 0.2s ease;
     }
 
-    #button-select-file {
-      width: 100%;
-      margin-bottom: 14px;
-      padding: 10px 12px;
-      background: rgba(255, 255, 255, 0.04);
-      color: var(--text-primary);
-      border-color: var(--border-subtle);
-      font-size: 0.9rem;
-    }
-
-    #button-select-file:hover {
-      background: rgba(255, 255, 255, 0.09);
+    #drop-area small {
+      display: block;
+      box-sizing: border-box;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      font-size: 0.8rem;
+      line-height: 1.35;
     }
 
     .btn-primary {
@@ -551,6 +596,15 @@
       }
       .btn-control {
         flex: 1;
+      }
+      .button-grid {
+        grid-template-columns: 1fr;
+      }
+      .button-wrapper.w-full {
+        grid-column: span 1;
+      }
+      .button-file-row {
+        grid-template-columns: 1fr;
       }
     }
   </style>
@@ -619,26 +673,40 @@
     </div>
 
     <div class="field-group">
-      <label for="button-url">Enlace o archivo HTML</label>
-      <input type="text" id="button-url" placeholder="CONTROL FORMACIÓN.html o https://...">
+      <label for="button-url">Enlace o archivo HTML (detecta subcarpetas)</label>
+      <input type="text" id="button-url" placeholder="subcarpeta/archivo.html o pega ruta de Windows">
+    </div>
+
+    <div class="field-group">
+      <label for="button-subfolder">Subcarpeta manual (opcional)</label>
+      <input type="text" id="button-subfolder" placeholder="Ej. modulos/cursos">
     </div>
 
     <input type="file" id="button-file-input" accept=".html,.htm,text/html" hidden>
-    <button type="button" id="button-select-file">
-      <i class="fas fa-folder-open"></i> Seleccionar archivo HTML
-    </button>
+    <input type="file" id="button-folder-input" webkitdirectory directory hidden>
+
+    <div class="button-file-row">
+      <button type="button" id="button-select-file" class="btn-file-choice">
+        <i class="fas fa-file-code"></i> Elegir archivo HTML
+      </button>
+      <button type="button" id="button-select-folder" class="btn-file-choice" title="Selecciona la carpeta donde está tu archivo">
+        <i class="fas fa-folder-tree"></i> Elegir por subcarpeta
+      </button>
+    </div>
 
     <div class="field-group">
       <label for="button-type">Tamaño en cuadrícula</label>
       <select id="button-type">
-        <option value="short">Normal (1 columna)</option>
-        <option value="long">Ancho (2 columnas)</option>
+        <option value="w-1-3">1/3</option>
+        <option value="w-1-2">1/2 (50%)</option>
+        <option value="w-2-3">2/3</option>
+        <option value="w-full">3/3 (Todo el ancho)</option>
       </select>
     </div>
 
     <div id="drop-area">
       <i class="fas fa-file-code" style="font-size:1.35rem; margin-bottom:6px; display:block; color:#60a5fa;"></i>
-      <small>Elige un HTML junto a index.html o arrástralo aquí para generar su ruta relativa.</small>
+      <small>Arrastra aquí el HTML o pega su ruta de Windows en el campo de enlace superior.</small>
     </div>
 
     <button id="button-submit" class="btn-primary">Guardar Cambios</button>
@@ -685,11 +753,48 @@
       .replace(/'/g, "&#39;");
   }
 
+  function cleanRelativePath(raw) {
+    let clean = String(raw || "").trim();
+    if (!clean) return "";
+
+    // Si es una URL web completa (http / https), respetarla
+    if (/^https?:\/\//i.test(clean)) return clean;
+
+    // Quitar comillas si se pegó una ruta con comillas desde Windows
+    clean = clean.replace(/^["']|["']$/g, "");
+
+    // Si viene pegada una ruta tipo "file:///C:/..."
+    clean = clean.replace(/^file:\/\/\/?/i, "");
+
+    // Convertir barras invertidas de Windows a barras web
+    clean = clean.replace(/\\/g, "/");
+
+    // Si es una ruta absoluta de disco duro (C:/Users/.../carpeta/sub/archivo.html)
+    // Extraemos la parte relevante evitando que apunte a la raíz de la máquina
+    if (/^[a-zA-Z]:\//.test(clean)) {
+      const parts = clean.split("/");
+      const currentDirName = window.location.pathname.split("/").filter(Boolean).slice(-2, -1)[0];
+      if (currentDirName && parts.includes(currentDirName)) {
+        const indexCurrent = parts.lastIndexOf(currentDirName);
+        clean = parts.slice(indexCurrent + 1).join("/");
+      } else {
+        // Tomar el final razonable (última subcarpeta + archivo)
+        clean = parts.slice(-2).join("/");
+      }
+    }
+
+    // Limpieza de barras redundantes iniciales
+    clean = clean.replace(/^\.?\/+/, "").replace(/\/+/g, "/");
+    return clean ? `./${clean}` : "";
+  }
+
   function isSafeUrl(url) {
     const trimmed = String(url || "").trim();
     if (!trimmed) return "#";
-    const lower = trimmed.toLowerCase();
-    if (lower.startsWith("javascript:") || lower.startsWith("data:") || lower.startsWith("vbscript:")) {
+    const scheme = trimmed.match(/^([a-z][a-z\d+.-]*):/i);
+    if (!scheme) return cleanRelativePath(trimmed);
+
+    if (["javascript", "data", "vbscript"].includes(scheme[1].toLowerCase())) {
       return "#";
     }
     return trimmed;
@@ -823,6 +928,21 @@
     db.ref("botones").on("value", (snap) => renderButtons(snap.val()));
   }
 
+  function normalizeButtonWidth(span) {
+    switch (span) {
+      case "w-1-3":
+      case "w-1-2":
+      case "w-2-3":
+      case "w-full":
+        return span;
+      case "long":
+        return "w-2-3";
+      case "short":
+      default:
+        return "w-1-3";
+    }
+  }
+
   function renderButtons(data) {
     const grid = document.getElementById("buttonGrid");
     grid.innerHTML = "";
@@ -834,7 +954,7 @@
 
     sorted.forEach((btn) => {
       const wrapper = document.createElement("div");
-      wrapper.className = `button-wrapper ${btn.span === "long" ? "long" : ""}`;
+      wrapper.className = `button-wrapper ${normalizeButtonWidth(btn.span)}`;
       wrapper.setAttribute("data-key", btn.key);
 
       if (isEditMode && isAdmin) {
@@ -882,17 +1002,27 @@
     editingKey = key;
     document.getElementById("button-name").value = "";
     document.getElementById("button-url").value = "";
-    document.getElementById("button-type").value = "short";
+    document.getElementById("button-subfolder").value = "";
+    document.getElementById("button-type").value = "w-1-3";
     document.getElementById("buttonModalTitle").textContent = key ? "Editar botón" : "Nuevo botón";
+    resetDropAreaText();
 
     if (key) {
       const snap = await db.ref("botones/" + key).once("value");
       const d = snap.val() || {};
       document.getElementById("button-name").value = d.name || "";
       document.getElementById("button-url").value = d.url || "";
-      document.getElementById("button-type").value = d.span === "long" ? "long" : "short";
+      document.getElementById("button-subfolder").value = getSubfolderFromUrl(d.url || "");
+      document.getElementById("button-type").value = normalizeButtonWidth(d.span);
     }
     btnModal.classList.add("open");
+  }
+
+  function resetDropAreaText() {
+    drop.innerHTML = `
+      <i class="fas fa-file-code" style="font-size:1.35rem; margin-bottom:6px; display:block; color:#60a5fa;"></i>
+      <small>Arrastra aquí el HTML o usa los botones superiores.</small>
+    `;
   }
 
   function closeButtonModal() {
@@ -905,22 +1035,28 @@
   document.getElementById("button-submit").onclick = async () => {
     if (!isAdmin) return;
     const name = document.getElementById("button-name").value.trim();
-    const rawUrl = document.getElementById("button-url").value.trim();
+    let rawUrl = document.getElementById("button-url").value.trim();
+
+    if (!rawUrl) {
+      const sub = normalizeSubfolder(subfolderInput.value);
+      if (sub) rawUrl = `./${sub}/index.html`;
+    }
+
     const safeUrl = isSafeUrl(rawUrl);
 
     if (!name) {
       alert("El botón necesita un nombre.");
       return;
     }
-    if (rawUrl && safeUrl === "#") {
-      alert("Ese enlace no está permitido.");
+    if (!safeUrl || safeUrl === "#") {
+      alert("Debes indicar un archivo HTML o enlace válido.");
       return;
     }
 
     const payload = {
       name,
       url: safeUrl,
-      span: document.getElementById("button-type").value === "long" ? "long" : "short"
+      span: normalizeButtonWidth(document.getElementById("button-type").value)
     };
 
     if (editingKey) {
@@ -986,25 +1122,99 @@
 
   const drop = document.getElementById("drop-area");
   const fileInput = document.getElementById("button-file-input");
+  const folderInput = document.getElementById("button-folder-input");
+  const urlInput = document.getElementById("button-url");
+  const subfolderInput = document.getElementById("button-subfolder");
 
-  function setSelectedHtmlFile(file) {
-    if (!/\.html?$/i.test(file.name)) {
-      alert("Selecciona un archivo .html o .htm que esté junto a index.html.");
-      return;
-    }
-
-    const url = `./${encodeURIComponent(file.name)}`;
-    document.getElementById("button-url").value = url;
-    drop.innerHTML = `<i class="fas fa-check" style="color:#34d399; font-size:1.3rem;"></i><br><small>${escapeHTML(file.name)} → ${escapeHTML(url)}</small>`;
+  function getSubfolderFromUrl(url) {
+    const path = String(url || "").trim().split(/[?#]/, 1)[0].replace(/^\.\//, "");
+    const lastSlash = path.lastIndexOf("/");
+    return lastSlash < 0 ? "" : path.slice(0, lastSlash);
   }
 
+  function normalizeSubfolder(value) {
+    return String(value || "")
+      .trim()
+      .replace(/\\/g, "/")
+      .replace(/\/+/g, "/")
+      .replace(/^\/+|\/+$/g, "")
+      .replace(/^(?:\.\/)+/, "");
+  }
+
+  function applyFileSelection(filename, detectedSubfolder = "") {
+    let subfolder = detectedSubfolder ? normalizeSubfolder(detectedSubfolder) : normalizeSubfolder(subfolderInput.value);
+    subfolderInput.value = subfolder;
+
+    const fullUrl = cleanRelativePath(`${subfolder ? `${subfolder}/` : ""}${filename}`);
+    urlInput.value = fullUrl;
+
+    if (!document.getElementById("button-name").value.trim()) {
+      const cleanName = filename.replace(/\.html?$/i, "").replace(/[-_]+/g, " ");
+      document.getElementById("button-name").value = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+    }
+
+    drop.innerHTML = `<i class="fas fa-check-circle" style="color:#10b981; font-size:1.4rem; margin-bottom:4px;"></i><br><small><strong>${escapeHTML(filename)}</strong><br>${escapeHTML(fullUrl)}</small>`;
+  }
+
+  // Pegar directamente rutas con subcarpetas
+  urlInput.addEventListener("input", () => {
+    const val = urlInput.value.trim();
+    if (val && !/^https?:\/\//i.test(val)) {
+      const cleaned = cleanRelativePath(val);
+      if (cleaned && cleaned !== val && !val.endsWith("/")) {
+        urlInput.value = cleaned;
+      }
+      subfolderInput.value = getSubfolderFromUrl(urlInput.value);
+    }
+  });
+
+  subfolderInput.addEventListener("input", () => {
+    const sub = normalizeSubfolder(subfolderInput.value);
+    const cur = urlInput.value.trim();
+    if (cur && !/^https?:\/\//i.test(cur)) {
+      const fileName = cur.split("/").pop() || "index.html";
+      urlInput.value = cleanRelativePath(`${sub ? `${sub}/` : ""}${fileName}`);
+    }
+  });
+
+  // 1. Selector de archivo individual
   document.getElementById("button-select-file").onclick = () => fileInput.click();
   fileInput.addEventListener("change", () => {
     const file = fileInput.files[0];
-    if (file) setSelectedHtmlFile(file);
+    if (file) {
+      if (!/\.html?$/i.test(file.name)) {
+        alert("Selecciona un archivo .html o .htm");
+        return;
+      }
+      applyFileSelection(file.name);
+    }
     fileInput.value = "";
   });
 
+  // 2. Selector de carpeta completa (autodetecta subcarpetas)
+  document.getElementById("button-select-folder").onclick = () => folderInput.click();
+  folderInput.addEventListener("change", () => {
+    const files = Array.from(folderInput.files);
+    if (!files.length) return;
+
+    // Buscar si hay index.html o el primer html disponible
+    let target = files.find(f => /index\.html?$/i.test(f.name)) || files.find(f => /\.html?$/i.test(f.name));
+
+    if (!target) {
+      alert("No se encontró ningún archivo .html dentro de esa carpeta.");
+      return;
+    }
+
+    const relPath = target.webkitRelativePath || target.name;
+    const parts = relPath.replace(/\\/g, "/").split("/");
+    const fileName = parts.pop();
+    const folderPath = parts.join("/");
+
+    applyFileSelection(fileName, folderPath);
+    folderInput.value = "";
+  });
+
+  // Drag & drop
   drop.addEventListener("dragover", (e) => {
     e.preventDefault();
     drop.style.borderColor = "#34d399";
@@ -1018,8 +1228,24 @@
     e.preventDefault();
     drop.style.borderColor = "";
     drop.style.background = "";
+
+    // Si arrastraron texto (ej. una ruta de Windows o enlace copiado)
+    const textData = e.dataTransfer.getData("text");
+    if (textData && !e.dataTransfer.files.length) {
+      urlInput.value = cleanRelativePath(textData);
+      subfolderInput.value = getSubfolderFromUrl(urlInput.value);
+      drop.innerHTML = `<i class="fas fa-check" style="color:#34d399; font-size:1.3rem;"></i><br><small>Ruta detectada:<br>${escapeHTML(urlInput.value)}</small>`;
+      return;
+    }
+
     const file = e.dataTransfer.files[0];
-    if (file) setSelectedHtmlFile(file);
+    if (file) {
+      if (!/\.html?$/i.test(file.name)) {
+        alert("Arrastra un archivo .html");
+        return;
+      }
+      applyFileSelection(file.name);
+    }
   });
 
   document.addEventListener("keydown", (e) => {

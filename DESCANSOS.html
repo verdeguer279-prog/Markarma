@@ -3,282 +3,888 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Vacaciones y Asuntos Propios</title>
+    <title>GAD · Gestión de Descansos y Horas</title>
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
-        /* =========================================
-           ESTILOS ORIGINALES + NUEVOS PLEGABLES
-           ========================================= */
         :root {
-            --primary-color: #3498db;
-            --secondary-color: #2980b9;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #2c3e50;
-            --gray-border: #e0e0e0;
+            --bg-canvas: #0b0f19;
+            --bg-surface: #111827;
+            --bg-elevated: #182234;
+            --bg-hover: #1e2b42;
+            --border-subtle: rgba(148, 163, 184, 0.14);
+            --border-strong: rgba(148, 163, 184, 0.28);
+
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --accent-indigo: #6366f1;
+            --accent-purple: #8b5cf6;
+            --accent-amber: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.45);
+            --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.65);
         }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; line-height: 1.5; font-size: 14px; -webkit-tap-highlight-color: transparent; }
-        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
-        
-        header { background-color: var(--primary-color); color: white; padding: 15px 0; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 25px; }
-        .header-content { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; flex-wrap: wrap; gap: 15px;}
-        h1 { font-size: 1.6rem; font-weight: 600; margin: 0; }
-        
-        .btn { display: inline-block; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; text-decoration: none; transition: all 0.2s; color: white; font-size: 0.9rem; }
-        .btn-primary { background-color: var(--primary-color); }
-        .btn-primary:hover { background-color: var(--secondary-color); }
-        .btn-secondary { background-color: #ecf0f1; color: #333; border: 1px solid #ccc; }
-        .btn-secondary:hover { background-color: #dcdcdc; }
-        .btn-warning { background-color: #f39c12; color: white; }
-        .btn-warning:hover { background-color: #d68910; }
-        .btn-small { padding: 4px 10px; font-size: 0.8rem; }
-        
-        .card { background-color: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 20px; height: 100%; border: 1px solid var(--gray-border); display: flex; flex-direction: column; }
-        .card-title-left { font-size: 1.3rem; margin-bottom: 20px; color: var(--dark-color); border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; font-weight: 700; }
-        
-        /* Estilos para Plegables (Acordeón) */
-        .collapsible-header { cursor: pointer; user-select: none; justify-content: space-between !important; margin-bottom: 0 !important; border-bottom: none !important; padding-bottom: 0 !important; transition: background-color 0.2s; border-radius: 4px; padding: 10px;}
-        .collapsible-header:hover { background-color: #f8f9fa; }
-        .collapsible-header::after { content: '▼'; font-size: 0.8em; transition: transform 0.3s; color: #888; }
-        .collapsible-header.open { border-bottom: 2px solid #f0f0f0 !important; margin-bottom: 15px !important; padding-bottom: 10px !important; }
-        .collapsible-header.open::after { transform: rotate(180deg); }
-        .collapsible-content { display: none; flex-direction: column; flex: 1; }
-        .collapsible-content.open { display: flex; }
 
-        .status-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; margin-bottom: 25px; width: 100%; }
-        .status-card { background-color: white; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 15px; text-align: center; border: 1px solid var(--gray-border); display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; }
-        .status-value { font-size: 2.2rem; font-weight: 700; margin: 10px 0; line-height: 1; }
-        .vacaciones { color: var(--primary-color); }
-        .asuntos-propios { color: var(--warning-color); }
-        .horas-acumuladas { color: var(--success-color); }
-        .anio-anterior { color: #9b59b6; }
-        .permutas { color: #8e44ad; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; margin-bottom: 25px; }
-        
-        .form-group { margin-bottom: 15px; width: 100%; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; font-size: 0.9rem; }
-        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; background-color: #fff; height: 40px;}
-        input:disabled { background-color: #f9f9f9; color: #777; }
-        
-        .table-container { overflow-x: auto; margin-top: 15px; border: 1px solid var(--gray-border); border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; } 
-        th, td { padding: 12px 15px; border-bottom: 1px solid #eee; text-align: left; vertical-align: middle; }
-        th { background-color: #f8f9fa; font-weight: 600; color: #444; }
-        
-        .estado-badge { padding: 5px 10px; border-radius: 4px; font-weight: 700; font-size: 0.85rem; display: inline-block; text-align: center; width: 100px; }
-        .EnTrámite, .tramite { background-color: #FFF59D; color: #F57F17; border: 1px solid #FBC02D; }
-        .Denegado, .denegado { background-color: #EF9A9A; color: #B71C1C; border: 1px solid #E53935; }
-        .Disfrutado, .disfrutado { background-color: #A5D6A7; color: #1B5E20; border: 1px solid #43A047; }
-        .Pendiente, .pendiente { background-color: #e2e3e5; color: #383d41; border: 1px solid #d6d8db; }
-        
-        .actions { display: flex; gap: 5px; justify-content: flex-end; align-items: center; }
-        .btn-action { padding: 6px 12px; font-size: 0.85rem; border: none; border-radius: 4px; cursor: pointer; color: #333; font-weight: 600; white-space: nowrap; }
-        
-        .btn-tramite { background-color: #FFEB3B; border: 1px solid #e6db55; }
-        .btn-tramite:hover { background-color: #fdd835; }
-        .btn-denegado { background-color: #F44336; color: white; border: 1px solid #d32f2f; }
-        .btn-denegado:hover { background-color: #d32f2f; }
-        .btn-disfrutado { background-color: #4CAF50; color: white; border: 1px solid #388e3c; }
-        .btn-disfrutado:hover { background-color: #388e3c; }
-        
-        .btn-icon { padding: 6px 10px; color: white; min-width: 35px; text-align: center;}
-        .btn-editar { background-color: var(--primary-color); border: 1px solid #2980b9; }
-        .btn-eliminar { background-color: #7f8c8d; border: 1px solid #636e72; }
-        
-        .filtros { display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap; }
-        .btn-filtro { background: white; border: 1px solid #ddd; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; color: #555; transition: all 0.2s; }
-        .btn-filtro.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background-color: white; padding: 25px; border-radius: 8px; width: 95%; max-width: 650px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .modal-title { font-size: 1.4rem; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; color: var(--dark-color); }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
-        
-        .historial-list { max-height: 350px; overflow-y: auto; border: 1px solid #eee; padding: 0; border-radius: 4px; margin-top: 10px; }
-        .item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; border-bottom: 1px solid #eee; background: #fff; }
-        .item-row:nth-child(even) { background-color: #f9f9f9; }
-        
-        .permuta-display { display: flex; flex-direction: column; width: 100%; }
-        .permuta-header { font-weight: bold; font-size: 1.1rem; color: #2c3e50; margin-bottom: 5px; }
-        .permuta-details { display: flex; gap: 20px; margin-top: 5px; flex-wrap: wrap; }
-        .permuta-chip { background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 4px; padding: 5px 10px; font-size: 0.9rem; color: #495057; }
-        
-        .horas-pos { color: var(--success-color); font-weight: bold; }
-        .horas-neg { color: var(--danger-color); font-weight: bold; }
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.12), transparent 42%),
+                radial-gradient(circle at 85% 12%, rgba(99, 102, 241, 0.10), transparent 40%),
+                var(--bg-canvas);
+            color: var(--text-primary);
+            line-height: 1.5;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
 
-        tr.detail-row { display: none; }
-        .mobile-detail-content { padding: 15px; background: #f9f9f9; border-bottom: 2px solid #ddd; }
-        .mobile-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; font-size: 0.9rem; }
-        .mobile-actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
-        .mobile-actions-grid button { width: 100%; }
+        .container {
+            max-width: 1560px;
+            margin: 0 auto;
+            padding: 24px 20px 60px;
+        }
 
+        header {
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-subtle);
+            padding: 16px 0;
+            margin-bottom: 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-title-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-badge {
+            background: linear-gradient(135deg, var(--primary), var(--accent-indigo));
+            color: white;
+            font-weight: 800;
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            border-radius: var(--radius-sm);
+            letter-spacing: 0.05em;
+        }
+
+        h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+        }
+
+        .year-selector-pill {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-strong);
+            padding: 6px 14px;
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .year-selector-pill label {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .year-selector-pill select {
+            background: transparent;
+            color: var(--text-primary);
+            font-weight: 800;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-family: inherit;
+        }
+
+        .year-selector-pill select option {
+            background: var(--bg-surface);
+            color: var(--text-primary);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.86rem;
+            font-family: inherit;
+            text-decoration: none;
+            transition: transform 0.16s ease, background-color 0.2s ease, border-color 0.2s ease, filter 0.2s ease;
+        }
+
+        .btn:active { transform: scale(0.98); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent-indigo));
+            color: white;
+        }
+        .btn-primary:hover { filter: brightness(1.1); }
+
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            border-color: var(--border-subtle);
+        }
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-color: var(--border-strong);
+        }
+
+        .btn-purple {
+            background: rgba(139, 92, 246, 0.15);
+            color: #c4b5fd;
+            border-color: rgba(139, 92, 246, 0.35);
+        }
+        .btn-purple:hover {
+            background: rgba(139, 92, 246, 0.28);
+        }
+
+        .btn-amber {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fcd34d;
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+        .btn-amber:hover {
+            background: rgba(245, 158, 11, 0.28);
+        }
+
+        .btn-small { padding: 5px 11px; font-size: 0.78rem; border-radius: 6px; }
+
+        /* GRID ESTADOS */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .status-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--border-subtle);
+        }
+
+        .status-card.card-vac::before { background: var(--primary); }
+        .status-card.card-ap::before { background: var(--accent-amber); }
+        .status-card.card-horas::before { background: var(--success); }
+        .status-card.card-prev::before { background: var(--accent-purple); }
+        .status-card.card-perm::before { background: #06b6d4; }
+
+        .status-card h3 {
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.3rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin: 6px 0;
+        }
+
+        .val-vac { color: #60a5fa; }
+        .val-ap { color: #fbbf24; }
+        .val-horas-pos { color: #34d399; }
+        .val-horas-neg { color: #f87171; }
+        .val-prev { color: #c084fc; }
+        .val-perm { color: #38bdf8; }
+
+        .status-sub {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        /* CARDS & PLEGABLES */
+        .card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 22px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .card-title-left {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+        }
+
+        .collapsible-header {
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            margin-bottom: 0 !important;
+            border-bottom: none !important;
+        }
+        .collapsible-header:hover { background: var(--bg-hover); }
+        .collapsible-header::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            transition: transform 0.25s ease;
+        }
+        .collapsible-header.open {
+            border-bottom: 1px solid var(--border-subtle) !important;
+            margin-bottom: 16px !important;
+            padding-bottom: 12px !important;
+        }
+        .collapsible-header.open::after {
+            transform: rotate(180deg);
+            color: var(--primary);
+        }
+        .collapsible-content { display: none; }
+        .collapsible-content.open { display: block; animation: fadeIn 0.25s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            border-radius: var(--radius-sm);
+            font-family: inherit;
+            font-size: 0.9rem;
+            height: 42px;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        input:disabled {
+            background: rgba(15, 23, 42, 0.6);
+            color: var(--text-muted);
+            border-color: rgba(148, 163, 184, 0.08);
+            cursor: not-allowed;
+        }
+
+        /* TABLA DE SOLICITUDES */
+        .table-container {
+            overflow-x: auto;
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            background: var(--bg-surface);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background: rgba(24, 34, 52, 0.7);
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        tr.main-row:hover { background: rgba(255, 255, 255, 0.02); }
+
+        .estado-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            display: inline-block;
+            text-align: center;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-tramite { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.35); }
+        .badge-denegado { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.35); }
+        .badge-disfrutado { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.35); }
+        .badge-concedido { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.35); }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .btn-action {
+            padding: 5px 10px;
+            font-size: 0.78rem;
+            border-radius: 6px;
+            font-weight: 700;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn-action.btn-t-tramite { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+        .btn-action.btn-t-denegado { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+        .btn-action.btn-t-disfrutado { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+
+        .btn-action.btn-t-tramite:hover { background: rgba(245, 158, 11, 0.28); }
+        .btn-action.btn-t-denegado:hover { background: rgba(239, 68, 68, 0.28); }
+        .btn-action.btn-t-disfrutado:hover { background: rgba(16, 185, 129, 0.28); }
+
+        .btn-icon {
+            padding: 5px 9px;
+            color: var(--text-secondary);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-icon:hover { color: var(--text-primary); background: var(--bg-hover); }
+
+        .filtros {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn-filtro {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .btn-filtro.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* MODALES */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.82);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: var(--bg-surface);
+            padding: 26px;
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 680px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-strong);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 12px;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .historial-list {
+            max-height: 380px;
+            overflow-y: auto;
+            border: 1px solid var(--border-subtle);
+            padding: 6px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-elevated);
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            margin-bottom: 4px;
+            background: var(--bg-surface);
+            font-size: 0.88rem;
+        }
+        .item-row:last-child { margin-bottom: 0; }
+
+        .permuta-display {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .permuta-header {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .permuta-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .permuta-chip {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .horas-pos { color: #34d399; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+        .horas-neg { color: #f87171; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+        .consumo-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-subtle);
+            align-items: center;
+            background: var(--bg-surface);
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 0.88rem;
+        }
+
+        /* PLANIFICACIÓN ANUAL - TARJETAS Y GRID */
+        .plan-item {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .plan-item.plan-concedido {
+            border-left: 4px solid var(--primary);
+        }
+        .plan-item.plan-denegado {
+            border-left: 4px solid var(--danger);
+            opacity: 0.75;
+        }
+        .plan-item.plan-tramite {
+            border-left: 4px solid var(--accent-amber);
+        }
+
+        .plan-actions-group {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        /* NOTIFICACIONES Y CARGA */
         .hidden { display: none !important; }
-        .loading { position: fixed; top:0; left:0; width:100%; height:100%; background:white; z-index:3000; display:flex; justify-content:center; align-items:center; font-size:1.2rem; color:var(--primary-color); }
-        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 4px; color: white; z-index: 4000; animation: slideIn 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-weight: 500; }
-        .notif-success { background-color: var(--success-color); }
-        .notif-error { background-color: var(--danger-color); }
+        .loading {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-canvas);
+            z-index: 3000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            font-size: 1rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .spinner {
+            width: 42px;
+            height: 42px;
+            border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            color: white;
+            z-index: 4000;
+            box-shadow: var(--shadow-lg);
+            font-weight: 600;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+        .notif-success { background: #065f46; border: 1px solid #10b981; }
+        .notif-error { background: #7f1d1d; border: 1px solid #ef4444; }
+        .notif-info { background: #1e3a8a; border: 1px solid #3b82f6; }
+
         @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        @media (min-width: 769px) { tr.detail-row { display: none !important; } }
-        @media (max-width: 1200px) { .status-grid { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 900px) { .form-row { grid-template-columns: 1fr; } .status-grid { grid-template-columns: repeat(2, 1fr); } }
+        /* RESPONSIVE */
+        @media (max-width: 1200px) {
+            .status-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .form-row { grid-template-columns: 1fr; }
+            .status-grid { grid-template-columns: repeat(2, 1fr); }
+        }
         @media (max-width: 768px) {
             .status-grid { grid-template-columns: 1fr; }
-            .header-content { flex-direction: column; text-align: center; gap: 10px; }
+            .header-content { flex-direction: column; text-align: center; }
             .table-container { border: none; }
-            table { width: 100%; min-width: 100%; }
+            table { min-width: 100%; }
             th.hide-mobile, td.hide-mobile { display: none; }
-            td:nth-child(2)::after { content: ' ▼'; font-size: 0.8em; color: #999; float: right; }
-            tr.main-row { cursor: pointer; border-bottom: 1px solid #ddd; }
-            tr.main-row.active { background-color: #eef2f7; }
+            td:nth-child(2)::after { content: ' \25bc'; font-size: 0.75em; color: var(--text-muted); float: right; }
+            tr.main-row { cursor: pointer; }
+            tr.detail-row { display: none; }
             tr.detail-row.open { display: table-row; }
-        }
-
-        .consumo-item { display: flex; justify-content: space-between; padding: 8px 10px; border-bottom: 1px solid #eee; align-items: center;}
-        .consumo-item:last-child { border-bottom: none; }
-        /* --- AJUSTES EXTRA PARA MÓVILES --- */
-        @media (max-width: 768px) {
-            .header-content { flex-direction: column; text-align: center; gap: 15px; padding: 15px; }
-            .header-content > div { flex-wrap: wrap; justify-content: center; width: 100%; }
-            .header-content button, .header-content a { width: 100%; justify-content: center; text-align: center; margin-bottom: 5px;}
-            /* Hacer que los formularios dentro de los modales se pongan en una sola columna en móvil */
-            .modal-content > div[style*="grid-template-columns"] { grid-template-columns: 1fr !important; }
+            .mobile-detail-content {
+                padding: 14px;
+                background: var(--bg-elevated);
+                border-bottom: 2px solid var(--border-strong);
+            }
+            .mobile-info-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                margin-bottom: 12px;
+                font-size: 0.85rem;
+            }
+            .mobile-actions-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+            }
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
+
     <header>
         <div class="container header-content">
-            <h1>Gestión de Vacaciones y Asuntos Propios</h1>
+            <div class="header-title-box">
+                <span class="header-badge">GAD</span>
+                <h1>Gestión de Vacaciones, Asuntos Propios y Horas</h1>
+            </div>
             
-            <div style="background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 4px; display: flex; align-items: center;">
-                <label style="color: white; margin-right: 10px; margin-bottom: 0;">Año Activo:</label>
-                <select id="selector-anio-global" style="width: auto; height: 30px; font-weight: bold; padding: 0 10px; border:none;"></select>
+            <div class="year-selector-pill">
+                <label for="selector-anio-global"><i class="fas fa-calendar-alt"></i> Año Activo:</label>
+                <select id="selector-anio-global"></select>
             </div>
 
-            <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: center;">
-                <button onclick="abrirIncidencias()" class="btn btn-primary" style="background-color: #8e44ad; display: flex; align-items: center; gap: 8px;">
-                    <span>⚠️</span> Incidencias
+            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: center;">
+                <button onclick="abrirPlanificacionAnual()" class="btn btn-amber">
+                    <i class="fas fa-calendar-check"></i> Planificación Anual
                 </button>
-                <button onclick="abrirHistoricoMovimientos()" class="btn btn-warning" style="display: flex; align-items: center; gap: 8px;">
-                    <span>📖</span> Histórico Movimientos
+                <button onclick="abrirIncidencias()" class="btn btn-purple">
+                    <i class="fas fa-triangle-exclamation"></i> Incidencias
                 </button>
-                <a href="index.html" class="btn btn-secondary">Volver al Inicio</a>
+                <button onclick="abrirHistoricoMovimientos()" class="btn btn-secondary">
+                    <i class="fas fa-file-invoice"></i> Histórico y PDF
+                </button>
+                <a href="index.html" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver al Menú
+                </a>
             </div>
+        </div>
     </header>
     
     <div class="container">
         <div id="notification-area"></div>
-        <div id="loading"><div class="loading">Sincronizando con base de datos...</div></div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <div>Sincronizando con base de datos policial...</div>
+        </div>
         
         <div id="app" class="hidden">
+            <!-- STATUS TOP GRID -->
             <div class="status-grid">
-                <div class="status-card">
+                <div class="status-card card-vac">
                     <h3>Vacaciones <span class="anio-display"></span></h3>
-                    <div class="status-value vacaciones" id="vacaciones-disponibles">--</div>
-                    <p style="font-size:0.8rem; color:#777;">Días restantes</p>
+                    <div class="status-value val-vac" id="vacaciones-disponibles">--</div>
+                    <p class="status-sub">Días restantes de la bolsa</p>
                 </div>
                 
-                <div class="status-card">
+                <div class="status-card card-ap">
                     <h3>Asuntos Propios <span class="anio-display"></span></h3>
-                    <div class="status-value asuntos-propios" id="asuntos-propios-disponibles">--</div>
-                    <p style="font-size:0.8rem; color:#777;">Días restantes</p>
+                    <div class="status-value val-ap" id="asuntos-propios-disponibles">--</div>
+                    <p class="status-sub">Días restantes de la bolsa</p>
                 </div>
                 
-                <div class="status-card">
+                <div class="status-card card-horas">
                     <h3>Bolsa de Horas <span class="anio-display"></span></h3>
-                    <div class="status-value horas-acumuladas" id="horas-acumuladas">--</div>
-                    <p style="font-size:0.8rem; color:#777;">Saldo a final de año</p>
-                    <button id="btn-gestionar-horas" class="btn btn-primary btn-small" style="margin-top:auto;">Gestionar</button>
+                    <div class="status-value val-horas-pos" id="horas-acumuladas">--</div>
+                    <p class="status-sub" id="horas-info-cierre">Saldo activo computable</p>
+                    <button id="btn-gestionar-horas" class="btn btn-primary btn-small" style="margin-top:auto;">
+                        <i class="fas fa-clock"></i> Gestionar Horas
+                    </button>
                 </div>
                 
-                <div class="status-card">
-                    <h3>Año Anterior</h3>
-                    <div>
-                        <span class="anio-anterior" style="font-weight:bold; font-size:1.2rem;" id="vacaciones-anio-anterior">--</span> 
-                        <span style="font-size:0.8rem">Vac (31 Ene)</span>
+                <div class="status-card card-prev">
+                    <h3>Arrastre Año Anterior</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px;">
+                        <span style="font-size:0.82rem; color:var(--text-secondary);">Vacaciones (31 Ene):</span>
+                        <span class="val-prev" style="font-weight:700; font-size:1.15rem; font-family:'JetBrains Mono', monospace;" id="vacaciones-anio-anterior">--</span>
                     </div>
-                    <div style="margin-top:5px;">
-                        <span class="anio-anterior" style="font-weight:bold; font-size:1.2rem;" id="asuntos-anio-anterior">--</span>
-                        <span style="font-size:0.8rem">AP (15 Feb)</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+                        <span style="font-size:0.82rem; color:var(--text-secondary);">Asuntos Propios (15 Feb):</span>
+                        <span class="val-prev" style="font-weight:700; font-size:1.15rem; font-family:'JetBrains Mono', monospace;" id="asuntos-anio-anterior">--</span>
                     </div>
+                    <p class="status-sub" style="margin-top:auto; padding-top:6px;">Días consumibles con cómputo previo</p>
                 </div>
                 
-                <div class="status-card">
+                <div class="status-card card-perm">
                     <h3>Permutas <span class="anio-display"></span></h3>
-                    <div class="status-value permutas" id="permutas-realizadas">0</div>
-                    <div class="status-buttons" style="margin-top:auto;">
-                        <button id="btn-add-permuta" class="btn btn-primary btn-small">Añadir</button>
-                        <button id="btn-view-permuta" class="btn btn-secondary btn-small">Ver</button>
+                    <div class="status-value val-perm" id="permutas-realizadas">0</div>
+                    <div style="display:flex; gap:6px; margin-top:auto;">
+                        <button id="btn-add-permuta" class="btn btn-primary btn-small" style="flex:1;">
+                            <i class="fas fa-plus"></i> Añadir
+                        </button>
+                        <button id="btn-view-permuta" class="btn btn-secondary btn-small" style="flex:1;">
+                            <i class="fas fa-list"></i> Ver
+                        </button>
                     </div>
                 </div>
             </div>
             
+            <!-- CONFIG Y SOLICITUDES EN 2 COLUMNAS -->
             <div class="form-row">
-                <div class="card" style="height: auto;">
+                <!-- CONFIGURACIÓN BASE -->
+                <div class="card" style="margin-bottom:0;">
                     <div class="card-title-left collapsible-header" onclick="toggleCollapsible('content-config', this)">
-                        <span style="color:var(--dark-color)">Configuración Base <span class="anio-display"></span></span>
+                        <span><i class="fas fa-sliders" style="color:var(--primary); margin-right:8px;"></i> Configuración Base y Ajuste Horario <span class="anio-display"></span></span>
                     </div>
                     <div id="content-config" class="collapsible-content">
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                            <div class="form-group"><label>Días Vacaciones:</label><input type="number" id="dias-vacaciones" min="0"></div>
-                            <div class="form-group"><label>Días Asuntos Propios:</label><input type="number" id="dias-asuntos-propios" min="0"></div>
-                        </div>
-                        <div class="form-group" style="margin-top:10px;">
-                            <label>Saldo Inicial Horas (Arrastre 1 Ene):</label>
-                            <div style="display:flex; gap:5px;">
-                                <input type="number" id="horas-manuales" step="0.5">
-                                <button id="btn-unlock" type="button" title="Editar manual" style="border:1px solid #ccc; background:#fff; cursor:pointer; width:40px;">🔓</button>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                            <div class="form-group">
+                                <label for="dias-vacaciones">Días Vacaciones Asignados:</label>
+                                <input type="number" id="dias-vacaciones" min="0" placeholder="Ej. 22">
                             </div>
-                            <small id="msg-horas-auto" style="color:#27ae60; font-size:0.8rem; display:none;">* Calculado del cierre del año anterior</small>
+                            <div class="form-group">
+                                <label for="dias-asuntos-propios">Días Asuntos Propios Asignados:</label>
+                                <input type="number" id="dias-asuntos-propios" min="0" placeholder="Ej. 6">
+                            </div>
                         </div>
-                        <button id="btn-guardar-config" class="btn btn-primary" style="margin-top:auto; width:100%;">Guardar Configuración</button>
+
+                        <div class="form-group" style="margin-top:4px;">
+                            <label for="horas-manuales">Saldo Base / Ajuste de Horas (Oficial del Servicio):</label>
+                            <div style="display:flex; gap:8px;">
+                                <input type="number" id="horas-manuales" step="0.5" placeholder="0.0">
+                                <button id="btn-unlock" type="button" class="btn btn-secondary" title="Modificar manualmente el saldo horario">
+                                    <i class="fas fa-lock" id="icon-lock"></i>
+                                </button>
+                            </div>
+                            <small id="msg-horas-auto" style="color:var(--text-muted); font-size:0.78rem; display:block; margin-top:6px;">
+                                <i class="fas fa-circle-info"></i> Introduce aquí en enero el saldo real que te faciliten en el trabajo para fijar la base oficial de partida.
+                            </small>
+                        </div>
+                        <button id="btn-guardar-config" class="btn btn-primary" style="width:100%; margin-top:8px;">
+                            <i class="fas fa-floppy-disk"></i> Guardar Configuración Base
+                        </button>
                     </div>
                 </div>
                 
-                <div class="card" style="height: auto;">
+                <!-- SOLICITAR DESCANSO -->
+                <div class="card" style="margin-bottom:0;">
                     <div class="card-title-left collapsible-header" onclick="toggleCollapsible('content-solicitar', this)">
-                        <span style="color:var(--success-color)">Solicitar Descanso</span>
+                        <span><i class="fas fa-calendar-plus" style="color:var(--success); margin-right:8px;"></i> Registrar Solicitud Individual</span>
                     </div>
                     <div id="content-solicitar" class="collapsible-content">
-                        <div class="form-group"><label>Tipo:</label><select id="tipo-descanso"><option value="vacaciones">Vacaciones</option><option value="asuntos-propios">Asuntos Propios</option><option value="horas">Horas Sueltas</option></select></div>
-                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                            <div class="form-group"><label>Fecha:</label><input type="date" id="fecha-descanso"></div>
-                            <div class="form-group"><label>Cargar al Año:</label><select id="computo"></select></div>
+                        <div class="form-group">
+                            <label for="tipo-descanso">Tipo de Descanso:</label>
+                            <select id="tipo-descanso">
+                                <option value="vacaciones">Vacaciones</option>
+                                <option value="asuntos-propios">Asuntos Propios</option>
+                                <option value="horas">Horas Sueltas</option>
+                            </select>
                         </div>
-                        <div class="form-group hidden" id="group-horas-cantidad"><label>Cantidad Horas:</label><input type="number" id="horas-solicitadas" value="8" step="0.5"></div>
-                        <button id="btn-solicitar" class="btn btn-primary" style="margin-top:auto; width:100%;">Registrar Solicitud</button>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+                            <div class="form-group">
+                                <label for="fecha-descanso">Fecha a Disfrutar:</label>
+                                <input type="date" id="fecha-descanso">
+                            </div>
+                            <div class="form-group">
+                                <label for="computo">Cargar a la Bolsa del Año:</label>
+                                <select id="computo"></select>
+                            </div>
+                        </div>
+                        <div class="form-group hidden" id="group-horas-cantidad">
+                            <label for="horas-solicitadas">Cantidad de Horas a Descontar:</label>
+                            <input type="number" id="horas-solicitadas" value="8" step="0.5">
+                        </div>
+                        <button id="btn-solicitar" class="btn btn-primary" style="width:100%; margin-top:8px;">
+                            <i class="fas fa-paper-plane"></i> Registrar Solicitud
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-title-left"><span>Resumen Rápido de Días Gastados <span class="anio-display"></span></span></div>
-                <div id="lista-consumo" class="historial-list" style="margin-top: 0; max-height: 200px;"></div>
-            </div>
-            
+            <!-- RESUMEN DÍAS GASTADOS -->
             <div class="card">
                 <div class="card-title-left">
-                    <span>Desglose de Solicitudes <span class="anio-display"></span></span>
+                    <span><i class="fas fa-check-double" style="color:var(--success); margin-right:8px;"></i> Resumen de Días Disfrutados <span class="anio-display"></span></span>
+                </div>
+                <div id="lista-consumo" class="historial-list" style="max-height: 190px;"></div>
+            </div>
+            
+            <!-- DESGLOSE DE SOLICITUDES -->
+            <div class="card">
+                <div class="card-title-left">
+                    <span><i class="fas fa-table-list" style="color:var(--primary); margin-right:8px;"></i> Desglose de Solicitudes <span class="anio-display"></span></span>
                 </div>
                 
                 <div class="filtros">
                     <button class="btn-filtro active" data-filtro="todos">Todos</button>
                     <button class="btn-filtro" data-filtro="vacaciones">Vacaciones</button>
-                    <button class="btn-filtro" data-filtro="asuntos-propios">Asuntos P.</button>
+                    <button class="btn-filtro" data-filtro="asuntos-propios">Asuntos Propios</button>
                     <button class="btn-filtro" data-filtro="horas">Horas</button>
-                    <button class="btn-filtro" data-filtro="pendiente">Pendientes</button>
-                    <button class="btn-filtro" data-filtro="tramite">Trámite</button>
+                    <button class="btn-filtro" data-filtro="tramite">En Trámite</button>
+                    <button class="btn-filtro" data-filtro="concedido">Concedidos</button>
                     <button class="btn-filtro" data-filtro="denegado">Denegados</button>
                     <button class="btn-filtro" data-filtro="disfrutado">Disfrutados</button>
                 </div>
@@ -287,11 +893,11 @@
                     <table id="tabla-solicitudes">
                         <thead>
                             <tr>
-                                <th style="width:15%">Fecha</th>
-                                <th style="width:20%">Tipo</th>
-                                <th class="hide-mobile" style="width:10%">Cómputo</th>
+                                <th style="width:16%">Fecha Disfrute</th>
+                                <th style="width:22%">Concepto</th>
+                                <th class="hide-mobile" style="width:12%">Cómputo</th>
                                 <th class="hide-mobile" style="width:15%">Estado</th>
-                                <th class="hide-mobile" style="width:40%; text-align:right;">Acciones</th>
+                                <th class="hide-mobile" style="width:35%; text-align:right;">Gestión de Estado</th>
                             </tr>
                         </thead>
                         <tbody id="cuerpo-tabla"></tbody>
@@ -301,97 +907,234 @@
         </div>
     </div>
 
+    <!-- MODAL PLANIFICACIÓN ANUAL (NUEVO) -->
+    <div id="modal-planificacion" class="modal">
+        <div class="modal-content" style="max-width: 820px;">
+            <div class="modal-title">
+                <span><i class="fas fa-calendar-check" style="color:var(--accent-amber); margin-right:8px;"></i> Planificación Anual Anticipada (<span id="plan-anio-display"></span>)</span>
+                <button type="button" onclick="cerrarPlanificacion()" class="btn-icon"><i class="fas fa-times"></i></button>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:16px;">
+                Registra aquí todas las fechas solicitadas en la tanda general para el año siguiente. Marca las que te vayan concediendo o denegando; las <strong>concedidas se traspasarán automáticamente al desglose activo</strong>.
+            </p>
+
+            <div style="background:var(--bg-elevated); border:1px solid var(--border-subtle); border-radius:var(--radius-sm); padding:16px; margin-bottom:18px;">
+                <h4 style="font-size:0.9rem; margin-bottom:12px; color:var(--text-primary);">Añadir Día Solicitado en la Planificación</h4>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr auto; gap:10px; align-items:end;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="plan-tipo">Tipo:</label>
+                        <select id="plan-tipo">
+                            <option value="vacaciones">Vacaciones</option>
+                            <option value="asuntos-propios">Asuntos Propios</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="plan-fecha">Fecha:</label>
+                        <input type="date" id="plan-fecha">
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label for="plan-estado-inicial">Estado Inicial:</label>
+                        <select id="plan-estado-inicial">
+                            <option value="En Trámite">En Trámite (Esperando resolución)</option>
+                            <option value="Concedido">Concedido</option>
+                            <option value="Denegado">Denegado</option>
+                        </select>
+                    </div>
+                    <button onclick="agregarItemPlanificacion()" class="btn btn-primary" style="height:42px;">
+                        <i class="fas fa-plus"></i> Añadir
+                    </button>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h4 style="font-size:0.9rem; color:var(--text-secondary);">Días en la Planificación (<span id="plan-contador">0</span>)</h4>
+                <div style="font-size:0.8rem; color:var(--text-muted);">
+                    <span style="color:#60a5fa;"><i class="fas fa-circle"></i> Concedido</span> | 
+                    <span style="color:#f87171;"><i class="fas fa-circle"></i> Denegado</span> | 
+                    <span style="color:#fbbf24;"><i class="fas fa-circle"></i> Trámite</span>
+                </div>
+            </div>
+
+            <div class="historial-list" id="lista-planificacion" style="max-height: 380px;"></div>
+
+            <div class="modal-actions">
+                <button onclick="cerrarPlanificacion()" class="btn btn-secondary">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTÓRICO Y PDF -->
     <div id="modal-historico-movimientos" class="modal">
-        <div class="modal-content" style="max-width: 750px;">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-    <h2 class="modal-title" style="border:none; margin:0; padding:0; font-size: 1.3rem;">Movimientos AP y Vacaciones (<span id="historico-anio-display"></span>)</h2>
-    <button id="btn-generar-pdf" onclick="generarPDF()" class="btn btn-primary btn-small" style="background-color: #e74c3c; border:none;">📄 Generar PDF</button>
-</div>
-<p id="texto-explicativo-historico" style="margin-bottom: 10px; color: #555; font-size: 0.85rem;">Registro de días disfrutados y horas modificadas.</p>
-            <div class="historial-list" id="lista-historico-movimientos" style="max-height: 500px; padding: 10px;"></div>
+        <div class="modal-content" style="max-width: 780px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 12px;">
+                <h2 class="modal-title" style="border:none; margin:0; padding:0;">
+                    <i class="fas fa-file-pdf" style="color:#f87171; margin-right:8px;"></i> Movimientos AP, Vacaciones y Horas (<span id="historico-anio-display"></span>)
+                </h2>
+                <button id="btn-generar-pdf" onclick="generarPDF()" class="btn btn-primary btn-small" style="background:#dc2626;">
+                    <i class="fas fa-file-pdf"></i> Generar PDF
+                </button>
+            </div>
+            <p id="texto-explicativo-historico" style="margin-bottom: 14px; color: var(--text-secondary); font-size: 0.85rem;">
+                Registro oficial de descansos disfrutados y variaciones registradas en la bolsa de horas.
+            </p>
+            <div class="historial-list" id="lista-historico-movimientos" style="max-height: 480px;"></div>
             <div class="modal-actions">
                 <button onclick="document.getElementById('modal-historico-movimientos').style.display='none'" class="btn btn-secondary">Cerrar</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-editar-solicitud" class="modal"><div class="modal-content">
-        <h2 class="modal-title">Editar Solicitud</h2>
-        <input type="hidden" id="edit-index">
-        <div class="form-group"><label>Tipo:</label><select id="edit-tipo"><option value="vacaciones">Vacaciones</option><option value="asuntos-propios">Asuntos P.</option><option value="horas">Horas</option></select></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="form-group"><label>Fecha:</label><input type="date" id="edit-fecha"></div>
-            <div class="form-group"><label>Año:</label><select id="edit-computo"></select></div>
+    <!-- MODAL EDITAR SOLICITUD -->
+    <div id="modal-editar-solicitud" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Editar Registro de Solicitud</h2>
+            <input type="hidden" id="edit-id">
+            <div class="form-group">
+                <label for="edit-tipo">Tipo de Descanso:</label>
+                <select id="edit-tipo">
+                    <option value="vacaciones">Vacaciones</option>
+                    <option value="asuntos-propios">Asuntos Propios</option>
+                    <option value="horas">Horas Sueltas</option>
+                </select>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                <div class="form-group">
+                    <label for="edit-fecha">Fecha:</label>
+                    <input type="date" id="edit-fecha">
+                </div>
+                <div class="form-group">
+                    <label for="edit-computo">Cargar al Año:</label>
+                    <select id="edit-computo"></select>
+                </div>
+            </div>
+            <div class="form-group hidden" id="edit-group-horas">
+                <label for="edit-horas">Horas:</label>
+                <input type="number" id="edit-horas" step="0.5">
+            </div>
+            <div class="modal-actions">
+                <button onclick="document.getElementById('modal-editar-solicitud').style.display='none'" class="btn btn-secondary">Cancelar</button>
+                <button onclick="guardarEdicionSolicitud()" class="btn btn-primary">Guardar Cambios</button>
+            </div>
         </div>
-        <div class="form-group hidden" id="edit-group-horas"><label>Horas:</label><input type="number" id="edit-horas" step="0.5"></div>
-        <div class="modal-actions"><button onclick="document.getElementById('modal-editar-solicitud').style.display='none'" class="btn btn-secondary">Cancelar</button><button onclick="guardarEdicionSolicitud()" class="btn btn-primary">Guardar</button></div>
-    </div></div>
+    </div>
 
-    <div id="modal-gestion-horas" class="modal"><div class="modal-content">
-        <h2 class="modal-title">Gestión de Horas</h2>
-        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
-            <div class="form-group"><label>Fecha:</label><input type="date" id="fecha-op-horas"></div>
-            <div class="form-group"><label>Horas:</label><input type="number" id="cantidad-op-horas" value="1" step="0.5"></div>
+    <!-- MODAL GESTIÓN DE HORAS -->
+    <div id="modal-gestion-horas" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Gestión de Bolsa de Horas (<span class="anio-display"></span>)</h2>
+            <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px;">
+                <div class="form-group">
+                    <label for="fecha-op-horas">Fecha:</label>
+                    <input type="date" id="fecha-op-horas">
+                </div>
+                <div class="form-group">
+                    <label for="cantidad-op-horas">Cantidad Horas:</label>
+                    <input type="number" id="cantidad-op-horas" value="1" step="0.5">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="concepto-op-horas">Concepto (Ej. Citación Judicial, Exceso Jornada, Servicio Extra):</label>
+                <input type="text" id="concepto-op-horas" placeholder="Motivo u origen...">
+            </div>
+            <div style="display:flex; gap:10px; margin-bottom:18px;">
+                <button id="btn-sumar" class="btn btn-primary" style="flex:1; background:#059669;">
+                    <i class="fas fa-plus-circle"></i> Sumar (+)
+                </button>
+                <button id="btn-restar" class="btn btn-primary" style="flex:1; background:#dc2626;">
+                    <i class="fas fa-minus-circle"></i> Restar (-)
+                </button>
+            </div>
+            <h4 style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:8px;">Historial de Operaciones</h4>
+            <div class="historial-list" id="lista-horas"></div>
+            <div class="modal-actions">
+                <button id="btn-cerrar-gestion-horas" class="btn btn-secondary">Cerrar</button>
+            </div>
         </div>
-        <div class="form-group"><label>Concepto (Ej. Citación Judicial, Exceso Jornada):</label><input type="text" id="concepto-op-horas" placeholder="Escribe el motivo..."></div>
-        <div style="display:flex; gap:10px;"><button id="btn-sumar" class="btn btn-primary" style="flex:1; background:var(--success-color)">Sumar (+)</button><button id="btn-restar" class="btn btn-primary" style="flex:1; background:var(--danger-color)">Restar (-)</button></div>
-        <h4>Historial de Edición</h4><div class="historial-list" id="lista-horas"></div>
-        <div class="modal-actions"><button id="btn-cerrar-gestion-horas" class="btn btn-secondary">Cerrar</button></div>
-    </div></div>
+    </div>
 
-    <div id="modal-editar-hora" class="modal"><div class="modal-content">
-        <h2 class="modal-title">Editar Operación de Horas</h2>
-        <input type="hidden" id="edit-hora-index">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="form-group"><label>Fecha:</label><input type="date" id="edit-hora-fecha"></div>
-            <div class="form-group"><label>Horas:</label><input type="number" id="edit-hora-cantidad" step="0.5"></div>
+    <!-- MODAL EDITAR HORA -->
+    <div id="modal-editar-hora" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Editar Operación de Horas</h2>
+            <input type="hidden" id="edit-hora-id">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                <div class="form-group"><label for="edit-hora-fecha">Fecha:</label><input type="date" id="edit-hora-fecha"></div>
+                <div class="form-group"><label for="edit-hora-cantidad">Horas:</label><input type="number" id="edit-hora-cantidad" step="0.5"></div>
+            </div>
+            <div class="form-group"><label for="edit-hora-concepto">Concepto:</label><input type="text" id="edit-hora-concepto"></div>
+            <div class="form-group"><label for="edit-hora-tipo">Tipo de Operación:</label><select id="edit-hora-tipo"><option value="suma">Suma (+)</option><option value="resta">Resta (-)</option></select></div>
+            <div class="modal-actions">
+                <button onclick="document.getElementById('modal-editar-hora').style.display='none'" class="btn btn-secondary">Cancelar</button>
+                <button onclick="guardarEdicionHora()" class="btn btn-primary">Guardar Cambios</button>
+            </div>
         </div>
-        <div class="form-group"><label>Concepto:</label><input type="text" id="edit-hora-concepto"></div>
-        <div class="form-group"><label>Tipo:</label><select id="edit-hora-tipo"><option value="suma">Suma (+)</option><option value="resta">Resta (-)</option></select></div>
-        <div class="modal-actions"><button onclick="document.getElementById('modal-editar-hora').style.display='none'" class="btn btn-secondary">Cancelar</button><button onclick="guardarEdicionHora()" class="btn btn-primary">Guardar Cambios</button></div>
-    </div></div>
+    </div>
 
-    <div id="modal-permuta" class="modal"><div class="modal-content">
-        <h2 class="modal-title">Añadir Permuta</h2>
-        <div class="form-group"><label>Agente:</label><input type="text" id="p-agente"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Mi Fecha:</label><input type="date" id="p-fecha-yo"></div><div class="form-group"><label>Turno:</label><select id="p-turno-yo"><option value="primero">Turno Primero</option><option value="segundo">Turno Segundo</option><option value="tercero">Turno Tercero</option></select></div></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Su Fecha:</label><input type="date" id="p-fecha-el"></div><div class="form-group"><label>Turno:</label><select id="p-turno-el"><option value="primero">Turno Primero</option><option value="segundo">Turno Segundo</option><option value="tercero">Turno Tercero</option></select></div></div>
-        <div class="modal-actions"><button id="btn-cancelar-permuta" class="btn btn-secondary">Cancelar</button><button id="btn-save-permuta" class="btn btn-primary">Guardar</button></div>
-    </div></div>
-
-    <div id="modal-ver-permutas" class="modal"><div class="modal-content">
-        <h2 class="modal-title">Historial Completo Permutas</h2>
-        <div class="historial-list" id="lista-permutas"></div>
-        <div class="modal-actions"><button id="btn-cerrar-permutas" class="btn btn-secondary">Cerrar</button></div>
-    </div></div>
-
-    <div id="modal-incidencias" class="modal"><div class="modal-content">
-        <h2 class="modal-title">Gestión de Incidencias</h2>
-        <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px; margin-bottom: 10px;">
-            <div class="form-group" style="margin-bottom:0;"><label>Fecha:</label><input type="date" id="incidencia-fecha"></div>
-            <div class="form-group" style="margin-bottom:0;"><label>Texto / Motivo:</label><input type="text" id="incidencia-texto" placeholder="Describe la incidencia..."></div>
+    <!-- MODAL PERMUTA -->
+    <div id="modal-permuta" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Añadir Permuta de Servicio</h2>
+            <div class="form-group"><label for="p-agente">Agente:</label><input type="text" id="p-agente" placeholder="Número o nombre del compañero"></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                <div class="form-group"><label for="p-fecha-yo">Mi Fecha:</label><input type="date" id="p-fecha-yo"></div>
+                <div class="form-group"><label for="p-turno-yo">Mi Turno:</label><select id="p-turno-yo"><option value="primero">Turno Primero (Mañana)</option><option value="segundo">Turno Segundo (Tarde)</option><option value="tercero">Turno Tercero (Noche)</option></select></div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                <div class="form-group"><label for="p-fecha-el">Su Fecha:</label><input type="date" id="p-fecha-el"></div>
+                <div class="form-group"><label for="p-turno-el">Su Turno:</label><select id="p-turno-el"><option value="primero">Turno Primero (Mañana)</option><option value="segundo">Turno Segundo (Tarde)</option><option value="tercero">Turno Tercero (Noche)</option></select></div>
+            </div>
+            <div class="modal-actions">
+                <button id="btn-cancelar-permuta" class="btn btn-secondary">Cancelar</button>
+                <button id="btn-save-permuta" class="btn btn-primary">Guardar Permuta</button>
+            </div>
         </div>
-        <button onclick="guardarIncidencia()" class="btn btn-primary" style="width: 100%; margin-bottom: 15px; background-color:#8e44ad;">Añadir Incidencia</button>
-        
-        <h4>Historial de Incidencias</h4>
-        <div class="historial-list" id="lista-incidencias"></div>
-        
-        <div class="modal-actions"><button onclick="document.getElementById('modal-incidencias').style.display='none'" class="btn btn-secondary">Cerrar</button></div>
-    </div></div>
+    </div>
 
-    <div id="modal-editar-incidencia" class="modal"><div class="modal-content">
-        <h2 class="modal-title">Editar Incidencia</h2>
-        <input type="hidden" id="edit-incidencia-index">
-        <div style="display:grid; grid-template-columns: 1fr 2fr; gap:10px;">
-            <div class="form-group"><label>Fecha:</label><input type="date" id="edit-incidencia-fecha"></div>
-            <div class="form-group"><label>Texto:</label><input type="text" id="edit-incidencia-texto"></div>
+    <!-- MODAL VER PERMUTAS -->
+    <div id="modal-ver-permutas" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Historial Completo de Permutas</h2>
+            <div class="historial-list" id="lista-permutas"></div>
+            <div class="modal-actions"><button id="btn-cerrar-permutas" class="btn btn-secondary">Cerrar</button></div>
         </div>
-        <div class="modal-actions">
-            <button onclick="document.getElementById('modal-editar-incidencia').style.display='none'" class="btn btn-secondary">Cancelar</button>
-            <button onclick="guardarEdicionIncidencia()" class="btn btn-primary" style="background-color:#8e44ad;">Guardar Cambios</button>
+    </div>
+
+    <!-- MODAL INCIDENCIAS -->
+    <div id="modal-incidencias" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title"><i class="fas fa-triangle-exclamation" style="color:var(--accent-purple); margin-right:8px;"></i> Registro de Incidencias</h2>
+            <div style="display:grid; grid-template-columns: 1fr 2fr; gap:12px; margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom:0;"><label for="incidencia-fecha">Fecha:</label><input type="date" id="incidencia-fecha"></div>
+                <div class="form-group" style="margin-bottom:0;"><label for="incidencia-texto">Motivo / Descripción:</label><input type="text" id="incidencia-texto" placeholder="Detalle de la incidencia..."></div>
+            </div>
+            <button onclick="guardarIncidencia()" class="btn btn-purple" style="width: 100%; margin-bottom: 18px;">
+                <i class="fas fa-plus"></i> Añadir Incidencia
+            </button>
+            
+            <h4 style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:8px;">Historial</h4>
+            <div class="historial-list" id="lista-incidencias"></div>
+            
+            <div class="modal-actions"><button onclick="document.getElementById('modal-incidencias').style.display='none'" class="btn btn-secondary">Cerrar</button></div>
         </div>
-    </div></div>
-   <script>
+    </div>
+
+    <!-- MODAL EDITAR INCIDENCIA -->
+    <div id="modal-editar-incidencia" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Editar Incidencia</h2>
+            <input type="hidden" id="edit-incidencia-id">
+            <div style="display:grid; grid-template-columns: 1fr 2fr; gap:12px;">
+                <div class="form-group"><label for="edit-incidencia-fecha">Fecha:</label><input type="date" id="edit-incidencia-fecha"></div>
+                <div class="form-group"><label for="edit-incidencia-texto">Texto:</label><input type="text" id="edit-incidencia-texto"></div>
+            </div>
+            <div class="modal-actions">
+                <button onclick="document.getElementById('modal-editar-incidencia').style.display='none'" class="btn btn-secondary">Cancelar</button>
+                <button onclick="guardarEdicionIncidencia()" class="btn btn-primary">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
         // =========================================
         // 1. CONFIGURACIÓN FIREBASE
         // =========================================
@@ -405,13 +1148,13 @@
             appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
         };
         
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
-        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
         
         let USER_ID = null; 
-        let datos = { configuraciones: {}, solicitudes: [], horas: [], permutas: [], incidencias: [] };
+        let datos = { configuraciones: {}, solicitudes: [], horas: [], permutas: [], incidencias: [], planificaciones: [] };
         const anioActual = new Date().getFullYear();
         let anioActivo = anioActual;
         let filtroActual = 'todos';
@@ -433,6 +1176,7 @@
             inpAp: document.getElementById('dias-asuntos-propios'),
             inpHoras: document.getElementById('horas-manuales'),
             btnUnlock: document.getElementById('btn-unlock'),
+            iconLock: document.getElementById('icon-lock'),
             msgHoras: document.getElementById('msg-horas-auto'),
             selTipo: document.getElementById('tipo-descanso'),
             inpFecha: document.getElementById('fecha-descanso'),
@@ -446,12 +1190,26 @@
             modalVerPerm: document.getElementById('modal-ver-permutas'),
             modalEdit: document.getElementById('modal-editar-solicitud'),
             modalEditHora: document.getElementById('modal-editar-hora'),
+            modalPlan: document.getElementById('modal-planificacion'),
             inpFechaOp: document.getElementById('fecha-op-horas'),
             inpConcOp: document.getElementById('concepto-op-horas'),
             inpCantOp: document.getElementById('cantidad-op-horas'),
             listHoras: document.getElementById('lista-horas'),
             listPermutas: document.getElementById('lista-permutas')
         };
+
+        function uid() {
+            return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6);
+        }
+
+        function escapeHTML(value) {
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#39;");
+        }
 
         window.toggleCollapsible = (id, headerEl) => {
             const content = document.getElementById(id);
@@ -468,47 +1226,56 @@
                 const today = new Date().toISOString().split('T')[0];
                 dom.inpFecha.value = today;
                 dom.inpFechaOp.value = today;
-                cargarDatosConMigracion(); 
+                document.getElementById('plan-fecha').value = today;
+                cargarDatos(); 
                 setupListeners();
             } else {
                 window.location.href = "index.html";
             }
         });
 
-        function cargarDatosConMigracion() {
+        function cargarDatos() {
             const userRef = db.ref('descansos/' + USER_ID);
             userRef.once('value').then(snap => {
-                if(snap.exists()) {
+                if (snap.exists()) {
                     datos = snap.val();
-                    comprobarArrays();
-                    renderTodo();
                 } else {
-                    db.ref('descansos/usuario-demo').once('value').then(oldSnap => {
-                        if(oldSnap.exists()) {
-                            datos = oldSnap.val();
-                            userRef.set(datos).then(() => {
-                                comprobarArrays();
-                                renderTodo();
-                            });
-                        } else {
-                            comprobarArrays();
-                            renderTodo();
-                        }
-                    });
+                    datos = { configuraciones: {}, solicitudes: [], horas: [], permutas: [], incidencias: [], planificaciones: [] };
                 }
+                comprobarEstructura();
+                renderTodo();
             }).catch(err => {
                 console.error(err);
-                alert("Error de conexión.");
+                notificar("Error de conexión con la base de datos.", "error");
             });
         }
 
-        function comprobarArrays() {
-            if(!datos.solicitudes) datos.solicitudes = [];
-            if(!datos.horas) datos.horas = [];
-            if(!datos.permutas) datos.permutas = [];
-            if(!datos.incidencias) datos.incidencias = [];
-            if(!datos.configuraciones) datos.configuraciones = {};
-            datos.solicitudes.forEach(s => s.computo = parseInt(s.computo));
+        function comprobarEstructura() {
+            if (!datos.solicitudes) datos.solicitudes = [];
+            if (!datos.horas) datos.horas = [];
+            if (!datos.permutas) datos.permutas = [];
+            if (!datos.incidencias) datos.incidencias = [];
+            if (!datos.planificaciones) datos.planificaciones = [];
+            if (!datos.configuraciones) datos.configuraciones = {};
+
+            // Asignar ID si faltara en elementos antiguos
+            datos.solicitudes.forEach(s => {
+                s.computo = parseInt(s.computo);
+                if (!s.id) s.id = uid();
+            });
+            datos.horas.forEach(h => {
+                if (!h.id) h.id = uid();
+            });
+            datos.incidencias.forEach(i => {
+                if (!i.id) i.id = uid();
+            });
+            datos.permutas.forEach(p => {
+                if (!p.id) p.id = uid();
+            });
+            datos.planificaciones.forEach(p => {
+                if (!p.id) p.id = uid();
+                p.año = parseInt(p.año);
+            });
         }
 
         function renderTodo() {
@@ -519,7 +1286,7 @@
         }
 
         // =========================================
-        // 3. LISTENERS Y SELECTORES
+        // 3. LISTENERS
         // =========================================
         function setupListeners() {
             dom.selGlobal.addEventListener('change', e => { 
@@ -530,10 +1297,12 @@
             document.getElementById('btn-guardar-config').addEventListener('click', guardarConfig);
             dom.selTipo.addEventListener('change', e => dom.groupHoras.classList.toggle('hidden', e.target.value !== 'horas'));
             dom.btnSol.addEventListener('click', procesarSolicitud);
+            
             dom.filtros.forEach(b => b.addEventListener('click', e => {
                 dom.filtros.forEach(f => f.classList.remove('active'));
-                e.target.classList.add('active');
-                filtroActual = e.target.dataset.filtro;
+                const btn = e.target.closest('.btn-filtro');
+                btn.classList.add('active');
+                filtroActual = btn.dataset.filtro;
                 renderTabla();
             }));
             
@@ -541,7 +1310,22 @@
             document.getElementById('btn-cerrar-gestion-horas').addEventListener('click', () => dom.modalHoras.style.display = 'none');
             document.getElementById('btn-sumar').addEventListener('click', () => opHoras('suma'));
             document.getElementById('btn-restar').addEventListener('click', () => opHoras('resta'));
-            dom.btnUnlock.addEventListener('click', () => { if(confirm("¿Editar saldo inicial manualmente?")) { dom.inpHoras.disabled = false; dom.inpHoras.focus(); } });
+            
+            dom.btnUnlock.addEventListener('click', () => {
+                const bloqueado = dom.inpHoras.disabled;
+                if (bloqueado) {
+                    if (confirm("¿Desbloquear para introducir el saldo real del servicio oficial? Este valor sustituirá cualquier cálculo previo y será la base para sumar o restar horas a partir de ahora.")) {
+                        dom.inpHoras.disabled = false;
+                        dom.iconLock.className = "fas fa-lock-open";
+                        dom.btnUnlock.style.borderColor = "var(--primary)";
+                        dom.inpHoras.focus();
+                    }
+                } else {
+                    dom.inpHoras.disabled = true;
+                    dom.iconLock.className = "fas fa-lock";
+                    dom.btnUnlock.style.borderColor = "";
+                }
+            });
             
             document.getElementById('btn-add-permuta').addEventListener('click', () => dom.modalPerm.style.display = 'flex');
             document.getElementById('btn-cancelar-permuta').addEventListener('click', () => dom.modalPerm.style.display = 'none');
@@ -549,91 +1333,115 @@
             document.getElementById('btn-view-permuta').addEventListener('click', () => { renderListaPermutas(); dom.modalVerPerm.style.display = 'flex'; });
             document.getElementById('btn-cerrar-permutas').addEventListener('click', () => dom.modalVerPerm.style.display = 'none');
             
-            document.getElementById('edit-tipo').addEventListener('change', e => document.getElementById('edit-group-horas').classList.toggle('hidden', e.target.value !== 'horas'));
+            document.getElementById('edit-tipo').addEventListener('change', e => {
+                document.getElementById('edit-group-horas').classList.toggle('hidden', e.target.value !== 'horas');
+            });
         }
 
         function initSelectores() {
-            const arr = [anioActual-2, anioActual-1, anioActual, anioActual+1, anioActual+2];
+            const arr = [anioActual - 2, anioActual - 1, anioActual, anioActual + 1, anioActual + 2];
             [dom.selGlobal, dom.selComputo, dom.selComputoEdit].forEach(sel => {
                 sel.innerHTML = '';
                 arr.forEach(y => {
-                    const o = document.createElement('option'); o.value = y; o.textContent = y;
-                    if(y===anioActual) o.selected = true;
+                    const o = document.createElement('option');
+                    o.value = y;
+                    o.textContent = y;
+                    if (y === anioActivo) o.selected = true;
                     sel.appendChild(o);
                 });
             });
         }
 
         // =========================================
-        // 4. LÓGICA PRINCIPAL (VISTAS Y HORAS)
+        // 4. LÓGICA DE HORAS Y ESTADOS
         // =========================================
-        function getSaldoHorasCierreAnterior(anioObjetivo) {
-            let saldoAcumulado = 0;
-            const yearsConfig = Object.keys(datos.configuraciones).map(Number).sort((a,b)=>a-b);
-            const startYear = yearsConfig.length > 0 ? yearsConfig[0] : anioActual;
+        // Si hay saldo manual fijado para un año, ese es la base. Si no, arrastra del cierre del anterior.
+        function getSaldoBaseHorasAnio(targetYear) {
+            const conf = datos.configuraciones[targetYear];
+            if (conf && conf.horasManuales !== undefined && conf.horasManuales !== null && conf.horasManuales !== "") {
+                return { valor: parseFloat(conf.horasManuales) || 0, esManual: true };
+            }
 
-            for (let y = startYear; y < anioObjetivo; y++) {
-                if (datos.configuraciones[y] && datos.configuraciones[y].horasManuales !== undefined && datos.configuraciones[y].horasManuales !== 0) {
-                    saldoAcumulado = parseFloat(datos.configuraciones[y].horasManuales);
+            // Si no está fijado a mano, calcular arrastre acumulado de años previos
+            let saldo = 0;
+            const yearsConfig = Object.keys(datos.configuraciones).map(Number).sort((a, b) => a - b);
+            const startYear = yearsConfig.length > 0 ? Math.min(yearsConfig[0], targetYear - 1) : targetYear - 1;
+
+            for (let y = startYear; y < targetYear; y++) {
+                if (datos.configuraciones[y] && datos.configuraciones[y].horasManuales !== undefined) {
+                    saldo = parseFloat(datos.configuraciones[y].horasManuales) || 0;
                 }
                 datos.horas.forEach(op => {
-                    if (new Date(op.fecha).getFullYear() === y) {
-                        if (op.tipo === 'suma') saldoAcumulado += parseFloat(op.cantidad);
-                        else saldoAcumulado -= parseFloat(op.cantidad);
+                    if (op.fecha && parseInt(op.fecha.split('-')[0]) === y) {
+                        saldo += (op.tipo === 'suma' ? parseFloat(op.cantidad || 0) : -parseFloat(op.cantidad || 0));
                     }
                 });
             }
-            return saldoAcumulado;
+            return { valor: saldo, esManual: false };
         }
 
         function renderUI() {
             dom.txtAnio.forEach(e => e.textContent = `(${anioActivo})`);
             
-            const conf = datos.configuraciones[anioActivo] || {diasVacaciones:0, diasAsuntosPropios:0};
+            const conf = datos.configuraciones[anioActivo] || { diasVacaciones: 0, diasAsuntosPropios: 0 };
             dom.inpVac.value = conf.diasVacaciones || '';
             dom.inpAp.value = conf.diasAsuntosPropios || '';
             
-            const saldoArrastre = getSaldoHorasCierreAnterior(anioActivo);
-            dom.inpHoras.value = (datos.configuraciones[anioActivo]?.horasManuales !== undefined && datos.configuraciones[anioActivo]?.horasManuales !== saldoArrastre) 
-                                 ? datos.configuraciones[anioActivo].horasManuales 
-                                 : saldoArrastre.toFixed(2);
+            const baseInfo = getSaldoBaseHorasAnio(anioActivo);
+            dom.inpHoras.value = baseInfo.valor.toFixed(2);
             dom.inpHoras.disabled = true;
-            dom.msgHoras.style.display = 'inline';
+            dom.iconLock.className = "fas fa-lock";
+            dom.btnUnlock.style.borderColor = "";
+
+            if (baseInfo.esManual) {
+                dom.msgHoras.innerHTML = `<i class="fas fa-check-circle" style="color:var(--success);"></i> Saldo base fijado manualmente según datos oficiales del servicio (${baseInfo.valor.toFixed(2)}h).`;
+            } else {
+                dom.msgHoras.innerHTML = `<i class="fas fa-arrows-rotate"></i> Saldo calculado automáticamente por arrastre del cierre del año anterior (${baseInfo.valor.toFixed(2)}h).`;
+            }
             
-            const vacU = datos.solicitudes.filter(s => s.tipo==='vacaciones' && s.estado!=='denegado' && s.computo===anioActivo).length;
-            const apU = datos.solicitudes.filter(s => s.tipo==='asuntos-propios' && s.estado!=='denegado' && s.computo===anioActivo).length;
+            // Vacaciones y Asuntos Propios del año activo (se cuentan los disfrutados, concedidos y en trámite; los denegados no restan)
+            const vacU = datos.solicitudes.filter(s => s.tipo === 'vacaciones' && s.estado !== 'Denegado' && s.computo === anioActivo).length;
+            const apU = datos.solicitudes.filter(s => s.tipo === 'asuntos-propios' && s.estado !== 'Denegado' && s.computo === anioActivo).length;
             
-            dom.vacDisp.textContent = Math.max(0, (conf.diasVacaciones||0) - vacU);
-            dom.apDisp.textContent = Math.max(0, (conf.diasAsuntosPropios||0) - apU);
+            dom.vacDisp.textContent = Math.max(0, (conf.diasVacaciones || 0) - vacU);
+            dom.apDisp.textContent = Math.max(0, (conf.diasAsuntosPropios || 0) - apU);
             
-            let saldoVivo = parseFloat(dom.inpHoras.value);
+            // Saldo de horas activo del año: Saldo base fijado + horas añadidas/restadas en el año activo
+            let saldoVivo = baseInfo.valor;
             datos.horas.forEach(op => {
-                if (new Date(op.fecha).getFullYear() === anioActivo) {
-                    if(op.tipo==='suma') saldoVivo += parseFloat(op.cantidad);
-                    else saldoVivo -= parseFloat(op.cantidad);
+                if (op.fecha && parseInt(op.fecha.split('-')[0]) === anioActivo) {
+                    saldoVivo += (op.tipo === 'suma' ? parseFloat(op.cantidad || 0) : -parseFloat(op.cantidad || 0));
                 }
             });
             dom.horasAcum.textContent = saldoVivo.toFixed(2);
-            dom.horasAcum.style.color = saldoVivo < 0 ? 'var(--danger-color)' : 'var(--success-color)';
+            dom.horasAcum.className = `status-value ${saldoVivo < 0 ? 'val-horas-neg' : 'val-horas-pos'}`;
             
+            // Arrastre año anterior (cálculo de días restantes del año anterior)
             const prev = anioActivo - 1;
-            const confPrev = datos.configuraciones[prev] || {diasVacaciones:0, diasAsuntosPropios:0};
-            const vacPrevU = datos.solicitudes.filter(s => s.tipo==='vacaciones' && s.estado!=='denegado' && s.computo===prev).length;
-            const apPrevU = datos.solicitudes.filter(s => s.tipo==='asuntos-propios' && s.estado!=='denegado' && s.computo===prev).length;
+            const confPrev = datos.configuraciones[prev] || { diasVacaciones: 0, diasAsuntosPropios: 0 };
+            const vacPrevU = datos.solicitudes.filter(s => s.tipo === 'vacaciones' && s.estado !== 'Denegado' && s.computo === prev).length;
+            const apPrevU = datos.solicitudes.filter(s => s.tipo === 'asuntos-propios' && s.estado !== 'Denegado' && s.computo === prev).length;
             
-            let vPend = Math.max(0, (confPrev.diasVacaciones||0) - vacPrevU);
-            let aPend = Math.max(0, (confPrev.diasAsuntosPropios||0) - apPrevU);
+            let vPend = Math.max(0, (confPrev.diasVacaciones || 0) - vacPrevU);
+            let aPend = Math.max(0, (confPrev.diasAsuntosPropios || 0) - apPrevU);
             
             const hoy = new Date();
             const esAnioEnCurso = (anioActivo === new Date().getFullYear());
-            const limV = new Date(anioActivo, 0, 31);
-            const limA = new Date(anioActivo, 1, 15);
+            // Límite reglamentario para disfrutar (31 enero vac / 15 febrero AP)
+            const limV = new Date(anioActivo, 0, 31, 23, 59, 59);
+            const limA = new Date(anioActivo, 1, 15, 23, 59, 59);
             
-            if(esAnioEnCurso && hoy > limV && vPend > 0) dom.vacAnt.innerHTML = `<s style="color:#999">${vPend}</s> <span style="font-size:0.7em;color:red">Caducado</span>`;
-            else dom.vacAnt.textContent = vPend;
+            if (esAnioEnCurso && hoy > limV && vPend > 0) {
+                dom.vacAnt.innerHTML = `<s style="color:var(--text-muted)">${vPend}</s> <span style="font-size:0.75rem;color:var(--danger)">Caducado</span>`;
+            } else {
+                dom.vacAnt.textContent = vPend;
+            }
             
-            if(esAnioEnCurso && hoy > limA && aPend > 0) dom.apAnt.innerHTML = `<s style="color:#999">${aPend}</s> <span style="font-size:0.7em;color:red">Caducado</span>`;
-            else dom.apAnt.textContent = aPend;
+            if (esAnioEnCurso && hoy > limA && aPend > 0) {
+                dom.apAnt.innerHTML = `<s style="color:var(--text-muted)">${aPend}</s> <span style="font-size:0.75rem;color:var(--danger)">Caducado</span>`;
+            } else {
+                dom.apAnt.textContent = aPend;
+            }
             
             dom.permDisp.textContent = datos.permutas.filter(p => parseInt(p.año) === anioActivo).length;
             
@@ -642,7 +1450,161 @@
         }
 
         // =========================================
-        // 5. HISTÓRICO Y RESÚMENES (TABLAS)
+        // 5. PLANIFICACIÓN ANUAL ANTICIPADA
+        // =========================================
+        window.abrirPlanificacionAnual = () => {
+            document.getElementById('plan-anio-display').textContent = anioActivo;
+            renderListaPlanificacion();
+            dom.modalPlan.style.display = 'flex';
+        };
+
+        window.cerrarPlanificacion = () => {
+            dom.modalPlan.style.display = 'none';
+        };
+
+        window.renderListaPlanificacion = () => {
+            const lista = document.getElementById('lista-planificacion');
+            lista.innerHTML = '';
+            
+            const list = datos.planificaciones
+                .filter(p => parseInt(p.año) === anioActivo)
+                .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+            document.getElementById('plan-contador').textContent = list.length;
+
+            if (list.length === 0) {
+                lista.innerHTML = `<div style="padding:24px; text-align:center; color:var(--text-secondary); font-size:0.9rem;">
+                    No hay solicitudes registradas en la planificación de ${anioActivo}. Usa el formulario superior para añadir las fechas solicitadas en la rueda anual.
+                </div>`;
+                return;
+            }
+
+            list.forEach(item => {
+                const pDiv = document.createElement('div');
+                const estadoClass = item.estado === 'Concedido' ? 'plan-concedido' : (item.estado === 'Denegado' ? 'plan-denegado' : 'plan-tramite');
+                pDiv.className = `plan-item ${estadoClass}`;
+
+                const badgeClass = item.estado === 'Concedido' ? 'badge-concedido' : (item.estado === 'Denegado' ? 'badge-denegado' : 'badge-tramite');
+                const icono = item.tipo === 'vacaciones' ? '<i class="fas fa-umbrella-beach" style="color:#60a5fa;"></i>' : '<i class="fas fa-file-lines" style="color:#fbbf24;"></i>';
+
+                pDiv.innerHTML = `
+                    <div style="display:flex; align-items:center; gap:12px; flex:1;">
+                        <span style="font-size:1.2rem;">${icono}</span>
+                        <div>
+                            <div style="font-weight:700; font-size:0.92rem; color:var(--text-primary);">
+                                ${fmtDate(item.fecha)} <span style="font-size:0.8rem; font-weight:normal; color:var(--text-secondary);">(${fmtType(item.tipo)})</span>
+                            </div>
+                            <div style="margin-top:2px;">
+                                <span class="estado-badge ${badgeClass}">${item.estado}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="plan-actions-group">
+                        <button onclick="cambiarEstadoPlan('${item.id}', 'Concedido')" class="btn-action btn-t-disfrutado" title="Marcar Concedido (pasa a activas)"><i class="fas fa-check"></i> Concedido</button>
+                        <button onclick="cambiarEstadoPlan('${item.id}', 'Denegado')" class="btn-action btn-t-denegado" title="Marcar Denegado"><i class="fas fa-xmark"></i> Denegado</button>
+                        <button onclick="cambiarEstadoPlan('${item.id}', 'En Trámite')" class="btn-action btn-t-tramite" title="En Espera"><i class="fas fa-clock"></i> Espera</button>
+                        <button onclick="eliminarItemPlan('${item.id}')" class="btn-icon" title="Eliminar"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                lista.appendChild(pDiv);
+            });
+        };
+
+        window.agregarItemPlanificacion = () => {
+            const tipo = document.getElementById('plan-tipo').value;
+            const fecha = document.getElementById('plan-fecha').value;
+            const estado = document.getElementById('plan-estado-inicial').value;
+
+            if (!fecha) return notificar("Selecciona la fecha del día planificado.", "error");
+
+            const yearFecha = parseInt(fecha.split('-')[0]);
+            const nuevoItem = {
+                id: uid(),
+                tipo,
+                fecha,
+                año: yearFecha,
+                estado,
+                fechaReg: new Date().toISOString()
+            };
+
+            datos.planificaciones.push(nuevoItem);
+
+            // Si se añade como Concedido de entrada, crear la solicitud en el desglose
+            if (estado === 'Concedido') {
+                const nuevaSol = {
+                    id: uid(),
+                    tipo: nuevoItem.tipo,
+                    fecha: nuevoItem.fecha,
+                    computo: nuevoItem.año,
+                    estado: 'Concedido',
+                    planId: nuevoItem.id,
+                    fechaReg: new Date().toISOString()
+                };
+                datos.solicitudes.push(nuevaSol);
+                notificar("Día concedido añadido a la planificación y sincronizado en el desglose.", "success");
+            } else {
+                notificar("Día guardado en la planificación anual.", "success");
+            }
+
+            guardarEnBD();
+            renderListaPlanificacion();
+        };
+
+        window.cambiarEstadoPlan = (planId, nuevoEstado) => {
+            const plan = datos.planificaciones.find(p => p.id === planId);
+            if (!plan) return;
+
+            const estadoAnterior = plan.estado;
+            plan.estado = nuevoEstado;
+
+            // Sincronización automática con el desglose de solicitudes
+            const solIndex = datos.solicitudes.findIndex(s => s.planId === planId);
+
+            if (nuevoEstado === 'Concedido') {
+                if (solIndex === -1) {
+                    // Se concede: se crea la solicitud en el desglose
+                    datos.solicitudes.push({
+                        id: uid(),
+                        tipo: plan.tipo,
+                        fecha: plan.fecha,
+                        computo: plan.año,
+                        estado: 'Concedido',
+                        planId: plan.id,
+                        fechaReg: new Date().toISOString()
+                    });
+                } else {
+                    datos.solicitudes[solIndex].estado = 'Concedido';
+                }
+                notificar(`Día del ${fmtDate(plan.fecha)} CONCEDIDO. Añadido al desglose de solicitudes.`, "success");
+            } else if (nuevoEstado === 'Denegado' || nuevoEstado === 'En Trámite') {
+                if (solIndex !== -1) {
+                    // Si ya no está concedido, se quita del desglose activo para no duplicar ni computar de más
+                    datos.solicitudes.splice(solIndex, 1);
+                }
+                notificar(`Estado actualizado a ${nuevoEstado}.`, "info");
+            }
+
+            guardarEnBD();
+            renderListaPlanificacion();
+        };
+
+        window.eliminarItemPlan = (planId) => {
+            if (!confirm("¿Eliminar este día de la planificación anual?")) return;
+            const pIdx = datos.planificaciones.findIndex(p => p.id === planId);
+            if (pIdx > -1) {
+                datos.planificaciones.splice(pIdx, 1);
+            }
+            // Si tenía solicitud vinculada, eliminarla también
+            const solIndex = datos.solicitudes.findIndex(s => s.planId === planId);
+            if (solIndex > -1) {
+                datos.solicitudes.splice(solIndex, 1);
+            }
+            guardarEnBD("Día eliminado de la planificación.");
+            renderListaPlanificacion();
+        };
+
+        // =========================================
+        // 6. HISTÓRICO Y PDF
         // =========================================
         window.abrirHistoricoMovimientos = () => {
             document.getElementById('historico-anio-display').textContent = anioActivo;
@@ -653,40 +1615,59 @@
             
             const solsFiltered = datos.solicitudes.filter(s => {
                 if (s.tipo === 'horas') return false;
-                const estadoLimpio = s.estado ? s.estado.trim().toLowerCase() : '';
-                if (estadoLimpio !== 'disfrutado') return false;
+                const est = (s.estado || '').toLowerCase().trim();
+                if (est !== 'disfrutado') return false;
                 if (!s.fecha) return false;
-                const yearDisfrute = parseInt(s.fecha.split('-')[0]);
-                return yearDisfrute === anioActivo;
+                return parseInt(s.fecha.split('-')[0]) === anioActivo;
             });
 
             solsFiltered.forEach(s => {
-                 let titulo = s.tipo === 'vacaciones' ? 'Vacaciones' : 'Asuntos Propios';
-                 let concepto = 'Día de descanso disfrutado';
+                 let titulo = s.tipo === 'vacaciones' ? 'Vacaciones Disfrutadas' : 'Asuntos Propios Disfrutados';
+                 let concepto = 'Día de descanso consumido';
                  if (parseInt(s.computo) !== anioActivo) {
-                     titulo += ` (del año ${s.computo})`;
-                     concepto = `Día disfrutado perteneciente a la bolsa del año ${s.computo}`;
+                     titulo += ` (Cómputo Año ${s.computo})`;
+                     concepto = `Día consumido con cargo a la bolsa de ${s.computo}`;
                  }
-                 allMovs.push({ fecha: s.fecha, fechaReal: new Date(s.fecha), titulo: titulo, concepto: concepto, valor: '-1 día', claseValor: 'horas-neg', icono: s.tipo === 'vacaciones' ? '🏖️' : '📝' });
+                 allMovs.push({
+                     fecha: s.fecha,
+                     fechaReal: new Date(s.fecha),
+                     titulo,
+                     concepto,
+                     valor: '-1 día',
+                     claseValor: 'horas-neg',
+                     icono: s.tipo === 'vacaciones' ? '<i class="fas fa-umbrella-beach" style="color:#60a5fa;"></i>' : '<i class="fas fa-file-lines" style="color:#fbbf24;"></i>'
+                 });
             });
 
             const horasOp = datos.horas.filter(h => h.fecha && parseInt(h.fecha.split('-')[0]) === anioActivo);
             horasOp.forEach(h => {
-                 allMovs.push({ fecha: h.fecha, fechaReal: new Date(h.fecha), titulo: h.tipo === 'suma' ? 'Horas Añadidas' : 'Horas Descontadas', concepto: h.concepto || 'Ajuste de horas', valor: (h.tipo === 'suma' ? '+' : '-') + h.cantidad + 'h', claseValor: h.tipo === 'suma' ? 'horas-pos' : 'horas-neg', icono: h.tipo === 'suma' ? '📈' : '📉' });
+                 allMovs.push({
+                     fecha: h.fecha,
+                     fechaReal: new Date(h.fecha),
+                     titulo: h.tipo === 'suma' ? 'Horas Añadidas' : 'Horas Descontadas',
+                     concepto: escapeHTML(h.concepto || 'Ajuste de horas'),
+                     valor: (h.tipo === 'suma' ? '+' : '-') + h.cantidad + 'h',
+                     claseValor: h.tipo === 'suma' ? 'horas-pos' : 'horas-neg',
+                     icono: h.tipo === 'suma' ? '<i class="fas fa-arrow-up" style="color:#34d399;"></i>' : '<i class="fas fa-arrow-down" style="color:#f87171;"></i>'
+                 });
             });
 
             allMovs.sort((a, b) => b.fechaReal - a.fechaReal);
 
             if (allMovs.length === 0) {
-                lista.innerHTML = '<div style="padding: 20px; text-align: center; color: #888; font-size: 1.1rem;">No hay movimientos registrados en este año.</div>';
+                lista.innerHTML = '<div style="padding: 24px; text-align: center; color: var(--text-secondary); font-size: 0.95rem;">No hay descansos disfrutados ni movimientos de horas registrados en este año.</div>';
             } else {
                 allMovs.forEach(m => {
                     lista.innerHTML += `
-                        <div class="item-row" style="align-items: center; padding: 6px 10px; border-bottom: 1px solid #eee; background: #fff; font-size: 0.9rem;">
-                            <div style="font-size: 1.2rem; margin-right: 10px;">${m.icono}</div>
-                            <div style="flex: 1; display: flex; justify-content: space-between; align-items: center;">
-                                <div><span style="font-weight: bold; color: var(--dark-color);">${fmtDate(m.fecha)}</span> - ${m.titulo} <span style="color: #666; font-style: italic; font-size: 0.8rem; margin-left: 5px;">(${m.concepto})</span></div>
-                                <div class="${m.claseValor}" style="font-weight: bold; margin-left: 10px;">${m.valor}</div>
+                        <div class="item-row">
+                            <div style="font-size: 1.15rem; margin-right: 12px; width:26px; text-align:center;">${m.icono}</div>
+                            <div style="flex: 1; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                                <div>
+                                    <span style="font-weight: 700; color: var(--text-primary);">${fmtDate(m.fecha)}</span> - 
+                                    <span style="font-weight:600;">${m.titulo}</span>
+                                    <span style="color: var(--text-muted); font-size: 0.8rem; margin-left: 6px;">(${m.concepto})</span>
+                                </div>
+                                <div class="${m.claseValor}" style="font-size: 0.95rem;">${m.valor}</div>
                             </div>
                         </div>
                     `;
@@ -698,53 +1679,367 @@
         function renderResumenConsumo() {
             const lista = document.getElementById('lista-consumo');
             lista.innerHTML = '';
-            const disfrutados = datos.solicitudes.filter(s => s.computo === anioActivo && s.estado === 'Disfrutado');
-            disfrutados.sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+            const disfrutados = datos.solicitudes.filter(s => s.computo === anioActivo && (s.estado === 'Disfrutado' || s.estado === 'Concedido'));
+            disfrutados.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
 
             if (disfrutados.length === 0) {
-                lista.innerHTML = '<div style="padding: 10px; color: #888; text-align: center;">No has gastado días de la bolsa de este año.</div>';
+                lista.innerHTML = '<div style="padding: 14px; color: var(--text-muted); text-align: center; font-size:0.86rem;">No hay días consumidos ni concedidos de la bolsa de este año.</div>';
                 return;
             }
             disfrutados.forEach(d => {
-                const icono = d.tipo === 'vacaciones' ? '🏖️' : (d.tipo === 'asuntos-propios' ? '📝' : '⏱️');
+                const icono = d.tipo === 'vacaciones' ? '<i class="fas fa-umbrella-beach" style="color:#60a5fa;"></i>' : (d.tipo === 'asuntos-propios' ? '<i class="fas fa-file-lines" style="color:#fbbf24;"></i>' : '<i class="fas fa-clock" style="color:#34d399;"></i>');
                 const tipoTexto = d.tipo === 'horas' ? `${d.horas}h (Horas)` : fmtType(d.tipo);
-                lista.innerHTML += `<div class="consumo-item"><span>${icono} <strong>${fmtDate(d.fecha)}</strong> - ${tipoTexto}</span><span style="color:var(--success-color); font-weight:bold;">✔ Consumido</span></div>`;
+                const badgeTxt = d.estado === 'Disfrutado' ? '<span style="color:var(--success); font-weight:700;"><i class="fas fa-check"></i> Disfrutado</span>' : '<span style="color:var(--primary); font-weight:700;"><i class="fas fa-calendar-check"></i> Concedido</span>';
+                lista.innerHTML += `<div class="consumo-item"><span>${icono} <strong style="margin-left:6px;">${fmtDate(d.fecha)}</strong> - ${tipoTexto}</span>${badgeTxt}</div>`;
             });
         }
 
         function renderTabla() {
             dom.tbody.innerHTML = '';
             let list = datos.solicitudes.filter(s => s.computo === anioActivo); 
-            list.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-            if(filtroActual !== 'todos') {
+            list.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+            if (filtroActual !== 'todos') {
                 list = list.filter(s => {
-                    if(['vacaciones','asuntos-propios','horas'].includes(filtroActual)) return s.tipo === filtroActual;
-                    return s.estado.toLowerCase() === filtroActual.toLowerCase() || (filtroActual==='tramite' && s.estado==='En Trámite');
+                    if (['vacaciones', 'asuntos-propios', 'horas'].includes(filtroActual)) return s.tipo === filtroActual;
+                    const st = (s.estado || '').toLowerCase();
+                    if (filtroActual === 'tramite') return st.includes('trámite') || st.includes('tramite');
+                    if (filtroActual === 'denegado') return st === 'denegado';
+                    if (filtroActual === 'concedido') return st === 'concedido';
+                    if (filtroActual === 'disfrutado') return st === 'disfrutado';
+                    return true;
                 });
             }
-            if(list.length === 0) return dom.tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px; color:#888;">Sin registros</td></tr>';
+
+            if (list.length === 0) {
+                return dom.tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:28px; color:var(--text-muted);">Sin solicitudes registradas para este año con el filtro seleccionado</td></tr>';
+            }
             
             list.forEach(s => {
-                const idx = datos.solicitudes.indexOf(s);
                 const tr = document.createElement('tr');
                 tr.className = 'main-row';
-                const btns = `<button onclick="cambiarEstado(${idx},'En Trámite')" class="btn-action btn-tramite">Trámite</button><button onclick="cambiarEstado(${idx},'Denegado')" class="btn-action btn-denegado">Denegado</button><button onclick="cambiarEstado(${idx},'Disfrutado')" class="btn-action btn-disfrutado">Disfrutado</button><button onclick="abrirEdicion(${idx})" class="btn-action btn-editar btn-icon" title="Editar">✏️</button><button onclick="eliminarSol(${idx})" class="btn-action btn-eliminar btn-icon" title="Borrar">🗑️</button>`;
-                const estadoClass = s.estado.replace(/\s+/g, '');
 
-                tr.innerHTML = `<td>${fmtDate(s.fecha)}</td><td class="mobile-trigger">${fmtType(s.tipo)}${s.tipo==='horas'? ` (${s.horas}h)` : ''}</td><td class="hide-mobile">${s.computo}</td><td class="hide-mobile"><span class="estado-badge ${estadoClass}">${s.estado}</span></td><td class="hide-mobile actions">${btns}</td>`;
-                tr.onclick = (e) => { if(window.innerWidth <= 768 && !e.target.closest('button')) { const detail = document.getElementById(`detail-${idx}`); tr.classList.toggle('active'); detail.classList.toggle('open'); } };
+                const btns = `
+                    <button onclick="cambiarEstadoSol('${s.id}', 'En Trámite')" class="btn-action btn-t-tramite">Trámite</button>
+                    <button onclick="cambiarEstadoSol('${s.id}', 'Concedido')" class="btn-action" style="background:rgba(59,130,246,0.15); color:#93c5fd; border:1px solid rgba(59,130,246,0.3);">Concedido</button>
+                    <button onclick="cambiarEstadoSol('${s.id}', 'Disfrutado')" class="btn-action btn-t-disfrutado">Disfrutado</button>
+                    <button onclick="cambiarEstadoSol('${s.id}', 'Denegado')" class="btn-action btn-t-denegado">Denegado</button>
+                    <button onclick="abrirEdicionSol('${s.id}')" class="btn-icon" title="Editar"><i class="fas fa-pencil"></i></button>
+                    <button onclick="eliminarSol('${s.id}')" class="btn-icon" title="Borrar"><i class="fas fa-trash"></i></button>
+                `;
+
+                let badgeClass = 'badge-tramite';
+                const stLower = (s.estado || '').toLowerCase();
+                if (stLower === 'denegado') badgeClass = 'badge-denegado';
+                else if (stLower === 'disfrutado') badgeClass = 'badge-disfrutado';
+                else if (stLower === 'concedido') badgeClass = 'badge-concedido';
+
+                tr.innerHTML = `
+                    <td><strong>${fmtDate(s.fecha)}</strong></td>
+                    <td class="mobile-trigger">${fmtType(s.tipo)}${s.tipo === 'horas' ? ` (${s.horas}h)` : ''}</td>
+                    <td class="hide-mobile">${s.computo}</td>
+                    <td class="hide-mobile"><span class="estado-badge ${badgeClass}">${s.estado}</span></td>
+                    <td class="hide-mobile actions">${btns}</td>
+                `;
+
+                tr.onclick = (e) => {
+                    if (window.innerWidth <= 768 && !e.target.closest('button')) {
+                        const detail = document.getElementById(`detail-${s.id}`);
+                        tr.classList.toggle('active');
+                        detail.classList.toggle('open');
+                    }
+                };
                 dom.tbody.appendChild(tr);
                 
                 const trDetail = document.createElement('tr');
                 trDetail.className = 'detail-row';
-                trDetail.id = `detail-${idx}`;
-                trDetail.innerHTML = `<td colspan="5" style="padding:0;"><div class="mobile-detail-content"><div class="mobile-info-grid"><div><strong>Año:</strong> ${s.computo}</div><div><strong>Estado:</strong> <span class="estado-badge ${estadoClass}">${s.estado}</span></div></div><div class="mobile-actions-grid">${btns}</div></div></td>`;
+                trDetail.id = `detail-${s.id}`;
+                trDetail.innerHTML = `
+                    <td colspan="5" style="padding:0;">
+                        <div class="mobile-detail-content">
+                            <div class="mobile-info-grid">
+                                <div><strong>Año Cómputo:</strong> ${s.computo}</div>
+                                <div><strong>Estado:</strong> <span class="estado-badge ${badgeClass}">${s.estado}</span></div>
+                            </div>
+                            <div class="mobile-actions-grid">${btns}</div>
+                        </div>
+                    </td>
+                `;
                 dom.tbody.appendChild(trDetail);
             });
         }
 
         // =========================================
-        // 6. GESTIÓN DE INCIDENCIAS (NUEVO)
+        // 7. GESTIÓN DE HORAS E INCIDENCIAS
+        // =========================================
+        function renderListaHoras() {
+            dom.listHoras.innerHTML = '';
+            const list = [...datos.horas]
+                .filter(h => h.fecha && parseInt(h.fecha.split('-')[0]) === anioActivo)
+                .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+            if (list.length === 0) {
+                dom.listHoras.innerHTML = '<div style="padding:18px; text-align:center; color:var(--text-muted); font-size:0.88rem;">No hay operaciones de horas en este año.</div>';
+                return;
+            }
+
+            list.forEach(h => {
+                dom.listHoras.innerHTML += `
+                    <div class="item-row">
+                        <div>
+                            <strong>${fmtDate(h.fecha)}</strong>: ${escapeHTML(h.concepto || '')}
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span class="${h.tipo === 'suma' ? 'horas-pos' : 'horas-neg'}">${h.tipo === 'suma' ? '+' : '-'}${h.cantidad}h</span>
+                            <button onclick="abrirEditarHora('${h.id}')" class="btn-icon" title="Editar"><i class="fas fa-pencil"></i></button>
+                            <button onclick="eliminarHora('${h.id}')" class="btn-icon" title="Borrar"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function opHoras(tipo) {
+            const f = dom.inpFechaOp.value;
+            const c = dom.inpConcOp.value.trim();
+            const h = parseFloat(dom.inpCantOp.value);
+
+            if (!f || !c || !h) return notificar("Rellena todos los campos de la operación de horas.", "error");
+
+            datos.horas.push({
+                id: uid(),
+                tipo,
+                fecha: f,
+                concepto: c,
+                cantidad: h,
+                fechaReg: new Date().toISOString()
+            });
+
+            dom.inpConcOp.value = '';
+            guardarEnBD("Operación de horas registrada.");
+            renderListaHoras();
+        }
+
+        window.abrirEditarHora = (hId) => {
+            const h = datos.horas.find(x => x.id === hId);
+            if (!h) return;
+            document.getElementById('edit-hora-id').value = h.id;
+            document.getElementById('edit-hora-fecha').value = h.fecha;
+            document.getElementById('edit-hora-cantidad').value = h.cantidad;
+            document.getElementById('edit-hora-concepto').value = h.concepto || '';
+            document.getElementById('edit-hora-tipo').value = h.tipo;
+            dom.modalEditHora.style.display = 'flex';
+        };
+
+        window.guardarEdicionHora = () => {
+            const hId = document.getElementById('edit-hora-id').value;
+            const h = datos.horas.find(x => x.id === hId);
+            if (!h) return;
+
+            const f = document.getElementById('edit-hora-fecha').value;
+            const cant = parseFloat(document.getElementById('edit-hora-cantidad').value);
+            const conc = document.getElementById('edit-hora-concepto').value.trim();
+            const tipo = document.getElementById('edit-hora-tipo').value;
+
+            if (!f || !cant || !conc) return notificar("Rellena todos los datos.", "error");
+
+            h.fecha = f;
+            h.cantidad = cant;
+            h.concepto = conc;
+            h.tipo = tipo;
+
+            dom.modalEditHora.style.display = 'none';
+            guardarEnBD("Operación de horas actualizada.");
+            renderListaHoras();
+        };
+
+        window.eliminarHora = (hId) => {
+            if (!confirm("¿Eliminar este movimiento de horas?")) return;
+            const idx = datos.horas.findIndex(x => x.id === hId);
+            if (idx > -1) {
+                datos.horas.splice(idx, 1);
+                guardarEnBD("Movimiento de horas eliminado.");
+                renderListaHoras();
+            }
+        };
+
+        // =========================================
+        // 8. ACCIONES SOBRE SOLICITUDES
+        // =========================================
+        function procesarSolicitud() {
+            const t = dom.selTipo.value;
+            const f = dom.inpFecha.value;
+            const c = parseInt(dom.selComputo.value);
+            const h = parseFloat(dom.inpHoraSol.value);
+
+            if (!f) return notificar("Selecciona la fecha del descanso.", "error");
+
+            // Si es con cómputo del año anterior, se comprueba que la fecha a disfrutar no exceda los límites legales
+            const hoy = new Date();
+            const actualY = hoy.getFullYear();
+            if (c < actualY) {
+                const [yearDisfrute, mesDisfrute, diaDisfrute] = f.split('-').map(Number);
+                // Vacaciones límite 31 de enero; Asuntos propios límite 15 de febrero
+                if (t === 'vacaciones') {
+                    if (yearDisfrute > c + 1 || (yearDisfrute === c + 1 && (mesDisfrute > 1 || diaDisfrute > 31))) {
+                        return notificar("El límite para disfrutar vacaciones del año anterior es hasta el 31 de enero.", "error");
+                    }
+                }
+                if (t === 'asuntos-propios') {
+                    if (yearDisfrute > c + 1 || (yearDisfrute === c + 1 && (mesDisfrute > 2 || (mesDisfrute === 2 && diaDisfrute > 15)))) {
+                        return notificar("El límite para disfrutar asuntos propios del año anterior es hasta el 15 de febrero.", "error");
+                    }
+                }
+            }
+
+            const solId = uid();
+            const sol = {
+                id: solId,
+                tipo: t,
+                fecha: f,
+                computo: c,
+                estado: 'En Trámite',
+                fechaReg: new Date().toISOString()
+            };
+
+            if (t === 'horas') {
+                sol.horas = h;
+                const horaVinculadaId = uid();
+                sol.horaOpId = horaVinculadaId;
+                datos.horas.push({
+                    id: horaVinculadaId,
+                    tipo: 'resta',
+                    fecha: f,
+                    concepto: 'Día Solicitado por Horas',
+                    cantidad: h,
+                    solicitudId: solId,
+                    fechaReg: new Date().toISOString()
+                });
+            }
+
+            datos.solicitudes.push(sol);
+            guardarEnBD("Solicitud registrada con éxito.");
+
+            document.getElementById('content-solicitar').classList.remove('open');
+            document.querySelector('[onclick="toggleCollapsible(\'content-solicitar\', this)"]').classList.remove('open');
+        }
+
+        window.cambiarEstadoSol = (solId, nuevoEstado) => {
+            const s = datos.solicitudes.find(x => x.id === solId);
+            if (!s) return;
+            s.estado = nuevoEstado;
+
+            // Si proviene de la planificación anual, sincronizar también el estado en la planificación
+            if (s.planId) {
+                const plan = datos.planificaciones.find(p => p.id === s.planId);
+                if (plan) plan.estado = nuevoEstado;
+            }
+
+            guardarEnBD("Estado actualizado a " + nuevoEstado);
+        };
+
+        window.abrirEdicionSol = (solId) => {
+            const s = datos.solicitudes.find(x => x.id === solId);
+            if (!s) return;
+
+            document.getElementById('edit-id').value = s.id;
+            document.getElementById('edit-tipo').value = s.tipo;
+            document.getElementById('edit-fecha').value = s.fecha;
+            document.getElementById('edit-computo').value = s.computo;
+
+            const gh = document.getElementById('edit-group-horas');
+            const ih = document.getElementById('edit-horas');
+
+            if (s.tipo === 'horas') {
+                gh.classList.remove('hidden');
+                ih.value = s.horas || 8;
+            } else {
+                gh.classList.add('hidden');
+                ih.value = '';
+            }
+
+            dom.modalEdit.style.display = 'flex';
+        };
+
+        window.guardarEdicionSolicitud = () => {
+            const solId = document.getElementById('edit-id').value;
+            const s = datos.solicitudes.find(x => x.id === solId);
+            if (!s) return;
+
+            const tipo = document.getElementById('edit-tipo').value;
+            const fecha = document.getElementById('edit-fecha').value;
+            const computo = parseInt(document.getElementById('edit-computo').value);
+            const horas = parseFloat(document.getElementById('edit-horas').value);
+
+            if (!fecha) return notificar("Introduce la fecha.", "error");
+
+            // Si antes tenía horas vinculadas, eliminar su registro en la bolsa
+            if (s.horaOpId) {
+                const idx = datos.horas.findIndex(h => h.id === s.horaOpId);
+                if (idx > -1) datos.horas.splice(idx, 1);
+                delete s.horaOpId;
+            }
+
+            s.tipo = tipo;
+            s.fecha = fecha;
+            s.computo = computo;
+
+            if (tipo === 'horas') {
+                s.horas = horas;
+                const newHoraId = uid();
+                s.horaOpId = newHoraId;
+                datos.horas.push({
+                    id: newHoraId,
+                    tipo: 'resta',
+                    fecha: fecha,
+                    concepto: 'Día Solicitado por Horas (Editado)',
+                    cantidad: horas,
+                    solicitudId: s.id,
+                    fechaReg: new Date().toISOString()
+                });
+            } else {
+                delete s.horas;
+            }
+
+            dom.modalEdit.style.display = 'none';
+            guardarEnBD("Solicitud actualizada.");
+        };
+
+        window.eliminarSol = (solId) => {
+            if (!confirm("¿Eliminar esta solicitud definitivamente?")) return;
+            const idx = datos.solicitudes.findIndex(x => x.id === solId);
+            if (idx > -1) {
+                const s = datos.solicitudes[idx];
+                if (s.horaOpId) {
+                    const hIdx = datos.horas.findIndex(h => h.id === s.horaOpId);
+                    if (hIdx > -1) datos.horas.splice(hIdx, 1);
+                }
+                datos.solicitudes.splice(idx, 1);
+                guardarEnBD("Solicitud eliminada.");
+            }
+        };
+
+        // =========================================
+        // 9. CONFIGURACIÓN BASE (SALDO FIJADO POR EL TRABAJO)
+        // =========================================
+        function guardarConfig() {
+            if (!datos.configuraciones[anioActivo]) datos.configuraciones[anioActivo] = {};
+            datos.configuraciones[anioActivo].diasVacaciones = parseInt(dom.inpVac.value) || 0;
+            datos.configuraciones[anioActivo].diasAsuntosPropios = parseInt(dom.inpAp.value) || 0;
+
+            // Si el campo de horas fue desbloqueado para introducir el ajuste oficial del servicio, se fija como nuevo saldo base
+            if (!dom.inpHoras.disabled) {
+                const nuevoSaldoManual = parseFloat(dom.inpHoras.value);
+                datos.configuraciones[anioActivo].horasManuales = isNaN(nuevoSaldoManual) ? 0 : nuevoSaldoManual;
+            }
+
+            guardarEnBD("Configuración y saldo base del año guardados.");
+            document.getElementById('content-config').classList.remove('open');
+            document.querySelector('[onclick="toggleCollapsible(\'content-config\', this)"]').classList.remove('open');
+        }
+
+        // =========================================
+        // 10. INCIDENCIAS Y PERMUTAS
         // =========================================
         window.abrirIncidencias = () => {
             const today = new Date().toISOString().split('T')[0];
@@ -755,165 +2050,188 @@
         };
 
         window.guardarIncidencia = () => {
-            const fecha = document.getElementById('incidencia-fecha').value;
-            const texto = document.getElementById('incidencia-texto').value;
-            if(!fecha || !texto) return notificar("Rellena la fecha y el texto", "error");
-            datos.incidencias.push({ fecha, texto, fechaReg: new Date().toISOString() });
-            guardarEnBD("Incidencia guardada");
+            const f = document.getElementById('incidencia-fecha').value;
+            const t = document.getElementById('incidencia-texto').value.trim();
+            if (!f || !t) return notificar("Rellena la fecha y el motivo de la incidencia.", "error");
+
+            datos.incidencias.push({
+                id: uid(),
+                fecha: f,
+                texto: t,
+                fechaReg: new Date().toISOString()
+            });
+
             document.getElementById('incidencia-texto').value = '';
+            guardarEnBD("Incidencia anotada.");
             renderListaIncidencias();
         };
 
         window.renderListaIncidencias = () => {
             const lista = document.getElementById('lista-incidencias');
             lista.innerHTML = '';
-            const list = [...(datos.incidencias || [])].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-            if(list.length === 0) { lista.innerHTML = '<div style="padding:15px; text-align:center; color:#888;">No hay incidencias registradas</div>'; return; }
+            const list = [...datos.incidencias].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+            if (list.length === 0) {
+                lista.innerHTML = '<div style="padding:18px; text-align:center; color:var(--text-muted); font-size:0.88rem;">No hay incidencias registradas.</div>';
+                return;
+            }
+
             list.forEach(inc => {
-                const idx = datos.incidencias.indexOf(inc);
-                lista.innerHTML += `<div class="item-row" style="align-items:center;"><div style="flex:1;"><strong>${fmtDate(inc.fecha)}</strong>: <br><span style="color:#555; font-size:0.95rem;">${inc.texto}</span></div><div style="display:flex; gap:5px;"><button onclick="abrirEditarIncidencia(${idx})" class="btn-action btn-editar btn-icon">✏️</button><button onclick="eliminarIncidencia(${idx})" class="btn-action btn-eliminar btn-icon">🗑️</button></div></div>`;
+                lista.innerHTML += `
+                    <div class="item-row" style="align-items:flex-start;">
+                        <div style="flex:1;">
+                            <strong>${fmtDate(inc.fecha)}</strong>: 
+                            <div style="color:var(--text-secondary); font-size:0.86rem; margin-top:2px;">${escapeHTML(inc.texto)}</div>
+                        </div>
+                        <div style="display:flex; gap:6px; margin-left:10px;">
+                            <button onclick="abrirEditarIncidencia('${inc.id}')" class="btn-icon" title="Editar"><i class="fas fa-pencil"></i></button>
+                            <button onclick="eliminarIncidencia('${inc.id}')" class="btn-icon" title="Borrar"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
             });
         };
 
-        window.abrirEditarIncidencia = (idx) => {
-            const inc = datos.incidencias[idx];
-            document.getElementById('edit-incidencia-index').value = idx;
+        window.abrirEditarIncidencia = (incId) => {
+            const inc = datos.incidencias.find(x => x.id === incId);
+            if (!inc) return;
+            document.getElementById('edit-incidencia-id').value = inc.id;
             document.getElementById('edit-incidencia-fecha').value = inc.fecha;
             document.getElementById('edit-incidencia-texto').value = inc.texto;
             document.getElementById('modal-editar-incidencia').style.display = 'flex';
         };
 
         window.guardarEdicionIncidencia = () => {
-            const idx = parseInt(document.getElementById('edit-incidencia-index').value);
-            const fecha = document.getElementById('edit-incidencia-fecha').value;
-            const texto = document.getElementById('edit-incidencia-texto').value;
-            if(!fecha || !texto) return notificar("Datos incompletos", "error");
-            datos.incidencias[idx] = { ...datos.incidencias[idx], fecha, texto };
+            const incId = document.getElementById('edit-incidencia-id').value;
+            const inc = datos.incidencias.find(x => x.id === incId);
+            if (!inc) return;
+
+            const f = document.getElementById('edit-incidencia-fecha').value;
+            const t = document.getElementById('edit-incidencia-texto').value.trim();
+
+            if (!f || !t) return notificar("Rellena todos los datos.", "error");
+
+            inc.fecha = f;
+            inc.texto = t;
+
             document.getElementById('modal-editar-incidencia').style.display = 'none';
-            guardarEnBD("Incidencia editada");
+            guardarEnBD("Incidencia actualizada.");
             renderListaIncidencias();
         };
 
-        window.eliminarIncidencia = (idx) => {
-            if(confirm("¿Seguro que quieres borrar esta incidencia?")) {
+        window.eliminarIncidencia = (incId) => {
+            if (!confirm("¿Eliminar esta incidencia?")) return;
+            const idx = datos.incidencias.findIndex(x => x.id === incId);
+            if (idx > -1) {
                 datos.incidencias.splice(idx, 1);
-                guardarEnBD("Incidencia borrada");
+                guardarEnBD("Incidencia eliminada.");
                 renderListaIncidencias();
             }
         };
 
-        // =========================================
-        // 7. FUNCIONES DE GUARDADO Y EDICIÓN
-        // =========================================
-        function abrirEditarHora(idx) {
-            const h = datos.horas[idx];
-            document.getElementById('edit-hora-index').value = idx;
-            document.getElementById('edit-hora-fecha').value = h.fecha;
-            document.getElementById('edit-hora-cantidad').value = h.cantidad;
-            document.getElementById('edit-hora-concepto').value = h.concepto;
-            document.getElementById('edit-hora-tipo').value = h.tipo;
-            dom.modalEditHora.style.display = 'flex';
-        }
-
-        function guardarEdicionHora() {
-            const idx = parseInt(document.getElementById('edit-hora-index').value);
-            const fecha = document.getElementById('edit-hora-fecha').value;
-            const cant = parseFloat(document.getElementById('edit-hora-cantidad').value);
-            const conc = document.getElementById('edit-hora-concepto').value;
-            const tipo = document.getElementById('edit-hora-tipo').value;
-            if(!fecha || !cant) return notificar("Datos incompletos", "error");
-            datos.horas[idx] = { ...datos.horas[idx], fecha, cantidad:cant, concepto:conc, tipo };
-            dom.modalEditHora.style.display='none'; guardarEnBD("Hora editada"); renderListaHoras();
-        }
-
-        window.abrirEdicion = (idx) => {
-            const s = datos.solicitudes[idx];
-            document.getElementById('edit-index').value = idx;
-            document.getElementById('edit-tipo').value = s.tipo;
-            document.getElementById('edit-fecha').value = s.fecha;
-            document.getElementById('edit-computo').value = s.computo;
-            const gh = document.getElementById('edit-group-horas');
-            const ih = document.getElementById('edit-horas');
-            if(s.tipo==='horas') { gh.classList.remove('hidden'); ih.value = s.horas; } else { gh.classList.add('hidden'); ih.value = ''; }
-            dom.modalEdit.style.display = 'flex';
-        };
-
-        window.guardarEdicionSolicitud = () => {
-            const idx = parseInt(document.getElementById('edit-index').value);
-            const solOld = datos.solicitudes[idx];
-            const tipo = document.getElementById('edit-tipo').value;
-            const fecha = document.getElementById('edit-fecha').value;
-            const comp = parseInt(document.getElementById('edit-computo').value);
-            const horas = parseFloat(document.getElementById('edit-horas').value);
-            if(!fecha) return notificar("Falta fecha", "error");
-            if(solOld.tipo==='horas') { const opIdx = datos.horas.findIndex(h => h.relacionado && h.fecha===solOld.fecha); if(opIdx>-1) datos.horas.splice(opIdx,1); }
-            solOld.tipo = tipo; solOld.fecha = fecha; solOld.computo = comp;
-            if(tipo==='horas') { solOld.horas = horas; datos.horas.push({ tipo:'resta', fecha, concepto:'Día (Editado)', cantidad:horas, relacionado:true, fechaReg:new Date().toISOString() }); }
-            else { delete solOld.horas; }
-            dom.modalEdit.style.display='none'; guardarEnBD("Editado correctamente");
-        };
-
-        function guardarConfig() {
-            if(!datos.configuraciones[anioActivo]) datos.configuraciones[anioActivo] = {};
-            datos.configuraciones[anioActivo].diasVacaciones = parseInt(dom.inpVac.value)||0;
-            datos.configuraciones[anioActivo].diasAsuntosPropios = parseInt(dom.inpAp.value)||0;
-            if (!dom.inpHoras.disabled) { datos.configuraciones[anioActivo].horasManuales = parseFloat(dom.inpHoras.value)||0; }
-            guardarEnBD("Configuración guardada");
-            document.getElementById('content-config').classList.remove('open');
-            document.querySelector('[onclick="toggleCollapsible(\'content-config\', this)"]').classList.remove('open');
-        }
-
-        function procesarSolicitud() {
-            const t = dom.selTipo.value; const f = dom.inpFecha.value; const c = parseInt(dom.selComputo.value); const h = parseFloat(dom.inpHoraSol.value);
-            if(!f) return notificar("Fecha requerida", "error");
-            const hoy = new Date();
-            if(c < hoy.getFullYear()) {
-                const limV = new Date(c+1, 0, 31); const limA = new Date(c+1, 1, 15);
-                if(t==='vacaciones' && hoy > limV) return notificar("Plazo vacaciones caducado", "error");
-                if(t==='asuntos-propios' && hoy > limA) return notificar("Plazo asuntos caducado", "error");
-            }
-            const sol = { tipo:t, fecha:f, computo:c, estado:'En Trámite', fechaReg:new Date().toISOString() };
-            if(t==='horas') { sol.horas = h; datos.horas.push({ tipo:'resta', fecha:f, concepto:'Día Solicitado', cantidad:h, relacionado:true, fechaReg:new Date().toISOString() }); }
-            datos.solicitudes.push(sol); guardarEnBD("Solicitud creada");
-            document.getElementById('content-solicitar').classList.remove('open');
-            document.querySelector('[onclick="toggleCollapsible(\'content-solicitar\', this)"]').classList.remove('open');
-        }
-
-        function opHoras(tipo) {
-            const f = dom.inpFechaOp.value; const c = dom.inpConcOp.value; const h = parseFloat(dom.inpCantOp.value);
-            if(!f || !c || !h) return notificar("Datos incompletos", "error");
-            datos.horas.push({ tipo, fecha:f, concepto:c, cantidad:h, fechaReg:new Date().toISOString() });
-            document.getElementById('concepto-op-horas').value=''; guardarEnBD("Operación registrada"); renderListaHoras();
-        }
-
         function guardarPermuta() {
-            datos.permutas.push({ agente: document.getElementById('p-agente').value, fechaPropia: document.getElementById('p-fecha-yo').value, turnoPropio: document.getElementById('p-turno-yo').value, fechaAgente: document.getElementById('p-fecha-el').value, turnoAgente: document.getElementById('p-turno-el').value, año: anioActivo, fechaReg: new Date().toISOString() });
-            dom.modalPerm.style.display='none'; guardarEnBD("Permuta guardada");
-        }
+            const agente = document.getElementById('p-agente').value.trim();
+            const fYo = document.getElementById('p-fecha-yo').value;
+            const tYo = document.getElementById('p-turno-yo').value;
+            const fEl = document.getElementById('p-fecha-el').value;
+            const tEl = document.getElementById('p-turno-el').value;
 
-        function renderListaHoras() {
-            dom.listHoras.innerHTML = ''; const list = [...datos.horas].sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-            list.forEach(h => { const idx = datos.horas.indexOf(h); dom.listHoras.innerHTML += `<div class="item-row"><div><strong>${fmtDate(h.fecha)}</strong>: ${h.concepto}</div><div style="display:flex;align-items:center;gap:5px;"><span class="${h.tipo==='suma'?'horas-pos':'horas-neg'}">${h.tipo==='suma'?'+':'-'} ${h.cantidad}h</span><button onclick="abrirEditarHora(${idx})" class="btn-action btn-editar btn-icon">✏️</button><button onclick="eliminarHora(${idx})" class="btn-action btn-eliminar btn-icon">🗑️</button></div></div>`; });
+            if (!agente || !fYo || !fEl) return notificar("Rellena todos los campos de la permuta.", "error");
+
+            datos.permutas.push({
+                id: uid(),
+                agente,
+                fechaPropia: fYo,
+                turnoPropio: tYo,
+                fechaAgente: fEl,
+                turnoAgente: tEl,
+                año: anioActivo,
+                fechaReg: new Date().toISOString()
+            });
+
+            dom.modalPerm.style.display = 'none';
+            guardarEnBD("Permuta registrada.");
         }
 
         function renderListaPermutas() {
-            dom.listPermutas.innerHTML = ''; const list = [...datos.permutas].sort((a,b) => new Date(b.fechaReg) - new Date(a.fechaReg)); 
-            list.forEach(p => { 
-                const idx = datos.permutas.indexOf(p); const fYo = p.fechaPropia || p.fechaYo; const tYo = p.turnoPropio || p.turnoYo; const fEl = p.fechaAgente || p.fechaEl; const tEl = p.turnoAgente || p.turnoEl;
-                dom.listPermutas.innerHTML += `<div class="permuta-display" style="border-bottom:1px solid #eee; padding:15px 0;"><div class="permuta-header">Agente: ${p.agente} <span style="font-size:0.85rem; font-weight:normal; color:#888;">(${p.año})</span></div><div class="permuta-details"><div class="permuta-chip"><strong>279:</strong> ${fmtDate(fYo)} (${fmtTurno(tYo)})</div><div class="permuta-chip"><strong>${p.agente}:</strong> ${fmtDate(fEl)} (${fmtTurno(tEl)})</div><button onclick="eliminarPermuta(${idx})" class="btn-action btn-eliminar btn-icon" style="margin-left:auto;">🗑️</button></div></div>`; 
+            dom.listPermutas.innerHTML = '';
+            const list = [...datos.permutas].sort((a, b) => new Date(b.fechaReg || b.fechaPropia) - new Date(a.fechaReg || a.fechaPropia));
+
+            if (list.length === 0) {
+                dom.listPermutas.innerHTML = '<div style="padding:18px; text-align:center; color:var(--text-muted); font-size:0.88rem;">No hay permutas registradas.</div>';
+                return;
+            }
+
+            list.forEach(p => {
+                const fYo = p.fechaPropia || p.fechaYo;
+                const tYo = p.turnoPropio || p.turnoYo;
+                const fEl = p.fechaAgente || p.fechaEl;
+                const tEl = p.turnoAgente || p.turnoEl;
+
+                dom.listPermutas.innerHTML += `
+                    <div class="permuta-display">
+                        <div class="permuta-header">
+                            <span><i class="fas fa-handshake" style="color:var(--primary); margin-right:6px;"></i> Agente: ${escapeHTML(p.agente)} <span style="font-size:0.8rem; font-weight:normal; color:var(--text-muted);">(${p.año})</span></span>
+                            <button onclick="eliminarPermuta('${p.id}')" class="btn-icon" title="Eliminar permuta"><i class="fas fa-trash"></i></button>
+                        </div>
+                        <div class="permuta-chips">
+                            <div class="permuta-chip"><strong>G-279:</strong> ${fmtDate(fYo)} (${fmtTurno(tYo)})</div>
+                            <div class="permuta-chip"><strong>${escapeHTML(p.agente)}:</strong> ${fmtDate(fEl)} (${fmtTurno(tEl)})</div>
+                        </div>
+                    </div>
+                `;
             });
         }
 
-        window.cambiarEstado = (idx, st) => { datos.solicitudes[idx].estado = st; guardarEnBD("Estado actualizado"); };
-        window.eliminarSol = (idx) => { if(!confirm("¿Borrar?")) return; const s = datos.solicitudes[idx]; if(s.tipo==='horas') { const opIdx = datos.horas.findIndex(h => h.relacionado && h.fecha===s.fecha); if(opIdx>-1) datos.horas.splice(opIdx,1); } datos.solicitudes.splice(idx,1); guardarEnBD("Eliminado"); };
-        window.eliminarHora = (idx) => { if(confirm("¿Borrar?")) { datos.horas.splice(idx,1); guardarEnBD("Hora borrada"); renderListaHoras(); } };
-        window.eliminarPermuta = (idx) => { if(confirm("¿Borrar?")) { datos.permutas.splice(idx,1); guardarEnBD("Permuta borrada"); renderListaPermutas(); } };
+        window.eliminarPermuta = (permId) => {
+            if (!confirm("¿Eliminar esta permuta del registro?")) return;
+            const idx = datos.permutas.findIndex(x => x.id === permId);
+            if (idx > -1) {
+                datos.permutas.splice(idx, 1);
+                guardarEnBD("Permuta eliminada.");
+                renderListaPermutas();
+            }
+        };
 
-        function guardarEnBD(msg) { renderUI(); db.ref('descansos/' + USER_ID).set(datos).then(() => { notificar(msg, 'success'); renderUI(); }).catch(e => { console.error(e); notificar("Error guardando: " + e.message, 'error'); }); }
-        function notificar(msg, type) { const d = document.createElement('div'); d.className = `notification ${type==='success'?'notif-success':'notif-error'}`; d.textContent = msg; document.getElementById('notification-area').appendChild(d); setTimeout(() => d.remove(), 3000); }
-        function fmtDate(f) { if(!f)return''; const p=f.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; }
-        function fmtType(t) { return t.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase()); }
-        function fmtTurno(t) { if(!t) return ''; return t.charAt(0).toUpperCase() + t.slice(1); }
+        // =========================================
+        // 11. UTILIDADES Y PDF
+        // =========================================
+        function guardarEnBD(msg) {
+            renderUI();
+            db.ref('descansos/' + USER_ID).set(datos).then(() => {
+                if (msg) notificar(msg, 'success');
+                renderUI();
+            }).catch(e => {
+                console.error(e);
+                notificar("Error al sincronizar con Firebase: " + e.message, 'error');
+            });
+        }
+
+        function notificar(msg, type) {
+            const d = document.createElement('div');
+            const icon = type === 'success' ? '<i class="fas fa-check-circle"></i>' : (type === 'error' ? '<i class="fas fa-circle-exclamation"></i>' : '<i class="fas fa-info-circle"></i>');
+            d.className = `notification notif-${type}`;
+            d.innerHTML = `${icon} <span>${escapeHTML(msg)}</span>`;
+            document.getElementById('notification-area').appendChild(d);
+            setTimeout(() => d.remove(), 3200);
+        }
+
+        function fmtDate(f) {
+            if (!f) return '';
+            const p = f.split('-');
+            if (p.length < 3) return f;
+            return `${p[2]}/${p[1]}/${p[0]}`;
+        }
+
+        function fmtType(t) {
+            if (!t) return '';
+            return t.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase());
+        }
+
+        function fmtTurno(t) {
+            if (!t) return '';
+            return t.charAt(0).toUpperCase() + t.slice(1);
+        }
 
         window.generarPDF = () => {
             const modalActions = document.querySelector('#modal-historico-movimientos .modal-actions');
@@ -923,7 +2241,7 @@
 
             modalActions.style.display = 'none';
             btnPdf.style.display = 'none';
-            if(pDesc) pDesc.style.display = 'none';
+            if (pDesc) pDesc.style.display = 'none';
 
             const oldMaxHeight = listaContenedor.style.maxHeight;
             const oldOverflow = listaContenedor.style.overflowY;
@@ -934,18 +2252,18 @@
             
             const opt = {
                 margin:       [10, 10, 10, 10],
-                filename:     `Movimientos_AP_y_Vacaciones_${anioActivo}.pdf`,
+                filename:     `Movimientos_AP_Vacaciones_${anioActivo}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2 },
+                html2canvas:  { scale: 2, backgroundColor: '#111827' },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak:    { mode: 'avoid-all' }
             };
 
             html2pdf().set(opt).from(elemento).save().then(() => {
                 modalActions.style.display = 'flex';
-                btnPdf.style.display = 'block';
-                if(pDesc) pDesc.style.display = 'block';
-                listaContenedor.style.maxHeight = oldMaxHeight || '500px';
+                btnPdf.style.display = 'inline-flex';
+                if (pDesc) pDesc.style.display = 'block';
+                listaContenedor.style.maxHeight = oldMaxHeight || '480px';
                 listaContenedor.style.overflowY = oldOverflow || 'auto';
             });
         };

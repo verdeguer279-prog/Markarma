@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GAD · Panel de Control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-canvas: #0b0f19;
+      --bg-surface: #111827;
+      --bg-elevated: #182234;
+      --bg-hover: #1e2b42;
+      --border-subtle: rgba(148, 163, 184, 0.14);
+      --border-strong: rgba(148, 163, 184, 0.28);
+
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --accent-indigo: #6366f1;
+      --accent-cyan: #06b6d4;
+      --accent-amber: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --shadow-md: 0 12px 30px rgba(0, 0, 0, 0.45);
+      --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.65);
+    }
+
+    html {
+      box-sizing: border-box;
+      overflow-x: hidden;
+    }
+
+    *, *::before, *::after {
+      box-sizing: inherit;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.14), transparent 42%),
+        radial-gradient(circle at 85% 12%, rgba(99, 102, 241, 0.12), transparent 40%),
+        var(--bg-canvas);
+      color: var(--text-primary);
+      margin: 0;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* LOGIN SCREEN */
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 25%, rgba(59, 130, 246, 0.16), transparent 55%),
+        var(--bg-canvas);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 5000;
+      transition: opacity 0.35s ease;
+    }
+
+    .brand-logo {
+      max-width: 190px;
+      height: auto;
+      margin-bottom: 24px;
+      filter: drop-shadow(0 8px 24px rgba(59, 130, 246, 0.25));
+    }
+
+    .login-card {
+      background: rgba(17, 24, 39, 0.92);
+      backdrop-filter: blur(12px);
+      padding: 36px 32px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      max-width: 380px;
+      width: 100%;
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-lg);
+      display: none;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .login-card.visible {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .login-card h2 {
+      margin: 0 0 8px;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .login-card p.sub {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin: 0 0 26px;
+    }
+
+    .google-btn {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+      width: 100%;
+      font-size: 0.92rem;
+    }
+
+    .google-btn:hover {
+      background: #f1f5f9;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.35);
+    }
+
+    .google-btn img {
+      width: 19px;
+      height: 19px;
+    }
+
+    .error-msg {
+      color: #fca5a5;
+      font-size: 0.84rem;
+      margin-top: 16px;
+      display: none;
+      background: rgba(239, 68, 68, 0.14);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+    }
+
+    .spinner {
+      width: 38px;
+      height: 38px;
+      border: 3px solid rgba(59, 130, 246, 0.22);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* MAIN DASHBOARD */
+    .container {
+      max-width: 1080px;
+      margin: 36px auto;
+      padding: 0 20px 48px;
+      display: none;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding-bottom: 22px;
+      margin-bottom: 26px;
+      border-bottom: 1px solid var(--border-subtle);
+      flex-wrap: wrap;
+    }
+
+    .app-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform 0.2s ease;
+    }
+
+    .app-logo img {
+      max-height: 72px;
+      max-width: 140px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+
+    body.edit-mode .app-logo {
+      cursor: pointer;
+    }
+
+    body.edit-mode .app-logo:hover {
+      transform: scale(1.03);
+    }
+
+    .header-title {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .header-title h1 {
+      margin: 0;
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .header-title p {
+      margin: 4px 0 0;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    .session-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button {
+      font-family: inherit;
+      border: 1px solid transparent;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.16s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .btn-control {
+      padding: 9px 15px;
+      font-size: 0.86rem;
+    }
+
+    .btn-logout {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-secondary);
+      border-color: var(--border-subtle);
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.14);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    #btnToggleEdit {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.35);
+      display: none;
+    }
+
+    #btnToggleEdit:hover {
+      background: rgba(245, 158, 11, 0.25);
+    }
+
+    /* BUTTON GRID */
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .button-wrapper {
+      position: relative;
+      min-height: 82px;
+    }
+
+    .button-wrapper.long {
+      grid-column: span 2;
+    }
+
+    @media (max-width: 768px) {
+      .button-wrapper.long {
+        grid-column: span 1;
+      }
+    }
+
+    .button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 22px 18px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(99, 102, 241, 0.18));
+      border: 1px solid rgba(99, 102, 241, 0.35);
+      color: var(--text-primary);
+      font-weight: 700;
+      text-decoration: none;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-size: 0.92rem;
+      height: 100%;
+      width: 100%;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+      transition: transform 0.18s ease, border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    body:not(.edit-mode) .button:hover {
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.28), rgba(99, 102, 241, 0.28));
+      border-color: rgba(129, 140, 248, 0.65);
+      box-shadow: 0 10px 24px rgba(59, 130, 246, 0.22);
+    }
+
+    /* EDIT MODE */
+    body.edit-mode .button {
+      pointer-events: none;
+      opacity: 0.85;
+    }
+
+    body.edit-mode .button-wrapper {
+      border: 1.5px dashed rgba(245, 158, 11, 0.65);
+      border-radius: 14px;
+      padding: 5px;
+      background: rgba(245, 158, 11, 0.05);
+      cursor: grab;
+    }
+
+    .action-buttons {
+      position: absolute;
+      top: -9px;
+      right: -9px;
+      display: flex;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .action-button {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 0.78rem;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .action-button.edit {
+      background: var(--accent-amber);
+      color: #1e293b;
+    }
+
+    .action-button.delete {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    #btnAddButton {
+      background: rgba(16, 185, 129, 0.08);
+      color: #34d399;
+      border: 1.5px dashed rgba(16, 185, 129, 0.45);
+      padding: 15px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 22px;
+      text-align: center;
+      display: none;
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    #btnAddButton:hover {
+      background: rgba(16, 185, 129, 0.15);
+      border-color: rgba(16, 185, 129, 0.7);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(6px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+      z-index: 9999;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--bg-surface);
+      padding: 26px;
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 480px;
+      position: relative;
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 14px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 1.12rem;
+      font-weight: 700;
+    }
+
+    .close-modal {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-subtle);
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+    }
+
+    .close-modal:hover {
+      background: rgba(239, 68, 68, 0.16);
+      color: #fca5a5;
+    }
+
+    .field-group {
+      margin-bottom: 14px;
+    }
+
+    .field-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .modal input, .modal select {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    .modal input:focus, .modal select:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .button-file-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .btn-file-choice {
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.84rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-file-choice:hover {
+      background: rgba(255, 255, 255, 0.09);
+      border-color: var(--primary);
+    }
+
+    #drop-area {
+      box-sizing: border-box;
+      max-width: 100%;
+      min-width: 0;
+      border: 1.5px dashed var(--border-strong);
+      background: rgba(255, 255, 255, 0.02);
+      padding: 16px;
+      text-align: center;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      margin-bottom: 18px;
+      color: var(--text-secondary);
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      transition: border-color 0.2s ease, background-color 0.2s ease;
+    }
+
+    #drop-area small {
+      display: block;
+      box-sizing: border-box;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      font-size: 0.8rem;
+      line-height: 1.35;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent-indigo));
+      color: #fff;
+      padding: 11px 18px;
+      width: 100%;
+      font-size: 0.92rem;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.08);
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        margin: 16px auto;
+        padding: 0 12px 36px;
+      }
+      .card {
+        padding: 20px;
+      }
+      .header {
+        flex-direction: column;
+        text-align: center;
+      }
+      .session-controls {
+        justify-content: center;
+        width: 100%;
+      }
+      .btn-control {
+        flex: 1;
+      }
+      .button-file-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="login-screen">
+  <img src="logogad.png" alt="GAD Logo" class="brand-logo" onerror="this.src='https://placehold.co/200x90/111827/f8fafc?text=GAD'">
+  <div id="initial-loader" class="spinner"></div>
+
+  <div id="login-card-content" class="login-card">
+    <h2>Acceso Administrador</h2>
+    <p class="sub">Autenticación restringida al responsable del panel</p>
+
+    <button id="btn-login-google" class="google-btn">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Continuar con Google
+    </button>
+    <p id="login-error" class="error-msg"></p>
+  </div>
+</div>
+
+<div class="container" id="main-content">
+  <div class="card">
+    <header class="header">
+      <div class="app-logo" id="appLogo" title="Logo del panel">
+        <img id="logoImage" src="logogad.png" alt="GAD" onerror="this.src='https://placehold.co/120x60/182234/f8fafc?text=GAD'">
+      </div>
+      <input type="file" id="logoFileInput" style="display: none;" accept="image/*">
+
+      <div class="header-title">
+        <h1 id="welcome-message">Panel de Control</h1>
+        <p id="user-email-label">GAD · Gestión operativa</p>
+      </div>
+
+      <div class="session-controls">
+        <button id="btnToggleEdit" class="btn-control">
+          <i class="fas fa-pen"></i> Editar menú
+        </button>
+        <button id="btn-logout" class="btn-control btn-logout" title="Cerrar sesión">
+          <i class="fas fa-right-from-bracket"></i> Salir
+        </button>
+      </div>
+    </header>
+
+    <div class="button-grid" id="buttonGrid"></div>
+
+    <div id="btnAddButton">
+      <i class="fas fa-plus-circle"></i> NUEVO BOTÓN
+    </div>
+  </div>
+</div>
+
+<div id="button-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="buttonModalTitle">Configurar botón</h3>
+      <button type="button" class="close-modal" id="close-button-modal" aria-label="Cerrar">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="field-group">
+      <label for="button-name">Nombre del botón</label>
+      <input type="text" id="button-name" placeholder="Ej. Control de Cursos">
+    </div>
+
+    <div class="field-group">
+      <label for="button-url">Enlace o archivo HTML (detecta subcarpetas)</label>
+      <input type="text" id="button-url" placeholder="subcarpeta/archivo.html o pega ruta de Windows">
+    </div>
+
+    <div class="field-group">
+      <label for="button-subfolder">Subcarpeta manual (opcional)</label>
+      <input type="text" id="button-subfolder" placeholder="Ej. modulos/cursos">
+    </div>
+
+    <input type="file" id="button-file-input" accept=".html,.htm,text/html" hidden>
+    <input type="file" id="button-folder-input" webkitdirectory directory hidden>
+
+    <div class="button-file-row">
+      <button type="button" id="button-select-file" class="btn-file-choice">
+        <i class="fas fa-file-code"></i> Elegir archivo HTML
+      </button>
+      <button type="button" id="button-select-folder" class="btn-file-choice" title="Selecciona la carpeta donde está tu archivo">
+        <i class="fas fa-folder-tree"></i> Elegir por subcarpeta
+      </button>
+    </div>
+
+    <div class="field-group">
+      <label for="button-type">Tamaño en cuadrícula</label>
+      <select id="button-type">
+        <option value="short">Normal (1 columna)</option>
+        <option value="long">Ancho (2 columnas)</option>
+      </select>
+    </div>
+
+    <div id="drop-area">
+      <i class="fas fa-file-code" style="font-size:1.35rem; margin-bottom:6px; display:block; color:#60a5fa;"></i>
+      <small>Arrastra aquí el HTML o pega su ruta de Windows en el campo de enlace superior.</small>
+    </div>
+
+    <button id="button-submit" class="btn-primary">Guardar Cambios</button>
+  </div>
+</div>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
+    authDomain: "markarma279.firebaseapp.com",
+    databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "markarma279",
+    storageBucket: "markarma279.firebasestorage.app",
+    messagingSenderId: "280620278315",
+    appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
+  };
+
+  if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const auth = firebase.auth();
+  const provider = new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+  auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(() => {});
+
+  const ADMIN_EMAIL = "verdeguer279@gmail.com";
+
+  const loginScreen = document.getElementById("login-screen");
+  const loginCard = document.getElementById("login-card-content");
+  const loader = document.getElementById("initial-loader");
+  const mainContent = document.getElementById("main-content");
+  const loginError = document.getElementById("login-error");
+  const btnModal = document.getElementById("button-modal");
+
+  let isEditMode = false;
+  let isAdmin = false;
+  let editingKey = null;
+
+  function escapeHTML(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function cleanRelativePath(raw) {
+    let clean = String(raw || "").trim();
+    if (!clean) return "";
+
+    // Si es una URL web completa (http / https), respetarla
+    if (/^https?:\/\//i.test(clean)) return clean;
+
+    // Quitar comillas si se pegó una ruta con comillas desde Windows
+    clean = clean.replace(/^["']|["']$/g, "");
+
+    // Si viene pegada una ruta tipo "file:///C:/..."
+    clean = clean.replace(/^file:\/\/\/?/i, "");
+
+    // Convertir barras invertidas de Windows a barras web
+    clean = clean.replace(/\\/g, "/");
+
+    // Si es una ruta absoluta de disco duro (C:/Users/.../carpeta/sub/archivo.html)
+    // Extraemos la parte relevante evitando que apunte a la raíz de la máquina
+    if (/^[a-zA-Z]:\//.test(clean)) {
+      const parts = clean.split("/");
+      const currentDirName = window.location.pathname.split("/").filter(Boolean).slice(-2, -1)[0];
+      if (currentDirName && parts.includes(currentDirName)) {
+        const indexCurrent = parts.lastIndexOf(currentDirName);
+        clean = parts.slice(indexCurrent + 1).join("/");
+      } else {
+        // Tomar el final razonable (última subcarpeta + archivo)
+        clean = parts.slice(-2).join("/");
+      }
+    }
+
+    // Limpieza de barras redundantes iniciales
+    clean = clean.replace(/^\.?\/+/, "").replace(/\/+/g, "/");
+    return clean ? `./${clean}` : "";
+  }
+
+  function isSafeUrl(url) {
+    const trimmed = String(url || "").trim();
+    if (!trimmed) return "#";
+    const scheme = trimmed.match(/^([a-z][a-z\d+.-]*):/i);
+    if (!scheme) return cleanRelativePath(trimmed);
+
+    if (["javascript", "data", "vbscript"].includes(scheme[1].toLowerCase())) {
+      return "#";
+    }
+    return trimmed;
+  }
+
+  function showLoginError(message) {
+    loader.style.display = "none";
+    loginCard.classList.add("visible");
+    loginError.textContent = message;
+    loginError.style.display = "block";
+  }
+
+  auth.onAuthStateChanged(async (user) => {
+    if (!user) {
+      isAdmin = false;
+      mainContent.style.display = "none";
+      loginScreen.style.display = "flex";
+      loginScreen.style.opacity = "1";
+      loader.style.display = "none";
+      loginCard.classList.add("visible");
+      return;
+    }
+
+    const email = (user.email || "").trim().toLowerCase();
+    if (email !== ADMIN_EMAIL) {
+      isAdmin = false;
+      try {
+        await auth.signOut();
+      } catch (_) {}
+      showLoginError("Acceso denegado: esta cuenta no está autorizada en este panel.");
+      return;
+    }
+
+    isAdmin = true;
+    enterDashboard(user);
+  });
+
+  function enterDashboard(user) {
+    loginError.style.display = "none";
+    loginScreen.style.opacity = "0";
+    setTimeout(() => {
+      loginScreen.style.display = "none";
+      mainContent.style.display = "block";
+    }, 250);
+
+    const displayName = (user.displayName || "Administrador").toUpperCase();
+    document.getElementById("welcome-message").textContent = `Hola, ${displayName}`;
+    document.getElementById("user-email-label").textContent = user.email;
+    document.getElementById("btnToggleEdit").style.display = "inline-flex";
+
+    loadLogo();
+    loadButtons();
+  }
+
+  document.getElementById("btn-login-google").onclick = async () => {
+    loginError.style.display = "none";
+    try {
+      await auth.signInWithPopup(provider);
+    } catch (err) {
+      showLoginError("No se pudo completar el inicio de sesión con Google.");
+      console.error(err);
+    }
+  };
+
+  document.getElementById("btn-logout").onclick = async () => {
+    isEditMode = false;
+    document.body.classList.remove("edit-mode");
+    await auth.signOut();
+  };
+
+  function loadLogo() {
+    db.ref("config/logo").on("value", (snap) => {
+      const val = snap.val();
+      if (typeof val === "string" && (val.startsWith("data:image/") || val.startsWith("https://") || val.startsWith("./") || !val.includes(":"))) {
+        document.getElementById("logoImage").src = val;
+      }
+    });
+  }
+
+  document.getElementById("appLogo").onclick = () => {
+    if (isEditMode && isAdmin) {
+      document.getElementById("logoFileInput").click();
+    }
+  };
+
+  document.getElementById("logoFileInput").onchange = (e) => {
+    if (!isAdmin) return;
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Selecciona un archivo de imagen válido.");
+      return;
+    }
+    if (file.size > 512 * 1024) {
+      alert("La imagen supera los 512 KB. Usa una imagen más ligera para no cargar la base de datos.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      db.ref("config/logo").set(ev.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  document.getElementById("btnToggleEdit").onclick = () => {
+    if (!isAdmin) return;
+    isEditMode = !isEditMode;
+    const btn = document.getElementById("btnToggleEdit");
+    const addBtn = document.getElementById("btnAddButton");
+
+    if (isEditMode) {
+      btn.innerHTML = `<i class="fas fa-check"></i> Terminar`;
+      btn.style.background = "rgba(16, 185, 129, 0.18)";
+      btn.style.color = "#34d399";
+      btn.style.borderColor = "rgba(16, 185, 129, 0.4)";
+      document.body.classList.add("edit-mode");
+      addBtn.style.display = "block";
+    } else {
+      btn.innerHTML = `<i class="fas fa-pen"></i> Editar menú`;
+      btn.style.background = "rgba(245, 158, 11, 0.15)";
+      btn.style.color = "#fbbf24";
+      btn.style.borderColor = "rgba(245, 158, 11, 0.35)";
+      document.body.classList.remove("edit-mode");
+      addBtn.style.display = "none";
+    }
+
+    db.ref("botones").once("value").then((s) => renderButtons(s.val()));
+  };
+
+  function loadButtons() {
+    db.ref("botones").on("value", (snap) => renderButtons(snap.val()));
+  }
+
+  function renderButtons(data) {
+    const grid = document.getElementById("buttonGrid");
+    grid.innerHTML = "";
+    if (!data) return;
+
+    const sorted = Object.entries(data)
+      .map(([key, val]) => ({ key, ...(val || {}) }))
+      .sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
+
+    sorted.forEach((btn) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = `button-wrapper ${btn.span === "long" ? "long" : ""}`;
+      wrapper.setAttribute("data-key", btn.key);
+
+      if (isEditMode && isAdmin) {
+        const actions = document.createElement("div");
+        actions.className = "action-buttons";
+
+        const editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "action-button edit";
+        editBtn.title = "Editar";
+        editBtn.innerHTML = `<i class="fas fa-edit"></i>`;
+        editBtn.onclick = () => openModal(btn.key);
+
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "action-button delete";
+        delBtn.title = "Eliminar";
+        delBtn.innerHTML = `<i class="fas fa-trash"></i>`;
+        delBtn.onclick = () => deleteBtn(btn.key);
+
+        actions.appendChild(editBtn);
+        actions.appendChild(delBtn);
+        wrapper.appendChild(actions);
+
+        wrapper.draggable = true;
+        setupDrag(wrapper);
+      }
+
+      const link = document.createElement("a");
+      link.className = "button";
+      const safeHref = isSafeUrl(btn.url);
+      link.href = isEditMode ? "javascript:void(0)" : safeHref;
+      if (!isEditMode && /^https?:\/\//i.test(safeHref)) {
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      }
+      link.textContent = btn.name || "Botón";
+      wrapper.appendChild(link);
+      grid.appendChild(wrapper);
+    });
+  }
+
+  async function openModal(key = null) {
+    if (!isAdmin) return;
+    editingKey = key;
+    document.getElementById("button-name").value = "";
+    document.getElementById("button-url").value = "";
+    document.getElementById("button-subfolder").value = "";
+    document.getElementById("button-type").value = "short";
+    document.getElementById("buttonModalTitle").textContent = key ? "Editar botón" : "Nuevo botón";
+    resetDropAreaText();
+
+    if (key) {
+      const snap = await db.ref("botones/" + key).once("value");
+      const d = snap.val() || {};
+      document.getElementById("button-name").value = d.name || "";
+      document.getElementById("button-url").value = d.url || "";
+      document.getElementById("button-subfolder").value = getSubfolderFromUrl(d.url || "");
+      document.getElementById("button-type").value = d.span === "long" ? "long" : "short";
+    }
+    btnModal.classList.add("open");
+  }
+
+  function resetDropAreaText() {
+    drop.innerHTML = `
+      <i class="fas fa-file-code" style="font-size:1.35rem; margin-bottom:6px; display:block; color:#60a5fa;"></i>
+      <small>Arrastra aquí el HTML o usa los botones superiores.</small>
+    `;
+  }
+
+  function closeButtonModal() {
+    btnModal.classList.remove("open");
+  }
+
+  document.getElementById("close-button-modal").onclick = closeButtonModal;
+  document.getElementById("btnAddButton").onclick = () => openModal();
+
+  document.getElementById("button-submit").onclick = async () => {
+    if (!isAdmin) return;
+    const name = document.getElementById("button-name").value.trim();
+    let rawUrl = document.getElementById("button-url").value.trim();
+
+    if (!rawUrl) {
+      const sub = normalizeSubfolder(subfolderInput.value);
+      if (sub) rawUrl = `./${sub}/index.html`;
+    }
+
+    const safeUrl = isSafeUrl(rawUrl);
+
+    if (!name) {
+      alert("El botón necesita un nombre.");
+      return;
+    }
+    if (!safeUrl || safeUrl === "#") {
+      alert("Debes indicar un archivo HTML o enlace válido.");
+      return;
+    }
+
+    const payload = {
+      name,
+      url: safeUrl,
+      span: document.getElementById("button-type").value === "long" ? "long" : "short"
+    };
+
+    if (editingKey) {
+      await db.ref("botones/" + editingKey).update(payload);
+    } else {
+      const snap = await db.ref("botones").once("value");
+      payload.order = snap.numChildren() + 1;
+      await db.ref("botones").push(payload);
+    }
+
+    closeButtonModal();
+  };
+
+  async function deleteBtn(key) {
+    if (!isAdmin) return;
+    if (confirm("¿Eliminar este botón?")) {
+      await db.ref("botones/" + key).remove();
+    }
+  }
+
+  let dragSrc = null;
+  function setupDrag(el) {
+    el.addEventListener("dragstart", (e) => {
+      dragSrc = el;
+      e.dataTransfer.effectAllowed = "move";
+      setTimeout(() => { el.style.opacity = "0.45"; }, 0);
+    });
+
+    el.addEventListener("dragend", () => {
+      el.style.opacity = "1";
+      saveOrder();
+    });
+
+    el.addEventListener("dragover", (e) => {
+      e.preventDefault();
+    });
+
+    el.addEventListener("drop", (e) => {
+      e.stopPropagation();
+      if (dragSrc && dragSrc !== el) {
+        const grid = document.getElementById("buttonGrid");
+        const children = Array.from(grid.children);
+        const fromIndex = children.indexOf(dragSrc);
+        const toIndex = children.indexOf(el);
+        if (fromIndex < toIndex) el.after(dragSrc);
+        else el.before(dragSrc);
+      }
+      return false;
+    });
+  }
+
+  function saveOrder() {
+    if (!isAdmin) return;
+    const updates = {};
+    document.querySelectorAll(".button-wrapper").forEach((wrapper, index) => {
+      const key = wrapper.getAttribute("data-key");
+      if (key) updates[`botones/${key}/order`] = index;
+    });
+    if (Object.keys(updates).length > 0) {
+      db.ref().update(updates);
+    }
+  }
+
+  const drop = document.getElementById("drop-area");
+  const fileInput = document.getElementById("button-file-input");
+  const folderInput = document.getElementById("button-folder-input");
+  const urlInput = document.getElementById("button-url");
+  const subfolderInput = document.getElementById("button-subfolder");
+
+  function getSubfolderFromUrl(url) {
+    const path = String(url || "").trim().split(/[?#]/, 1)[0].replace(/^\.\//, "");
+    const lastSlash = path.lastIndexOf("/");
+    return lastSlash < 0 ? "" : path.slice(0, lastSlash);
+  }
+
+  function normalizeSubfolder(value) {
+    return String(value || "")
+      .trim()
+      .replace(/\\/g, "/")
+      .replace(/\/+/g, "/")
+      .replace(/^\/+|\/+$/g, "")
+      .replace(/^(?:\.\/)+/, "");
+  }
+
+  function applyFileSelection(filename, detectedSubfolder = "") {
+    let subfolder = detectedSubfolder ? normalizeSubfolder(detectedSubfolder) : normalizeSubfolder(subfolderInput.value);
+    subfolderInput.value = subfolder;
+
+    const fullUrl = cleanRelativePath(`${subfolder ? `${subfolder}/` : ""}${filename}`);
+    urlInput.value = fullUrl;
+
+    if (!document.getElementById("button-name").value.trim()) {
+      const cleanName = filename.replace(/\.html?$/i, "").replace(/[-_]+/g, " ");
+      document.getElementById("button-name").value = cleanName.charAt(0).toUpperCase() + cleanName.slice(1);
+    }
+
+    drop.innerHTML = `<i class="fas fa-check-circle" style="color:#10b981; font-size:1.4rem; margin-bottom:4px;"></i><br><small><strong>${escapeHTML(filename)}</strong><br>${escapeHTML(fullUrl)}</small>`;
+  }
+
+  // Pegar directamente rutas con subcarpetas
+  urlInput.addEventListener("input", () => {
+    const val = urlInput.value.trim();
+    if (val && !/^https?:\/\//i.test(val)) {
+      const cleaned = cleanRelativePath(val);
+      if (cleaned && cleaned !== val && !val.endsWith("/")) {
+        urlInput.value = cleaned;
+      }
+      subfolderInput.value = getSubfolderFromUrl(urlInput.value);
+    }
+  });
+
+  subfolderInput.addEventListener("input", () => {
+    const sub = normalizeSubfolder(subfolderInput.value);
+    const cur = urlInput.value.trim();
+    if (cur && !/^https?:\/\//i.test(cur)) {
+      const fileName = cur.split("/").pop() || "index.html";
+      urlInput.value = cleanRelativePath(`${sub ? `${sub}/` : ""}${fileName}`);
+    }
+  });
+
+  // 1. Selector de archivo individual
+  document.getElementById("button-select-file").onclick = () => fileInput.click();
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files[0];
+    if (file) {
+      if (!/\.html?$/i.test(file.name)) {
+        alert("Selecciona un archivo .html o .htm");
+        return;
+      }
+      applyFileSelection(file.name);
+    }
+    fileInput.value = "";
+  });
+
+  // 2. Selector de carpeta completa (autodetecta subcarpetas)
+  document.getElementById("button-select-folder").onclick = () => folderInput.click();
+  folderInput.addEventListener("change", () => {
+    const files = Array.from(folderInput.files);
+    if (!files.length) return;
+
+    // Buscar si hay index.html o el primer html disponible
+    let target = files.find(f => /index\.html?$/i.test(f.name)) || files.find(f => /\.html?$/i.test(f.name));
+
+    if (!target) {
+      alert("No se encontró ningún archivo .html dentro de esa carpeta.");
+      return;
+    }
+
+    const relPath = target.webkitRelativePath || target.name;
+    const parts = relPath.replace(/\\/g, "/").split("/");
+    const fileName = parts.pop();
+    const folderPath = parts.join("/");
+
+    applyFileSelection(fileName, folderPath);
+    folderInput.value = "";
+  });
+
+  // Drag & drop
+  drop.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    drop.style.borderColor = "#34d399";
+    drop.style.background = "rgba(16, 185, 129, 0.08)";
+  });
+  drop.addEventListener("dragleave", () => {
+    drop.style.borderColor = "";
+    drop.style.background = "";
+  });
+  drop.addEventListener("drop", (e) => {
+    e.preventDefault();
+    drop.style.borderColor = "";
+    drop.style.background = "";
+
+    // Si arrastraron texto (ej. una ruta de Windows o enlace copiado)
+    const textData = e.dataTransfer.getData("text");
+    if (textData && !e.dataTransfer.files.length) {
+      urlInput.value = cleanRelativePath(textData);
+      subfolderInput.value = getSubfolderFromUrl(urlInput.value);
+      drop.innerHTML = `<i class="fas fa-check" style="color:#34d399; font-size:1.3rem;"></i><br><small>Ruta detectada:<br>${escapeHTML(urlInput.value)}</small>`;
+      return;
+    }
+
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      if (!/\.html?$/i.test(file.name)) {
+        alert("Arrastra un archivo .html");
+        return;
+      }
+      applyFileSelection(file.name);
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeButtonModal();
+  });
+
+  btnModal.addEventListener("click", (e) => {
+    if (e.target === btnModal) closeButtonModal();
+  });
+</script>
+</body>
+</html>

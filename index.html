@@ -110,6 +110,12 @@
       display: none;
     }
 
+    @media (display-mode: standalone), (display-mode: minimal-ui), (display-mode: fullscreen) {
+      [data-install-app] {
+        display: none !important;
+      }
+    }
+
     .login-card .install-btn {
       width: 100%;
       margin-bottom: 12px;
@@ -810,7 +816,9 @@
   let deferredInstallPrompt = null;
 
   const isInstalledApp = () =>
-    window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    ["standalone", "minimal-ui", "fullscreen"].some((mode) =>
+      window.matchMedia(`(display-mode: ${mode})`).matches
+    ) || window.navigator.standalone === true;
 
   if (isInstalledApp()) {
     installButtons.forEach((button) => { button.hidden = true; });

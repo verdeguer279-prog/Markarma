@@ -404,7 +404,7 @@
             margin-bottom: 14px;
         }
         .modal-section-card h4 {
-            margin: 0 0 6px 0;
+            margin: 0 0 8px 0;
             font-size: 13px;
             color: var(--m-green-dark);
             display: flex;
@@ -412,17 +412,40 @@
             gap: 6px;
         }
 
-        .user-tag-badge {
-            background: #eef4f0;
-            color: #2c4433;
-            padding: 5px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            margin-bottom: 5px;
+        .user-member-row {
             display: flex;
             align-items: center;
-            gap: 6px;
+            justify-content: space-between;
+            background: #ffffff;
+            border: 1px solid #d9e4dc;
+            padding: 7px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            margin-bottom: 6px;
         }
+        .user-member-row span {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 280px;
+        }
+
+        .btn-del-member {
+            background: #dc3545;
+            color: white;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .btn-del-member:active { transform: scale(0.9); }
 
         .btn-config { background: transparent; color: var(--m-green); border: 1px solid var(--m-green); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .seccion-item { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border-radius: 8px; border: 1px solid #eee; }
@@ -493,28 +516,28 @@
         </div>
     </div>
 
-    <!-- Modal Editar Producto -->
+    <!-- Modal Editar o Crear Producto (con asignación directa de pasillo) -->
     <div id="modal-edicion" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--m-green);">Editar Producto</h3>
-            <label style="font-size:12px; font-weight:bold; color:#777;">Nombre Original / Ticket</label>  
+            <h3 style="margin-top:0; color:var(--m-green);" id="modal-edicion-titulo">Editar Producto</h3>
+            <label style="font-size:12px; font-weight:bold; color:#777;">Nombre Original / Interno</label>  
             <input type="text" id="edit-original" class="modal-input" disabled style="background:#eee; color:#666;">
             
             <label style="font-size:12px; font-weight:bold; color:#555;">Nombre Visible / Habitual</label>
             <input type="text" id="edit-visible" class="modal-input" placeholder="Ej. Atún en aceite de oliva">
             
-            <label style="font-size:12px; font-weight:bold; color:#555;">Sección / Pasillo</label>
+            <label style="font-size:12px; font-weight:bold; color:#555;">Pasillo del Supermercado</label>
             <select id="edit-seccion" class="modal-input"></select>
             
             <div style="display:flex; gap:8px;">
-                <button class="primary" style="background:#dc3545; flex:0.3;" onclick="eliminarProducto()">🗑️</button>
+                <button class="primary" id="btn-eliminar-prod-modal" style="background:#dc3545; flex:0.3;" onclick="eliminarProducto()">🗑️</button>
                 <button class="primary" style="background:#888; flex:0.7;" onclick="cerrarModal()">Cancelar</button>
                 <button class="primary" style="flex:1;" onclick="guardarEdicion()">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Gestión del Catálogo -->
+    <!-- Modal Gestión Completa del Catálogo -->
     <div id="modal-gestion-catalogo" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 style="margin-top:0; color:var(--m-green);">📁 Gestión de Catálogos</h3>
@@ -528,13 +551,18 @@
                 </div>
             </div>
 
-            <!-- 2. Usuarios / Familiares unidos a este catálogo -->
+            <!-- 2. Miembros autorizados con botón rojo para eliminar y botón para añadir -->
             <div class="modal-section-card">
                 <h4>👥 Miembros autorizados en este catálogo</h4>
-                <div id="lista-usuarios-autorizados-catalogo" style="max-height: 120px; overflow-y: auto; margin-top: 6px;"></div>
+                <div id="lista-usuarios-autorizados-catalogo" style="max-height: 140px; overflow-y: auto; margin-bottom: 8px;"></div>
+                
+                <div style="display:flex; gap:6px; margin-top:8px;">
+                    <input type="email" id="input-nuevo-miembro-email" class="modal-input" style="margin:0; flex:1; padding:8px; font-size:13px;" placeholder="correo@gmail.com..." onkeypress="if(event.key==='Enter') agregarNuevoMiembroACatalogo()">
+                    <button class="primary" style="margin:0; width:auto; padding: 8px 12px; font-size:13px;" onclick="agregarNuevoMiembroACatalogo()">➕ Añadir</button>
+                </div>
             </div>
 
-            <!-- 3. Cambiar de catálogo disponible para este usuario -->
+            <!-- 3. Cambiar de catálogo disponible -->
             <div class="modal-section-card" id="card-cambiar-catalogo">
                 <h4>🔄 Cambiar de catálogo activo</h4>
                 <div style="display:flex; gap:6px;">
@@ -546,7 +574,7 @@
             <!-- 4. Crear catálogo secundario para el grupo familiar -->
             <div class="modal-section-card">
                 <h4>➕ Crear catálogo secundario compartido</h4>
-                <p style="font-size:12px; color:#666; margin:0 0 8px 0;">Todos los miembros autorizados en este catálogo tendrán acceso a él.</p>
+                <p style="font-size:12px; color:#666; margin:0 0 8px 0;">Los miembros autorizados en este catálogo tendrán acceso a él.</p>
                 
                 <input type="text" id="input-nuevo-catalogo-nombre" class="modal-input" style="margin:0 0 8px 0;" placeholder="Nombre del nuevo catálogo...">
                 
@@ -560,7 +588,7 @@
             <!-- 5. Exportar catálogo actual a JSON -->
             <div class="modal-section-card" style="margin-bottom:15px;">
                 <h4>📤 Exportar catálogo actual</h4>
-                <p style="font-size:12px; color:#666; margin:0 0 8px 0;">Descarga tus productos y pasillos en un archivo JSON para compartirlo o guardarlo.</p>
+                <p style="font-size:12px; color:#666; margin:0 0 8px 0;">Descarga tus productos y pasillos en JSON para compartirlos o hacer una copia.</p>
                 <button class="primary" style="background:#005b26; padding:10px;" onclick="exportarCatalogoActualAJson()">💾 Descargar archivo JSON</button>
             </div>
             
@@ -689,7 +717,7 @@
                 
                 <div class="controls-row">
                     <div class="search-wrapper">
-                        <!-- Al hacer clic o pulsar en móvil, se limpia instantáneamente -->
+                        <!-- Limpieza instantánea al pulsar en móvil o hacer clic en PC -->
                         <input type="text" id="buscador" class="search-bar" placeholder="🔍 Buscar alimento (ej: atun, pan)..." oninput="filtrarCatalogoInstaneamente()" onclick="limpiarAlEnfocarBuscador()" onfocus="limpiarAlEnfocarBuscador()">
                         <button class="clear-search-btn hidden" id="btn-clear-search" onclick="limpiarBusqueda()" title="Limpiar">×</button>
                     </div>
@@ -705,9 +733,10 @@
                     <button id="btn-toggle-plegar-pasillos" class="btn-fold-toggle" onclick="alternarPlegadoTodosPasillos()">📁 Plegar pasillos</button>
                 </div>
 
+                <!-- Crear nuevo alimento: abre directamente el modal con el pasillo a elegir -->
                 <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                    <input type="text" id="nuevo-producto" class="search-bar" style="margin:0;" placeholder="Crear nuevo alimento..." onkeypress="if(event.key==='Enter') crearProductoEnCatalogo()">
-                    <button class="primary" style="width: auto; margin:0; padding: 0 16px;" onclick="crearProductoEnCatalogo()">+ Guardar</button>
+                    <input type="text" id="nuevo-producto" class="search-bar" style="margin:0;" placeholder="Escribe el nuevo alimento..." onkeypress="if(event.key==='Enter') abrirModalParaCrearNuevoAlimento()">
+                    <button class="primary" style="width: auto; margin:0; padding: 0 16px; white-space:nowrap;" onclick="abrirModalParaCrearNuevoAlimento()">+ Guardar</button>
                 </div>
 
                 <div id="items-catalogo"></div>
@@ -737,7 +766,7 @@
         let currentUser = null;
         let idCatalogoActual = "2014_DLV";
         let nombreCatalogoActual = "2014 DLV";
-        let catalogosAccesibles = {}; // { clave: { nombre, miembros, ... } }
+        let catalogosAccesibles = {}; 
         let miembrosCatalogoActual = {};
 
         let datosListaActual = { productos: {}, orden: 'seccion', seccionesVisibles: {} };
@@ -746,11 +775,13 @@
         let seccionesTemporales = [];
         let filtroSeccionesTemp = {};
 
+        let productoEditandoId = null;
+        let esCreacionProductoNuevo = false;
+
         let estadoPlegadoSecciones = {};
         let todosPasillosPlegados = false;
         let backupEstadoParaDeshacer = null;
 
-        // Limpieza de caracteres no permitidos en claves Firebase conservando el nombre original
         function generarClaveFirebase(nombre) {
             return (nombre || 'Catalogo')
                 .toString()
@@ -759,7 +790,6 @@
                 .replace(/\s+/g, '_');
         }
 
-        // Quita emojis e iconos para dejar los nombres de pasillo limpios
         function limpiarTextoPasillo(texto) {
             return (texto || '')
                 .toString()
@@ -768,7 +798,6 @@
                 .trim();
         }
 
-        // Normaliza texto eliminando acentos/tildes y convirtiendo a minúsculas para búsquedas fluidas
         function normalizarTexto(texto) {
             return (texto || '')
                 .toString()
@@ -869,11 +898,9 @@
             const userEmailKey = sanitizeEmail(user.email);
             const emailsFamiliaBase = ['verdeguer279_gmail_com', 'copg279_gmail_com', 'claramorasaez_gmail_com', 'rafaverdeguermora_gmail_com'];
 
-            // Comprobar y migrar estructura antigua si existe bajo 'mercadona/familias'
             firebaseDb.ref('mercadona/catalogos').once('value', snapCatalogos => {
                 let nodosCatalogos = snapCatalogos.val() || {};
 
-                // Migración transparente si aún existían en mercadona/familias
                 if (Object.keys(nodosCatalogos).length === 0) {
                     firebaseDb.ref('mercadona/familias').once('value', snapFamilias => {
                         const viejasFamilias = snapFamilias.val() || {};
@@ -935,7 +962,6 @@
             } else if (emailsFamiliaBase.includes(userEmailKey)) {
                 inicializarCatalogoBase2014(user.email);
             } else {
-                // Usuario autorizado en reglas que entra por primera vez sin catálogo -> crea el suyo propio
                 document.getElementById('loading-screen').classList.add('hidden');
                 document.getElementById('app').classList.add('hidden');
                 document.getElementById('fab-add').classList.add('hidden');
@@ -1002,7 +1028,6 @@
                 }
             };
 
-            // Escuchar nombre
             firebaseDb.ref(`${basePath}/nombre`).on('value', snap => {
                 const nom = snap.val();
                 if (nom) {
@@ -1011,13 +1036,11 @@
                 }
             }, manejarError);
 
-            // Escuchar miembros autorizados
             firebaseDb.ref(`${basePath}/miembros`).on('value', snap => {
                 miembrosCatalogoActual = snap.val() || {};
                 renderizarMiembrosEnModal();
             }, manejarError);
 
-            // Escuchar secciones (limpiando cualquier icono que hubiera)
             firebaseDb.ref(`${basePath}/secciones`).on('value', snap => {
                 const data = snap.val();
                 if (data && Array.isArray(data) && data.length > 0) {
@@ -1044,7 +1067,6 @@
                 renderizarListaActual();
             }, manejarError);
 
-            // Escuchar catálogo
             firebaseDb.ref(`${basePath}/catalogo`).on('value', snap => {
                 catalogoProductos = snap.val() || {};
                 if (catalogoProductos['agua_oxigenada'] && catalogoProductos['agua_oxigenada'].consumos >= 20) {
@@ -1056,7 +1078,6 @@
                 renderizarListaActual();
             }, manejarError);
 
-            // Escuchar lista activa
             firebaseDb.ref(`${basePath}/listaActiva`).on('value', snap => {
                 datosListaActual = snap.val() || { productos: {}, orden: 'seccion', seccionesVisibles: {} };
                 if (!datosListaActual.productos) datosListaActual.productos = {};
@@ -1070,10 +1091,11 @@
             }, manejarError);
         }
 
-        // 2. GESTIÓN Y RENOMBRADO DEL CATÁLOGO (SOBRESCRITURA DE NODO SIN DUPLICAR)
+        // 2. GESTIÓN DE CATÁLOGO, MIEMBROS Y RENOMBRADO
         function abrirModalGestionCatalogo() {
             document.getElementById('input-renombrar-catalogo').value = nombreCatalogoActual;
             document.getElementById('input-nuevo-catalogo-nombre').value = '';
+            document.getElementById('input-nuevo-miembro-email').value = '';
 
             const select = document.getElementById('select-cambiar-catalogo');
             select.innerHTML = '';
@@ -1107,8 +1129,39 @@
             }
             entries.forEach(([key, val]) => {
                 const emailMostrar = (typeof val === 'string' && val.includes('@')) ? val : key.replace(/_/g, '.');
-                cont.innerHTML += `<div class="user-tag-badge">👤 <span>${emailMostrar}</span></div>`;
+                cont.innerHTML += `
+                    <div class="user-member-row">
+                        <span>👤 ${emailMostrar}</span>
+                        <button class="btn-del-member" onclick="eliminarMiembroDeCatalogo('${key}', '${emailMostrar}')" title="Eliminar miembro">✕</button>
+                    </div>
+                `;
             });
+        }
+
+        function agregarNuevoMiembroACatalogo() {
+            const inp = document.getElementById('input-nuevo-miembro-email');
+            const email = (inp.value || '').trim().toLowerCase();
+            if (!email || !email.includes('@')) {
+                alert("Introduce un correo electrónico válido (ej: nombre@gmail.com).");
+                return;
+            }
+
+            const emailKey = sanitizeEmail(email);
+            const basePath = getCatalogBasePath();
+
+            firebaseDb.ref(`${basePath}/miembros/${emailKey}`).set(email).then(() => {
+                inp.value = '';
+                mostrarToast(`✅ Miembro ${email} añadido a este catálogo`);
+            });
+        }
+
+        function eliminarMiembroDeCatalogo(key, email) {
+            if (confirm(`¿Eliminar el acceso a este catálogo para ${email}?`)) {
+                const basePath = getCatalogBasePath();
+                firebaseDb.ref(`${basePath}/miembros/${key}`).remove().then(() => {
+                    mostrarToast("Miembro eliminado del catálogo");
+                });
+            }
         }
 
         function guardarNuevoNombreCatalogo() {
@@ -1131,21 +1184,28 @@
                 return;
             }
 
-            // Sobrescribir nodo en Firebase: mover datos completos a la nueva clave y eliminar el nodo viejo
-            firebaseDb.ref(`mercadona/catalogos/${claveVieja}`).once('value', snap => {
-                const datos = snap.val() || {};
-                datos.nombre = nuevoNombre;
+            // Validar si ya existe otro catálogo con ese nombre exacto
+            firebaseDb.ref(`mercadona/catalogos/${nuevaClave}`).once('value', snapExiste => {
+                if (snapExiste.exists()) {
+                    alert(`El nombre de catálogo "${nuevoNombre}" ya existe en Firebase. Por favor, elige un nombre diferente.`);
+                    return;
+                }
 
-                firebaseDb.ref(`mercadona/catalogos/${nuevaClave}`).set(datos).then(() => {
-                    firebaseDb.ref(`mercadona/catalogos/${claveVieja}`).remove().then(() => {
-                        delete catalogosAccesibles[claveVieja];
-                        catalogosAccesibles[nuevaClave] = datos;
-                        idCatalogoActual = nuevaClave;
-                        nombreCatalogoActual = nuevoNombre;
-                        document.getElementById('family-badge-name').innerText = nuevoNombre;
-                        cerrarModalGestionCatalogo();
-                        mostrarToast("✅ Catálogo renombrado en Firebase");
-                        iniciarAppCatalogo();
+                firebaseDb.ref(`mercadona/catalogos/${claveVieja}`).once('value', snap => {
+                    const datos = snap.val() || {};
+                    datos.nombre = nuevoNombre;
+
+                    firebaseDb.ref(`mercadona/catalogos/${nuevaClave}`).set(datos).then(() => {
+                        firebaseDb.ref(`mercadona/catalogos/${claveVieja}`).remove().then(() => {
+                            delete catalogosAccesibles[claveVieja];
+                            catalogosAccesibles[nuevaClave] = datos;
+                            idCatalogoActual = nuevaClave;
+                            nombreCatalogoActual = nuevoNombre;
+                            document.getElementById('family-badge-name').innerText = nuevoNombre;
+                            cerrarModalGestionCatalogo();
+                            mostrarToast("✅ Catálogo renombrado en Firebase");
+                            iniciarAppCatalogo();
+                        });
                     });
                 });
             });
@@ -1163,7 +1223,6 @@
             iniciarAppCatalogo();
         }
 
-        // Crear catálogo propio o secundario
         function crearCatalogoPropio(contenidoJson = null) {
             const inp = document.getElementById('input-nombre-catalogo-propio');
             const nombre = (inp.value || '').trim();
@@ -1173,13 +1232,19 @@
             }
 
             const clave = generarClaveFirebase(nombre);
-            const userEmailKey = sanitizeEmail(currentUser.email);
 
-            guardarNodoCatalogoEnFirebase(clave, nombre, [userEmailKey], contenidoJson, () => {
-                document.getElementById('onboarding-screen').classList.add('hidden');
-                idCatalogoActual = clave;
-                nombreCatalogoActual = nombre;
-                iniciarAppCatalogo();
+            firebaseDb.ref(`mercadona/catalogos/${clave}`).once('value', snap => {
+                if (snap.exists()) {
+                    alert(`El catálogo "${nombre}" ya existe en Firebase. Por favor, elige otro nombre.`);
+                    return;
+                }
+                const userEmailKey = sanitizeEmail(currentUser.email);
+                guardarNodoCatalogoEnFirebase(clave, nombre, [userEmailKey], contenidoJson, () => {
+                    document.getElementById('onboarding-screen').classList.add('hidden');
+                    idCatalogoActual = clave;
+                    nombreCatalogoActual = nombre;
+                    iniciarAppCatalogo();
+                });
             });
         }
 
@@ -1192,18 +1257,25 @@
             }
 
             const clave = generarClaveFirebase(nombre);
-            const basePath = getCatalogBasePath();
 
-            firebaseDb.ref(`${basePath}/miembros`).once('value', snapMiembros => {
-                let miembrosActuales = snapMiembros.val() || {};
-                const userEmailKey = sanitizeEmail(currentUser.email);
-                miembrosActuales[userEmailKey] = currentUser.email;
+            firebaseDb.ref(`mercadona/catalogos/${clave}`).once('value', snap => {
+                if (snap.exists()) {
+                    alert(`El nombre de catálogo "${nombre}" ya existe en Firebase. Por favor, elige otro nombre.`);
+                    return;
+                }
 
-                guardarNodoCatalogoEnFirebase(clave, nombre, Object.keys(miembrosActuales), contenidoJson, () => {
-                    cerrarModalGestionCatalogo();
-                    idCatalogoActual = clave;
-                    nombreCatalogoActual = nombre;
-                    iniciarAppCatalogo();
+                const basePath = getCatalogBasePath();
+                firebaseDb.ref(`${basePath}/miembros`).once('value', snapMiembros => {
+                    let miembrosActuales = snapMiembros.val() || {};
+                    const userEmailKey = sanitizeEmail(currentUser.email);
+                    miembrosActuales[userEmailKey] = currentUser.email;
+
+                    guardarNodoCatalogoEnFirebase(clave, nombre, Object.keys(miembrosActuales), contenidoJson, () => {
+                        cerrarModalGestionCatalogo();
+                        idCatalogoActual = clave;
+                        nombreCatalogoActual = nombre;
+                        iniciarAppCatalogo();
+                    });
                 });
             });
         }
@@ -1278,24 +1350,34 @@
                 return;
             }
 
-            const lector = new FileReader();
-            lector.onload = (e) => {
-                try {
-                    const datos = JSON.parse(e.target.result);
-                    const inp = document.getElementById(idInputObjetivoParaJson);
-                    if (inp) inp.value = nombreElegido.trim();
+            const claveNueva = generarClaveFirebase(nombreElegido.trim());
 
-                    if (esOnboarding) {
-                        crearCatalogoPropio(datos);
-                    } else {
-                        crearCatalogoSecundario(datos);
-                    }
+            firebaseDb.ref(`mercadona/catalogos/${claveNueva}`).once('value', snapExiste => {
+                if (snapExiste.exists()) {
+                    alert(`El nombre de catálogo "${nombreElegido.trim()}" ya existe en Firebase. Por favor, elige otro nombre.`);
                     inputElement.value = '';
-                } catch (error) {
-                    alert("El archivo no contiene un JSON válido.");
+                    return;
                 }
-            };
-            lector.readAsText(archivo);
+
+                const lector = new FileReader();
+                lector.onload = (e) => {
+                    try {
+                        const datos = JSON.parse(e.target.result);
+                        const inp = document.getElementById(idInputObjetivoParaJson);
+                        if (inp) inp.value = nombreElegido.trim();
+
+                        if (esOnboarding) {
+                            crearCatalogoPropio(datos);
+                        } else {
+                            crearCatalogoSecundario(datos);
+                        }
+                        inputElement.value = '';
+                    } catch (error) {
+                        alert("El archivo no contiene un JSON válido.");
+                    }
+                };
+                lector.readAsText(archivo);
+            });
         }
 
         function exportarCatalogoActualAJson() {
@@ -1364,7 +1446,7 @@
             renderizarCatalogo();
         }
 
-        // 5. RENDERIZADO DEL CATÁLOGO (PASILLOS SIN ICONOS)
+        // 5. RENDERIZADO DEL CATÁLOGO
         function renderizarCatalogo() {
             const cont = document.getElementById('items-catalogo');
             const busquedaNorm = normalizarTexto(document.getElementById('buscador').value || '');
@@ -1398,10 +1480,10 @@
 
                 return `
                     <div class="card">
-                        <div class="card-info" onclick="abrirEdicion('${key}')" style="cursor:pointer;">
+                        <div class="card-info" onclick="abrirEdicionExistente('${key}')" style="cursor:pointer;">
                             <div class="card-title">${nombreVisual}</div>
                             <div class="card-ticket-name">
-                                <button class="badge-card-section" onclick="event.stopPropagation(); abrirEdicion('${key}')">${seccion}</button>
+                                <button class="badge-card-section" onclick="event.stopPropagation(); abrirEdicionExistente('${key}')">${seccion}</button>
                             </div>
                         </div>
                         ${actionBtn}
@@ -1549,7 +1631,7 @@
 
                 html += `
                     <div class="card">
-                        <div class="card-info" onclick="abrirEdicion('${k}')" style="cursor:pointer;">
+                        <div class="card-info" onclick="abrirEdicionExistente('${k}')" style="cursor:pointer;">
                             <div class="card-title ${p.comprado ? 'crossed' : ''}">${nombre}</div>
                             <div class="card-ticket-name">${seccion}</div>
                         </div>
@@ -1639,6 +1721,7 @@
             mostrarToast(`⭐ ${sumados} alimentos habituales añadidos`);
         }
 
+        // CORRECCIÓN COMPLETA DE "AÑADIR PRODUCTO SIN CATEGORIZAR"
         function agregarRapidoDesdeLista() {
             const input = document.getElementById('buscador-rapido-lista');
             const texto = (input.value || '').trim();
@@ -1647,19 +1730,32 @@
             const key = limpiarKey(texto);
             const basePath = getCatalogBasePath();
 
+            const updates = {};
             if (!catalogoProductos[key]) {
-                firebaseDb.ref(`${basePath}/catalogo/${key}`).set({
+                updates[`${basePath}/catalogo/${key}`] = {
                     nombreOriginal: texto.toLowerCase(),
                     nombrePersonalizado: texto,
                     seccion: "Sin Pasillo",
                     consumos: 1,
                     vecesComprado: 1
-                });
+                };
             }
-            
-            updateQty(key, 1);
-            input.value = '';
-            mostrarToast(`🛒 ${texto} añadido sin categorizar`);
+
+            let currentQty = (datosListaActual && datosListaActual.productos && datosListaActual.productos[key])
+                ? (datosListaActual.productos[key].cantidad || 1)
+                : 0;
+
+            updates[`${basePath}/listaActiva/productos/${key}`] = {
+                comprado: false,
+                cantidad: currentQty + 1
+            };
+
+            firebaseDb.ref().update(updates).then(() => {
+                input.value = '';
+                mostrarToast(`🛒 "${texto}" añadido a tu lista`);
+            }).catch(err => {
+                alert("Error al guardar: " + err.message);
+            });
         }
 
         function updateQty(idProducto, delta, event) {
@@ -1705,33 +1801,87 @@
             firebaseDb.ref(`${basePath}/listaActiva/orden`).set(orden);
         }
 
-        function abrirEdicion(id) {
+        // 8. EDICIÓN Y CREACIÓN DE PRODUCTOS DIRECTA CON PASILLO
+        function abrirModalParaCrearNuevoAlimento() {
+            const input = document.getElementById('nuevo-producto');
+            const texto = (input.value || '').trim();
+            if (!texto) {
+                alert("Escribe el nombre del alimento antes de pulsar Guardar.");
+                input.focus();
+                return;
+            }
+
+            esCreacionProductoNuevo = true;
+            productoEditandoId = limpiarKey(texto);
+
+            document.getElementById('modal-edicion-titulo').innerText = "➕ Nuevo Alimento";
+            document.getElementById('edit-original').value = texto.toUpperCase();
+            document.getElementById('edit-visible').value = texto;
+            document.getElementById('btn-eliminar-prod-modal').style.display = 'none';
+
+            renderizarSelectSecciones("Sin Pasillo");
+            document.getElementById('modal-edicion').classList.remove('hidden');
+        }
+
+        function abrirEdicionExistente(id) {
             const p = catalogoProductos[id];
             if(!p) return;
+
+            esCreacionProductoNuevo = false;
             productoEditandoId = id;
+
+            document.getElementById('modal-edicion-titulo').innerText = "✏️ Editar Producto";
             document.getElementById('edit-original').value = (p.nombreOriginal || p.nombre || "").toUpperCase();
             document.getElementById('edit-visible').value = p.nombrePersonalizado || p.nombre || "";
+            document.getElementById('btn-eliminar-prod-modal').style.display = 'block';
+
             renderizarSelectSecciones(p.seccion || "Sin Pasillo");
             document.getElementById('modal-edicion').classList.remove('hidden');
         }
-        function cerrarModal() { document.getElementById('modal-edicion').classList.add('hidden'); }
+
+        function cerrarModal() { 
+            document.getElementById('modal-edicion').classList.add('hidden'); 
+            productoEditandoId = null;
+            esCreacionProductoNuevo = false;
+        }
 
         function guardarEdicion() {
-            const nVis = document.getElementById('edit-visible').value.trim();
+            const nVis = (document.getElementById('edit-visible').value || '').trim();
             const sec = limpiarTextoPasillo(document.getElementById('edit-seccion').value);
-            if (nVis && productoEditandoId) {
-                const basePath = getCatalogBasePath();
-                firebaseDb.ref(`${basePath}/catalogo/${productoEditandoId}`).update({ nombrePersonalizado: nVis, seccion: sec });
-                cerrarModal();
-                mostrarToast("Alimento actualizado");
+            if (!nVis || !productoEditandoId) return;
+
+            const basePath = getCatalogBasePath();
+
+            if (esCreacionProductoNuevo) {
+                firebaseDb.ref(`${basePath}/catalogo/${productoEditandoId}`).set({
+                    nombreOriginal: nVis.toLowerCase(),
+                    nombrePersonalizado: nVis,
+                    seccion: sec,
+                    consumos: 1,
+                    vecesComprado: 1
+                }).then(() => {
+                    document.getElementById('nuevo-producto').value = '';
+                    cerrarModal();
+                    mostrarToast(`✅ "${nVis}" guardado en pasillo ${sec}`);
+                });
+            } else {
+                firebaseDb.ref(`${basePath}/catalogo/${productoEditandoId}`).update({
+                    nombrePersonalizado: nVis,
+                    seccion: sec
+                }).then(() => {
+                    cerrarModal();
+                    mostrarToast("Alimento actualizado");
+                });
             }
         }
 
         function eliminarProducto() {
-            if (productoEditandoId && confirm("¿Eliminar producto del catálogo definitivamente?")) {
+            if (productoEditandoId && confirm("¿Eliminar este producto del catálogo definitivamente?")) {
                 const basePath = getCatalogBasePath();
-                firebaseDb.ref(`${basePath}/catalogo/${productoEditandoId}`).remove();
-                cerrarModal();
+                firebaseDb.ref(`${basePath}/catalogo/${productoEditandoId}`).remove().then(() => {
+                    cerrarModal();
+                    mostrarToast("Producto eliminado del catálogo");
+                });
             }
         }
 
@@ -1742,24 +1892,7 @@
             select.innerHTML = seccionesPersonalizadas.map(s => `<option value="${s.id}" ${secLimpia === s.id ? 'selected' : ''}>${s.nombre}</option>`).join('');
         }
 
-        function crearProductoEnCatalogo() {
-            const input = document.getElementById('nuevo-producto');
-            const val = input.value.trim();
-            if (val) {
-                const key = limpiarKey(val);
-                const basePath = getCatalogBasePath();
-                firebaseDb.ref(`${basePath}/catalogo/${key}`).set({
-                    nombreOriginal: val.toLowerCase(),
-                    nombrePersonalizado: val,
-                    seccion: "Sin Pasillo",
-                    consumos: 1,
-                    vecesComprado: 1
-                });
-                input.value = '';
-                mostrarToast("Añadido al catálogo");
-            }
-        }
-
+        // 9. GESTIÓN DE PASILLOS
         function abrirModalSecciones() {
             seccionesTemporales = JSON.parse(JSON.stringify(seccionesPersonalizadas));
             renderizarSeccionesEnModal();

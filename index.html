@@ -89,7 +89,7 @@
       max-width: 60vw;
       max-height: 60vw;
       object-fit: contain;
-      object-position: center;
+      object-position: center bottom;
       margin-bottom: 24px;
       filter: drop-shadow(0 8px 24px rgba(59, 130, 246, 0.25));
     }
@@ -104,6 +104,10 @@
 
     .install-btn:hover {
       background: rgba(59, 130, 246, 0.27);
+    }
+
+    .install-btn[hidden] {
+      display: none;
     }
 
     .login-card .install-btn {
@@ -669,14 +673,14 @@
 <body>
 
 <div id="login-screen">
-  <img src="./logomarkarma-512.png" alt="Markarma" class="brand-logo">
+  <img src="./logomarkarma-login.png" alt="Markarma" class="brand-logo">
   <div id="initial-loader" class="spinner"></div>
 
   <div id="login-card-content" class="login-card">
     <h2>Acceso Administrador</h2>
     <p class="sub">Autenticación restringida al responsable del panel</p>
 
-    <button type="button" class="install-btn" data-install-app>
+    <button type="button" class="install-btn" data-install-app hidden>
       <i class="fas fa-download"></i> Instalar Markarma
     </button>
     <button id="btn-login-google" class="google-btn">
@@ -701,7 +705,7 @@
       </div>
 
       <div class="session-controls">
-        <button type="button" class="btn-control install-btn" data-install-app>
+        <button type="button" class="btn-control install-btn" data-install-app hidden>
           <i class="fas fa-download"></i> Instalar app
         </button>
         <button id="btnToggleEdit" class="btn-control">
@@ -815,6 +819,9 @@
   window.addEventListener("beforeinstallprompt", (event) => {
     event.preventDefault();
     deferredInstallPrompt = event;
+    if (!isInstalledApp()) {
+      installButtons.forEach((button) => { button.hidden = false; });
+    }
   });
 
   window.addEventListener("appinstalled", () => {
@@ -824,21 +831,11 @@
 
   installButtons.forEach((button) => {
     button.addEventListener("click", async () => {
-      if (!window.isSecureContext) {
-        alert("Para instalar Markarma, abre la aplicación desde una dirección HTTPS.");
-        return;
-      }
-
-      if (!deferredInstallPrompt) {
-        const instructions = /iphone|ipad|ipod/i.test(navigator.userAgent)
-          ? "En Safari, pulsa Compartir y elige «Añadir a pantalla de inicio»."
-          : "En Chrome, abre el menú ⋮ y elige «Instalar aplicación» o «Añadir a pantalla de inicio».";
-        alert(`La instalación directa no está disponible todavía. ${instructions}`);
-        return;
-      }
+      if (!deferredInstallPrompt) return;
 
       const installPrompt = deferredInstallPrompt;
       deferredInstallPrompt = null;
+      installButtons.forEach((installButton) => { installButton.hidden = true; });
       try {
         await installPrompt.prompt();
         await installPrompt.userChoice;

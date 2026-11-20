@@ -1,6 +1,6 @@
 {
-  "name": "GAD · Panel de Control",
-  "short_name": "GAD",
+  "name": "Markarma",
+  "short_name": "Markarma",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

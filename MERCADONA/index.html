@@ -34,7 +34,7 @@
         }
         
         #loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: var(--m-green); color: white; }
-        #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: white; padding: 25px; text-align: center; }
+        #login-screen, #onboarding-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: white; padding: 25px; text-align: center; }
         .btn-login { background: white; border: 1px solid #ddd; padding: 14px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); color: #333; font-size: 16px; display: inline-flex; align-items: center; gap: 10px; }
 
         header { 
@@ -51,21 +51,22 @@
         }
         .header-left { display: flex; align-items: center; gap: 8px; }
         .header-right { display: flex; align-items: center; gap: 8px; }
+        
         .family-pill {
             background: rgba(255,255,255,0.22);
             color: white;
-            padding: 5px 10px;
+            padding: 5px 11px;
             border-radius: 16px;
             font-size: 12px;
             font-weight: bold;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 4px;
-            border: 1px solid rgba(255,255,255,0.3);
+            gap: 5px;
+            border: 1px solid rgba(255,255,255,0.35);
             white-space: nowrap;
         }
-        .family-pill:active { background: rgba(255,255,255,0.35); }
+        .family-pill:active { background: rgba(255,255,255,0.38); }
         .user-pill {
             background: rgba(0,0,0,0.15);
             padding: 5px 10px;
@@ -93,7 +94,6 @@
             .panel-title { display: block; }
         }
 
-        /* Títulos de pasillo plegables */
         .section-group-title { 
             background: #e2ebd5; 
             color: #005b26; 
@@ -149,7 +149,6 @@
         }
         .btn-add:active { transform: scale(0.92); }
 
-        /* Controles de compra y cantidad */
         .qty-list-controls { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
         .qty-btn-list { 
             background: #eaf5eb; 
@@ -317,6 +316,20 @@
         }
         .btn-fold:active { background: #ddd; }
 
+        /* Tarjetas de Selección en Onboarding */
+        .option-card {
+            background: #f9fbf9;
+            border: 2px solid #e0ebe2;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 15px;
+            text-align: left;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .option-card:hover { border-color: var(--m-green); box-shadow: 0 4px 12px rgba(0,122,51,0.08); }
+        .option-card h4 { margin: 0 0 6px 0; color: var(--m-green-dark); font-size: 16px; display: flex; align-items: center; gap: 6px; }
+        .option-card p { margin: 0 0 12px 0; color: #666; font-size: 13px; line-height: 1.35; }
+
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 1000; display: flex; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 440px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
         .modal-input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 14px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
@@ -364,22 +377,55 @@
 
     <div id="loading-screen">
         <h1 style="margin: 0; font-size: 44px;">🛒</h1>
-        <h2 style="margin-top: 15px; font-weight: 500;" id="loading-text">Cargando catálogo...</h2>
+        <h2 style="margin-top: 15px; font-weight: 500;" id="loading-text">Cargando Mercadona...</h2>
     </div>
 
     <!-- Pantalla de Login -->
     <div id="login-screen" class="hidden">
         <h2 style="color:var(--m-green); margin-bottom: 6px;">🛒 Lista Compra Mercadona</h2>
-        <p style="color: #666; margin-bottom: 25px; font-size: 14px;">Acceso familiar por cuenta autorizada</p>
+        <p style="color: #666; margin-bottom: 25px; font-size: 14px;">Acceso familiar con cuenta autorizada</p>
         
         <div id="error-auth" class="hidden" style="background: #ffebee; color: #dc3545; padding: 12px 18px; border-radius: 8px; border: 1px solid #f5c6cb; margin-bottom: 20px; font-size: 13px; text-align: center; max-width: 320px;">
-            ⛔ <b>Acceso denegado:</b><br><span id="error-auth-msg">Tu correo no tiene asignado ningún catálogo todavía. Contacta con el administrador.</span>
+            ⛔ <b>Acceso denegado:</b><br><span id="error-auth-msg">Por favor, inicia sesión con tu cuenta de Google.</span>
         </div>
 
         <button class="btn-login" onclick="login()">
             <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.616z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.173 0 7.548 0 9s.347 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
             Entrar con Google
         </button>
+    </div>
+
+    <!-- Pantalla Intuitiva de Onboarding: Si entra por primera vez sin catálogo -->
+    <div id="onboarding-screen" class="hidden">
+        <div style="max-width: 440px; width: 100%;">
+            <div style="font-size: 38px; margin-bottom: 5px;">🛒</div>
+            <h2 style="color:var(--m-green); margin: 0 0 6px 0;">¡Hola <span id="onboarding-user-name"></span>!</h2>
+            <p style="color: #666; margin: 0 0 22px 0; font-size: 14px;">Elige cómo quieres empezar tu lista de compra:</p>
+            
+            <!-- Opción 1: Unirse a catálogo familiar existente -->
+            <div class="option-card">
+                <h4>👨‍👩‍👧‍👦 Unirme a un catálogo familiar</h4>
+                <p>Si te han invitado (por ejemplo a <b>2014 DLV</b>), selecciónalo aquí para compartir la lista:</p>
+                <div style="display:flex; gap:8px;">
+                    <select id="select-catalogo-existente" class="modal-input" style="margin:0; flex:1;">
+                        <option value="">Buscando catálogos...</option>
+                    </select>
+                    <button class="primary" style="margin:0; width:auto; padding: 10px 16px; white-space:nowrap;" onclick="confirmarUnirseCatalogo()">Unirme</button>
+                </div>
+            </div>
+
+            <!-- Opción 2: Crear catálogo propio independiente -->
+            <div class="option-card">
+                <h4>✨ Crear mi propio catálogo</h4>
+                <p>Crea un catálogo nuevo e independiente para tu casa o familia:</p>
+                <div style="display:flex; gap:8px;">
+                    <input type="text" id="input-nuevo-catalogo-nombre" class="modal-input" style="margin:0; flex:1;" placeholder="Ej: Mi Casa, Familia Gómez...">
+                    <button class="primary" style="margin:0; width:auto; padding: 10px 16px; white-space:nowrap; background:var(--m-orange);" onclick="confirmarCrearCatalogoNuevo()">Crear</button>
+                </div>
+            </div>
+
+            <button onclick="logout()" style="background:none; border:none; color:#888; font-size:13px; cursor:pointer; text-decoration:underline; margin-top:10px;">Cerrar sesión</button>
+        </div>
     </div>
 
     <!-- Modal Editar Producto -->
@@ -403,26 +449,41 @@
         </div>
     </div>
 
-    <!-- Modal Gestión de Miembros y Catálogo Familiar -->
+    <!-- Modal Gestión del Catálogo (Miembros, Cambiar de Catálogo, Crear Nuevo) -->
     <div id="modal-familia" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--m-green);">👨‍👩‍👧‍👦 Configurar Catálogo Familiar</h3>
-            <p style="font-size: 12px; color: #666; margin-top: 0;">
-                Estás en el catálogo: <b id="modal-nombre-familia-txt">2014 DLV</b>.
-                <br>Solo los correos autorizados aquí podrán ver y usar este catálogo.
-            </p>
+            <h3 style="margin-top:0; color:var(--m-green);">📁 Catálogo Actual: <span id="modal-nombre-familia-txt" style="color:var(--m-orange);">2014 DLV</span></h3>
             
-            <div style="margin-bottom: 12px;">
-                <label style="font-size:12px; font-weight:bold; color:#555;">Correos electrónicos autorizados:</label>
-                <div id="lista-correos-familia" style="margin-top: 8px; max-height: 180px; overflow-y: auto;"></div>
+            <!-- Sección 1: Miembros y correos autorizados -->
+            <div style="background:#f9fbf9; border:1px solid #e2ebe4; padding:12px; border-radius:8px; margin-bottom:15px;">
+                <strong style="font-size:13px; color:#333; display:block; margin-bottom:6px;">👥 Familiares con acceso a este catálogo:</strong>
+                <div id="lista-correos-familia" style="max-height: 140px; overflow-y: auto; margin-bottom:8px;"></div>
+                
+                <div style="display: flex; gap: 6px;">
+                    <input type="email" id="nuevo-correo-miembro" class="modal-input" style="margin:0; flex:1; padding:8px; font-size:13px;" placeholder="añadir correo familiar..." onkeypress="if(event.key==='Enter') agregarMiembroFamilia()">
+                    <button class="primary" style="margin:0; width:auto; padding: 8px 12px; font-size:13px;" onclick="agregarMiembroFamilia()">➕ Invitar</button>
+                </div>
+            </div>
+
+            <!-- Sección 2: Cambiar a otro catálogo existente -->
+            <div style="margin-bottom:15px;">
+                <label style="font-size:12px; font-weight:bold; color:#555;">🔄 Cambiar a otro catálogo:</label>
+                <div style="display:flex; gap:6px; margin-top:4px;">
+                    <select id="select-cambiar-catalogo" class="modal-input" style="margin:0; flex:1; padding:8px; font-size:13px;"></select>
+                    <button class="primary" style="margin:0; width:auto; padding: 8px 12px; font-size:13px; background:#555;" onclick="cambiarACatalogoDesdeModal()">Cambiar</button>
+                </div>
+            </div>
+
+            <!-- Sección 3: Crear otro catálogo nuevo -->
+            <div style="margin-bottom:15px;">
+                <label style="font-size:12px; font-weight:bold; color:#555;">✨ Crear un nuevo catálogo independiente:</label>
+                <div style="display:flex; gap:6px; margin-top:4px;">
+                    <input type="text" id="input-crear-otro-catalogo" class="modal-input" style="margin:0; flex:1; padding:8px; font-size:13px;" placeholder="Nombre nuevo catálogo..." onkeypress="if(event.key==='Enter') crearOtroCatalogoDesdeModal()">
+                    <button class="primary" style="margin:0; width:auto; padding: 8px 12px; font-size:13px; background:var(--m-orange);" onclick="crearOtroCatalogoDesdeModal()">➕ Crear</button>
+                </div>
             </div>
             
-            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
-                <input type="email" id="nuevo-correo-miembro" class="modal-input" style="margin:0; flex:1;" placeholder="ejemplo@gmail.com" onkeypress="if(event.key==='Enter') agregarMiembroFamilia()">
-                <button class="primary" style="margin:0; width:auto; padding: 10px 14px;" onclick="agregarMiembroFamilia()">➕ Añadir</button>
-            </div>
-            
-            <button class="primary" style="background:#555;" onclick="cerrarModalFamilia()">Cerrar</button>
+            <button class="primary" style="background:#888; padding:10px;" onclick="cerrarModalFamilia()">Cerrar</button>
         </div>
     </div>
 
@@ -471,8 +532,8 @@
         <header>
             <div class="header-left">
                 <strong style="font-size: 17px; display: flex; align-items: center; gap: 6px;">🛒 Mercadona</strong>
-                <div class="family-pill" onclick="abrirModalFamilia()" title="Gestionar correos autorizados para este catálogo">
-                    📁 <span id="family-badge-name">2014 DLV</span> ⚙️
+                <div class="family-pill" onclick="abrirModalFamilia()" title="Gestionar correos o cambiar de catálogo">
+                    📁 <span id="family-badge-name">2014 DLV</span> ▾
                 </div>
             </div>
             <div class="header-right">
@@ -481,7 +542,6 @@
             </div>
         </header>
 
-        <!-- Navegación móvil sin Historial -->
         <div class="tabs-mobile">
             <div class="tab active" onclick="switchTab('lista')" id="tab-lista">🛒 Mi Lista</div>
             <div class="tab" onclick="switchTab('catalogo')" id="tab-catalogo">📖 Catálogo</div>
@@ -589,6 +649,7 @@
         let currentUser = null;
         let idFamiliaActual = "2014_dlv";
         let nombreFamiliaActual = "2014 DLV";
+        let listaFamiliasDisponibles = {}; // { id: { nombre, creador, ... } }
         let miembrosFamiliaActual = {};
 
         let datosListaActual = { productos: {}, orden: 'seccion', seccionesVisibles: {} };
@@ -597,7 +658,6 @@
         let seccionesTemporales = [];
         let filtroSeccionesTemp = {};
 
-        // Control de secciones plegadas
         let estadoPlegadoSecciones = {};
 
         function mostrarToast(mensaje) {
@@ -615,7 +675,6 @@
             return (email || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
         }
 
-        // Navegación por pestañas (Solo Lista y Catálogo)
         const tabsOrder = ['lista', 'catalogo'];
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -638,18 +697,20 @@
             }, 100);
         }
 
-        // Autenticación Google
+        // 1. AUTENTICACIÓN GOOGLE
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
                 document.getElementById('user-display').innerText = `👤 ${user.displayName || user.email.split('@')[0]}`;
+                document.getElementById('onboarding-user-name').innerText = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('loading-screen').classList.remove('hidden');
-                determinarFamiliaUsuario(user);
+                verificarAccesoYCatalogo(user);
             } else {
                 currentUser = null;
                 document.getElementById('loading-screen').classList.add('hidden');
                 document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('onboarding-screen').classList.add('hidden');
                 document.getElementById('app').classList.add('hidden');
                 document.getElementById('fab-add').classList.add('hidden');
             }
@@ -664,57 +725,144 @@
         }
         function logout() { auth.signOut(); }
 
-        // Ruta de la familia del usuario autenticado
         function getFamilyBasePath() {
             return `mercadona/familias/${idFamiliaActual}`;
         }
 
-        // Determinar a qué catálogo pertenece el usuario según su correo
-        function determinarFamiliaUsuario(user) {
+        // 2. VERIFICACIÓN Y ONBOARDING INTUITIVO
+        function verificarAccesoYCatalogo(user) {
             const userEmailKey = sanitizeEmail(user.email);
             
-            // Comprobamos en el nodo de autorizaciones
-            firebaseDb.ref(`mercadona/autorizaciones/${userEmailKey}`).once('value', snap => {
-                const auto = snap.val();
-                if (auto && auto.familiaId) {
-                    // Usuario asignado a una familia específica
-                    idFamiliaActual = auto.familiaId;
-                    nombreFamiliaActual = auto.nombreFamilia || "Mi Catálogo";
-                    iniciarAppFamilia();
+            // Cargar primero todas las familias existentes para saber qué opciones hay
+            firebaseDb.ref('mercadona/familias').once('value', snapFamilias => {
+                listaFamiliasDisponibles = snapFamilias.val() || {};
+                
+                // Si no existe ninguna familia aún en la base de datos, creamos la primera "2014 DLV"
+                if (Object.keys(listaFamiliasDisponibles).length === 0) {
+                    idFamiliaActual = "2014_dlv";
+                    nombreFamiliaActual = "2014 DLV";
+                    inicializarFamiliaBase("2014_dlv", "2014 DLV", user.email);
+                    return;
+                }
+
+                // Consultar si este correo ya tiene un catálogo asignado
+                firebaseDb.ref(`mercadona/autorizaciones/${userEmailKey}`).once('value', snapAuto => {
+                    const auto = snapAuto.val();
+                    
+                    if (auto && auto.familiaId && listaFamiliasDisponibles[auto.familiaId]) {
+                        // Ya tiene catálogo asignado y existe: entra directamente
+                        idFamiliaActual = auto.familiaId;
+                        nombreFamiliaActual = listaFamiliasDisponibles[auto.familiaId].nombre || auto.nombreFamilia || "Mi Catálogo";
+                        iniciarAppFamilia();
+                    } else {
+                        // NO tiene catálogo asignado todavía -> Le mostramos la pantalla de Onboarding para que elija con 1 clic
+                        mostrarPantallaOnboarding();
+                    }
+                });
+            });
+        }
+
+        function mostrarPantallaOnboarding() {
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('app').classList.add('hidden');
+            document.getElementById('fab-add').classList.add('hidden');
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('onboarding-screen').classList.remove('hidden');
+
+            // Llenar el desplegable con las familias existentes (ej. 2014 DLV)
+            const select = document.getElementById('select-catalogo-existente');
+            select.innerHTML = '';
+            
+            const famKeys = Object.keys(listaFamiliasDisponibles);
+            famKeys.forEach(k => {
+                const fam = listaFamiliasDisponibles[k];
+                const opt = document.createElement('option');
+                opt.value = k;
+                opt.innerText = fam.nombre || k;
+                if (k === "2014_dlv") opt.selected = true;
+                select.appendChild(opt);
+            });
+        }
+
+        // Acción: El usuario se une a un catálogo existente
+        function confirmarUnirseCatalogo() {
+            const select = document.getElementById('select-catalogo-existente');
+            const famId = select.value;
+            if (!famId || !listaFamiliasDisponibles[famId]) {
+                alert("Selecciona un catálogo válido.");
+                return;
+            }
+
+            const fam = listaFamiliasDisponibles[famId];
+            vincularUsuarioACatalogo(famId, fam.nombre || famId);
+        }
+
+        // Acción: El usuario crea su propio catálogo independiente
+        function confirmarCrearCatalogoNuevo() {
+            const inp = document.getElementById('input-nuevo-catalogo-nombre');
+            const nombre = (inp.value || '').trim();
+            if (!nombre) {
+                alert("Por favor, escribe un nombre para tu catálogo (ej: Familia López, Casa Playa...)");
+                return;
+            }
+
+            const famId = limpiarKey(nombre);
+            crearNuevoCatalogoEnFirebase(famId, nombre, true);
+        }
+
+        function vincularUsuarioACatalogo(famId, famNombre) {
+            const userEmailKey = sanitizeEmail(currentUser.email);
+            
+            // 1. Guardar en autorizaciones
+            firebaseDb.ref(`mercadona/autorizaciones/${userEmailKey}`).set({
+                familiaId: famId,
+                nombreFamilia: famNombre,
+                email: currentUser.email
+            });
+
+            // 2. Guardar en miembros de la familia
+            firebaseDb.ref(`mercadona/familias/${famId}/miembros/${userEmailKey}`).set(currentUser.email).then(() => {
+                idFamiliaActual = famId;
+                nombreFamiliaActual = famNombre;
+                document.getElementById('onboarding-screen').classList.add('hidden');
+                mostrarToast(`✅ Conectado al catálogo: ${famNombre}`);
+                iniciarAppFamilia();
+            });
+        }
+
+        function crearNuevoCatalogoEnFirebase(famId, famNombre, entrarDeInmediato = true) {
+            const userEmailKey = sanitizeEmail(currentUser.email);
+            
+            // Secciones iniciales base
+            const seccionesBase = [
+                { id: "Sin Pasillo", nombre: "📍 Sin Pasillo" },
+                { id: "🍎 Fruta y Verdura", nombre: "🍎 Fruta y Verdura" },
+                { id: "🍞 Panadería y Pastelería", nombre: "🍞 Panadería y Pastelería" },
+                { id: "🥩 Carnicería - Refrigerados", nombre: "🥩 Carnicería - Refrigerados" },
+                { id: "🐟 Pescadería - ❄️ Congelados", nombre: "🐟 Pescadería - ❄️ Congelados" },
+                { id: "🥛 Lácteos - Café - Botes tomate - Huevos", nombre: "🥛 Lácteos - Café - Botes tomate - Huevos" },
+                { id: "🥫 Despensa - Ingredientes - Frutos secos", nombre: "🥫 Despensa - Ingredientes - Frutos secos" },
+                { id: "🥤 Bebidas y Aguas", nombre: "🥤 Bebidas y Aguas" },
+                { id: "🧼 Limpieza - Higiene - Mosquitos", nombre: "🧼 Limpieza - Higiene - Mosquitos" },
+                { id: "🧴 Perfumería y Cosmética", nombre: "🧴 Perfumería y Cosmética" }
+            ];
+
+            const nuevaFamiliaPayload = {
+                nombre: famNombre,
+                creador: currentUser.email,
+                miembros: { [userEmailKey]: currentUser.email },
+                catalogo: {},
+                secciones: seccionesBase,
+                listaActiva: { productos: {}, orden: 'seccion' }
+            };
+
+            firebaseDb.ref(`mercadona/familias/${famId}`).set(nuevaFamiliaPayload).then(() => {
+                listaFamiliasDisponibles[famId] = nuevaFamiliaPayload;
+                if (entrarDeInmediato) {
+                    vincularUsuarioACatalogo(famId, famNombre);
                 } else {
-                    // Si no está registrado en autorizaciones:
-                    // Verificamos si existe la familia principal "2014 DLV"
-                    firebaseDb.ref(`mercadona/familias/2014_dlv`).once('value', snapFam => {
-                        const famData = snapFam.val();
-                        if (!famData) {
-                            // Inicializamos "2014 DLV" y autorizamos a este primer usuario como admin de la familia
-                            idFamiliaActual = "2014_dlv";
-                            nombreFamiliaActual = "2014 DLV";
-                            inicializarFamiliaBase("2014_dlv", "2014 DLV", user.email);
-                        } else {
-                            // Comprobamos si el correo está en la lista de miembros de 2014 DLV
-                            const miembros = famData.miembros || {};
-                            if (miembros[userEmailKey] || Object.keys(miembros).length === 0) {
-                                idFamiliaActual = "2014_dlv";
-                                nombreFamiliaActual = famData.nombre || "2014 DLV";
-                                // Guardamos su autorización fija
-                                firebaseDb.ref(`mercadona/autorizaciones/${userEmailKey}`).set({
-                                    familiaId: idFamiliaActual,
-                                    nombreFamilia: nombreFamiliaActual,
-                                    email: user.email
-                                });
-                                firebaseDb.ref(`mercadona/familias/2014_dlv/miembros/${userEmailKey}`).set(user.email);
-                                iniciarAppFamilia();
-                            } else {
-                                // No autorizado para 2014 DLV ni tiene familia asignada
-                                document.getElementById('loading-screen').classList.add('hidden');
-                                document.getElementById('app').classList.add('hidden');
-                                document.getElementById('login-screen').classList.remove('hidden');
-                                document.getElementById('error-auth').classList.remove('hidden');
-                                auth.signOut();
-                            }
-                        }
-                    });
+                    mostrarToast(`✅ Catálogo "${famNombre}" creado`);
+                    actualizarSelectoresDeCatalogo();
                 }
             });
         }
@@ -722,7 +870,7 @@
         function inicializarFamiliaBase(famId, famNombre, emailAdmin) {
             const emailKey = sanitizeEmail(emailAdmin);
             
-            // Migrar catálogo y secciones existentes de mercadona si existen
+            // Migrar catálogo y secciones existentes si estaban en la raíz
             firebaseDb.ref('mercadona').once('value', snapRoot => {
                 const rootData = snapRoot.val() || {};
                 const catExistente = rootData.catalogo || {};
@@ -731,6 +879,7 @@
 
                 const payload = {
                     nombre: famNombre,
+                    creador: emailAdmin,
                     miembros: { [emailKey]: emailAdmin },
                     catalogo: catExistente,
                     secciones: secExistente.length ? secExistente : [
@@ -742,55 +891,37 @@
                 };
 
                 firebaseDb.ref(`mercadona/familias/${famId}`).set(payload).then(() => {
-                    firebaseDb.ref(`mercadona/autorizaciones/${emailKey}`).set({
-                        familiaId: famId,
-                        nombreFamilia: famNombre,
-                        email: emailAdmin
-                    }).then(() => {
-                        iniciarAppFamilia();
-                    });
+                    listaFamiliasDisponibles[famId] = payload;
+                    vincularUsuarioACatalogo(famId, famNombre);
                 });
             });
         }
 
+        // 3. CARGA PRINCIPAL DEL CATÁLOGO EN CURSO
         function iniciarAppFamilia() {
             document.getElementById('family-badge-name').innerText = nombreFamiliaActual;
             document.getElementById('modal-nombre-familia-txt').innerText = nombreFamiliaActual;
 
             const basePath = getFamilyBasePath();
 
-            // 1. Escuchar Miembros de la familia
+            // Escuchar Miembros de esta familia
             firebaseDb.ref(`${basePath}/miembros`).on('value', snap => {
                 miembrosFamiliaActual = snap.val() || {};
                 renderizarMiembrosEnModal();
             });
 
-            // 2. Escuchar Pasillos / Secciones
+            // Escuchar Pasillos de esta familia
             firebaseDb.ref(`${basePath}/secciones`).on('value', snap => {
                 const data = snap.val();
                 if (data && Array.isArray(data) && data.length > 0) {
                     seccionesPersonalizadas = data;
-                } else {
-                    seccionesPersonalizadas = [
-                        { id: "Sin Pasillo", nombre: "📍 Sin Pasillo" },
-                        { id: "🍎 Fruta y Verdura", nombre: "🍎 Fruta y Verdura" },
-                        { id: "🍞 Panadería y Pastelería", nombre: "🍞 Panadería y Pastelería" },
-                        { id: "🥩 Carnicería - Refrigerados", nombre: "🥩 Carnicería - Refrigerados" },
-                        { id: "🐟 Pescadería - ❄️ Congelados", nombre: "🐟 Pescadería - ❄️ Congelados" },
-                        { id: "🥛 Lácteos - Café - Botes tomate - Huevos", nombre: "🥛 Lácteos - Café - Botes tomate - Huevos" },
-                        { id: "🥫 Despensa - Ingredientes - Frutos secos", nombre: "🥫 Despensa - Ingredientes - Frutos secos" },
-                        { id: "🥤 Bebidas y Aguas", nombre: "🥤 Bebidas y Aguas" },
-                        { id: "🧼 Limpieza - Higiene - Mosquitos", nombre: "🧼 Limpieza - Higiene - Mosquitos" },
-                        { id: "🧴 Perfumería y Cosmética", nombre: "🧴 Perfumería y Cosmética" }
-                    ];
-                    firebaseDb.ref(`${basePath}/secciones`).set(seccionesPersonalizadas);
                 }
                 renderizarSelectSecciones();
                 renderizarCatalogo();
                 renderizarListaActual();
             });
 
-            // 3. Escuchar Catálogo Familiar
+            // Escuchar Catálogo de esta familia
             firebaseDb.ref(`${basePath}/catalogo`).on('value', snap => {
                 catalogoProductos = snap.val() || {};
                 document.getElementById('contador-productos').innerText = Object.keys(catalogoProductos).length;
@@ -798,7 +929,7 @@
                 renderizarListaActual();
             });
 
-            // 4. Escuchar Lista Activa Compartida de la Familia
+            // Escuchar Lista Activa Compartida de esta familia
             firebaseDb.ref(`${basePath}/listaActiva`).on('value', snap => {
                 datosListaActual = snap.val() || { productos: {}, orden: 'seccion', seccionesVisibles: {} };
                 if (!datosListaActual.productos) datosListaActual.productos = {};
@@ -810,10 +941,32 @@
                 renderizarListaActual();
                 renderizarCatalogo();
             });
+
+            // Actualizar lista global de familias disponibles
+            firebaseDb.ref('mercadona/familias').on('value', snap => {
+                listaFamiliasDisponibles = snap.val() || {};
+                actualizarSelectoresDeCatalogo();
+            });
         }
 
-        // GESTIÓN DE MIEMBROS FAMILIARES
+        function actualizarSelectoresDeCatalogo() {
+            const selectModal = document.getElementById('select-cambiar-catalogo');
+            if (!selectModal) return;
+            selectModal.innerHTML = '';
+            
+            Object.keys(listaFamiliasDisponibles).forEach(k => {
+                const fam = listaFamiliasDisponibles[k];
+                const opt = document.createElement('option');
+                opt.value = k;
+                opt.innerText = fam.nombre || k;
+                if (k === idFamiliaActual) opt.selected = true;
+                selectModal.appendChild(opt);
+            });
+        }
+
+        // 4. MODAL GESTIÓN DE CATÁLOGO Y FAMILIARES
         function abrirModalFamilia() {
+            actualizarSelectoresDeCatalogo();
             renderizarMiembrosEnModal();
             document.getElementById('modal-familia').classList.remove('hidden');
         }
@@ -826,7 +979,7 @@
             cont.innerHTML = '';
             const entries = Object.entries(miembrosFamiliaActual);
             if (entries.length === 0) {
-                cont.innerHTML = '<div style="color:#888; font-size:13px;">No hay miembros registrados aún.</div>';
+                cont.innerHTML = '<div style="color:#888; font-size:13px; font-style:italic;">No hay otros miembros añadidos.</div>';
                 return;
             }
             entries.forEach(([key, email]) => {
@@ -843,14 +996,13 @@
             const inp = document.getElementById('nuevo-correo-miembro');
             const email = (inp.value || '').trim().toLowerCase();
             if (!email || !email.includes('@')) {
-                alert("Por favor, introduce un correo electrónico válido.");
+                alert("Por favor, introduce un correo electrónico válido (ej: nombre@gmail.com).");
                 return;
             }
 
             const emailKey = sanitizeEmail(email);
             const basePath = getFamilyBasePath();
 
-            // Guardar en la familia actual y en la tabla de autorizaciones
             firebaseDb.ref(`${basePath}/miembros/${emailKey}`).set(email).then(() => {
                 firebaseDb.ref(`mercadona/autorizaciones/${emailKey}`).set({
                     familiaId: idFamiliaActual,
@@ -858,7 +1010,7 @@
                     email: email
                 }).then(() => {
                     inp.value = '';
-                    mostrarToast(`✅ Correo autorizado en ${nombreFamiliaActual}`);
+                    mostrarToast(`✅ Acceso concedido a ${email}`);
                 });
             });
         }
@@ -868,11 +1020,34 @@
                 const basePath = getFamilyBasePath();
                 firebaseDb.ref(`${basePath}/miembros/${key}`).remove();
                 firebaseDb.ref(`mercadona/autorizaciones/${key}`).remove();
-                mostrarToast("Miembro eliminado");
+                mostrarToast("Miembro retirado");
             }
         }
 
-        // BÚSQUEDA Y PLEGADO DE PASILLOS EN CATÁLOGO
+        function cambiarACatalogoDesdeModal() {
+            const select = document.getElementById('select-cambiar-catalogo');
+            const nuevoFamId = select.value;
+            if (!nuevoFamId || nuevoFamId === idFamiliaActual) return;
+
+            const fam = listaFamiliasDisponibles[nuevoFamId];
+            vincularUsuarioACatalogo(nuevoFamId, fam.nombre || nuevoFamId);
+            cerrarModalFamilia();
+        }
+
+        function crearOtroCatalogoDesdeModal() {
+            const inp = document.getElementById('input-crear-otro-catalogo');
+            const nombre = (inp.value || '').trim();
+            if (!nombre) {
+                alert("Escribe un nombre para el nuevo catálogo.");
+                return;
+            }
+            const nuevoId = limpiarKey(nombre);
+            inp.value = '';
+            crearNuevoCatalogoEnFirebase(nuevoId, nombre, true);
+            cerrarModalFamilia();
+        }
+
+        // 5. BÚSQUEDA Y PLEGADO DE PASILLOS EN CATÁLOGO
         function filtrarCatalogoInstaneamente() {
             toggleClearSearchBtn();
             renderizarCatalogo();
@@ -907,7 +1082,7 @@
             renderizarCatalogo();
         }
 
-        // RENDERIZADO DEL CATÁLOGO
+        // 6. RENDERIZADO DEL CATÁLOGO
         function renderizarCatalogo() {
             const cont = document.getElementById('items-catalogo');
             const busqueda = (document.getElementById('buscador').value || '').toLowerCase().trim();
@@ -922,7 +1097,6 @@
                 return busqueda.length === 0 || nVis.includes(busqueda) || nOrig.includes(busqueda);
             });
 
-            // Mostrar u ocultar barra de plegar según si estamos ordenando por pasillo
             const foldBar = document.getElementById('fold-controls');
             if (orden === 'seccion' && busqueda.length === 0) {
                 foldBar.classList.remove('hidden');
@@ -976,7 +1150,6 @@
                 seccionesOrdenadas.forEach(secName => {
                     estructurado[secName].sort((a,b) => (catalogoProductos[a].nombrePersonalizado || "").localeCompare(catalogoProductos[b].nombrePersonalizado || ""));
                     
-                    // Si el usuario está buscando texto específico, desplegamos automáticamente para ver coincidencias
                     const estaPlegada = busqueda.length === 0 ? !!estadoPlegadoSecciones[secName] : false;
                     const flecha = estaPlegada ? '▶' : '▼';
                     const conteo = estructurado[secName].length;
@@ -1005,7 +1178,7 @@
             cont.innerHTML = htmlContent || `<p style="text-align:center; color:#999; padding:25px;">No se encontraron alimentos.</p>`;
         }
 
-        // RENDERIZADO DE "MI LISTA"
+        // 7. RENDERIZADO DE "MI LISTA"
         function renderizarListaActual() {
             if (!datosListaActual) return;
             const cont = document.getElementById('items-comprando');
@@ -1106,7 +1279,7 @@
             return html;
         }
 
-        // AÑADIR DIRECTO DESDE "MI LISTA"
+        // 8. ACCIONES RÁPIDAS
         function agregarRapidoDesdeLista() {
             const input = document.getElementById('buscador-rapido-lista');
             const texto = input.value.trim();
@@ -1129,7 +1302,6 @@
             mostrarToast(`🛒 ${texto} añadido`);
         }
 
-        // OPERACIONES DE CANTIDAD Y CARRO
         function updateQty(idProducto, delta, event) {
             if(event) event.stopPropagation();
             const basePath = getFamilyBasePath();
@@ -1200,7 +1372,6 @@
             mostrarToast("⭐ 15 habituales añadidos a la lista");
         }
 
-        // EDICIÓN Y GESTIÓN DE PRODUCTOS
         function abrirEdicion(id) {
             const p = catalogoProductos[id];
             if(!p) return;
@@ -1254,7 +1425,6 @@
             }
         }
 
-        // Modal Pasillos / Secciones
         function abrirModalSecciones() {
             seccionesTemporales = JSON.parse(JSON.stringify(seccionesPersonalizadas));
             renderizarSeccionesEnModal();
@@ -1311,7 +1481,6 @@
             });
         }
 
-        // Filtro pasillos en compra
         function abrirModalFiltroSecciones() {
             filtroSeccionesTemp = { ...(datosListaActual?.seccionesVisibles || {}) };
             const cont = document.getElementById('lista-filtro-secciones');

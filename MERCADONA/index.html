@@ -40,43 +40,80 @@
         header { 
             background: var(--m-green); 
             color: white; 
-            padding: 12px 16px; 
+            padding: 10px 14px; 
             position: sticky; 
             top: 0; 
             z-index: 90; 
             box-shadow: 0 2px 10px rgba(0,0,0,0.12); 
             display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+            flex-direction: column;
+            gap: 8px;
         }
-        .header-left { display: flex; align-items: center; gap: 8px; }
-        .header-right { display: flex; align-items: center; gap: 8px; }
-        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+        .header-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 8px;
+        }
+        @media (min-width: 768px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 12px 18px;
+            }
+            .header-top, .header-bottom {
+                width: auto;
+                gap: 12px;
+            }
+        }
+
         .family-pill {
             background: rgba(255,255,255,0.22);
             color: white;
-            padding: 5px 11px;
+            padding: 5px 12px;
             border-radius: 16px;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 5px;
             border: 1px solid rgba(255,255,255,0.35);
             white-space: nowrap;
         }
         .family-pill:active { background: rgba(255,255,255,0.38); }
+        
         .user-pill {
-            background: rgba(0,0,0,0.15);
+            background: rgba(0,0,0,0.16);
+            color: white;
             padding: 5px 10px;
             border-radius: 16px;
             font-size: 12px;
-            max-width: 140px;
+            max-width: 160px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
         }
+
+        .btn-header-logout {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-header-logout:active { background: rgba(255,255,255,0.3); }
 
         .tabs-mobile { display: flex; background: rgba(0,0,0,0.06); padding: 5px; margin: 10px 15px; border-radius: 10px; gap: 6px; }
         .tab { flex: 1; text-align: center; padding: 11px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #555; transition: 0.2s; white-space: nowrap; font-size: 14px; }
@@ -267,7 +304,6 @@
         .hidden { display: none !important; }
         .badge { font-size:12px; background:var(--m-green); color:white; padding:4px 9px; border-radius:20px; font-weight: bold; }
 
-        /* Botón Flotante Permanente (FAB) en Móvil */
         #fab-add {
             position: fixed;
             bottom: 22px;
@@ -316,7 +352,34 @@
         }
         .btn-fold:active { background: #ddd; }
 
-        /* Tarjetas de Selección en Onboarding */
+        .action-row { 
+            display: flex; 
+            gap: 8px; 
+            margin-bottom: 12px; 
+            flex-wrap: wrap;
+        }
+        .btn-action {
+            flex: 1 1 30%;
+            min-width: 100px;
+            padding: 10px 6px;
+            font-size: 12px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            transition: opacity 0.15s, transform 0.1s;
+        }
+        .btn-action:active { transform: scale(0.96); opacity: 0.9; }
+
+        .btn-action-habituales { background: var(--m-orange); }
+        .btn-action-finalizar { background: #1a1a1a; }
+        .btn-action-deshacer { background: #555; }
+
         .option-card {
             background: #f9fbf9;
             border: 2px solid #e0ebe2;
@@ -333,7 +396,6 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 1000; display: flex; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 440px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
         .modal-input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 14px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
-        .action-row { display: flex; gap: 8px; margin-bottom: 12px; }
 
         .btn-config { background: transparent; color: var(--m-green); border: 1px solid var(--m-green); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .seccion-item { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border-radius: 8px; border: 1px solid #eee; }
@@ -395,14 +457,13 @@
         </button>
     </div>
 
-    <!-- Pantalla Intuitiva de Onboarding: Si entra por primera vez sin catálogo -->
+    <!-- Pantalla Intuitiva de Onboarding -->
     <div id="onboarding-screen" class="hidden">
         <div style="max-width: 440px; width: 100%;">
             <div style="font-size: 38px; margin-bottom: 5px;">🛒</div>
             <h2 style="color:var(--m-green); margin: 0 0 6px 0;">¡Hola <span id="onboarding-user-name"></span>!</h2>
             <p style="color: #666; margin: 0 0 22px 0; font-size: 14px;">Elige cómo quieres empezar tu lista de compra:</p>
             
-            <!-- Opción 1: Unirse a catálogo familiar existente -->
             <div class="option-card">
                 <h4>👨‍👩‍👧‍👦 Unirme a un catálogo familiar</h4>
                 <p>Si te han invitado (por ejemplo a <b>2014 DLV</b>), selecciónalo aquí para compartir la lista:</p>
@@ -414,7 +475,6 @@
                 </div>
             </div>
 
-            <!-- Opción 2: Crear catálogo propio independiente -->
             <div class="option-card">
                 <h4>✨ Crear mi propio catálogo</h4>
                 <p>Crea un catálogo nuevo e independiente para tu casa o familia:</p>
@@ -449,12 +509,11 @@
         </div>
     </div>
 
-    <!-- Modal Gestión del Catálogo (Miembros, Cambiar de Catálogo, Crear Nuevo) -->
+    <!-- Modal Gestión del Catálogo -->
     <div id="modal-familia" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 style="margin-top:0; color:var(--m-green);">📁 Catálogo Actual: <span id="modal-nombre-familia-txt" style="color:var(--m-orange);">2014 DLV</span></h3>
             
-            <!-- Sección 1: Miembros y correos autorizados -->
             <div style="background:#f9fbf9; border:1px solid #e2ebe4; padding:12px; border-radius:8px; margin-bottom:15px;">
                 <strong style="font-size:13px; color:#333; display:block; margin-bottom:6px;">👥 Familiares con acceso a este catálogo:</strong>
                 <div id="lista-correos-familia" style="max-height: 140px; overflow-y: auto; margin-bottom:8px;"></div>
@@ -465,7 +524,6 @@
                 </div>
             </div>
 
-            <!-- Sección 2: Cambiar a otro catálogo existente -->
             <div style="margin-bottom:15px;">
                 <label style="font-size:12px; font-weight:bold; color:#555;">🔄 Cambiar a otro catálogo:</label>
                 <div style="display:flex; gap:6px; margin-top:4px;">
@@ -474,7 +532,6 @@
                 </div>
             </div>
 
-            <!-- Sección 3: Crear otro catálogo nuevo -->
             <div style="margin-bottom:15px;">
                 <label style="font-size:12px; font-weight:bold; color:#555;">✨ Crear un nuevo catálogo independiente:</label>
                 <div style="display:flex; gap:6px; margin-top:4px;">
@@ -529,37 +586,42 @@
 
     <!-- APLICACIÓN PRINCIPAL -->
     <div id="app" class="hidden">
+        
         <header>
-            <div class="header-left">
-                <strong style="font-size: 17px; display: flex; align-items: center; gap: 6px;">🛒 Mercadona</strong>
+            <div class="header-top">
+                <strong style="font-size: 18px; display: flex; align-items: center; gap: 6px;">🛒 Mercadona</strong>
+                <div style="display:flex; align-items:center; gap:6px;">
+                    <div class="user-pill" id="user-display">👤 Usuario</div>
+                    <button class="btn-header-logout" onclick="logout()" title="Cerrar sesión">Salir</button>
+                </div>
+            </div>
+            <div class="header-bottom">
                 <div class="family-pill" onclick="abrirModalFamilia()" title="Gestionar correos o cambiar de catálogo">
                     📁 <span id="family-badge-name">2014 DLV</span> ▾
                 </div>
-            </div>
-            <div class="header-right">
-                <div class="user-pill" id="user-display">👤 Usuario</div>
-                <button onclick="logout()" style="background:none; border:none; color:white; opacity: 0.95; font-size:13px; cursor:pointer; font-weight:bold;">Salir</button>
+                <div style="font-size:12px; color:rgba(255,255,255,0.85); font-weight:500;">
+                    <span id="header-counter-pill">0</span> en lista
+                </div>
             </div>
         </header>
 
         <div class="tabs-mobile">
-            <div class="tab active" onclick="switchTab('lista')" id="tab-lista">🛒 Mi Lista</div>
+            <div class="tab active" onclick="switchTab('lista')" id="tab-lista">🛒 Lista Actual</div>
             <div class="tab" onclick="switchTab('catalogo')" id="tab-catalogo">📖 Catálogo</div>
         </div>
 
         <div class="app-grid">
             
-            <!-- PANEL MI LISTA (COMPRA ACTUAL) -->
+            <!-- PANEL LISTA ACTUAL -->
             <div id="panel-lista" class="panel active">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
                     <div>
-                        <h3 class="panel-title" style="margin:0; border:none;">Compra Actual</h3>
-                        <div style="font-size: 12px; color: #888;" id="fecha-lista">Lista en curso</div>
+                        <h3 class="panel-title" style="margin:0; border:none;">Lista Actual</h3>
+                        <div style="font-size: 12px; color: #888;" id="fecha-lista">Artículos pendientes de comprar</div>
                     </div>
                     <span class="badge" style="background:var(--m-orange);"><span id="contador-lista">0</span> artículos</span>
                 </div>
 
-                <!-- Buscador directo desde Mi Lista para comprar sin salir -->
                 <div class="quick-add-box">
                     <div style="display:flex; gap: 8px;">
                         <input type="text" id="buscador-rapido-lista" class="search-bar" placeholder="🔍 Añadir a la lista (ej: Leche, Huevos)..." onkeypress="if(event.key==='Enter') agregarRapidoDesdeLista()">
@@ -569,8 +631,9 @@
 
                 <div id="active-list">
                     <div class="action-row">
-                        <button class="primary" style="background:var(--m-orange); margin:0; flex: 1; padding: 9px 4px; font-size: 12px;" onclick="cargarHabituales()">⭐ 15 Habituales</button>
-                        <button class="primary" style="background:#dc3545; margin:0; flex: 1; padding: 9px 4px; font-size: 12px;" onclick="vaciarListaActual()">🗑️ Vaciar Lista</button>
+                        <button class="btn-action btn-action-habituales" onclick="cargarHabituales()">⭐ 15 Habituales</button>
+                        <button class="btn-action btn-action-finalizar" onclick="finalizarCompra()">📦 Finalizar Compra</button>
+                        <button id="btn-deshacer" class="btn-action btn-action-deshacer hidden" onclick="deshacerUltimaAccion()">↩️ Deshacer</button>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px;">
@@ -610,7 +673,6 @@
                     </select>
                 </div>
 
-                <!-- Botones para Plegar / Desplegar todos los pasillos rápidamente -->
                 <div class="fold-bar" id="fold-controls">
                     <button class="btn-fold" onclick="plegarTodasSecciones(true)">📁 Plegar pasillos</button>
                     <button class="btn-fold" onclick="plegarTodasSecciones(false)">📂 Desplegar todos</button>
@@ -627,7 +689,6 @@
         </div>
     </div>
 
-    <!-- Botón flotante FAB para buscar / añadir rápido desde cualquier parte -->
     <button id="fab-add" onclick="irAlCatalogoYBuscador()" title="Buscar y Añadir Alimentos">➕</button>
 
     <div id="toast">Notificación</div>
@@ -649,7 +710,7 @@
         let currentUser = null;
         let idFamiliaActual = "2014_dlv";
         let nombreFamiliaActual = "2014 DLV";
-        let listaFamiliasDisponibles = {}; // { id: { nombre, creador, ... } }
+        let listaFamiliasDisponibles = {};
         let miembrosFamiliaActual = {};
 
         let datosListaActual = { productos: {}, orden: 'seccion', seccionesVisibles: {} };
@@ -659,6 +720,8 @@
         let filtroSeccionesTemp = {};
 
         let estadoPlegadoSecciones = {};
+
+        let backupEstadoParaDeshacer = null;
 
         function mostrarToast(mensaje) {
             const t = document.getElementById('toast');
@@ -697,12 +760,12 @@
             }, 100);
         }
 
-        // 1. AUTENTICACIÓN GOOGLE
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
-                document.getElementById('user-display').innerText = `👤 ${user.displayName || user.email.split('@')[0]}`;
-                document.getElementById('onboarding-user-name').innerText = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
+                const nombreCorto = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
+                document.getElementById('user-display').innerText = `👤 ${nombreCorto}`;
+                document.getElementById('onboarding-user-name').innerText = nombreCorto;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('loading-screen').classList.remove('hidden');
                 verificarAccesoYCatalogo(user);
@@ -729,15 +792,12 @@
             return `mercadona/familias/${idFamiliaActual}`;
         }
 
-        // 2. VERIFICACIÓN Y ONBOARDING INTUITIVO
         function verificarAccesoYCatalogo(user) {
             const userEmailKey = sanitizeEmail(user.email);
             
-            // Cargar primero todas las familias existentes para saber qué opciones hay
             firebaseDb.ref('mercadona/familias').once('value', snapFamilias => {
                 listaFamiliasDisponibles = snapFamilias.val() || {};
                 
-                // Si no existe ninguna familia aún en la base de datos, creamos la primera "2014 DLV"
                 if (Object.keys(listaFamiliasDisponibles).length === 0) {
                     idFamiliaActual = "2014_dlv";
                     nombreFamiliaActual = "2014 DLV";
@@ -745,17 +805,14 @@
                     return;
                 }
 
-                // Consultar si este correo ya tiene un catálogo asignado
                 firebaseDb.ref(`mercadona/autorizaciones/${userEmailKey}`).once('value', snapAuto => {
                     const auto = snapAuto.val();
                     
                     if (auto && auto.familiaId && listaFamiliasDisponibles[auto.familiaId]) {
-                        // Ya tiene catálogo asignado y existe: entra directamente
                         idFamiliaActual = auto.familiaId;
                         nombreFamiliaActual = listaFamiliasDisponibles[auto.familiaId].nombre || auto.nombreFamilia || "Mi Catálogo";
                         iniciarAppFamilia();
                     } else {
-                        // NO tiene catálogo asignado todavía -> Le mostramos la pantalla de Onboarding para que elija con 1 clic
                         mostrarPantallaOnboarding();
                     }
                 });
@@ -769,7 +826,6 @@
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('onboarding-screen').classList.remove('hidden');
 
-            // Llenar el desplegable con las familias existentes (ej. 2014 DLV)
             const select = document.getElementById('select-catalogo-existente');
             select.innerHTML = '';
             
@@ -784,7 +840,6 @@
             });
         }
 
-        // Acción: El usuario se une a un catálogo existente
         function confirmarUnirseCatalogo() {
             const select = document.getElementById('select-catalogo-existente');
             const famId = select.value;
@@ -797,7 +852,6 @@
             vincularUsuarioACatalogo(famId, fam.nombre || famId);
         }
 
-        // Acción: El usuario crea su propio catálogo independiente
         function confirmarCrearCatalogoNuevo() {
             const inp = document.getElementById('input-nuevo-catalogo-nombre');
             const nombre = (inp.value || '').trim();
@@ -813,14 +867,12 @@
         function vincularUsuarioACatalogo(famId, famNombre) {
             const userEmailKey = sanitizeEmail(currentUser.email);
             
-            // 1. Guardar en autorizaciones
             firebaseDb.ref(`mercadona/autorizaciones/${userEmailKey}`).set({
                 familiaId: famId,
                 nombreFamilia: famNombre,
                 email: currentUser.email
             });
 
-            // 2. Guardar en miembros de la familia
             firebaseDb.ref(`mercadona/familias/${famId}/miembros/${userEmailKey}`).set(currentUser.email).then(() => {
                 idFamiliaActual = famId;
                 nombreFamiliaActual = famNombre;
@@ -833,7 +885,6 @@
         function crearNuevoCatalogoEnFirebase(famId, famNombre, entrarDeInmediato = true) {
             const userEmailKey = sanitizeEmail(currentUser.email);
             
-            // Secciones iniciales base
             const seccionesBase = [
                 { id: "Sin Pasillo", nombre: "📍 Sin Pasillo" },
                 { id: "🍎 Fruta y Verdura", nombre: "🍎 Fruta y Verdura" },
@@ -870,12 +921,15 @@
         function inicializarFamiliaBase(famId, famNombre, emailAdmin) {
             const emailKey = sanitizeEmail(emailAdmin);
             
-            // Migrar catálogo y secciones existentes si estaban en la raíz
             firebaseDb.ref('mercadona').once('value', snapRoot => {
                 const rootData = snapRoot.val() || {};
-                const catExistente = rootData.catalogo || {};
+                let catExistente = rootData.catalogo || {};
                 const secExistente = rootData.secciones || [];
                 const listaExistente = (rootData.listas && rootData.listas['2026-11-01_12-4-13']) ? rootData.listas['2026-11-01_12-4-13'] : { productos: {}, orden: 'seccion' };
+
+                if (catExistente['agua_oxigenada'] && catExistente['agua_oxigenada'].consumos >= 20) {
+                    catExistente['agua_oxigenada'].consumos = 1;
+                }
 
                 const payload = {
                     nombre: famNombre,
@@ -897,20 +951,17 @@
             });
         }
 
-        // 3. CARGA PRINCIPAL DEL CATÁLOGO EN CURSO
         function iniciarAppFamilia() {
             document.getElementById('family-badge-name').innerText = nombreFamiliaActual;
             document.getElementById('modal-nombre-familia-txt').innerText = nombreFamiliaActual;
 
             const basePath = getFamilyBasePath();
 
-            // Escuchar Miembros de esta familia
             firebaseDb.ref(`${basePath}/miembros`).on('value', snap => {
                 miembrosFamiliaActual = snap.val() || {};
                 renderizarMiembrosEnModal();
             });
 
-            // Escuchar Pasillos de esta familia
             firebaseDb.ref(`${basePath}/secciones`).on('value', snap => {
                 const data = snap.val();
                 if (data && Array.isArray(data) && data.length > 0) {
@@ -921,15 +972,19 @@
                 renderizarListaActual();
             });
 
-            // Escuchar Catálogo de esta familia
             firebaseDb.ref(`${basePath}/catalogo`).on('value', snap => {
                 catalogoProductos = snap.val() || {};
+
+                if (catalogoProductos['agua_oxigenada'] && catalogoProductos['agua_oxigenada'].consumos >= 20) {
+                    catalogoProductos['agua_oxigenada'].consumos = 1;
+                    firebaseDb.ref(`${basePath}/catalogo/agua_oxigenada/consumos`).set(1);
+                }
+
                 document.getElementById('contador-productos').innerText = Object.keys(catalogoProductos).length;
                 renderizarCatalogo();
                 renderizarListaActual();
             });
 
-            // Escuchar Lista Activa Compartida de esta familia
             firebaseDb.ref(`${basePath}/listaActiva`).on('value', snap => {
                 datosListaActual = snap.val() || { productos: {}, orden: 'seccion', seccionesVisibles: {} };
                 if (!datosListaActual.productos) datosListaActual.productos = {};
@@ -942,7 +997,6 @@
                 renderizarCatalogo();
             });
 
-            // Actualizar lista global de familias disponibles
             firebaseDb.ref('mercadona/familias').on('value', snap => {
                 listaFamiliasDisponibles = snap.val() || {};
                 actualizarSelectoresDeCatalogo();
@@ -964,7 +1018,6 @@
             });
         }
 
-        // 4. MODAL GESTIÓN DE CATÁLOGO Y FAMILIARES
         function abrirModalFamilia() {
             actualizarSelectoresDeCatalogo();
             renderizarMiembrosEnModal();
@@ -1047,7 +1100,6 @@
             cerrarModalFamilia();
         }
 
-        // 5. BÚSQUEDA Y PLEGADO DE PASILLOS EN CATÁLOGO
         function filtrarCatalogoInstaneamente() {
             toggleClearSearchBtn();
             renderizarCatalogo();
@@ -1082,7 +1134,6 @@
             renderizarCatalogo();
         }
 
-        // 6. RENDERIZADO DEL CATÁLOGO
         function renderizarCatalogo() {
             const cont = document.getElementById('items-catalogo');
             const busqueda = (document.getElementById('buscador').value || '').toLowerCase().trim();
@@ -1155,7 +1206,7 @@
                     const conteo = estructurado[secName].length;
 
                     htmlContent += `
-                        <div class="section-group-title" onclick="toggleSeccionPlegada('${secName.replace(/'/g, "\'")}')">
+                        <div class="section-group-title" onclick="toggleSeccionPlegada('${secName.replace(/'/g, "\\'")}')">
                             <span>${secName} (${conteo})</span>
                             <span class="section-toggle-icon">${flecha}</span>
                         </div>
@@ -1169,7 +1220,7 @@
                 if (orden === 'alfa') {
                     keysFiltradas.sort((a,b) => (catalogoProductos[a].nombrePersonalizado || "").localeCompare(catalogoProductos[b].nombrePersonalizado || ""));
                 } else if (orden === 'consumos') {
-                    keysFiltradas.sort((a,b) => (catalogoProductos[b].consumos || 0) - (catalogoProductos[a].consumos || 0));
+                    keysFiltradas.sort((a,b) => obtenerPuntuacionHabitual(b) - obtenerPuntuacionHabitual(a));
                     if (busqueda.length === 0) keysFiltradas = keysFiltradas.slice(0, 25);
                 }
                 keysFiltradas.forEach(k => htmlContent += dibujarTarjeta(k));
@@ -1178,7 +1229,14 @@
             cont.innerHTML = htmlContent || `<p style="text-align:center; color:#999; padding:25px;">No se encontraron alimentos.</p>`;
         }
 
-        // 7. RENDERIZADO DE "MI LISTA"
+        function obtenerPuntuacionHabitual(key) {
+            const p = catalogoProductos[key];
+            if (!p) return 0;
+            if (p.vecesComprado !== undefined) return p.vecesComprado;
+            if (key === 'agua_oxigenada') return 1;
+            return p.consumos || 0;
+        }
+
         function renderizarListaActual() {
             if (!datosListaActual) return;
             const cont = document.getElementById('items-comprando');
@@ -1188,6 +1246,7 @@
             let totalItems = 0;
             keys.forEach(k => totalItems += (prods[k].cantidad || 1));
             document.getElementById('contador-lista').innerText = totalItems;
+            document.getElementById('header-counter-pill').innerText = totalItems;
 
             if (keys.length === 0) {
                 cont.innerHTML = `
@@ -1279,7 +1338,73 @@
             return html;
         }
 
-        // 8. ACCIONES RÁPIDAS
+        function activarBotonDeshacer() {
+            const btn = document.getElementById('btn-deshacer');
+            if (btn) btn.classList.remove('hidden');
+        }
+
+        function desactivarBotonDeshacer() {
+            const btn = document.getElementById('btn-deshacer');
+            if (btn) btn.classList.add('hidden');
+        }
+
+        function deshacerUltimaAccion() {
+            if (backupEstadoParaDeshacer !== null) {
+                const basePath = getFamilyBasePath();
+                firebaseDb.ref(`${basePath}/listaActiva/productos`).set(backupEstadoParaDeshacer).then(() => {
+                    backupEstadoParaDeshacer = null;
+                    desactivarBotonDeshacer();
+                    mostrarToast("↩️ Acción deshecha con éxito");
+                });
+            }
+        }
+
+        function finalizarCompra() {
+            const prods = datosListaActual.productos || {};
+            const keys = Object.keys(prods);
+            if (keys.length === 0) {
+                mostrarToast("ℹ️ La lista ya está vacía.");
+                return;
+            }
+
+            backupEstadoParaDeshacer = JSON.parse(JSON.stringify(prods));
+            activarBotonDeshacer();
+
+            const basePath = getFamilyBasePath();
+
+            keys.forEach(k => {
+                if (prods[k].comprado && catalogoProductos[k]) {
+                    const veces = (catalogoProductos[k].vecesComprado || catalogoProductos[k].consumos || 0) + 1;
+                    firebaseDb.ref(`${basePath}/catalogo/${k}/vecesComprado`).set(veces);
+                }
+            });
+
+            firebaseDb.ref(`${basePath}/listaActiva/productos`).remove().then(() => {
+                mostrarToast("📦 Compra finalizada. Carro vaciado.");
+            });
+        }
+
+        function cargarHabituales() {
+            const keys = Object.keys(catalogoProductos);
+            if (keys.length === 0) { alert("Tu catálogo aún está vacío."); return; }
+
+            backupEstadoParaDeshacer = JSON.parse(JSON.stringify(datosListaActual.productos || {}));
+            activarBotonDeshacer();
+
+            keys.sort((a,b) => obtenerPuntuacionHabitual(b) - obtenerPuntuacionHabitual(a));
+            const top = keys.slice(0, 15);
+
+            const basePath = getFamilyBasePath();
+            let sumados = 0;
+            top.forEach(k => {
+                if (!datosListaActual?.productos?.[k]) {
+                    firebaseDb.ref(`${basePath}/listaActiva/productos/${k}`).set({ comprado: false, cantidad: 1 });
+                    sumados++;
+                }
+            });
+            mostrarToast(`⭐ ${sumados} alimentos habituales añadidos`);
+        }
+
         function agregarRapidoDesdeLista() {
             const input = document.getElementById('buscador-rapido-lista');
             const texto = input.value.trim();
@@ -1293,7 +1418,8 @@
                     nombreOriginal: texto.toLowerCase(),
                     nombrePersonalizado: texto,
                     seccion: "Sin Pasillo",
-                    consumos: 1
+                    consumos: 1,
+                    vecesComprado: 1
                 });
             }
             
@@ -1319,8 +1445,6 @@
             } else {
                 if (currentQty === 0) {
                     firebaseDb.ref(`${basePath}/listaActiva/productos/${idProducto}`).set({ comprado: false, cantidad: newQty });
-                    const cons = (catalogoProductos[idProducto]?.consumos) || 0;
-                    firebaseDb.ref(`${basePath}/catalogo/${idProducto}/consumos`).set(cons + 1);
                     mostrarToast("✅ Añadido");
                 } else {
                     firebaseDb.ref(`${basePath}/listaActiva/productos/${idProducto}/cantidad`).set(newQty);
@@ -1345,31 +1469,6 @@
             const orden = document.getElementById('orden-lista').value;
             const basePath = getFamilyBasePath();
             firebaseDb.ref(`${basePath}/listaActiva/orden`).set(orden);
-        }
-
-        function vaciarListaActual() {
-            if(confirm("⚠️ ¿Vaciar todos los alimentos de la lista de compra actual?")) {
-                const basePath = getFamilyBasePath();
-                firebaseDb.ref(`${basePath}/listaActiva/productos`).remove();
-                mostrarToast("Lista vaciada");
-            }
-        }
-
-        function cargarHabituales() {
-            const keys = Object.keys(catalogoProductos);
-            if (keys.length === 0) { alert("Tu catálogo aún está vacío."); return; }
-            keys.sort((a,b) => (catalogoProductos[b].consumos || 0) - (catalogoProductos[a].consumos || 0));
-            const top = keys.slice(0, 15);
-
-            const basePath = getFamilyBasePath();
-            top.forEach(k => {
-                if (!datosListaActual?.productos?.[k]) {
-                    firebaseDb.ref(`${basePath}/listaActiva/productos/${k}`).set({ comprado: false, cantidad: 1 });
-                    const cons = (catalogoProductos[k]?.consumos) || 0;
-                    firebaseDb.ref(`${basePath}/catalogo/${k}/consumos`).set(cons + 1);
-                }
-            });
-            mostrarToast("⭐ 15 habituales añadidos a la lista");
         }
 
         function abrirEdicion(id) {
@@ -1418,7 +1517,8 @@
                     nombreOriginal: val.toLowerCase(),
                     nombrePersonalizado: val,
                     seccion: "Sin Pasillo",
-                    consumos: 1
+                    consumos: 1,
+                    vecesComprado: 1
                 });
                 input.value = '';
                 mostrarToast("Añadido al catálogo");

@@ -393,8 +393,24 @@
         .create-box p { margin: 0 0 14px 0; color: #666; font-size: 13px; line-height: 1.4; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 1000; display: flex; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 440px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 92%; max-width: 450px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
         .modal-input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 14px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+
+        .modal-section-card {
+            background: #f9fbf9;
+            border: 1px solid #e2ebe4;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 14px;
+        }
+        .modal-section-card h4 {
+            margin: 0 0 6px 0;
+            font-size: 13px;
+            color: var(--m-green-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
 
         .btn-config { background: transparent; color: var(--m-green); border: 1px solid var(--m-green); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .seccion-item { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border-radius: 8px; border: 1px solid #eee; }
@@ -445,16 +461,21 @@
         </button>
     </div>
 
-    <!-- Pantalla de Creación de Catálogo Propio -->
+    <!-- Pantalla de Creación de Catálogo Propio para usuarios nuevos (con opción manual o importando JSON) -->
     <div id="onboarding-screen" class="hidden">
-        <div style="max-width: 420px; width: 100%;">
+        <div style="max-width: 430px; width: 100%;">
             <div style="font-size: 38px; margin-bottom: 6px;">🛒</div>
             <h2 style="color:var(--m-green); margin: 0 0 8px 0;">Crear tu catálogo</h2>
             <div class="create-box">
                 <h4>Crea tu propio catálogo de productos</h4>
-                <p>Escribe el nombre que quieras darle a tu catálogo de productos:</p>
-                <input type="text" id="input-nombre-catalogo-propio" class="modal-input" style="margin-top:0;" placeholder="Nombre de tu catálogo..." onkeypress="if(event.key==='Enter') crearCatalogoPropio()">
-                <button class="primary" onclick="crearCatalogoPropio()">Crear catálogo</button>
+                <p>Escribe el nombre que quieras darle a tu catálogo:</p>
+                <input type="text" id="input-nombre-catalogo-propio" class="modal-input" style="margin-top:0;" placeholder="Nombre de tu catálogo..." onkeypress="if(event.key==='Enter') crearCatalogoPropio(false)">
+                
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <button class="primary" onclick="crearCatalogoPropio(false)">Crear catálogo en blanco</button>
+                    <button class="primary" style="background:#555;" onclick="document.getElementById('input-json-onboarding').click()">📥 Crear importando un archivo JSON</button>
+                    <input type="file" id="input-json-onboarding" accept=".json" style="display:none;" onchange="crearCatalogoDesdeArchivoJson(this, 'input-nombre-catalogo-propio')">
+                </div>
             </div>
             <button onclick="logout()" style="background:none; border:none; color:#888; font-size:13px; cursor:pointer; text-decoration:underline; margin-top:8px;">Cerrar sesión</button>
         </div>
@@ -481,17 +502,51 @@
         </div>
     </div>
 
-    <!-- Modal Renombrar Catálogo -->
-    <div id="modal-renombrar-catalogo" class="modal-overlay hidden">
+    <!-- Modal Gestión Completa del Catálogo (Renombrar, Cambiar, Crear Secundario, Importar y Exportar JSON) -->
+    <div id="modal-gestion-catalogo" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--m-green);">✏️ Editar Nombre del Catálogo</h3>
-            <label style="font-size:12px; font-weight:bold; color:#555;">Nuevo nombre del catálogo:</label>
-            <input type="text" id="input-renombrar-catalogo" class="modal-input" onkeypress="if(event.key==='Enter') guardarNuevoNombreCatalogo()">
+            <h3 style="margin-top:0; color:var(--m-green);">📁 Gestión de Catálogos</h3>
             
-            <div style="display:flex; gap:8px;">
-                <button class="primary" style="background:#888; flex:1;" onclick="cerrarModalRenombrarCatalogo()">Cancelar</button>
-                <button class="primary" style="flex:1;" onclick="guardarNuevoNombreCatalogo()">Guardar</button>
+            <!-- 1. Renombrar catálogo actual -->
+            <div class="modal-section-card">
+                <h4>✏️ Renombrar catálogo actual</h4>
+                <div style="display:flex; gap:6px;">
+                    <input type="text" id="input-renombrar-catalogo" class="modal-input" style="margin:0; flex:1;" onkeypress="if(event.key==='Enter') guardarNuevoNombreCatalogo()">
+                    <button class="primary" style="margin:0; width:auto; padding: 8px 14px;" onclick="guardarNuevoNombreCatalogo()">Guardar</button>
+                </div>
             </div>
+
+            <!-- 2. Cambiar de catálogo disponible -->
+            <div class="modal-section-card" id="card-cambiar-catalogo">
+                <h4>🔄 Cambiar de catálogo activo</h4>
+                <div style="display:flex; gap:6px;">
+                    <select id="select-cambiar-catalogo" class="modal-input" style="margin:0; flex:1;"></select>
+                    <button class="primary" style="margin:0; width:auto; padding: 8px 14px; background:#444;" onclick="cambiarCatalogoActivo()">Cambiar</button>
+                </div>
+            </div>
+
+            <!-- 3. Crear catálogo secundario para el grupo familiar -->
+            <div class="modal-section-card">
+                <h4>➕ Crear catálogo secundario compartido</h4>
+                <p style="font-size:12px; color:#666; margin:0 0 8px 0;">Todos los miembros autorizados en este catálogo tendrán acceso a él.</p>
+                
+                <input type="text" id="input-nuevo-catalogo-nombre" class="modal-input" style="margin:0 0 8px 0;" placeholder="Nombre del nuevo catálogo...">
+                
+                <div style="display:flex; gap:6px;">
+                    <button class="primary" style="margin:0; flex:1; background:var(--m-orange); font-size:13px; padding:10px 6px;" onclick="crearCatalogoSecundario(false)">Crear en blanco</button>
+                    <button class="primary" style="margin:0; flex:1; background:#555; font-size:13px; padding:10px 6px;" onclick="document.getElementById('input-json-secundario').click()">📥 Importar JSON</button>
+                    <input type="file" id="input-json-secundario" accept=".json" style="display:none;" onchange="crearCatalogoDesdeArchivoJson(this, 'input-nuevo-catalogo-nombre')">
+                </div>
+            </div>
+
+            <!-- 4. Exportar catálogo actual a JSON -->
+            <div class="modal-section-card" style="margin-bottom:15px;">
+                <h4>📤 Exportar catálogo actual</h4>
+                <p style="font-size:12px; color:#666; margin:0 0 8px 0;">Descarga tus productos y pasillos en un archivo JSON para compartirlo o guardarlo.</p>
+                <button class="primary" style="background:#005b26; padding:10px;" onclick="exportarCatalogoActualAJson()">💾 Descargar archivo JSON</button>
+            </div>
+            
+            <button class="primary" style="background:#888; padding:10px;" onclick="cerrarModalGestionCatalogo()">Cerrar</button>
         </div>
     </div>
 
@@ -547,8 +602,8 @@
                 </div>
             </div>
             <div class="header-bottom">
-                <div class="family-pill" onclick="abrirModalRenombrarCatalogo()" title="Editar nombre del catálogo">
-                    📁 <span id="family-badge-name">2014 DLV</span> ✏️
+                <div class="family-pill" onclick="abrirModalGestionCatalogo()" title="Gestionar, renombrar, cambiar o crear catálogos">
+                    📁 <span id="family-badge-name">2014 DLV</span> ⚙️
                 </div>
                 <div style="font-size:12px; color:rgba(255,255,255,0.9); font-weight:500;">
                     <span id="header-counter-pill">0</span> en lista
@@ -616,7 +671,8 @@
                 
                 <div class="controls-row">
                     <div class="search-wrapper">
-                        <input type="text" id="buscador" class="search-bar" placeholder="🔍 Buscar alimento (ej: atun, cafe)..." oninput="filtrarCatalogoInstaneamente()">
+                        <!-- Al hacer click o pulsar con el dedo en el buscador, se limpia automáticamente para empezar desde cero -->
+                        <input type="text" id="buscador" class="search-bar" placeholder="🔍 Buscar alimento (ej: atun, pan)..." oninput="filtrarCatalogoInstaneamente()" onclick="limpiarAlEnfocarBuscador()" onfocus="limpiarAlEnfocarBuscador()">
                         <button class="clear-search-btn hidden" id="btn-clear-search" onclick="limpiarBusqueda()" title="Limpiar">×</button>
                     </div>
                     <select id="orden-catalogo" class="select-bar" onchange="renderizarCatalogo()">
@@ -663,6 +719,7 @@
         let currentUser = null;
         let idFamiliaActual = "2014_dlv";
         let nombreFamiliaActual = "2014 DLV";
+        let catalogosAccesibles = {}; // { id: { nombre, ... } }
 
         let datosListaActual = { productos: {}, orden: 'seccion', seccionesVisibles: {} };
         let catalogoProductos = {};
@@ -687,6 +744,7 @@
                 .replace(/\s+/g, '_');
         }
 
+        // Normaliza texto eliminando acentos/tildes y convirtiendo a minúsculas
         function normalizarTexto(texto) {
             return (texto || '')
                 .toString()
@@ -720,15 +778,29 @@
             if (activePanel) activePanel.classList.add('active');
         }
 
+        // Botón FAB "+": Cambia a Catálogo, limpia el cuadro de búsqueda y coloca el cursor listo para escribir
         function irAlCatalogoYBuscador() {
             switchTab('catalogo');
             setTimeout(() => {
                 const b = document.getElementById('buscador');
                 if (b) {
+                    b.value = '';
+                    toggleClearSearchBtn();
+                    renderizarCatalogo();
                     b.focus();
                     b.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }, 100);
+        }
+
+        // Limpiar buscador al pulsar con el ratón o con el dedo en móvil
+        function limpiarAlEnfocarBuscador() {
+            const b = document.getElementById('buscador');
+            if (b && b.value !== '') {
+                b.value = '';
+                toggleClearSearchBtn();
+                renderizarCatalogo();
+            }
         }
 
         auth.onAuthStateChanged(user => {
@@ -763,35 +835,50 @@
             return `mercadona/familias/${idFamiliaActual}`;
         }
 
+        // 1. CARGA DE CATÁLOGOS ACCESIBLES
         function verificarCatalogoUsuario(user) {
             const userEmailKey = sanitizeEmail(user.email);
 
-            firebaseDb.ref(`mercadona/usuarios_catalogos/${userEmailKey}`).once('value', snap => {
-                const asignacion = snap.val();
-                if (asignacion && asignacion.familiaId) {
-                    idFamiliaActual = asignacion.familiaId;
-                    nombreFamiliaActual = asignacion.nombreCatalogo || asignacion.familiaId;
+            // Escuchar todos los catálogos en los que este usuario tiene permiso
+            firebaseDb.ref('mercadona/familias').once('value', snapFam => {
+                const todasLasFamilias = snapFam.val() || {};
+                catalogosAccesibles = {};
+
+                // Buscar todos los catálogos donde el usuario esté en miembros o sea el creador,
+                // o si es la familia 2014_dlv y el usuario es uno de los 4 administradores/familiares autorizados
+                const emailsFamiliaBase = ['verdeguer279_gmail_com', 'copg279_gmail_com', 'claramorasaez_gmail_com', 'rafaverdeguermora_gmail_com'];
+
+                Object.keys(todasLasFamilias).forEach(k => {
+                    const fam = todasLasFamilias[k];
+                    const miembros = fam.miembros || {};
+                    const esMiembro = miembros[userEmailKey] || fam.creador === user.email;
+                    const esFamiliaBase = (k === '2014_dlv' && emailsFamiliaBase.includes(userEmailKey));
+
+                    if (esMiembro || esFamiliaBase) {
+                        catalogosAccesibles[k] = fam;
+                    }
+                });
+
+                const clavesAccesibles = Object.keys(catalogosAccesibles);
+
+                if (clavesAccesibles.length > 0) {
+                    // Si ya tenía guardada una última selección válida en localStorage, la usamos; si no, preferir 2014_dlv o la primera
+                    const preferida = localStorage.getItem(`mercadona_catalogo_${userEmailKey}`);
+                    if (preferida && catalogosAccesibles[preferida]) {
+                        idFamiliaActual = preferida;
+                    } else if (catalogosAccesibles['2014_dlv']) {
+                        idFamiliaActual = '2014_dlv';
+                    } else {
+                        idFamiliaActual = clavesAccesibles[0];
+                    }
+
+                    nombreFamiliaActual = catalogosAccesibles[idFamiliaActual].nombre || idFamiliaActual;
                     iniciarAppFamilia();
-                } else if (userEmailKey === 'verdeguer279_gmail_com') {
-                    firebaseDb.ref('mercadona/familias/2014_dlv').once('value', snapFam => {
-                        const famData = snapFam.val();
-                        if (!famData) {
-                            inicializarCatalogoPrincipal('2014_dlv', '2014 DLV', user.email);
-                        } else {
-                            idFamiliaActual = '2014_dlv';
-                            nombreFamiliaActual = famData.nombre || '2014 DLV';
-                            firebaseDb.ref(`mercadona/usuarios_catalogos/${userEmailKey}`).set({
-                                familiaId: idFamiliaActual,
-                                nombreCatalogo: nombreFamiliaActual,
-                                email: user.email
-                            }).then(() => iniciarAppFamilia());
-                        }
-                    }, err => {
-                        if (err && err.code === 'PERMISSION_DENIED') {
-                            auth.signOut().then(() => mostrarAccesoDenegado("Acceso denegado: tu cuenta no está autorizada en las reglas de Firebase."));
-                        }
-                    });
+                } else if (userEmailKey === 'verdeguer279_gmail_com' || emailsFamiliaBase.includes(userEmailKey)) {
+                    // Inicializar automáticamente 2014 DLV si es la primera vez que arranca la base de datos
+                    inicializarCatalogoPrincipal('2014_dlv', '2014 DLV', user.email);
                 } else {
+                    // Usuario nuevo autorizado en reglas sin catálogo creado todavía -> pantalla de creación propia
                     document.getElementById('loading-screen').classList.add('hidden');
                     document.getElementById('app').classList.add('hidden');
                     document.getElementById('fab-add').classList.add('hidden');
@@ -801,22 +888,217 @@
                 }
             }, err => {
                 if (err && err.code === 'PERMISSION_DENIED') {
-                    auth.signOut().then(() => mostrarAccesoDenegado("Acceso denegado: tu cuenta no está autorizada para acceder a este sistema."));
+                    auth.signOut().then(() => mostrarAccesoDenegado("Acceso denegado: tu cuenta no está autorizada en las reglas de Firebase."));
                 } else {
-                    mostrarAccesoDenegado("No se ha podido verificar tu catálogo.");
+                    mostrarAccesoDenegado("No se pudo verificar el acceso.");
                 }
             });
         }
 
-        function crearCatalogoPropio() {
+        // Crear catálogo propio para usuario nuevo (en blanco o con JSON)
+        function crearCatalogoPropio(contenidoJson = null) {
             const inp = document.getElementById('input-nombre-catalogo-propio');
             const nombre = (inp.value || '').trim();
             if (!nombre) {
-                alert("Escribe un nombre para tu catálogo.");
+                alert("Por favor, escribe un nombre para tu catálogo.");
                 return;
             }
+
             const userEmailKey = sanitizeEmail(currentUser.email);
             const famId = `cat_${userEmailKey}_${Date.now()}`;
+            guardarYVincularNuevoCatalogo(famId, nombre, [userEmailKey], contenidoJson, () => {
+                document.getElementById('onboarding-screen').classList.add('hidden');
+                iniciarAppFamilia();
+            });
+        }
+
+        function inicializarCatalogoPrincipal(famId, famNombre, emailAdmin) {
+            firebaseDb.ref('mercadona').once('value', snapRoot => {
+                const rootData = snapRoot.val() || {};
+                let catExistente = rootData.catalogo || {};
+                const secExistente = rootData.secciones || [];
+                const listaExistente = (rootData.listas && rootData.listas['2026-11-01_12-4-13']) ? rootData.listas['2026-11-01_12-4-13'] : { productos: {}, orden: 'seccion' };
+
+                if (catExistente['agua_oxigenada'] && catExistente['agua_oxigenada'].consumos >= 20) {
+                    catExistente['agua_oxigenada'].consumos = 1;
+                }
+
+                const miembrosBase = {
+                    'verdeguer279_gmail_com': 'verdeguer279@gmail.com',
+                    'copg279_gmail_com': 'copg279@gmail.com',
+                    'claramorasaez_gmail_com': 'claramorasaez@gmail.com',
+                    'rafaverdeguermora_gmail_com': 'rafaverdeguermora@gmail.com'
+                };
+
+                const payload = {
+                    nombre: famNombre,
+                    creador: emailAdmin,
+                    miembros: miembrosBase,
+                    catalogo: catExistente,
+                    secciones: secExistente.length ? secExistente : [
+                        { id: "Sin Pasillo", nombre: "📍 Sin Pasillo" },
+                        { id: "🍎 Fruta y Verdura", nombre: "🍎 Fruta y Verdura" },
+                        { id: "🥛 Lácteos - Huevos", nombre: "🥛 Lácteos - Huevos" }
+                    ],
+                    listaActiva: listaExistente
+                };
+
+                firebaseDb.ref(`mercadona/familias/${famId}`).set(payload).then(() => {
+                    catalogosAccesibles[famId] = payload;
+                    idFamiliaActual = famId;
+                    nombreFamiliaActual = famNombre;
+                    iniciarAppFamilia();
+                });
+            });
+        }
+
+        function iniciarAppFamilia() {
+            document.getElementById('family-badge-name').innerText = nombreFamiliaActual;
+            const basePath = getFamilyBasePath();
+            const userEmailKey = sanitizeEmail(currentUser.email);
+            localStorage.setItem(`mercadona_catalogo_${userEmailKey}`, idFamiliaActual);
+
+            const manejarError = (err) => {
+                if (err && err.code === 'PERMISSION_DENIED') {
+                    auth.signOut().then(() => {
+                        mostrarAccesoDenegado("Acceso denegado: tu cuenta no tiene permiso para ver este catálogo.");
+                    });
+                }
+            };
+
+            // Escuchar nombre
+            firebaseDb.ref(`${basePath}/nombre`).on('value', snap => {
+                const nom = snap.val();
+                if (nom) {
+                    nombreFamiliaActual = nom;
+                    document.getElementById('family-badge-name').innerText = nombreFamiliaActual;
+                }
+            }, manejarError);
+
+            // Escuchar secciones
+            firebaseDb.ref(`${basePath}/secciones`).on('value', snap => {
+                const data = snap.val();
+                if (data && Array.isArray(data) && data.length > 0) {
+                    seccionesPersonalizadas = data;
+                }
+                renderizarSelectSecciones();
+                renderizarCatalogo();
+                renderizarListaActual();
+            }, manejarError);
+
+            // Escuchar catálogo
+            firebaseDb.ref(`${basePath}/catalogo`).on('value', snap => {
+                catalogoProductos = snap.val() || {};
+                if (catalogoProductos['agua_oxigenada'] && catalogoProductos['agua_oxigenada'].consumos >= 20) {
+                    catalogoProductos['agua_oxigenada'].consumos = 1;
+                    firebaseDb.ref(`${basePath}/catalogo/agua_oxigenada/consumos`).set(1);
+                }
+                document.getElementById('contador-productos').innerText = Object.keys(catalogoProductos).length;
+                renderizarCatalogo();
+                renderizarListaActual();
+            }, manejarError);
+
+            // Escuchar lista activa
+            firebaseDb.ref(`${basePath}/listaActiva`).on('value', snap => {
+                datosListaActual = snap.val() || { productos: {}, orden: 'seccion', seccionesVisibles: {} };
+                if (!datosListaActual.productos) datosListaActual.productos = {};
+                document.getElementById('orden-lista').value = datosListaActual.orden || 'seccion';
+                
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                document.getElementById('fab-add').classList.remove('hidden');
+                renderizarListaActual();
+                renderizarCatalogo();
+            }, manejarError);
+        }
+
+        // 2. MODAL DE GESTIÓN DEL CATÁLOGO
+        function abrirModalGestionCatalogo() {
+            document.getElementById('input-renombrar-catalogo').value = nombreFamiliaActual;
+            document.getElementById('input-nuevo-catalogo-nombre').value = '';
+
+            // Llenar el selector con los catálogos a los que tiene acceso
+            const select = document.getElementById('select-cambiar-catalogo');
+            select.innerHTML = '';
+            const claves = Object.keys(catalogosAccesibles);
+            
+            claves.forEach(k => {
+                const opt = document.createElement('option');
+                opt.value = k;
+                opt.innerText = catalogosAccesibles[k].nombre || k;
+                if (k === idFamiliaActual) opt.selected = true;
+                select.appendChild(opt);
+            });
+
+            // Si solo tiene un catálogo, ocultamos el selector de cambio para no estorbar
+            document.getElementById('card-cambiar-catalogo').style.display = claves.length > 1 ? 'block' : 'none';
+
+            document.getElementById('modal-gestion-catalogo').classList.remove('hidden');
+        }
+
+        function cerrarModalGestionCatalogo() {
+            document.getElementById('modal-gestion-catalogo').classList.add('hidden');
+        }
+
+        function guardarNuevoNombreCatalogo() {
+            const nuevoNombre = (document.getElementById('input-renombrar-catalogo').value || '').trim();
+            if (!nuevoNombre) {
+                alert("Escribe un nombre válido para el catálogo.");
+                return;
+            }
+            const basePath = getFamilyBasePath();
+            firebaseDb.ref(`${basePath}/nombre`).set(nuevoNombre).then(() => {
+                nombreFamiliaActual = nuevoNombre;
+                if (catalogosAccesibles[idFamiliaActual]) catalogosAccesibles[idFamiliaActual].nombre = nuevoNombre;
+                document.getElementById('family-badge-name').innerText = nuevoNombre;
+                cerrarModalGestionCatalogo();
+                mostrarToast("✅ Nombre del catálogo actualizado");
+            });
+        }
+
+        function cambiarCatalogoActivo() {
+            const select = document.getElementById('select-cambiar-catalogo');
+            const nuevoFamId = select.value;
+            if (!nuevoFamId || nuevoFamId === idFamiliaActual) return;
+
+            idFamiliaActual = nuevoFamId;
+            nombreFamiliaActual = catalogosAccesibles[nuevoFamId].nombre || nuevoFamId;
+            cerrarModalGestionCatalogo();
+            mostrarToast(`📁 Cambiado a catálogo: ${nombreFamiliaActual}`);
+            iniciarAppFamilia();
+        }
+
+        // Crear catálogo secundario: hereda los miembros autorizados del catálogo actual
+        function crearCatalogoSecundario(contenidoJson = null) {
+            const inp = document.getElementById('input-nuevo-catalogo-nombre');
+            const nombre = (inp.value || '').trim();
+            if (!nombre) {
+                alert("Escribe un nombre para el nuevo catálogo.");
+                return;
+            }
+
+            const basePath = getFamilyBasePath();
+            
+            // Obtener la lista de miembros de la familia actual para darles acceso a todos ellos al nuevo catálogo secundario
+            firebaseDb.ref(`${basePath}/miembros`).once('value', snapMiembros => {
+                let miembrosActuales = snapMiembros.val() || {};
+                const userEmailKey = sanitizeEmail(currentUser.email);
+                miembrosActuales[userEmailKey] = currentUser.email;
+
+                const famId = `cat_fam_${Date.now()}`;
+
+                guardarYVincularNuevoCatalogo(famId, nombre, Object.keys(miembrosActuales), contenidoJson, () => {
+                    cerrarModalGestionCatalogo();
+                    idFamiliaActual = famId;
+                    nombreFamiliaActual = nombre;
+                    iniciarAppFamilia();
+                });
+            });
+        }
+
+        function guardarYVincularNuevoCatalogo(famId, nombre, miembrosKeysArray, datosJsonImportados, callbackExito) {
+            const miembrosMap = {};
+            miembrosKeysArray.forEach(k => { miembrosMap[k] = true; });
 
             const seccionesBase = [
                 { id: "Sin Pasillo", nombre: "📍 Sin Pasillo" },
@@ -831,150 +1113,84 @@
                 { id: "🧴 Perfumería y Cosmética", nombre: "🧴 Perfumería y Cosmética" }
             ];
 
-            const nuevoCatalogo = {
+            let catalogoFinal = {};
+            let seccionesFinales = seccionesBase;
+
+            if (datosJsonImportados && typeof datosJsonImportados === 'object') {
+                if (datosJsonImportados.catalogo) catalogoFinal = datosJsonImportados.catalogo;
+                else catalogoFinal = datosJsonImportados;
+
+                if (datosJsonImportados.secciones && Array.isArray(datosJsonImportados.secciones)) {
+                    seccionesFinales = datosJsonImportados.secciones;
+                }
+            }
+
+            const nuevoCatalogoPayload = {
                 nombre: nombre,
-                propietario: currentUser.email,
-                catalogo: {},
-                secciones: seccionesBase,
+                creador: currentUser.email,
+                miembros: miembrosMap,
+                catalogo: catalogoFinal,
+                secciones: seccionesFinales,
                 listaActiva: { productos: {}, orden: 'seccion' }
             };
 
-            firebaseDb.ref(`mercadona/familias/${famId}`).set(nuevoCatalogo).then(() => {
-                firebaseDb.ref(`mercadona/usuarios_catalogos/${userEmailKey}`).set({
-                    familiaId: famId,
-                    nombreCatalogo: nombre,
-                    email: currentUser.email
-                }).then(() => {
-                    idFamiliaActual = famId;
-                    nombreFamiliaActual = nombre;
-                    document.getElementById('onboarding-screen').classList.add('hidden');
-                    iniciarAppFamilia();
-                    mostrarToast(`✅ Catálogo "${nombre}" creado`);
-                });
-            }, err => {
-                if (err && err.code === 'PERMISSION_DENIED') {
-                    auth.signOut().then(() => mostrarAccesoDenegado("Acceso denegado: no tienes permisos para crear un catálogo."));
-                }
+            firebaseDb.ref(`mercadona/familias/${famId}`).set(nuevoCatalogoPayload).then(() => {
+                catalogosAccesibles[famId] = nuevoCatalogoPayload;
+                mostrarToast(`✅ Catálogo "${nombre}" creado con éxito`);
+                if (callbackExito) callbackExito();
             });
         }
 
-        function inicializarCatalogoPrincipal(famId, famNombre, emailAdmin) {
-            const emailKey = sanitizeEmail(emailAdmin);
-            firebaseDb.ref('mercadona').once('value', snapRoot => {
-                const rootData = snapRoot.val() || {};
-                let catExistente = rootData.catalogo || {};
-                const secExistente = rootData.secciones || [];
-                const listaExistente = (rootData.listas && rootData.listas['2026-11-01_12-4-13']) ? rootData.listas['2026-11-01_12-4-13'] : { productos: {}, orden: 'seccion' };
+        // 3. IMPORTACIÓN Y EXPORTACIÓN DE ARCHIVOS JSON
+        function crearCatalogoDesdeArchivoJson(inputElement, idInputNombre) {
+            const archivo = inputElement.files && inputElement.files[0];
+            if (!archivo) return;
 
-                if (catExistente['agua_oxigenada'] && catExistente['agua_oxigenada'].consumos >= 20) {
-                    catExistente['agua_oxigenada'].consumos = 1;
-                }
+            const lector = new FileReader();
+            lector.onload = (e) => {
+                try {
+                    const datos = JSON.parse(e.target.result);
+                    const inp = document.getElementById(idInputNombre);
+                    
+                    // Si el usuario no había escrito nombre, sugerir el nombre del archivo sin extensión
+                    if (!inp.value.trim()) {
+                        inp.value = archivo.name.replace(/\.json$/i, '').replace(/[-_]/g, ' ');
+                    }
 
-                const payload = {
-                    nombre: famNombre,
-                    propietario: emailAdmin,
-                    catalogo: catExistente,
-                    secciones: secExistente.length ? secExistente : [
-                        { id: "Sin Pasillo", nombre: "📍 Sin Pasillo" },
-                        { id: "Fruta y Verdura", nombre: "🍎 Fruta y Verdura" },
-                        { id: "Lácteos - Huevos", nombre: "🥛 Lácteos - Huevos" }
-                    ],
-                    listaActiva: listaExistente
-                };
-
-                firebaseDb.ref(`mercadona/familias/${famId}`).set(payload).then(() => {
-                    firebaseDb.ref(`mercadona/usuarios_catalogos/${emailKey}`).set({
-                        familiaId: famId,
-                        nombreCatalogo: famNombre,
-                        email: emailAdmin
-                    }).then(() => {
-                        idFamiliaActual = famId;
-                        nombreFamiliaActual = famNombre;
-                        iniciarAppFamilia();
-                    });
-                });
-            });
-        }
-
-        function iniciarAppFamilia() {
-            document.getElementById('family-badge-name').innerText = nombreFamiliaActual;
-            const basePath = getFamilyBasePath();
-
-            const manejarError = (err) => {
-                if (err && err.code === 'PERMISSION_DENIED') {
-                    auth.signOut().then(() => {
-                        mostrarAccesoDenegado("Acceso denegado: tu cuenta no tiene permiso para ver este catálogo.");
-                    });
+                    if (idInputNombre === 'input-nombre-catalogo-propio') {
+                        crearCatalogoPropio(datos);
+                    } else {
+                        crearCatalogoSecundario(datos);
+                    }
+                    inputElement.value = '';
+                } catch (error) {
+                    alert("El archivo no contiene un JSON válido.");
                 }
             };
-
-            firebaseDb.ref(`${basePath}/nombre`).on('value', snap => {
-                const nom = snap.val();
-                if (nom) {
-                    nombreFamiliaActual = nom;
-                    document.getElementById('family-badge-name').innerText = nombreFamiliaActual;
-                }
-            }, manejarError);
-
-            firebaseDb.ref(`${basePath}/secciones`).on('value', snap => {
-                const data = snap.val();
-                if (data && Array.isArray(data) && data.length > 0) {
-                    seccionesPersonalizadas = data;
-                }
-                renderizarSelectSecciones();
-                renderizarCatalogo();
-                renderizarListaActual();
-            }, manejarError);
-
-            firebaseDb.ref(`${basePath}/catalogo`).on('value', snap => {
-                catalogoProductos = snap.val() || {};
-                if (catalogoProductos['agua_oxigenada'] && catalogoProductos['agua_oxigenada'].consumos >= 20) {
-                    catalogoProductos['agua_oxigenada'].consumos = 1;
-                    firebaseDb.ref(`${basePath}/catalogo/agua_oxigenada/consumos`).set(1);
-                }
-                document.getElementById('contador-productos').innerText = Object.keys(catalogoProductos).length;
-                renderizarCatalogo();
-                renderizarListaActual();
-            }, manejarError);
-
-            firebaseDb.ref(`${basePath}/listaActiva`).on('value', snap => {
-                datosListaActual = snap.val() || { productos: {}, orden: 'seccion', seccionesVisibles: {} };
-                if (!datosListaActual.productos) datosListaActual.productos = {};
-                document.getElementById('orden-lista').value = datosListaActual.orden || 'seccion';
-                
-                document.getElementById('loading-screen').classList.add('hidden');
-                document.getElementById('app').classList.remove('hidden');
-                document.getElementById('fab-add').classList.remove('hidden');
-                renderizarListaActual();
-                renderizarCatalogo();
-            }, manejarError);
+            lector.readAsText(archivo);
         }
 
-        function abrirModalRenombrarCatalogo() {
-            document.getElementById('input-renombrar-catalogo').value = nombreFamiliaActual;
-            document.getElementById('modal-renombrar-catalogo').classList.remove('hidden');
-            setTimeout(() => document.getElementById('input-renombrar-catalogo').focus(), 100);
-        }
-        function cerrarModalRenombrarCatalogo() {
-            document.getElementById('modal-renombrar-catalogo').classList.add('hidden');
-        }
-        function guardarNuevoNombreCatalogo() {
-            const nuevoNombre = (document.getElementById('input-renombrar-catalogo').value || '').trim();
-            if (!nuevoNombre) {
-                alert("Escribe un nombre válido para el catálogo.");
-                return;
-            }
-            const basePath = getFamilyBasePath();
-            const userEmailKey = sanitizeEmail(currentUser.email);
-            firebaseDb.ref(`${basePath}/nombre`).set(nuevoNombre).then(() => {
-                firebaseDb.ref(`mercadona/usuarios_catalogos/${userEmailKey}/nombreCatalogo`).set(nuevoNombre);
-                nombreFamiliaActual = nuevoNombre;
-                document.getElementById('family-badge-name').innerText = nuevoNombre;
-                cerrarModalRenombrarCatalogo();
-                mostrarToast("✅ Nombre del catálogo actualizado");
-            });
+        function exportarCatalogoActualAJson() {
+            const exportData = {
+                nombreCatalogo: nombreFamiliaActual,
+                fechaExportacion: new Date().toISOString(),
+                secciones: seccionesPersonalizadas,
+                catalogo: catalogoProductos
+            };
+
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `catalogo_${limpiarKey(nombreFamiliaActual)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            mostrarToast("💾 Catálogo descargado en JSON");
         }
 
+        // 4. BÚSQUEDA Y PLEGADO DE PASILLOS EN CATÁLOGO
         function filtrarCatalogoInstaneamente() {
             toggleClearSearchBtn();
             renderizarCatalogo();
@@ -1024,6 +1240,7 @@
             renderizarCatalogo();
         }
 
+        // 5. RENDERIZADO DEL CATÁLOGO
         function renderizarCatalogo() {
             const cont = document.getElementById('items-catalogo');
             const busquedaNorm = normalizarTexto(document.getElementById('buscador').value || '');
@@ -1127,6 +1344,7 @@
             return p.consumos || 0;
         }
 
+        // 6. RENDERIZADO DE "LISTA ACTUAL"
         function renderizarListaActual() {
             if (!datosListaActual) return;
             const cont = document.getElementById('items-comprando');
@@ -1228,6 +1446,7 @@
             return html;
         }
 
+        // 7. ACCIONES Y DESHACER
         function activarBotonDeshacer() {
             const btn = document.getElementById('btn-deshacer');
             if (btn) btn.classList.remove('hidden');

@@ -84,10 +84,31 @@
     }
 
     .brand-logo {
-      max-width: 190px;
-      height: auto;
+      width: 190px;
+      height: 190px;
+      max-width: 60vw;
+      max-height: 60vw;
+      object-fit: contain;
+      object-position: center;
       margin-bottom: 24px;
       filter: drop-shadow(0 8px 24px rgba(59, 130, 246, 0.25));
+    }
+
+    .install-btn {
+      padding: 11px 15px;
+      background: rgba(59, 130, 246, 0.16);
+      color: #bfdbfe;
+      border-color: rgba(59, 130, 246, 0.4);
+      font-size: 0.86rem;
+    }
+
+    .install-btn:hover {
+      background: rgba(59, 130, 246, 0.27);
+    }
+
+    .login-card .install-btn {
+      width: 100%;
+      margin-bottom: 12px;
     }
 
     .login-card {
@@ -648,13 +669,16 @@
 <body>
 
 <div id="login-screen">
-  <img src="logogad.png" alt="GAD Logo" class="brand-logo" onerror="this.src='https://placehold.co/200x90/111827/f8fafc?text=GAD'">
+  <img src="./logomarkarma-512.png" alt="Markarma" class="brand-logo">
   <div id="initial-loader" class="spinner"></div>
 
   <div id="login-card-content" class="login-card">
     <h2>Acceso Administrador</h2>
     <p class="sub">Autenticación restringida al responsable del panel</p>
 
+    <button type="button" class="install-btn" data-install-app>
+      <i class="fas fa-download"></i> Instalar Markarma
+    </button>
     <button id="btn-login-google" class="google-btn">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
       Continuar con Google
@@ -677,6 +701,9 @@
       </div>
 
       <div class="session-controls">
+        <button type="button" class="btn-control install-btn" data-install-app>
+          <i class="fas fa-download"></i> Instalar app
+        </button>
         <button id="btnToggleEdit" class="btn-control">
           <i class="fas fa-pen"></i> Editar menú
         </button>
@@ -775,6 +802,52 @@
   const mainContent = document.getElementById("main-content");
   const loginError = document.getElementById("login-error");
   const btnModal = document.getElementById("button-modal");
+  const installButtons = [...document.querySelectorAll("[data-install-app]")];
+  let deferredInstallPrompt = null;
+
+  const isInstalledApp = () =>
+    window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone === true;
+
+  if (isInstalledApp()) {
+    installButtons.forEach((button) => { button.hidden = true; });
+  }
+
+  window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    deferredInstallPrompt = event;
+  });
+
+  window.addEventListener("appinstalled", () => {
+    deferredInstallPrompt = null;
+    installButtons.forEach((button) => { button.hidden = true; });
+  });
+
+  installButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      if (!window.isSecureContext) {
+        alert("Para instalar Markarma, abre la aplicación desde una dirección HTTPS.");
+        return;
+      }
+
+      if (!deferredInstallPrompt) {
+        const instructions = /iphone|ipad|ipod/i.test(navigator.userAgent)
+          ? "En Safari, pulsa Compartir y elige «Añadir a pantalla de inicio»."
+          : "En Chrome, abre el menú ⋮ y elige «Instalar aplicación» o «Añadir a pantalla de inicio».";
+        alert(`La instalación directa no está disponible todavía. ${instructions}`);
+        return;
+      }
+
+      const installPrompt = deferredInstallPrompt;
+      deferredInstallPrompt = null;
+      try {
+        await installPrompt.prompt();
+        await installPrompt.userChoice;
+      } catch (error) {
+        console.error("No se pudo iniciar la instalación de Markarma.", error);
+        alert("No se pudo iniciar la instalación. Inténtalo desde el menú del navegador.");
+      }
+    });
+  });
 
   let isEditMode = false;
   let isAdmin = false;

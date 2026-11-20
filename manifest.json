@@ -18,12 +18,6 @@
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any"
-    },
-    {
-      "src": "./logomarkarma.png",
-      "type": "image/png",
-      "sizes": "any",
-      "purpose": "any"
     }
   ]
 }

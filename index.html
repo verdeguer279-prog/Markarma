@@ -230,6 +230,12 @@
       transform: scale(1.03);
     }
 
+    body.edit-mode .app-logo:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 4px;
+      border-radius: var(--radius-sm);
+    }
+
     .header-title {
       flex: 1;
       min-width: 220px;
@@ -584,18 +590,43 @@
         padding: 0 12px 36px;
       }
       .card {
-        padding: 20px;
+        padding: 16px;
       }
       .header {
-        flex-direction: column;
-        text-align: center;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 12px;
+        text-align: left;
+      }
+      .app-logo {
+        justify-content: flex-start;
+      }
+      .app-logo img {
+        max-width: 72px;
+        max-height: 56px;
+      }
+      .header-title {
+        min-width: 0;
+      }
+      .header-title h1 {
+        font-size: 1.05rem;
+        overflow-wrap: anywhere;
+      }
+      .header-title p {
+        font-size: 0.72rem;
+        overflow-wrap: anywhere;
       }
       .session-controls {
-        justify-content: center;
+        grid-column: 1 / -1;
+        justify-content: stretch;
         width: 100%;
+        gap: 8px;
       }
       .btn-control {
         flex: 1;
+        min-width: 0;
+        padding: 8px;
+        font-size: 0.78rem;
       }
       .button-grid {
         grid-template-columns: 1fr;
@@ -630,14 +661,14 @@
 <div class="container" id="main-content">
   <div class="card">
     <header class="header">
-      <div class="app-logo" id="appLogo" title="Logo del panel">
+      <div class="app-logo" id="appLogo" title="Pulsa para cambiar el logo en modo edición" role="button" tabindex="0" aria-label="Cambiar logo">
         <img id="logoImage" src="logogad.png" alt="GAD" onerror="this.src='https://placehold.co/120x60/182234/f8fafc?text=GAD'">
       </div>
       <input type="file" id="logoFileInput" style="display: none;" accept="image/*">
 
       <div class="header-title">
-        <h1 id="welcome-message">Panel de Control</h1>
-        <p id="user-email-label">GAD · Gestión operativa</p>
+        <h1 id="welcome-message">Panel de usuario</h1>
+        <p id="user-email-label"></p>
       </div>
 
       <div class="session-controls">
@@ -840,8 +871,7 @@
       mainContent.style.display = "block";
     }, 250);
 
-    const displayName = (user.displayName || "Administrador").toUpperCase();
-    document.getElementById("welcome-message").textContent = `Hola, ${displayName}`;
+    document.getElementById("welcome-message").textContent = "Panel de usuario";
     document.getElementById("user-email-label").textContent = user.email;
     document.getElementById("btnToggleEdit").style.display = "inline-flex";
 
@@ -880,9 +910,17 @@
     }
   };
 
+  document.getElementById("appLogo").onkeydown = (e) => {
+    if ((e.key === "Enter" || e.key === " ") && isEditMode && isAdmin) {
+      e.preventDefault();
+      document.getElementById("logoFileInput").click();
+    }
+  };
+
   document.getElementById("logoFileInput").onchange = (e) => {
     if (!isAdmin) return;
     const file = e.target.files[0];
+    e.target.value = "";
     if (!file) return;
     if (!file.type.startsWith("image/")) {
       alert("Selecciona un archivo de imagen válido.");
@@ -894,8 +932,16 @@
     }
     const reader = new FileReader();
     reader.onload = (ev) => {
-      db.ref("config/logo").set(ev.target.result);
+      if (typeof ev.target.result !== "string") {
+        alert("No se pudo leer la imagen seleccionada.");
+        return;
+      }
+      db.ref("config/logo").set(ev.target.result).catch((err) => {
+        console.error(err);
+        alert("No se pudo guardar el nuevo logo.");
+      });
     };
+    reader.onerror = () => alert("No se pudo leer la imagen seleccionada.");
     reader.readAsDataURL(file);
   };
 

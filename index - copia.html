@@ -303,22 +303,45 @@
     /* BUTTON GRID */
     .button-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(6, 1fr);
       gap: 16px;
     }
 
     .button-wrapper {
       position: relative;
       min-height: 82px;
+      min-width: 0;
     }
 
-    .button-wrapper.long {
+    .button-wrapper.w-1-3 {
       grid-column: span 2;
     }
 
+    .button-wrapper.w-1-2 {
+      grid-column: span 3;
+    }
+
+    .button-wrapper.w-2-3 {
+      grid-column: span 4;
+    }
+
+    .button-wrapper.w-full {
+      grid-column: span 6;
+    }
+
     @media (max-width: 768px) {
-      .button-wrapper.long {
+      .button-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .button-wrapper.w-1-3,
+      .button-wrapper.w-1-2,
+      .button-wrapper.w-2-3 {
         grid-column: span 1;
+      }
+
+      .button-wrapper.w-full {
+        grid-column: span 2;
       }
     }
 
@@ -574,6 +597,12 @@
       .btn-control {
         flex: 1;
       }
+      .button-grid {
+        grid-template-columns: 1fr;
+      }
+      .button-wrapper.w-full {
+        grid-column: span 1;
+      }
       .button-file-row {
         grid-template-columns: 1fr;
       }
@@ -668,8 +697,10 @@
     <div class="field-group">
       <label for="button-type">Tamaño en cuadrícula</label>
       <select id="button-type">
-        <option value="short">Normal (1 columna)</option>
-        <option value="long">Ancho (2 columnas)</option>
+        <option value="w-1-3">1/3</option>
+        <option value="w-1-2">1/2 (50%)</option>
+        <option value="w-2-3">2/3</option>
+        <option value="w-full">3/3 (Todo el ancho)</option>
       </select>
     </div>
 
@@ -897,6 +928,21 @@
     db.ref("botones").on("value", (snap) => renderButtons(snap.val()));
   }
 
+  function normalizeButtonWidth(span) {
+    switch (span) {
+      case "w-1-3":
+      case "w-1-2":
+      case "w-2-3":
+      case "w-full":
+        return span;
+      case "long":
+        return "w-2-3";
+      case "short":
+      default:
+        return "w-1-3";
+    }
+  }
+
   function renderButtons(data) {
     const grid = document.getElementById("buttonGrid");
     grid.innerHTML = "";
@@ -908,7 +954,7 @@
 
     sorted.forEach((btn) => {
       const wrapper = document.createElement("div");
-      wrapper.className = `button-wrapper ${btn.span === "long" ? "long" : ""}`;
+      wrapper.className = `button-wrapper ${normalizeButtonWidth(btn.span)}`;
       wrapper.setAttribute("data-key", btn.key);
 
       if (isEditMode && isAdmin) {
@@ -957,7 +1003,7 @@
     document.getElementById("button-name").value = "";
     document.getElementById("button-url").value = "";
     document.getElementById("button-subfolder").value = "";
-    document.getElementById("button-type").value = "short";
+    document.getElementById("button-type").value = "w-1-3";
     document.getElementById("buttonModalTitle").textContent = key ? "Editar botón" : "Nuevo botón";
     resetDropAreaText();
 
@@ -967,7 +1013,7 @@
       document.getElementById("button-name").value = d.name || "";
       document.getElementById("button-url").value = d.url || "";
       document.getElementById("button-subfolder").value = getSubfolderFromUrl(d.url || "");
-      document.getElementById("button-type").value = d.span === "long" ? "long" : "short";
+      document.getElementById("button-type").value = normalizeButtonWidth(d.span);
     }
     btnModal.classList.add("open");
   }
@@ -1010,7 +1056,7 @@
     const payload = {
       name,
       url: safeUrl,
-      span: document.getElementById("button-type").value === "long" ? "long" : "short"
+      span: normalizeButtonWidth(document.getElementById("button-type").value)
     };
 
     if (editingKey) {

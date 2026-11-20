@@ -326,13 +326,20 @@
         }
         #fab-add:active { transform: scale(0.92); background: #d88100; }
 
-        .quick-add-box {
+        .box-card {
             background: white;
             border: 1px solid #e1e6eb;
             border-radius: 10px;
-            padding: 10px;
+            padding: 11px 12px;
             margin-bottom: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .box-label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 6px;
         }
 
         .fold-bar {
@@ -481,7 +488,6 @@
         <h2 style="margin-top: 15px; font-weight: 500;" id="loading-text">Cargando Mercadona...</h2>
     </div>
 
-    <!-- Pantalla de Login -->
     <div id="login-screen" class="hidden">
         <h2 style="color:var(--m-green); margin-bottom: 6px;">🛒 Lista Compra Mercadona</h2>
         <p style="color: #666; margin-bottom: 25px; font-size: 14px;">Acceso por cuenta autorizada</p>
@@ -496,7 +502,6 @@
         </button>
     </div>
 
-    <!-- Pantalla de Creación de Catálogo Propio para usuarios nuevos -->
     <div id="onboarding-screen" class="hidden">
         <div style="max-width: 430px; width: 100%;">
             <div style="font-size: 38px; margin-bottom: 6px;">🛒</div>
@@ -508,7 +513,7 @@
                 
                 <div style="display:flex; flex-direction:column; gap:8px;">
                     <button class="primary" onclick="crearCatalogoPropio(null)">Crear catálogo en blanco</button>
-                    <button class="primary" style="background:#555;" onclick="pedirJsonParaCatalogo('input-nombre-catalogo-propio', true)">📥 Crear importando un archivo JSON</button>
+                    <button class="primary" style="background:#555;" onclick="pedirJsonParaCatalogo('input-nombre-catalogo-propio', true)">Crear importando un archivo JSON</button>
                     <input type="file" id="input-json-onboarding" accept=".json" style="display:none;" onchange="procesarArchivoJsonImportado(this, true)">
                 </div>
             </div>
@@ -516,15 +521,12 @@
         </div>
     </div>
 
-    <!-- Modal Editar o Crear Producto (con asignación directa de pasillo) -->
     <div id="modal-edicion" class="modal-overlay hidden">
         <div class="modal-content">
             <h3 style="margin-top:0; color:var(--m-green);" id="modal-edicion-titulo">Editar Producto</h3>
-            <label style="font-size:12px; font-weight:bold; color:#777;">Nombre Original / Interno</label>  
-            <input type="text" id="edit-original" class="modal-input" disabled style="background:#eee; color:#666;">
             
             <label style="font-size:12px; font-weight:bold; color:#555;">Nombre Visible / Habitual</label>
-            <input type="text" id="edit-visible" class="modal-input" placeholder="Ej. Atún en aceite de oliva">
+            <input type="text" id="edit-visible" class="modal-input" placeholder="Ej. Atún en aceite de oliva" onkeypress="if(event.key==='Enter') guardarEdicion()">
             
             <label style="font-size:12px; font-weight:bold; color:#555;">Pasillo del Supermercado</label>
             <select id="edit-seccion" class="modal-input"></select>
@@ -537,89 +539,81 @@
         </div>
     </div>
 
-    <!-- Modal Gestión Completa del Catálogo -->
     <div id="modal-gestion-catalogo" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--m-green);">📁 Gestión de Catálogos</h3>
+            <h3 style="margin-top:0; color:var(--m-green);">Gestión de Catálogos</h3>
             
-            <!-- 1. Renombrar catálogo actual -->
             <div class="modal-section-card">
-                <h4>✏️ Renombrar catálogo actual</h4>
+                <h4>Renombrar catálogo actual</h4>
                 <div style="display:flex; gap:6px;">
                     <input type="text" id="input-renombrar-catalogo" class="modal-input" style="margin:0; flex:1;" onkeypress="if(event.key==='Enter') guardarNuevoNombreCatalogo()">
                     <button class="primary" style="margin:0; width:auto; padding: 8px 14px;" onclick="guardarNuevoNombreCatalogo()">Guardar</button>
                 </div>
             </div>
 
-            <!-- 2. Miembros autorizados con botón rojo para eliminar y botón para añadir -->
             <div class="modal-section-card">
-                <h4>👥 Miembros autorizados en este catálogo</h4>
+                <h4>Miembros autorizados en este catálogo</h4>
                 <div id="lista-usuarios-autorizados-catalogo" style="max-height: 140px; overflow-y: auto; margin-bottom: 8px;"></div>
                 
                 <div style="display:flex; gap:6px; margin-top:8px;">
                     <input type="email" id="input-nuevo-miembro-email" class="modal-input" style="margin:0; flex:1; padding:8px; font-size:13px;" placeholder="correo@gmail.com..." onkeypress="if(event.key==='Enter') agregarNuevoMiembroACatalogo()">
-                    <button class="primary" style="margin:0; width:auto; padding: 8px 12px; font-size:13px;" onclick="agregarNuevoMiembroACatalogo()">➕ Añadir</button>
+                    <button class="primary" style="margin:0; width:auto; padding: 8px 12px; font-size:13px;" onclick="agregarNuevoMiembroACatalogo()">Añadir</button>
                 </div>
             </div>
 
-            <!-- 3. Cambiar de catálogo disponible -->
             <div class="modal-section-card" id="card-cambiar-catalogo">
-                <h4>🔄 Cambiar de catálogo activo</h4>
+                <h4>Cambiar de catálogo activo</h4>
                 <div style="display:flex; gap:6px;">
                     <select id="select-cambiar-catalogo" class="modal-input" style="margin:0; flex:1;"></select>
                     <button class="primary" style="margin:0; width:auto; padding: 8px 14px; background:#444;" onclick="cambiarCatalogoActivo()">Cambiar</button>
                 </div>
             </div>
 
-            <!-- 4. Crear catálogo secundario para el grupo familiar -->
             <div class="modal-section-card">
-                <h4>➕ Crear catálogo secundario compartido</h4>
+                <h4>Crear catálogo secundario compartido</h4>
                 <p style="font-size:12px; color:#666; margin:0 0 8px 0;">Los miembros autorizados en este catálogo tendrán acceso a él.</p>
                 
                 <input type="text" id="input-nuevo-catalogo-nombre" class="modal-input" style="margin:0 0 8px 0;" placeholder="Nombre del nuevo catálogo...">
                 
                 <div style="display:flex; gap:6px;">
                     <button class="primary" style="margin:0; flex:1; background:var(--m-orange); font-size:13px; padding:10px 6px;" onclick="crearCatalogoSecundario(null)">Crear en blanco</button>
-                    <button class="primary" style="margin:0; flex:1; background:#555; font-size:13px; padding:10px 6px;" onclick="pedirJsonParaCatalogo('input-nuevo-catalogo-nombre', false)">📥 Importar JSON</button>
+                    <button class="primary" style="margin:0; flex:1; background:#555; font-size:13px; padding:10px 6px;" onclick="pedirJsonParaCatalogo('input-nuevo-catalogo-nombre', false)">Importar JSON</button>
                     <input type="file" id="input-json-secundario" accept=".json" style="display:none;" onchange="procesarArchivoJsonImportado(this, false)">
                 </div>
             </div>
 
-            <!-- 5. Exportar catálogo actual a JSON -->
             <div class="modal-section-card" style="margin-bottom:15px;">
-                <h4>📤 Exportar catálogo actual</h4>
-                <p style="font-size:12px; color:#666; margin:0 0 8px 0;">Descarga tus productos y pasillos en JSON para compartirlos o hacer una copia.</p>
-                <button class="primary" style="background:#005b26; padding:10px;" onclick="exportarCatalogoActualAJson()">💾 Descargar archivo JSON</button>
+                <h4>Exportar catálogo actual</h4>
+                <p style="font-size:12px; color:#666; margin:0 0 8px 0;">Descarga tus productos y pasillos en JSON.</p>
+                <button class="primary" style="background:#005b26; padding:10px;" onclick="exportarCatalogoActualAJson()">Descargar archivo JSON</button>
             </div>
             
             <button class="primary" style="background:#888; padding:10px;" onclick="cerrarModalGestionCatalogo()">Cerrar</button>
         </div>
     </div>
 
-    <!-- Modal Gestión de Secciones (SIN ICONOS) -->
     <div id="modal-secciones" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--m-green);">⚙️ Gestionar Pasillos</h3>
+            <h3 style="margin-top:0; color:var(--m-green);">Gestionar Pasillos</h3>
             <p style="font-size: 12px; color: #666; margin-top: 0;">Organiza el orden de pasillos para tu recorrido en tienda.</p>
             
             <div id="lista-secciones-editar" style="margin-bottom: 12px;"></div>
             
             <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                 <input type="text" id="nueva-seccion-input" class="modal-input" style="margin:0; flex:1;" placeholder="Nombre nuevo pasillo..." onkeypress="if(event.key==='Enter') crearSeccion()">
-                <button class="primary" style="margin:0; width:auto; padding: 10px 14px;" onclick="crearSeccion()">➕</button>
+                <button class="primary" style="margin:0; width:auto; padding: 10px 14px;" onclick="crearSeccion()">Añadir</button>
             </div>
             
             <div style="display:flex; gap:8px;">
                 <button class="primary" style="background:#888; flex:1;" onclick="cerrarModalSecciones()">Cancelar</button>
-                <button class="primary" style="flex:1;" onclick="guardarSecciones()">💾 Guardar</button>
+                <button class="primary" style="flex:1;" onclick="guardarSecciones()">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Filtrar Pasillos -->
     <div id="modal-filtro-secciones" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--m-green);">👁️ Filtrar Pasillos</h3>
+            <h3 style="margin-top:0; color:var(--m-green);">Filtrar Pasillos</h3>
             <p style="font-size: 12px; color: #666; margin-top: 0;">Oculta los pasillos por los que hoy no vas a pasar.</p>
             
             <div id="lista-filtro-secciones" style="max-height: 380px; overflow-y: auto; margin-bottom: 12px; border: 1px solid #eee; border-radius: 8px; padding: 5px;"></div>
@@ -631,25 +625,24 @@
             
             <div style="display:flex; gap:8px;">
                 <button class="primary" style="background:#888; flex:1;" onclick="cerrarModalFiltro()">Cancelar</button>
-                <button class="primary" style="flex:1;" onclick="guardarFiltroSecciones()">💾 Aplicar</button>
+                <button class="primary" style="flex:1;" onclick="guardarFiltroSecciones()">Aplicar</button>
             </div>
         </div>
     </div>
 
-    <!-- APLICACIÓN PRINCIPAL -->
     <div id="app" class="hidden">
         
         <header>
             <div class="header-top">
-                <strong style="font-size: 18px; display: flex; align-items: center; gap: 6px;">🛒 Mercadona</strong>
+                <strong style="font-size: 18px; display: flex; align-items: center; gap: 6px;">Mercadona</strong>
                 <div style="display:flex; align-items:center; gap:6px;">
-                    <div class="user-pill" id="user-display">👤 Usuario</div>
+                    <div class="user-pill" id="user-display">Usuario</div>
                     <button class="btn-header-logout" onclick="logout()" title="Cerrar sesión">Salir</button>
                 </div>
             </div>
             <div class="header-bottom">
                 <div class="family-pill" onclick="abrirModalGestionCatalogo()" title="Gestionar, renombrar, cambiar o crear catálogos">
-                    📁 <span id="family-badge-name">2014 DLV</span> ⚙️
+                    <span id="family-badge-name">2014 DLV</span>
                 </div>
                 <div style="font-size:12px; color:rgba(255,255,255,0.9); font-weight:500;">
                     <span id="header-counter-pill">0</span> en lista
@@ -658,13 +651,12 @@
         </header>
 
         <div class="tabs-mobile">
-            <div class="tab active" onclick="switchTab('lista')" id="tab-lista">🛒 Lista Actual</div>
-            <div class="tab" onclick="switchTab('catalogo')" id="tab-catalogo">📖 Catálogo</div>
+            <div class="tab active" onclick="switchTab('lista')" id="tab-lista">Lista Actual</div>
+            <div class="tab" onclick="switchTab('catalogo')" id="tab-catalogo">Catálogo</div>
         </div>
 
         <div class="app-grid">
             
-            <!-- PANEL LISTA ACTUAL -->
             <div id="panel-lista" class="panel active">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
                     <div>
@@ -674,9 +666,8 @@
                     <span class="badge" style="background:var(--m-orange);"><span id="contador-lista">0</span> artículos</span>
                 </div>
 
-                <!-- Añadir producto sin categorizar -->
-                <div class="quick-add-box">
-                    <label style="display:block; font-size:12px; font-weight:bold; color:#555; margin-bottom:6px;">Añadir producto sin categorizar</label>
+                <div class="box-card">
+                    <label class="box-label" for="buscador-rapido-lista">Añadir producto sin categorizar</label>
                     <div style="display:flex; gap: 8px;">
                         <input type="text" id="buscador-rapido-lista" class="search-bar" placeholder="Ej: leche, huevos..." onkeypress="if(event.key==='Enter') agregarRapidoDesdeLista()">
                         <button class="primary" style="width: auto; margin:0; padding: 0 16px; white-space:nowrap;" onclick="agregarRapidoDesdeLista()">Añadir</button>
@@ -685,58 +676,57 @@
 
                 <div id="active-list">
                     <div class="action-row">
-                        <button class="btn-action btn-action-habituales" onclick="cargarHabituales()">⭐ 15 Habituales</button>
-                        <button class="btn-action btn-action-finalizar" onclick="finalizarCompra()">📦 Finalizar Compra</button>
-                        <button id="btn-deshacer" class="btn-action btn-action-deshacer hidden" onclick="deshacerUltimaAccion()">↩️ Deshacer</button>
+                        <button class="btn-action btn-action-habituales" onclick="cargarHabituales()">15 Habituales</button>
+                        <button class="btn-action btn-action-finalizar" onclick="finalizarCompra()">Finalizar Compra</button>
+                        <button id="btn-deshacer" class="btn-action btn-action-deshacer hidden" onclick="deshacerUltimaAccion()">Deshacer</button>
                     </div>
 
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px;">
                         <div style="display: flex; gap: 6px; align-items: center; flex: 1;">
                             <label style="font-size: 12px; color: #555; font-weight: bold; white-space: nowrap;">Orden:</label>
                             <select id="orden-lista" class="select-bar" style="margin: 0; flex: 1; padding: 8px;" onchange="cambiarOrdenLista()">
-                                <option value="seccion">📍 Por Pasillo</option>
-                                <option value="alfa">🔤 Alfabético</option>
+                                <option value="seccion">Por Pasillo</option>
+                                <option value="alfa">Alfabético</option>
                             </select>
                         </div>
-                        <button class="btn-config" onclick="abrirModalFiltroSecciones()">👁️ Pasillos</button>
+                        <button class="btn-config" onclick="abrirModalFiltroSecciones()">Pasillos</button>
                     </div>
 
                     <div id="items-comprando"></div>
                 </div>
             </div>
 
-            <!-- PANEL CATÁLOGO -->
             <div id="panel-catalogo" class="panel">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
                     <h3 class="panel-title" style="margin:0; border:none;">Catálogo</h3>
                     <div style="display: flex; gap: 8px; align-items: center;">
-                        <button class="btn-config" onclick="abrirModalSecciones()">⚙️ Pasillos</button>
+                        <button class="btn-config" onclick="abrirModalSecciones()">Pasillos</button>
                         <span class="badge"><span id="contador-productos">0</span> prods</span>
                     </div>
                 </div>
                 
                 <div class="controls-row">
                     <div class="search-wrapper">
-                        <!-- Limpieza instantánea al pulsar en móvil o hacer clic en PC -->
-                        <input type="text" id="buscador" class="search-bar" placeholder="🔍 Buscar alimento (ej: atun, pan)..." oninput="filtrarCatalogoInstaneamente()" onclick="limpiarAlEnfocarBuscador()" onfocus="limpiarAlEnfocarBuscador()">
+                        <input type="text" id="buscador" class="search-bar" placeholder="Buscar alimento (ej: atun, pan)..." oninput="filtrarCatalogoInstaneamente()" onclick="limpiarAlEnfocarBuscador()" onfocus="limpiarAlEnfocarBuscador()">
                         <button class="clear-search-btn hidden" id="btn-clear-search" onclick="limpiarBusqueda()" title="Limpiar">×</button>
                     </div>
                     <select id="orden-catalogo" class="select-bar" onchange="renderizarCatalogo()">
-                        <option value="seccion">📍 Por Pasillo</option>
-                        <option value="alfa">🔤 A - Z</option>
-                        <option value="consumos">⭐ Habituales</option>
+                        <option value="seccion">Por Pasillo</option>
+                        <option value="alfa">A - Z</option>
+                        <option value="consumos">Habituales</option>
                     </select>
                 </div>
 
-                <!-- Botón único de Plegar / Desplegar pasillos en móvil y ordenador -->
                 <div class="fold-bar" id="fold-controls">
-                    <button id="btn-toggle-plegar-pasillos" class="btn-fold-toggle" onclick="alternarPlegadoTodosPasillos()">📁 Plegar pasillos</button>
+                    <button id="btn-toggle-plegar-pasillos" class="btn-fold-toggle" onclick="alternarPlegadoTodosPasillos()">Plegar pasillos</button>
                 </div>
 
-                <!-- Crear nuevo alimento: abre directamente el modal con el pasillo a elegir -->
-                <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                    <input type="text" id="nuevo-producto" class="search-bar" style="margin:0;" placeholder="Escribe el nuevo alimento..." onkeypress="if(event.key==='Enter') abrirModalParaCrearNuevoAlimento()">
-                    <button class="primary" style="width: auto; margin:0; padding: 0 16px; white-space:nowrap;" onclick="abrirModalParaCrearNuevoAlimento()">+ Guardar</button>
+                <div class="box-card">
+                    <label class="box-label" for="nuevo-producto">Crear nuevo producto</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="nuevo-producto" class="search-bar" style="margin:0;" placeholder="Nombre del nuevo producto..." onkeypress="if(event.key==='Enter') abrirModalParaCrearNuevoAlimento()">
+                        <button class="primary" style="width: auto; margin:0; padding: 0 16px; white-space:nowrap;" onclick="abrirModalParaCrearNuevoAlimento()">Guardar</button>
+                    </div>
                 </div>
 
                 <div id="items-catalogo"></div>
@@ -745,7 +735,7 @@
         </div>
     </div>
 
-    <button id="fab-add" onclick="irAlCatalogoYBuscador()" title="Buscar y Añadir Alimentos">➕</button>
+    <button id="fab-add" onclick="irAlCatalogoYBuscador()" title="Buscar y Añadir Alimentos">+</button>
 
     <div id="toast">Notificación</div>
 
@@ -796,6 +786,16 @@
                 .replace(/[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '')
                 .replace(/^[^a-zA-Z0-9áéíóúÁÉÍÓÚñÑ]+/, '')
                 .trim();
+        }
+
+        function obtenerNombrePasilloSinAsignar() {
+            const encontrada = seccionesPersonalizadas.find(s =>
+                normalizarTexto(s.nombre).includes('sin seccion') ||
+                normalizarTexto(s.nombre).includes('sin pasillo') ||
+                normalizarTexto(s.id).includes('sin seccion') ||
+                normalizarTexto(s.id).includes('sin pasillo')
+            );
+            return encontrada ? encontrada.id : "Sin Sección / Pasillo";
         }
 
         function normalizarTexto(texto) {
@@ -865,7 +865,7 @@
             if (user) {
                 currentUser = user;
                 const nombreCorto = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
-                document.getElementById('user-display').innerText = `👤 ${nombreCorto}`;
+                document.getElementById('user-display').innerText = nombreCorto;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('error-auth').classList.add('hidden');
                 document.getElementById('loading-screen').classList.remove('hidden');
@@ -893,7 +893,6 @@
             return `mercadona/catalogos/${idCatalogoActual}`;
         }
 
-        // 1. CARGA DE CATÁLOGOS CON NODOS INDEPENDIENTES
         function verificarAccesoYCatalogos(user) {
             const userEmailKey = sanitizeEmail(user.email);
             const emailsFamiliaBase = ['verdeguer279_gmail_com', 'copg279_gmail_com', 'claramorasaez_gmail_com', 'rafaverdeguermora_gmail_com'];
@@ -990,7 +989,7 @@
                 };
 
                 const seccionesBaseLimpias = secExistente.length ? secExistente : [
-                    { id: "Sin Pasillo", nombre: "Sin Pasillo" },
+                    { id: "Sin Sección / Pasillo", nombre: "Sin Sección / Pasillo" },
                     { id: "Fruta y Verdura", nombre: "Fruta y Verdura" },
                     { id: "Lácteos - Huevos", nombre: "Lácteos - Huevos" }
                 ];
@@ -1050,7 +1049,7 @@
                     }));
                 } else {
                     seccionesPersonalizadas = [
-                        { id: "Sin Pasillo", nombre: "Sin Pasillo" },
+                        { id: "Sin Sección / Pasillo", nombre: "Sin Sección / Pasillo" },
                         { id: "Fruta y Verdura", nombre: "Fruta y Verdura" },
                         { id: "Panadería y Pastelería", nombre: "Panadería y Pastelería" },
                         { id: "Carnicería - Refrigerados", nombre: "Carnicería - Refrigerados" },
@@ -1091,7 +1090,6 @@
             }, manejarError);
         }
 
-        // 2. GESTIÓN DE CATÁLOGO, MIEMBROS Y RENOMBRADO
         function abrirModalGestionCatalogo() {
             document.getElementById('input-renombrar-catalogo').value = nombreCatalogoActual;
             document.getElementById('input-nuevo-catalogo-nombre').value = '';
@@ -1131,7 +1129,7 @@
                 const emailMostrar = (typeof val === 'string' && val.includes('@')) ? val : key.replace(/_/g, '.');
                 cont.innerHTML += `
                     <div class="user-member-row">
-                        <span>👤 ${emailMostrar}</span>
+                        <span>${emailMostrar}</span>
                         <button class="btn-del-member" onclick="eliminarMiembroDeCatalogo('${key}', '${emailMostrar}')" title="Eliminar miembro">✕</button>
                     </div>
                 `;
@@ -1142,7 +1140,7 @@
             const inp = document.getElementById('input-nuevo-miembro-email');
             const email = (inp.value || '').trim().toLowerCase();
             if (!email || !email.includes('@')) {
-                alert("Introduce un correo electrónico válido (ej: nombre@gmail.com).");
+                alert("Introduce un correo electrónico válido.");
                 return;
             }
 
@@ -1151,7 +1149,7 @@
 
             firebaseDb.ref(`${basePath}/miembros/${emailKey}`).set(email).then(() => {
                 inp.value = '';
-                mostrarToast(`✅ Miembro ${email} añadido a este catálogo`);
+                mostrarToast(`Miembro ${email} añadido a este catálogo`);
             });
         }
 
@@ -1179,15 +1177,14 @@
                     nombreCatalogoActual = nuevoNombre;
                     document.getElementById('family-badge-name').innerText = nuevoNombre;
                     cerrarModalGestionCatalogo();
-                    mostrarToast("✅ Nombre actualizado");
+                    mostrarToast("Nombre actualizado");
                 });
                 return;
             }
 
-            // Validar si ya existe otro catálogo con ese nombre exacto
             firebaseDb.ref(`mercadona/catalogos/${nuevaClave}`).once('value', snapExiste => {
                 if (snapExiste.exists()) {
-                    alert(`El nombre de catálogo "${nuevoNombre}" ya existe en Firebase. Por favor, elige un nombre diferente.`);
+                    alert(`El nombre de catálogo "${nuevoNombre}" ya existe en Firebase. Elige un nombre diferente.`);
                     return;
                 }
 
@@ -1203,7 +1200,7 @@
                             nombreCatalogoActual = nuevoNombre;
                             document.getElementById('family-badge-name').innerText = nuevoNombre;
                             cerrarModalGestionCatalogo();
-                            mostrarToast("✅ Catálogo renombrado en Firebase");
+                            mostrarToast("Catálogo renombrado en Firebase");
                             iniciarAppCatalogo();
                         });
                     });
@@ -1219,7 +1216,7 @@
             idCatalogoActual = nuevaClave;
             nombreCatalogoActual = catalogosAccesibles[nuevaClave].nombre || nuevaClave;
             cerrarModalGestionCatalogo();
-            mostrarToast(`📁 Cambiado a: ${nombreCatalogoActual}`);
+            mostrarToast(`Cambiado a: ${nombreCatalogoActual}`);
             iniciarAppCatalogo();
         }
 
@@ -1235,7 +1232,7 @@
 
             firebaseDb.ref(`mercadona/catalogos/${clave}`).once('value', snap => {
                 if (snap.exists()) {
-                    alert(`El catálogo "${nombre}" ya existe en Firebase. Por favor, elige otro nombre.`);
+                    alert(`El catálogo "${nombre}" ya existe en Firebase. Elige otro nombre.`);
                     return;
                 }
                 const userEmailKey = sanitizeEmail(currentUser.email);
@@ -1260,7 +1257,7 @@
 
             firebaseDb.ref(`mercadona/catalogos/${clave}`).once('value', snap => {
                 if (snap.exists()) {
-                    alert(`El nombre de catálogo "${nombre}" ya existe en Firebase. Por favor, elige otro nombre.`);
+                    alert(`El nombre de catálogo "${nombre}" ya existe en Firebase. Elige otro nombre.`);
                     return;
                 }
 
@@ -1285,7 +1282,7 @@
             miembrosKeysArray.forEach(k => { miembrosMap[k] = true; });
 
             const seccionesBaseLimpias = [
-                { id: "Sin Pasillo", nombre: "Sin Pasillo" },
+                { id: "Sin Sección / Pasillo", nombre: "Sin Sección / Pasillo" },
                 { id: "Fruta y Verdura", nombre: "Fruta y Verdura" },
                 { id: "Panadería y Pastelería", nombre: "Panadería y Pastelería" },
                 { id: "Carnicería - Refrigerados", nombre: "Carnicería - Refrigerados" },
@@ -1323,12 +1320,11 @@
 
             firebaseDb.ref(`mercadona/catalogos/${clave}`).set(nuevoCatalogoPayload).then(() => {
                 catalogosAccesibles[clave] = nuevoCatalogoPayload;
-                mostrarToast(`✅ Catálogo "${nombre}" creado en Firebase`);
+                mostrarToast(`Catálogo "${nombre}" creado en Firebase`);
                 if (callbackExito) callbackExito();
             });
         }
 
-        // 3. IMPORTACIÓN PREGUNTANDO SIEMPRE EL NOMBRE AL USUARIO
         let idInputObjetivoParaJson = '';
         function pedirJsonParaCatalogo(idInput, esOnboarding) {
             idInputObjetivoParaJson = idInput;
@@ -1354,7 +1350,7 @@
 
             firebaseDb.ref(`mercadona/catalogos/${claveNueva}`).once('value', snapExiste => {
                 if (snapExiste.exists()) {
-                    alert(`El nombre de catálogo "${nombreElegido.trim()}" ya existe en Firebase. Por favor, elige otro nombre.`);
+                    alert(`El nombre de catálogo "${nombreElegido.trim()}" ya existe en Firebase. Elige otro nombre.`);
                     inputElement.value = '';
                     return;
                 }
@@ -1397,10 +1393,9 @@
             a.click();
             a.remove();
             URL.revokeObjectURL(url);
-            mostrarToast("💾 Catálogo descargado en JSON");
+            mostrarToast("Catálogo descargado en JSON");
         }
 
-        // 4. BÚSQUEDA Y PLEGADO DE PASILLOS
         function filtrarCatalogoInstaneamente() {
             toggleClearSearchBtn();
             renderizarCatalogo();
@@ -1426,7 +1421,7 @@
         function actualizarTextoBotonPlegar() {
             const btn = document.getElementById('btn-toggle-plegar-pasillos');
             if (!btn) return;
-            btn.innerText = todosPasillosPlegados ? "📂 Desplegar pasillos" : "📁 Plegar pasillos";
+            btn.innerText = todosPasillosPlegados ? "Desplegar pasillos" : "Plegar pasillos";
         }
 
         function toggleSeccionPlegada(secId) {
@@ -1446,7 +1441,6 @@
             renderizarCatalogo();
         }
 
-        // 5. RENDERIZADO DEL CATÁLOGO
         function renderizarCatalogo() {
             const cont = document.getElementById('items-catalogo');
             const busquedaNorm = normalizarTexto(document.getElementById('buscador').value || '');
@@ -1471,11 +1465,11 @@
             const dibujarTarjeta = (key) => {
                 const prod = catalogoProductos[key];
                 const nombreVisual = prod.nombrePersonalizado || prod.nombre || prod.nombreOriginal || "";
-                const seccion = limpiarTextoPasillo(prod.seccion || "Sin Pasillo");
+                const seccion = limpiarTextoPasillo(prod.seccion || obtenerNombrePasilloSinAsignar());
                 const estaEnLista = datosListaActual && datosListaActual.productos && datosListaActual.productos[key];
                 
                 let actionBtn = estaEnLista 
-                    ? `<div onclick="quitarDelCatalogo('${key}', event)" style="color: var(--m-green); font-size: 26px; padding: 0 8px; cursor: pointer;" title="Quitar de la lista">✅</div>` 
+                    ? `<div onclick="quitarDelCatalogo('${key}', event)" style="color: var(--m-green); font-size: 24px; padding: 0 8px; cursor: pointer;" title="Quitar de la lista">✓</div>` 
                     : `<button class="btn-add" onclick="updateQty('${key}', 1, event)">+</button>`;
 
                 return `
@@ -1496,7 +1490,7 @@
             if (orden === 'seccion') {
                 let estructurado = {};
                 keysFiltradas.forEach(key => {
-                    const sec = limpiarTextoPasillo(catalogoProductos[key].seccion || "Sin Pasillo");
+                    const sec = limpiarTextoPasillo(catalogoProductos[key].seccion || obtenerNombrePasilloSinAsignar());
                     if (!estructurado[sec]) estructurado[sec] = [];
                     estructurado[sec].push(key);
                 });
@@ -1519,7 +1513,7 @@
                     const conteo = estructurado[secName].length;
 
                     htmlContent += `
-                        <div class="section-group-title" onclick="toggleSeccionPlegada('${secName.replace(/'/g, "\'")}')">
+                        <div class="section-group-title" onclick="toggleSeccionPlegada('${secName.replace(/'/g, "\\'")}')">
                             <span>${secName} (${conteo})</span>
                             <span class="section-toggle-icon">${flecha}</span>
                         </div>
@@ -1550,7 +1544,6 @@
             return p.consumos || 0;
         }
 
-        // 6. RENDERIZADO DE "LISTA ACTUAL"
         function renderizarListaActual() {
             if (!datosListaActual) return;
             const cont = document.getElementById('items-comprando');
@@ -1565,9 +1558,8 @@
             if (keys.length === 0) {
                 cont.innerHTML = `
                     <div style="text-align: center; padding: 35px 0;">
-                        <span style="font-size: 42px;">📝</span>
                         <p style="color: #666; font-size: 14px;">La lista de compra está vacía</p>
-                        <button class="primary" onclick="irAlCatalogoYBuscador()">🔍 Abrir Catálogo y Buscar</button>
+                        <button class="primary" onclick="irAlCatalogoYBuscador()">Abrir Catálogo y Buscar</button>
                     </div>
                 `;
                 return;
@@ -1584,7 +1576,7 @@
             if (orden === 'seccion') {
                 let estructurado = {};
                 pendientes.forEach(k => {
-                    const sec = limpiarTextoPasillo(catalogoProductos[k]?.seccion || "Sin Pasillo");
+                    const sec = limpiarTextoPasillo(catalogoProductos[k]?.seccion || obtenerNombrePasilloSinAsignar());
                     if (!estructurado[sec]) estructurado[sec] = [];
                     estructurado[sec].push({ key: k, datos: prods[k] });
                 });
@@ -1626,7 +1618,7 @@
                 const p = item.datos;
                 const cat = catalogoProductos[k] || {};
                 const nombre = cat.nombrePersonalizado || cat.nombre || cat.nombreOriginal || k;
-                const seccion = limpiarTextoPasillo(cat.seccion || "Sin Pasillo");
+                const seccion = limpiarTextoPasillo(cat.seccion || obtenerNombrePasilloSinAsignar());
                 const qty = p.cantidad || 1;
 
                 html += `
@@ -1653,7 +1645,6 @@
             return html;
         }
 
-        // 7. ACCIONES Y DESHACER
         function activarBotonDeshacer() {
             const btn = document.getElementById('btn-deshacer');
             if (btn) btn.classList.remove('hidden');
@@ -1670,7 +1661,7 @@
                 firebaseDb.ref(`${basePath}/listaActiva/productos`).set(backupEstadoParaDeshacer).then(() => {
                     backupEstadoParaDeshacer = null;
                     desactivarBotonDeshacer();
-                    mostrarToast("↩️ Acción deshecha con éxito");
+                    mostrarToast("Acción deshecha con éxito");
                 });
             }
         }
@@ -1679,7 +1670,7 @@
             const prods = datosListaActual.productos || {};
             const keys = Object.keys(prods);
             if (keys.length === 0) {
-                mostrarToast("ℹ️ La lista ya está vacía.");
+                mostrarToast("La lista ya está vacía.");
                 return;
             }
 
@@ -1696,7 +1687,7 @@
             });
 
             firebaseDb.ref(`${basePath}/listaActiva/productos`).remove().then(() => {
-                mostrarToast("📦 Compra finalizada. Carro vaciado.");
+                mostrarToast("Compra finalizada. Carro vaciado.");
             });
         }
 
@@ -1718,43 +1709,42 @@
                     sumados++;
                 }
             });
-            mostrarToast(`⭐ ${sumados} alimentos habituales añadidos`);
+            mostrarToast(`${sumados} alimentos habituales añadidos`);
         }
 
-        // CORRECCIÓN COMPLETA DE "AÑADIR PRODUCTO SIN CATEGORIZAR"
         function agregarRapidoDesdeLista() {
             const input = document.getElementById('buscador-rapido-lista');
             const texto = (input.value || '').trim();
             if (!texto) return;
 
-            const key = limpiarKey(texto);
+            const key = generarClaveFirebase(normalizarTexto(texto));
             const basePath = getCatalogBasePath();
-
-            const updates = {};
-            if (!catalogoProductos[key]) {
-                updates[`${basePath}/catalogo/${key}`] = {
-                    nombreOriginal: texto.toLowerCase(),
-                    nombrePersonalizado: texto,
-                    seccion: "Sin Pasillo",
-                    consumos: 1,
-                    vecesComprado: 1
-                };
-            }
+            const secSinAsignar = obtenerNombrePasilloSinAsignar();
 
             let currentQty = (datosListaActual && datosListaActual.productos && datosListaActual.productos[key])
                 ? (datosListaActual.productos[key].cantidad || 1)
                 : 0;
 
-            updates[`${basePath}/listaActiva/productos/${key}`] = {
+            const promesas = [];
+            if (!catalogoProductos[key]) {
+                promesas.push(firebaseDb.ref(`${basePath}/catalogo/${key}`).set({
+                    nombreOriginal: texto.toLowerCase(),
+                    nombrePersonalizado: texto,
+                    seccion: secSinAsignar,
+                    consumos: 1,
+                    vecesComprado: 1
+                }));
+            }
+            promesas.push(firebaseDb.ref(`${basePath}/listaActiva/productos/${key}`).set({
                 comprado: false,
                 cantidad: currentQty + 1
-            };
+            }));
 
-            firebaseDb.ref().update(updates).then(() => {
+            Promise.all(promesas).then(() => {
                 input.value = '';
-                mostrarToast(`🛒 "${texto}" añadido a tu lista`);
+                mostrarToast(`"${texto}" añadido`);
             }).catch(err => {
-                alert("Error al guardar: " + err.message);
+                alert("Error al añadir: " + err.message);
             });
         }
 
@@ -1771,11 +1761,11 @@
 
             if (newQty <= 0) {
                 firebaseDb.ref(`${basePath}/listaActiva/productos/${idProducto}`).remove();
-                mostrarToast("🗑️ Eliminado de la lista");
+                mostrarToast("Eliminado de la lista");
             } else {
                 if (currentQty === 0) {
                     firebaseDb.ref(`${basePath}/listaActiva/productos/${idProducto}`).set({ comprado: false, cantidad: newQty });
-                    mostrarToast("✅ Añadido");
+                    mostrarToast("Añadido");
                 } else {
                     firebaseDb.ref(`${basePath}/listaActiva/productos/${idProducto}/cantidad`).set(newQty);
                 }
@@ -1801,26 +1791,25 @@
             firebaseDb.ref(`${basePath}/listaActiva/orden`).set(orden);
         }
 
-        // 8. EDICIÓN Y CREACIÓN DE PRODUCTOS DIRECTA CON PASILLO
         function abrirModalParaCrearNuevoAlimento() {
             const input = document.getElementById('nuevo-producto');
             const texto = (input.value || '').trim();
             if (!texto) {
-                alert("Escribe el nombre del alimento antes de pulsar Guardar.");
+                alert("Escribe el nombre del nuevo producto antes de pulsar Guardar.");
                 input.focus();
                 return;
             }
 
             esCreacionProductoNuevo = true;
-            productoEditandoId = limpiarKey(texto);
+            productoEditandoId = generarClaveFirebase(normalizarTexto(texto));
 
-            document.getElementById('modal-edicion-titulo').innerText = "➕ Nuevo Alimento";
-            document.getElementById('edit-original').value = texto.toUpperCase();
+            document.getElementById('modal-edicion-titulo').innerText = "Nuevo Producto";
             document.getElementById('edit-visible').value = texto;
             document.getElementById('btn-eliminar-prod-modal').style.display = 'none';
 
-            renderizarSelectSecciones("Sin Pasillo");
+            renderizarSelectSecciones(obtenerNombrePasilloSinAsignar());
             document.getElementById('modal-edicion').classList.remove('hidden');
+            setTimeout(() => document.getElementById('edit-seccion').focus(), 80);
         }
 
         function abrirEdicionExistente(id) {
@@ -1830,12 +1819,11 @@
             esCreacionProductoNuevo = false;
             productoEditandoId = id;
 
-            document.getElementById('modal-edicion-titulo').innerText = "✏️ Editar Producto";
-            document.getElementById('edit-original').value = (p.nombreOriginal || p.nombre || "").toUpperCase();
+            document.getElementById('modal-edicion-titulo').innerText = "Editar Producto";
             document.getElementById('edit-visible').value = p.nombrePersonalizado || p.nombre || "";
             document.getElementById('btn-eliminar-prod-modal').style.display = 'block';
 
-            renderizarSelectSecciones(p.seccion || "Sin Pasillo");
+            renderizarSelectSecciones(p.seccion || obtenerNombrePasilloSinAsignar());
             document.getElementById('modal-edicion').classList.remove('hidden');
         }
 
@@ -1862,7 +1850,7 @@
                 }).then(() => {
                     document.getElementById('nuevo-producto').value = '';
                     cerrarModal();
-                    mostrarToast(`✅ "${nVis}" guardado en pasillo ${sec}`);
+                    mostrarToast(`"${nVis}" guardado en ${sec}`);
                 });
             } else {
                 firebaseDb.ref(`${basePath}/catalogo/${productoEditandoId}`).update({
@@ -1870,7 +1858,7 @@
                     seccion: sec
                 }).then(() => {
                     cerrarModal();
-                    mostrarToast("Alimento actualizado");
+                    mostrarToast("Producto actualizado");
                 });
             }
         }
@@ -1892,7 +1880,6 @@
             select.innerHTML = seccionesPersonalizadas.map(s => `<option value="${s.id}" ${secLimpia === s.id ? 'selected' : ''}>${s.nombre}</option>`).join('');
         }
 
-        // 9. GESTIÓN DE PASILLOS
         function abrirModalSecciones() {
             seccionesTemporales = JSON.parse(JSON.stringify(seccionesPersonalizadas));
             renderizarSeccionesEnModal();

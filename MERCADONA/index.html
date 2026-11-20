@@ -7,6 +7,7 @@
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#007a33">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Mercadona">
@@ -340,17 +341,17 @@
             margin-bottom: 12px;
             justify-content: flex-end;
         }
-        .btn-fold {
-            background: #eee;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 6px;
+        .btn-fold-toggle {
+            background: #eef2ef;
+            border: 1px solid #c5d3c8;
+            padding: 6px 12px;
+            border-radius: 8px;
             font-size: 12px;
             cursor: pointer;
-            color: #555;
-            font-weight: 500;
+            color: var(--m-green-dark);
+            font-weight: bold;
         }
-        .btn-fold:active { background: #ddd; }
+        .btn-fold-toggle:active { background: #dde6df; }
 
         .action-row { 
             display: flex; 
@@ -380,18 +381,16 @@
         .btn-action-finalizar { background: #1a1a1a; }
         .btn-action-deshacer { background: #555; }
 
-        .option-card {
+        .create-box {
             background: #f9fbf9;
             border: 2px solid #e0ebe2;
             border-radius: 12px;
-            padding: 16px;
+            padding: 18px;
             margin-bottom: 15px;
             text-align: left;
-            transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .option-card:hover { border-color: var(--m-green); box-shadow: 0 4px 12px rgba(0,122,51,0.08); }
-        .option-card h4 { margin: 0 0 6px 0; color: var(--m-green-dark); font-size: 16px; display: flex; align-items: center; gap: 6px; }
-        .option-card p { margin: 0 0 12px 0; color: #666; font-size: 13px; line-height: 1.35; }
+        .create-box h4 { margin: 0 0 8px 0; color: var(--m-green-dark); font-size: 16px; }
+        .create-box p { margin: 0 0 14px 0; color: #666; font-size: 13px; line-height: 1.4; }
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 1000; display: flex; justify-content: center; align-items: center; }
         .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 440px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
@@ -403,17 +402,6 @@
         .btn-reorder { background: #e9ecef; border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; font-size: 16px; color: #555; }
         .filtro-seccion-item { display: flex; align-items: center; gap: 10px; padding: 8px 4px; border-bottom: 1px solid #eee; font-size: 14px; }
         .filtro-seccion-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--m-green); }
-
-        .email-member-badge {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f0f4f1;
-            padding: 8px 12px;
-            border-radius: 6px;
-            margin-bottom: 6px;
-            font-size: 13px;
-        }
 
         #toast {
             position: fixed;
@@ -445,10 +433,10 @@
     <!-- Pantalla de Login -->
     <div id="login-screen" class="hidden">
         <h2 style="color:var(--m-green); margin-bottom: 6px;">🛒 Lista Compra Mercadona</h2>
-        <p style="color: #666; margin-bottom: 25px; font-size: 14px;">Acceso familiar con cuenta autorizada</p>
+        <p style="color: #666; margin-bottom: 25px; font-size: 14px;">Acceso por cuenta autorizada</p>
         
         <div id="error-auth" class="hidden" style="background: #ffebee; color: #dc3545; padding: 12px 18px; border-radius: 8px; border: 1px solid #f5c6cb; margin-bottom: 20px; font-size: 13px; text-align: center; max-width: 320px;">
-            ⛔ <b>Acceso denegado:</b><br><span id="error-auth-msg">Por favor, inicia sesión con tu cuenta de Google.</span>
+            ⛔ <b>Acceso denegado:</b><br><span id="error-auth-msg">Tu cuenta no está autorizada para utilizar esta aplicación.</span>
         </div>
 
         <button class="btn-login" onclick="login()">
@@ -457,34 +445,18 @@
         </button>
     </div>
 
-    <!-- Pantalla Intuitiva de Onboarding -->
+    <!-- Pantalla de Creación de Catálogo Propio -->
     <div id="onboarding-screen" class="hidden">
-        <div style="max-width: 440px; width: 100%;">
-            <div style="font-size: 38px; margin-bottom: 5px;">🛒</div>
-            <h2 style="color:var(--m-green); margin: 0 0 6px 0;">¡Hola <span id="onboarding-user-name"></span>!</h2>
-            <p style="color: #666; margin: 0 0 22px 0; font-size: 14px;">Elige cómo quieres empezar tu lista de compra:</p>
-            
-            <div class="option-card">
-                <h4>👨‍👩‍👧‍👦 Unirme a un catálogo familiar</h4>
-                <p>Si te han invitado (por ejemplo a <b>2014 DLV</b>), selecciónalo aquí para compartir la lista:</p>
-                <div style="display:flex; gap:8px;">
-                    <select id="select-catalogo-existente" class="modal-input" style="margin:0; flex:1;">
-                        <option value="">Buscando catálogos...</option>
-                    </select>
-                    <button class="primary" style="margin:0; width:auto; padding: 10px 16px; white-space:nowrap;" onclick="confirmarUnirseCatalogo()">Unirme</button>
-                </div>
+        <div style="max-width: 420px; width: 100%;">
+            <div style="font-size: 38px; margin-bottom: 6px;">🛒</div>
+            <h2 style="color:var(--m-green); margin: 0 0 8px 0;">Crear tu catálogo</h2>
+            <div class="create-box">
+                <h4>Crea tu propio catálogo de productos</h4>
+                <p>Escribe el nombre que quieras darle a tu catálogo de productos:</p>
+                <input type="text" id="input-nombre-catalogo-propio" class="modal-input" style="margin-top:0;" placeholder="Nombre de tu catálogo..." onkeypress="if(event.key==='Enter') crearCatalogoPropio()">
+                <button class="primary" onclick="crearCatalogoPropio()">Crear catálogo</button>
             </div>
-
-            <div class="option-card">
-                <h4>✨ Crear mi propio catálogo</h4>
-                <p>Crea un catálogo nuevo e independiente para tu casa o familia:</p>
-                <div style="display:flex; gap:8px;">
-                    <input type="text" id="input-nuevo-catalogo-nombre" class="modal-input" style="margin:0; flex:1;" placeholder="Ej: Mi Casa, Familia Gómez...">
-                    <button class="primary" style="margin:0; width:auto; padding: 10px 16px; white-space:nowrap; background:var(--m-orange);" onclick="confirmarCrearCatalogoNuevo()">Crear</button>
-                </div>
-            </div>
-
-            <button onclick="logout()" style="background:none; border:none; color:#888; font-size:13px; cursor:pointer; text-decoration:underline; margin-top:10px;">Cerrar sesión</button>
+            <button onclick="logout()" style="background:none; border:none; color:#888; font-size:13px; cursor:pointer; text-decoration:underline; margin-top:8px;">Cerrar sesión</button>
         </div>
     </div>
 
@@ -496,7 +468,7 @@
             <input type="text" id="edit-original" class="modal-input" disabled style="background:#eee; color:#666;">
             
             <label style="font-size:12px; font-weight:bold; color:#555;">Nombre Visible / Habitual</label>
-            <input type="text" id="edit-visible" class="modal-input" placeholder="Ej. Tomate triturado grande">
+            <input type="text" id="edit-visible" class="modal-input" placeholder="Ej. Atún en aceite de oliva">
             
             <label style="font-size:12px; font-weight:bold; color:#555;">Sección / Pasillo</label>
             <select id="edit-seccion" class="modal-input"></select>
@@ -509,38 +481,17 @@
         </div>
     </div>
 
-    <!-- Modal Gestión del Catálogo -->
-    <div id="modal-familia" class="modal-overlay hidden">
+    <!-- Modal Renombrar Catálogo -->
+    <div id="modal-renombrar-catalogo" class="modal-overlay hidden">
         <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--m-green);">📁 Catálogo Actual: <span id="modal-nombre-familia-txt" style="color:var(--m-orange);">2014 DLV</span></h3>
+            <h3 style="margin-top:0; color:var(--m-green);">✏️ Editar Nombre del Catálogo</h3>
+            <label style="font-size:12px; font-weight:bold; color:#555;">Nuevo nombre del catálogo:</label>
+            <input type="text" id="input-renombrar-catalogo" class="modal-input" onkeypress="if(event.key==='Enter') guardarNuevoNombreCatalogo()">
             
-            <div style="background:#f9fbf9; border:1px solid #e2ebe4; padding:12px; border-radius:8px; margin-bottom:15px;">
-                <strong style="font-size:13px; color:#333; display:block; margin-bottom:6px;">👥 Familiares con acceso a este catálogo:</strong>
-                <div id="lista-correos-familia" style="max-height: 140px; overflow-y: auto; margin-bottom:8px;"></div>
-                
-                <div style="display: flex; gap: 6px;">
-                    <input type="email" id="nuevo-correo-miembro" class="modal-input" style="margin:0; flex:1; padding:8px; font-size:13px;" placeholder="añadir correo familiar..." onkeypress="if(event.key==='Enter') agregarMiembroFamilia()">
-                    <button class="primary" style="margin:0; width:auto; padding: 8px 12px; font-size:13px;" onclick="agregarMiembroFamilia()">➕ Invitar</button>
-                </div>
+            <div style="display:flex; gap:8px;">
+                <button class="primary" style="background:#888; flex:1;" onclick="cerrarModalRenombrarCatalogo()">Cancelar</button>
+                <button class="primary" style="flex:1;" onclick="guardarNuevoNombreCatalogo()">Guardar</button>
             </div>
-
-            <div style="margin-bottom:15px;">
-                <label style="font-size:12px; font-weight:bold; color:#555;">🔄 Cambiar a otro catálogo:</label>
-                <div style="display:flex; gap:6px; margin-top:4px;">
-                    <select id="select-cambiar-catalogo" class="modal-input" style="margin:0; flex:1; padding:8px; font-size:13px;"></select>
-                    <button class="primary" style="margin:0; width:auto; padding: 8px 12px; font-size:13px; background:#555;" onclick="cambiarACatalogoDesdeModal()">Cambiar</button>
-                </div>
-            </div>
-
-            <div style="margin-bottom:15px;">
-                <label style="font-size:12px; font-weight:bold; color:#555;">✨ Crear un nuevo catálogo independiente:</label>
-                <div style="display:flex; gap:6px; margin-top:4px;">
-                    <input type="text" id="input-crear-otro-catalogo" class="modal-input" style="margin:0; flex:1; padding:8px; font-size:13px;" placeholder="Nombre nuevo catálogo..." onkeypress="if(event.key==='Enter') crearOtroCatalogoDesdeModal()">
-                    <button class="primary" style="margin:0; width:auto; padding: 8px 12px; font-size:13px; background:var(--m-orange);" onclick="crearOtroCatalogoDesdeModal()">➕ Crear</button>
-                </div>
-            </div>
-            
-            <button class="primary" style="background:#888; padding:10px;" onclick="cerrarModalFamilia()">Cerrar</button>
         </div>
     </div>
 
@@ -596,10 +547,10 @@
                 </div>
             </div>
             <div class="header-bottom">
-                <div class="family-pill" onclick="abrirModalFamilia()" title="Gestionar correos o cambiar de catálogo">
-                    📁 <span id="family-badge-name">2014 DLV</span> ▾
+                <div class="family-pill" onclick="abrirModalRenombrarCatalogo()" title="Editar nombre del catálogo">
+                    📁 <span id="family-badge-name">2014 DLV</span> ✏️
                 </div>
-                <div style="font-size:12px; color:rgba(255,255,255,0.85); font-weight:500;">
+                <div style="font-size:12px; color:rgba(255,255,255,0.9); font-weight:500;">
                     <span id="header-counter-pill">0</span> en lista
                 </div>
             </div>
@@ -617,15 +568,17 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
                     <div>
                         <h3 class="panel-title" style="margin:0; border:none;">Lista Actual</h3>
-                        <div style="font-size: 12px; color: #888;" id="fecha-lista">Artículos pendientes de comprar</div>
+                        <div style="font-size: 12px; color: #888;">Artículos pendientes de comprar</div>
                     </div>
                     <span class="badge" style="background:var(--m-orange);"><span id="contador-lista">0</span> artículos</span>
                 </div>
 
+                <!-- Añadir producto sin categorizar -->
                 <div class="quick-add-box">
+                    <label style="display:block; font-size:12px; font-weight:bold; color:#555; margin-bottom:6px;">Añadir producto sin categorizar</label>
                     <div style="display:flex; gap: 8px;">
-                        <input type="text" id="buscador-rapido-lista" class="search-bar" placeholder="🔍 Añadir a la lista (ej: Leche, Huevos)..." onkeypress="if(event.key==='Enter') agregarRapidoDesdeLista()">
-                        <button class="primary" style="width: auto; margin:0; padding: 0 16px; white-space:nowrap;" onclick="agregarRapidoDesdeLista()">+ Añadir</button>
+                        <input type="text" id="buscador-rapido-lista" class="search-bar" placeholder="Ej: leche, huevos..." onkeypress="if(event.key==='Enter') agregarRapidoDesdeLista()">
+                        <button class="primary" style="width: auto; margin:0; padding: 0 16px; white-space:nowrap;" onclick="agregarRapidoDesdeLista()">Añadir</button>
                     </div>
                 </div>
 
@@ -663,7 +616,7 @@
                 
                 <div class="controls-row">
                     <div class="search-wrapper">
-                        <input type="text" id="buscador" class="search-bar" placeholder="🔍 Escribe para buscar (ej: cafe, pollo)..." oninput="filtrarCatalogoInstaneamente()">
+                        <input type="text" id="buscador" class="search-bar" placeholder="🔍 Buscar alimento (ej: atun, cafe)..." oninput="filtrarCatalogoInstaneamente()">
                         <button class="clear-search-btn hidden" id="btn-clear-search" onclick="limpiarBusqueda()" title="Limpiar">×</button>
                     </div>
                     <select id="orden-catalogo" class="select-bar" onchange="renderizarCatalogo()">
@@ -673,9 +626,9 @@
                     </select>
                 </div>
 
+                <!-- Botón único de Plegar / Desplegar pasillos visible en móvil y ordenador -->
                 <div class="fold-bar" id="fold-controls">
-                    <button class="btn-fold" onclick="plegarTodasSecciones(true)">📁 Plegar pasillos</button>
-                    <button class="btn-fold" onclick="plegarTodasSecciones(false)">📂 Desplegar todos</button>
+                    <button id="btn-toggle-plegar-pasillos" class="btn-fold-toggle" onclick="alternarPlegadoTodosPasillos()">📁 Plegar pasillos</button>
                 </div>
 
                 <div style="display: flex; gap: 8px; margin-bottom: 14px;">
@@ -710,8 +663,6 @@
         let currentUser = null;
         let idFamiliaActual = "2014_dlv";
         let nombreFamiliaActual = "2014 DLV";
-        let listaFamiliasDisponibles = {};
-        let miembrosFamiliaActual = {};
 
         let datosListaActual = { productos: {}, orden: 'seccion', seccionesVisibles: {} };
         let catalogoProductos = {};
@@ -720,7 +671,7 @@
         let filtroSeccionesTemp = {};
 
         let estadoPlegadoSecciones = {};
-
+        let todosPasillosPlegados = false;
         let backupEstadoParaDeshacer = null;
 
         function mostrarToast(mensaje) {
@@ -731,14 +682,34 @@
         }
 
         function limpiarKey(texto) {
-            return (texto || '').toLowerCase().trim().replace(/[.#$[\]]/g, '').replace(/\s+/g, '_');
+            return normalizarTexto(texto || '')
+                .replace(/[.#$[\]]/g, '')
+                .replace(/\s+/g, '_');
+        }
+
+        function normalizarTexto(texto) {
+            return (texto || '')
+                .toString()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .trim();
         }
 
         function sanitizeEmail(email) {
             return (email || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
         }
 
-        const tabsOrder = ['lista', 'catalogo'];
+        function mostrarAccesoDenegado(mensaje) {
+            document.getElementById('loading-screen').classList.add('hidden');
+            document.getElementById('onboarding-screen').classList.add('hidden');
+            document.getElementById('app').classList.add('hidden');
+            document.getElementById('fab-add').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('error-auth-msg').innerText = mensaje || "Tu cuenta no está autorizada para utilizar esta aplicación.";
+            document.getElementById('error-auth').classList.remove('hidden');
+        }
+
         function switchTab(tab) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             const activeTabBtn = document.getElementById(`tab-${tab}`);
@@ -765,25 +736,25 @@
                 currentUser = user;
                 const nombreCorto = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
                 document.getElementById('user-display').innerText = `👤 ${nombreCorto}`;
-                document.getElementById('onboarding-user-name').innerText = nombreCorto;
                 document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('error-auth').classList.add('hidden');
                 document.getElementById('loading-screen').classList.remove('hidden');
-                verificarAccesoYCatalogo(user);
+                verificarCatalogoUsuario(user);
             } else {
                 currentUser = null;
                 document.getElementById('loading-screen').classList.add('hidden');
-                document.getElementById('login-screen').classList.remove('hidden');
                 document.getElementById('onboarding-screen').classList.add('hidden');
                 document.getElementById('app').classList.add('hidden');
                 document.getElementById('fab-add').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
             }
         });
 
         function login() { 
+            document.getElementById('error-auth').classList.add('hidden');
             const provider = new firebase.auth.GoogleAuthProvider();
             auth.signInWithPopup(provider).catch(err => {
-                document.getElementById('error-auth-msg').innerText = err.message;
-                document.getElementById('error-auth').classList.remove('hidden');
+                mostrarAccesoDenegado(err.message);
             });
         }
         function logout() { auth.signOut(); }
@@ -792,99 +763,61 @@
             return `mercadona/familias/${idFamiliaActual}`;
         }
 
-        function verificarAccesoYCatalogo(user) {
+        function verificarCatalogoUsuario(user) {
             const userEmailKey = sanitizeEmail(user.email);
-            
-            firebaseDb.ref('mercadona/familias').once('value', snapFamilias => {
-                listaFamiliasDisponibles = snapFamilias.val() || {};
-                
-                if (Object.keys(listaFamiliasDisponibles).length === 0) {
-                    idFamiliaActual = "2014_dlv";
-                    nombreFamiliaActual = "2014 DLV";
-                    inicializarFamiliaBase("2014_dlv", "2014 DLV", user.email);
-                    return;
+
+            firebaseDb.ref(`mercadona/usuarios_catalogos/${userEmailKey}`).once('value', snap => {
+                const asignacion = snap.val();
+                if (asignacion && asignacion.familiaId) {
+                    idFamiliaActual = asignacion.familiaId;
+                    nombreFamiliaActual = asignacion.nombreCatalogo || asignacion.familiaId;
+                    iniciarAppFamilia();
+                } else if (userEmailKey === 'verdeguer279_gmail_com') {
+                    firebaseDb.ref('mercadona/familias/2014_dlv').once('value', snapFam => {
+                        const famData = snapFam.val();
+                        if (!famData) {
+                            inicializarCatalogoPrincipal('2014_dlv', '2014 DLV', user.email);
+                        } else {
+                            idFamiliaActual = '2014_dlv';
+                            nombreFamiliaActual = famData.nombre || '2014 DLV';
+                            firebaseDb.ref(`mercadona/usuarios_catalogos/${userEmailKey}`).set({
+                                familiaId: idFamiliaActual,
+                                nombreCatalogo: nombreFamiliaActual,
+                                email: user.email
+                            }).then(() => iniciarAppFamilia());
+                        }
+                    }, err => {
+                        if (err && err.code === 'PERMISSION_DENIED') {
+                            auth.signOut().then(() => mostrarAccesoDenegado("Acceso denegado: tu cuenta no está autorizada en las reglas de Firebase."));
+                        }
+                    });
+                } else {
+                    document.getElementById('loading-screen').classList.add('hidden');
+                    document.getElementById('app').classList.add('hidden');
+                    document.getElementById('fab-add').classList.add('hidden');
+                    document.getElementById('login-screen').classList.add('hidden');
+                    document.getElementById('onboarding-screen').classList.remove('hidden');
+                    document.getElementById('input-nombre-catalogo-propio').value = '';
                 }
-
-                firebaseDb.ref(`mercadona/autorizaciones/${userEmailKey}`).once('value', snapAuto => {
-                    const auto = snapAuto.val();
-                    
-                    if (auto && auto.familiaId && listaFamiliasDisponibles[auto.familiaId]) {
-                        idFamiliaActual = auto.familiaId;
-                        nombreFamiliaActual = listaFamiliasDisponibles[auto.familiaId].nombre || auto.nombreFamilia || "Mi Catálogo";
-                        iniciarAppFamilia();
-                    } else {
-                        mostrarPantallaOnboarding();
-                    }
-                });
+            }, err => {
+                if (err && err.code === 'PERMISSION_DENIED') {
+                    auth.signOut().then(() => mostrarAccesoDenegado("Acceso denegado: tu cuenta no está autorizada para acceder a este sistema."));
+                } else {
+                    mostrarAccesoDenegado("No se ha podido verificar tu catálogo.");
+                }
             });
         }
 
-        function mostrarPantallaOnboarding() {
-            document.getElementById('loading-screen').classList.add('hidden');
-            document.getElementById('app').classList.add('hidden');
-            document.getElementById('fab-add').classList.add('hidden');
-            document.getElementById('login-screen').classList.add('hidden');
-            document.getElementById('onboarding-screen').classList.remove('hidden');
-
-            const select = document.getElementById('select-catalogo-existente');
-            select.innerHTML = '';
-            
-            const famKeys = Object.keys(listaFamiliasDisponibles);
-            famKeys.forEach(k => {
-                const fam = listaFamiliasDisponibles[k];
-                const opt = document.createElement('option');
-                opt.value = k;
-                opt.innerText = fam.nombre || k;
-                if (k === "2014_dlv") opt.selected = true;
-                select.appendChild(opt);
-            });
-        }
-
-        function confirmarUnirseCatalogo() {
-            const select = document.getElementById('select-catalogo-existente');
-            const famId = select.value;
-            if (!famId || !listaFamiliasDisponibles[famId]) {
-                alert("Selecciona un catálogo válido.");
-                return;
-            }
-
-            const fam = listaFamiliasDisponibles[famId];
-            vincularUsuarioACatalogo(famId, fam.nombre || famId);
-        }
-
-        function confirmarCrearCatalogoNuevo() {
-            const inp = document.getElementById('input-nuevo-catalogo-nombre');
+        function crearCatalogoPropio() {
+            const inp = document.getElementById('input-nombre-catalogo-propio');
             const nombre = (inp.value || '').trim();
             if (!nombre) {
-                alert("Por favor, escribe un nombre para tu catálogo (ej: Familia López, Casa Playa...)");
+                alert("Escribe un nombre para tu catálogo.");
                 return;
             }
-
-            const famId = limpiarKey(nombre);
-            crearNuevoCatalogoEnFirebase(famId, nombre, true);
-        }
-
-        function vincularUsuarioACatalogo(famId, famNombre) {
             const userEmailKey = sanitizeEmail(currentUser.email);
-            
-            firebaseDb.ref(`mercadona/autorizaciones/${userEmailKey}`).set({
-                familiaId: famId,
-                nombreFamilia: famNombre,
-                email: currentUser.email
-            });
+            const famId = `cat_${userEmailKey}_${Date.now()}`;
 
-            firebaseDb.ref(`mercadona/familias/${famId}/miembros/${userEmailKey}`).set(currentUser.email).then(() => {
-                idFamiliaActual = famId;
-                nombreFamiliaActual = famNombre;
-                document.getElementById('onboarding-screen').classList.add('hidden');
-                mostrarToast(`✅ Conectado al catálogo: ${famNombre}`);
-                iniciarAppFamilia();
-            });
-        }
-
-        function crearNuevoCatalogoEnFirebase(famId, famNombre, entrarDeInmediato = true) {
-            const userEmailKey = sanitizeEmail(currentUser.email);
-            
             const seccionesBase = [
                 { id: "Sin Pasillo", nombre: "📍 Sin Pasillo" },
                 { id: "🍎 Fruta y Verdura", nombre: "🍎 Fruta y Verdura" },
@@ -898,29 +831,35 @@
                 { id: "🧴 Perfumería y Cosmética", nombre: "🧴 Perfumería y Cosmética" }
             ];
 
-            const nuevaFamiliaPayload = {
-                nombre: famNombre,
-                creador: currentUser.email,
-                miembros: { [userEmailKey]: currentUser.email },
+            const nuevoCatalogo = {
+                nombre: nombre,
+                propietario: currentUser.email,
                 catalogo: {},
                 secciones: seccionesBase,
                 listaActiva: { productos: {}, orden: 'seccion' }
             };
 
-            firebaseDb.ref(`mercadona/familias/${famId}`).set(nuevaFamiliaPayload).then(() => {
-                listaFamiliasDisponibles[famId] = nuevaFamiliaPayload;
-                if (entrarDeInmediato) {
-                    vincularUsuarioACatalogo(famId, famNombre);
-                } else {
-                    mostrarToast(`✅ Catálogo "${famNombre}" creado`);
-                    actualizarSelectoresDeCatalogo();
+            firebaseDb.ref(`mercadona/familias/${famId}`).set(nuevoCatalogo).then(() => {
+                firebaseDb.ref(`mercadona/usuarios_catalogos/${userEmailKey}`).set({
+                    familiaId: famId,
+                    nombreCatalogo: nombre,
+                    email: currentUser.email
+                }).then(() => {
+                    idFamiliaActual = famId;
+                    nombreFamiliaActual = nombre;
+                    document.getElementById('onboarding-screen').classList.add('hidden');
+                    iniciarAppFamilia();
+                    mostrarToast(`✅ Catálogo "${nombre}" creado`);
+                });
+            }, err => {
+                if (err && err.code === 'PERMISSION_DENIED') {
+                    auth.signOut().then(() => mostrarAccesoDenegado("Acceso denegado: no tienes permisos para crear un catálogo."));
                 }
             });
         }
 
-        function inicializarFamiliaBase(famId, famNombre, emailAdmin) {
+        function inicializarCatalogoPrincipal(famId, famNombre, emailAdmin) {
             const emailKey = sanitizeEmail(emailAdmin);
-            
             firebaseDb.ref('mercadona').once('value', snapRoot => {
                 const rootData = snapRoot.val() || {};
                 let catExistente = rootData.catalogo || {};
@@ -933,8 +872,7 @@
 
                 const payload = {
                     nombre: famNombre,
-                    creador: emailAdmin,
-                    miembros: { [emailKey]: emailAdmin },
+                    propietario: emailAdmin,
                     catalogo: catExistente,
                     secciones: secExistente.length ? secExistente : [
                         { id: "Sin Pasillo", nombre: "📍 Sin Pasillo" },
@@ -945,22 +883,38 @@
                 };
 
                 firebaseDb.ref(`mercadona/familias/${famId}`).set(payload).then(() => {
-                    listaFamiliasDisponibles[famId] = payload;
-                    vincularUsuarioACatalogo(famId, famNombre);
+                    firebaseDb.ref(`mercadona/usuarios_catalogos/${emailKey}`).set({
+                        familiaId: famId,
+                        nombreCatalogo: famNombre,
+                        email: emailAdmin
+                    }).then(() => {
+                        idFamiliaActual = famId;
+                        nombreFamiliaActual = famNombre;
+                        iniciarAppFamilia();
+                    });
                 });
             });
         }
 
         function iniciarAppFamilia() {
             document.getElementById('family-badge-name').innerText = nombreFamiliaActual;
-            document.getElementById('modal-nombre-familia-txt').innerText = nombreFamiliaActual;
-
             const basePath = getFamilyBasePath();
 
-            firebaseDb.ref(`${basePath}/miembros`).on('value', snap => {
-                miembrosFamiliaActual = snap.val() || {};
-                renderizarMiembrosEnModal();
-            });
+            const manejarError = (err) => {
+                if (err && err.code === 'PERMISSION_DENIED') {
+                    auth.signOut().then(() => {
+                        mostrarAccesoDenegado("Acceso denegado: tu cuenta no tiene permiso para ver este catálogo.");
+                    });
+                }
+            };
+
+            firebaseDb.ref(`${basePath}/nombre`).on('value', snap => {
+                const nom = snap.val();
+                if (nom) {
+                    nombreFamiliaActual = nom;
+                    document.getElementById('family-badge-name').innerText = nombreFamiliaActual;
+                }
+            }, manejarError);
 
             firebaseDb.ref(`${basePath}/secciones`).on('value', snap => {
                 const data = snap.val();
@@ -970,20 +924,18 @@
                 renderizarSelectSecciones();
                 renderizarCatalogo();
                 renderizarListaActual();
-            });
+            }, manejarError);
 
             firebaseDb.ref(`${basePath}/catalogo`).on('value', snap => {
                 catalogoProductos = snap.val() || {};
-
                 if (catalogoProductos['agua_oxigenada'] && catalogoProductos['agua_oxigenada'].consumos >= 20) {
                     catalogoProductos['agua_oxigenada'].consumos = 1;
                     firebaseDb.ref(`${basePath}/catalogo/agua_oxigenada/consumos`).set(1);
                 }
-
                 document.getElementById('contador-productos').innerText = Object.keys(catalogoProductos).length;
                 renderizarCatalogo();
                 renderizarListaActual();
-            });
+            }, manejarError);
 
             firebaseDb.ref(`${basePath}/listaActiva`).on('value', snap => {
                 datosListaActual = snap.val() || { productos: {}, orden: 'seccion', seccionesVisibles: {} };
@@ -995,109 +947,32 @@
                 document.getElementById('fab-add').classList.remove('hidden');
                 renderizarListaActual();
                 renderizarCatalogo();
-            });
-
-            firebaseDb.ref('mercadona/familias').on('value', snap => {
-                listaFamiliasDisponibles = snap.val() || {};
-                actualizarSelectoresDeCatalogo();
-            });
+            }, manejarError);
         }
 
-        function actualizarSelectoresDeCatalogo() {
-            const selectModal = document.getElementById('select-cambiar-catalogo');
-            if (!selectModal) return;
-            selectModal.innerHTML = '';
-            
-            Object.keys(listaFamiliasDisponibles).forEach(k => {
-                const fam = listaFamiliasDisponibles[k];
-                const opt = document.createElement('option');
-                opt.value = k;
-                opt.innerText = fam.nombre || k;
-                if (k === idFamiliaActual) opt.selected = true;
-                selectModal.appendChild(opt);
-            });
+        function abrirModalRenombrarCatalogo() {
+            document.getElementById('input-renombrar-catalogo').value = nombreFamiliaActual;
+            document.getElementById('modal-renombrar-catalogo').classList.remove('hidden');
+            setTimeout(() => document.getElementById('input-renombrar-catalogo').focus(), 100);
         }
-
-        function abrirModalFamilia() {
-            actualizarSelectoresDeCatalogo();
-            renderizarMiembrosEnModal();
-            document.getElementById('modal-familia').classList.remove('hidden');
+        function cerrarModalRenombrarCatalogo() {
+            document.getElementById('modal-renombrar-catalogo').classList.add('hidden');
         }
-        function cerrarModalFamilia() {
-            document.getElementById('modal-familia').classList.add('hidden');
-        }
-
-        function renderizarMiembrosEnModal() {
-            const cont = document.getElementById('lista-correos-familia');
-            cont.innerHTML = '';
-            const entries = Object.entries(miembrosFamiliaActual);
-            if (entries.length === 0) {
-                cont.innerHTML = '<div style="color:#888; font-size:13px; font-style:italic;">No hay otros miembros añadidos.</div>';
+        function guardarNuevoNombreCatalogo() {
+            const nuevoNombre = (document.getElementById('input-renombrar-catalogo').value || '').trim();
+            if (!nuevoNombre) {
+                alert("Escribe un nombre válido para el catálogo.");
                 return;
             }
-            entries.forEach(([key, email]) => {
-                cont.innerHTML += `
-                    <div class="email-member-badge">
-                        <span>📧 ${email}</span>
-                        <button class="btn-small" style="width:26px; height:26px; font-size:12px;" onclick="eliminarMiembroFamilia('${key}', '${email}')">✕</button>
-                    </div>
-                `;
-            });
-        }
-
-        function agregarMiembroFamilia() {
-            const inp = document.getElementById('nuevo-correo-miembro');
-            const email = (inp.value || '').trim().toLowerCase();
-            if (!email || !email.includes('@')) {
-                alert("Por favor, introduce un correo electrónico válido (ej: nombre@gmail.com).");
-                return;
-            }
-
-            const emailKey = sanitizeEmail(email);
             const basePath = getFamilyBasePath();
-
-            firebaseDb.ref(`${basePath}/miembros/${emailKey}`).set(email).then(() => {
-                firebaseDb.ref(`mercadona/autorizaciones/${emailKey}`).set({
-                    familiaId: idFamiliaActual,
-                    nombreFamilia: nombreFamiliaActual,
-                    email: email
-                }).then(() => {
-                    inp.value = '';
-                    mostrarToast(`✅ Acceso concedido a ${email}`);
-                });
+            const userEmailKey = sanitizeEmail(currentUser.email);
+            firebaseDb.ref(`${basePath}/nombre`).set(nuevoNombre).then(() => {
+                firebaseDb.ref(`mercadona/usuarios_catalogos/${userEmailKey}/nombreCatalogo`).set(nuevoNombre);
+                nombreFamiliaActual = nuevoNombre;
+                document.getElementById('family-badge-name').innerText = nuevoNombre;
+                cerrarModalRenombrarCatalogo();
+                mostrarToast("✅ Nombre del catálogo actualizado");
             });
-        }
-
-        function eliminarMiembroFamilia(key, email) {
-            if (confirm(`¿Retirar acceso al catálogo ${nombreFamiliaActual} para ${email}?`)) {
-                const basePath = getFamilyBasePath();
-                firebaseDb.ref(`${basePath}/miembros/${key}`).remove();
-                firebaseDb.ref(`mercadona/autorizaciones/${key}`).remove();
-                mostrarToast("Miembro retirado");
-            }
-        }
-
-        function cambiarACatalogoDesdeModal() {
-            const select = document.getElementById('select-cambiar-catalogo');
-            const nuevoFamId = select.value;
-            if (!nuevoFamId || nuevoFamId === idFamiliaActual) return;
-
-            const fam = listaFamiliasDisponibles[nuevoFamId];
-            vincularUsuarioACatalogo(nuevoFamId, fam.nombre || nuevoFamId);
-            cerrarModalFamilia();
-        }
-
-        function crearOtroCatalogoDesdeModal() {
-            const inp = document.getElementById('input-crear-otro-catalogo');
-            const nombre = (inp.value || '').trim();
-            if (!nombre) {
-                alert("Escribe un nombre para el nuevo catálogo.");
-                return;
-            }
-            const nuevoId = limpiarKey(nombre);
-            inp.value = '';
-            crearNuevoCatalogoEnFirebase(nuevoId, nombre, true);
-            cerrarModalFamilia();
         }
 
         function filtrarCatalogoInstaneamente() {
@@ -1122,34 +997,49 @@
             renderizarCatalogo();
         }
 
+        function actualizarTextoBotonPlegar() {
+            const btn = document.getElementById('btn-toggle-plegar-pasillos');
+            if (!btn) return;
+            if (todosPasillosPlegados) {
+                btn.innerText = "📂 Desplegar pasillos";
+            } else {
+                btn.innerText = "📁 Plegar pasillos";
+            }
+        }
+
         function toggleSeccionPlegada(secId) {
             estadoPlegadoSecciones[secId] = !estadoPlegadoSecciones[secId];
+            todosPasillosPlegados = seccionesPersonalizadas.length > 0 && seccionesPersonalizadas.every(s => !!estadoPlegadoSecciones[s.id]);
+            actualizarTextoBotonPlegar();
             renderizarCatalogo();
         }
 
-        function plegarTodasSecciones(plegar) {
+        function alternarPlegadoTodosPasillos() {
+            const nuevoEstado = !todosPasillosPlegados;
+            todosPasillosPlegados = nuevoEstado;
             seccionesPersonalizadas.forEach(s => {
-                estadoPlegadoSecciones[s.id] = plegar;
+                estadoPlegadoSecciones[s.id] = nuevoEstado;
             });
+            actualizarTextoBotonPlegar();
             renderizarCatalogo();
         }
 
         function renderizarCatalogo() {
             const cont = document.getElementById('items-catalogo');
-            const busqueda = (document.getElementById('buscador').value || '').toLowerCase().trim();
+            const busquedaNorm = normalizarTexto(document.getElementById('buscador').value || '');
             const orden = document.getElementById('orden-catalogo').value;
             
             let keys = Object.keys(catalogoProductos);
             
             let keysFiltradas = keys.filter(key => {
                 const prod = catalogoProductos[key];
-                const nVis = (prod.nombrePersonalizado || prod.nombre || "").toLowerCase();
-                const nOrig = (prod.nombreOriginal || "").toLowerCase();
-                return busqueda.length === 0 || nVis.includes(busqueda) || nOrig.includes(busqueda);
+                const nVis = normalizarTexto(prod.nombrePersonalizado || prod.nombre || "");
+                const nOrig = normalizarTexto(prod.nombreOriginal || "");
+                return busquedaNorm.length === 0 || nVis.includes(busquedaNorm) || nOrig.includes(busquedaNorm);
             });
 
             const foldBar = document.getElementById('fold-controls');
-            if (orden === 'seccion' && busqueda.length === 0) {
+            if (orden === 'seccion' && busquedaNorm.length === 0) {
                 foldBar.classList.remove('hidden');
             } else {
                 foldBar.classList.add('hidden');
@@ -1201,7 +1091,7 @@
                 seccionesOrdenadas.forEach(secName => {
                     estructurado[secName].sort((a,b) => (catalogoProductos[a].nombrePersonalizado || "").localeCompare(catalogoProductos[b].nombrePersonalizado || ""));
                     
-                    const estaPlegada = busqueda.length === 0 ? !!estadoPlegadoSecciones[secName] : false;
+                    const estaPlegada = busquedaNorm.length === 0 ? !!estadoPlegadoSecciones[secName] : false;
                     const flecha = estaPlegada ? '▶' : '▼';
                     const conteo = estructurado[secName].length;
 
@@ -1221,7 +1111,7 @@
                     keysFiltradas.sort((a,b) => (catalogoProductos[a].nombrePersonalizado || "").localeCompare(catalogoProductos[b].nombrePersonalizado || ""));
                 } else if (orden === 'consumos') {
                     keysFiltradas.sort((a,b) => obtenerPuntuacionHabitual(b) - obtenerPuntuacionHabitual(a));
-                    if (busqueda.length === 0) keysFiltradas = keysFiltradas.slice(0, 25);
+                    if (busquedaNorm.length === 0) keysFiltradas = keysFiltradas.slice(0, 25);
                 }
                 keysFiltradas.forEach(k => htmlContent += dibujarTarjeta(k));
             }
@@ -1407,7 +1297,7 @@
 
         function agregarRapidoDesdeLista() {
             const input = document.getElementById('buscador-rapido-lista');
-            const texto = input.value.trim();
+            const texto = (input.value || '').trim();
             if (!texto) return;
 
             const key = limpiarKey(texto);
@@ -1425,7 +1315,7 @@
             
             updateQty(key, 1);
             input.value = '';
-            mostrarToast(`🛒 ${texto} añadido`);
+            mostrarToast(`🛒 ${texto} añadido sin categorizar`);
         }
 
         function updateQty(idProducto, delta, event) {

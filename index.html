@@ -246,15 +246,18 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      align-self: center;
       transition: transform 0.2s ease;
+      transform: translateY(9px);
     }
 
     .app-logo img {
-      max-height: 72px;
-      max-width: 140px;
-      width: auto;
-      height: auto;
+      width: 86.4px;
+      height: 86.4px;
+      max-height: 86.4px;
+      max-width: 168px;
       object-fit: contain;
+      object-position: center bottom;
       display: block;
     }
 
@@ -263,7 +266,7 @@
     }
 
     body.edit-mode .app-logo:hover {
-      transform: scale(1.03);
+      transform: translateY(9px) scale(1.03);
     }
 
     body.edit-mode .app-logo:focus-visible {
@@ -635,11 +638,14 @@
         text-align: left;
       }
       .app-logo {
-        justify-content: flex-start;
+        justify-content: center;
+        transform: translateY(7px);
       }
       .app-logo img {
-        max-width: 72px;
-        max-height: 56px;
+        width: 67.2px;
+        height: 67.2px;
+        max-width: 86.4px;
+        max-height: 67.2px;
       }
       .header-title {
         min-width: 0;
@@ -701,7 +707,7 @@
   <div class="card">
     <header class="header">
       <div class="app-logo" id="appLogo" title="Pulsa para cambiar el logo en modo edición" role="button" tabindex="0" aria-label="Cambiar logo">
-        <img id="logoImage" src="logogad.png" alt="GAD" onerror="this.src='https://placehold.co/120x60/182234/f8fafc?text=GAD'">
+        <img id="logoImage" src="logomarkarma.png" alt="Policía meditando" onerror="this.src='logomarkarma-login.png'">
       </div>
       <input type="file" id="logoFileInput" style="display: none;" accept="image/*">
 
@@ -981,6 +987,10 @@
   function loadLogo() {
     db.ref("config/logo").on("value", (snap) => {
       const val = snap.val();
+      if (typeof val === "string" && (val === "logogad.png" || val.includes("GAD") || val.endsWith("/logogad.png"))) {
+        document.getElementById("logoImage").src = "logomarkarma.png";
+        return;
+      }
       if (typeof val === "string" && (val.startsWith("data:image/") || val.startsWith("https://") || val.startsWith("./") || !val.includes(":"))) {
         document.getElementById("logoImage").src = val;
       }

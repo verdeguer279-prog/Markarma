@@ -1,0 +1,2546 @@
+{
+  "catalogo": {
+    "+_proteínas_flan": {
+      "consumos": 33,
+      "nombreOriginal": "+ proteínas flan",
+      "nombrePersonalizado": "Flan + proteínas",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "+prot_natilla_vaini": {
+      "consumos": 34,
+      "nombreOriginal": "+prot natilla vaini",
+      "nombrePersonalizado": "Natillas + proteínas",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "a_negras_rodajas": {
+      "consumos": 3,
+      "nombreOriginal": "a. negras rodajas",
+      "nombrePersonalizado": "Aceitunas negras rodajas",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "abrillantador_lavavajillas": {
+      "consumos": 22,
+      "nombreOriginal": "abrillantador lavavajillas",
+      "nombrePersonalizado": "Abrillantador lavavajillas",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "aceite_girasol": {
+      "consumos": 13,
+      "nombreOriginal": "aceite girasol",
+      "nombrePersonalizado": "Aceite girasol",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "aceite_virgen_ex": {
+      "consumos": 34,
+      "nombreOriginal": "aceite virgen ex",
+      "nombrePersonalizado": "Aceite de oliva virgen extra",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "aceituna_aliñada": {
+      "consumos": 21,
+      "nombreOriginal": "aceituna aliñada",
+      "nombrePersonalizado": "Aceitunas aliñadas",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "agua_mineral": {
+      "consumos": 28,
+      "nombreOriginal": "agua mineral",
+      "nombrePersonalizado": "Agua mineral 1 Litro",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "agua_mineral_1,5_litros": {
+      "consumos": 5,
+      "nombreOriginal": "agua mineral 1,5 litros",
+      "nombrePersonalizado": "Agua Mineral 1,5 Litros",
+      "seccion": "Bebidas y Aguas"
+    },
+    "agua_oxigenada": {
+      "consumos": 25,
+      "nombreOriginal": "agua oxigenada",
+      "nombrePersonalizado": "Agua oxigenada",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "ajo_granulado": {
+      "consumos": 9,
+      "nombreOriginal": "ajo granulado",
+      "nombrePersonalizado": "Ajo en polvo",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "ajo_seco_250_g": {
+      "consumos": 8,
+      "nombreOriginal": "ajo seco 250 g",
+      "nombrePersonalizado": "Ajos secos (250 g)",
+      "seccion": "Fruta y Verdura"
+    },
+    "alcohol": {
+      "consumos": 2,
+      "nombreOriginal": "alcohol",
+      "nombrePersonalizado": "Alcohol",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "ali_oli": {
+      "consumos": 2,
+      "nombreOriginal": "ali oli",
+      "nombrePersonalizado": "Ali oli",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "amb_c_fru_silvestres": {
+      "consumos": 5,
+      "nombreOriginal": "amb c fru silvestres",
+      "nombrePersonalizado": "Amb c fru silvestres",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "amb_coche_bali": {
+      "consumos": 6,
+      "nombreOriginal": "amb coche bali",
+      "nombrePersonalizado": "Amb coche bali",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "ambientador_lavavajillas": {
+      "consumos": 2,
+      "nombreOriginal": "ambientador lavavajillas",
+      "nombrePersonalizado": "Ambientador lavavajillas",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "antical": {
+      "consumos": 2,
+      "nombreOriginal": "antical",
+      "nombrePersonalizado": "Antical",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "arroz_basmati": {
+      "consumos": 5,
+      "nombreOriginal": "arroz basmati",
+      "nombrePersonalizado": "Arroz basmati",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "arroz_fallera": {
+      "consumos": 18,
+      "nombreOriginal": "arroz fallera",
+      "nombrePersonalizado": "Arroz La Fallera",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "arroz_ultracongelado": {
+      "consumos": 15,
+      "nombreOriginal": "arroz ultracongelado",
+      "nombrePersonalizado": "Arroz ultracongelado",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "atún_con_tomate": {
+      "consumos": 4,
+      "nombreOriginal": "atún con tomate",
+      "nombrePersonalizado": "Atún con tomate",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "atún_con_tomate_p3": {
+      "consumos": 16,
+      "nombreOriginal": "atún con tomate p3",
+      "nombrePersonalizado": "Atún en aceite de oliva",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "avecrem": {
+      "consumos": 3,
+      "nombreOriginal": "avecrem",
+      "nombrePersonalizado": "Avecrem",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "avena_crunchy_cacao": {
+      "consumos": 6,
+      "nombreOriginal": "avena crunchy cacao",
+      "nombrePersonalizado": "Cereales avena Rafa",
+      "seccion": "Panadería y Pastelería"
+    },
+    "azucar": {
+      "consumos": 2,
+      "nombreOriginal": "azucar",
+      "nombrePersonalizado": "Azúcar blanco",
+      "seccion": "Panadería y Pastelería"
+    },
+    "azúcar_glas": {
+      "consumos": 1,
+      "nombreOriginal": "azúcar glas",
+      "nombrePersonalizado": "Azúcar glas",
+      "seccion": "Panadería y Pastelería"
+    },
+    "bacon": {
+      "consumos": 1,
+      "nombreOriginal": "bacon",
+      "nombrePersonalizado": "Bacon",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "bacon_lonchas": {
+      "consumos": 7,
+      "nombreOriginal": "bacon lonchas",
+      "nombrePersonalizado": "Bacon en lonchas",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "bandejas_25x34_4bl": {
+      "consumos": 2,
+      "nombreOriginal": "bandejas 25x34 4bl",
+      "nombrePersonalizado": "Bandejas 25x34 4bl",
+      "seccion": "🍨Helados"
+    },
+    "barra_campesina": {
+      "consumos": 11,
+      "nombreOriginal": "barra campesina",
+      "nombrePersonalizado": "Barra de pan campesina",
+      "seccion": "Panadería y Pastelería"
+    },
+    "bastoncillo_famil": {
+      "consumos": 10,
+      "nombreOriginal": "bastoncillo famil",
+      "nombrePersonalizado": "Bastoncillos de algodón familiares",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "batata": {
+      "consumos": 2,
+      "nombreOriginal": "batata",
+      "nombrePersonalizado": "Batata",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "batido_cacao_pack_6": {
+      "consumos": 20,
+      "nombreOriginal": "batido cacao pack 6",
+      "nombrePersonalizado": "Choleck Rafa",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "bcierra_fácil": {
+      "consumos": 1,
+      "nombreOriginal": "b.cierra fácil",
+      "nombrePersonalizado": "Bolsas de congelación cierre fácil",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "bebida_avena": {
+      "consumos": 12,
+      "nombreOriginal": "bebida avena",
+      "nombrePersonalizado": "Bebida de avena",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "berenjena_rellena": {
+      "consumos": 1,
+      "nombreOriginal": "berenjena rellena",
+      "nombrePersonalizado": "Berenjenas rellenas",
+      "seccion": "❄️ Comidas preparadas"
+    },
+    "bolsa_basura_cocina": {
+      "consumos": 3,
+      "nombreOriginal": "bolsa basura cocina",
+      "nombrePersonalizado": "Bolsa Basura Cocina",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "bolsa_plastico": {
+      "consumos": 4,
+      "nombreOriginal": "bolsa plastico",
+      "nombrePersonalizado": "Bolsa plastico Grande",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "bolsa_plastico_pequeña": {
+      "consumos": 2,
+      "nombreOriginal": "bolsa plastico pequeña",
+      "nombrePersonalizado": "Bolsa plastico Pequeña",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "bolsas_basura_baño_grises": {
+      "consumos": 4,
+      "nombreOriginal": "bolsas basura baño grises",
+      "nombrePersonalizado": "Bolsas basura baño grises",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "bolsas_horno": {
+      "consumos": 2,
+      "nombreOriginal": "bolsas horno",
+      "nombrePersonalizado": "Bolsas horno",
+      "seccion": "🍨Helados"
+    },
+    "boniato_rafa": {
+      "consumos": 3,
+      "nombreOriginal": "boniato rafa",
+      "nombrePersonalizado": "Boniato rafa",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "bote_chicle_hierbab": {
+      "consumos": 3,
+      "nombreOriginal": "bote chicle hierbab",
+      "nombrePersonalizado": "Bote chicle hierbab",
+      "seccion": "Panadería y Pastelería"
+    },
+    "bíf_0%0%_nat": {
+      "consumos": 37,
+      "nombreOriginal": "bíf 0%0% nat",
+      "nombrePersonalizado": "Yogur Bífidus 0% natural",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "c_colombia_alu": {
+      "consumos": 10,
+      "nombreOriginal": "c. colombia alu.",
+      "nombrePersonalizado": "Café Colombia (Aluminio)",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "c_descafeinado_alu": {
+      "consumos": 9,
+      "nombreOriginal": "c. descafeinado alu",
+      "nombrePersonalizado": "Café descafeinado (Aluminio)",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "cacahuete_sin_sal": {
+      "consumos": 13,
+      "nombreOriginal": "cacahuete sin sal",
+      "nombrePersonalizado": "Cacahuete sin sal",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "café_cápsulas": {
+      "consumos": 2,
+      "nombreOriginal": "café cápsulas",
+      "nombrePersonalizado": "Café cápsulas",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "caldo_de_pollo": {
+      "consumos": 7,
+      "nombreOriginal": "caldo de pollo",
+      "nombrePersonalizado": "Caldo de pollo",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "canela_molida": {
+      "consumos": 1,
+      "nombreOriginal": "canela molida",
+      "nombrePersonalizado": "Canela molida",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "caramelos_de_miel": {
+      "consumos": 5,
+      "nombreOriginal": "caramelos de miel",
+      "nombrePersonalizado": "Caramelos de miel",
+      "seccion": "Panadería y Pastelería"
+    },
+    "caramelos_vita-c": {
+      "consumos": 4,
+      "nombreOriginal": "caramelos vita-c",
+      "nombrePersonalizado": "Caramelos Halls Vita-C",
+      "seccion": "Panadería y Pastelería"
+    },
+    "carne_picada": {
+      "consumos": 2,
+      "nombreOriginal": "carne picada",
+      "nombrePersonalizado": "Carne picada",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "cebolla_crujiente": {
+      "consumos": 3,
+      "nombreOriginal": "cebolla crujiente",
+      "nombrePersonalizado": "Cebolla frita crujiente",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "cebolla_dulce": {
+      "consumos": 11,
+      "nombreOriginal": "cebolla dulce",
+      "nombrePersonalizado": "Cebollas dulces",
+      "seccion": "Fruta y Verdura"
+    },
+    "cepillos_dientes": {
+      "consumos": 7,
+      "nombreOriginal": "cepillos dientes",
+      "nombrePersonalizado": "Cepillos dientes",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "cervezas": {
+      "consumos": 2,
+      "nombreOriginal": "cervezas",
+      "nombrePersonalizado": "Cervezas",
+      "seccion": "Bebidas y Aguas"
+    },
+    "cervezas_0%": {
+      "consumos": 3,
+      "nombreOriginal": "cervezas 0%",
+      "nombrePersonalizado": "Cervezas 0%",
+      "seccion": "Bebidas y Aguas"
+    },
+    "champiñon_laminado": {
+      "consumos": 6,
+      "nombreOriginal": "champiñon laminado",
+      "nombrePersonalizado": "Champiñones laminados frescos",
+      "seccion": "Fruta y Verdura"
+    },
+    "champiñón_en_lata": {
+      "consumos": 2,
+      "nombreOriginal": "champiñón en lata",
+      "nombrePersonalizado": "Champiñón en lata",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "champú_anticaspa": {
+      "consumos": 4,
+      "nombreOriginal": "champú anticaspa",
+      "nombrePersonalizado": "Champú anticaspa",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "champú_rafa": {
+      "consumos": 3,
+      "nombreOriginal": "champú rafa",
+      "nombrePersonalizado": "Champú Rafa",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "choc_leche_almen_ent": {
+      "consumos": 2,
+      "nombreOriginal": "choc leche almen ent",
+      "nombrePersonalizado": "Choc leche almen ent",
+      "seccion": "Panadería y Pastelería"
+    },
+    "chocolate_leche": {
+      "consumos": 2,
+      "nombreOriginal": "chocolate leche",
+      "nombrePersonalizado": "Chocolate leche",
+      "seccion": "Panadería y Pastelería"
+    },
+    "chucrut_con_vino": {
+      "consumos": 2,
+      "nombreOriginal": "chucrut con vino",
+      "nombrePersonalizado": "Chucrut con vino",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "clara_liquida_pasteu": {
+      "consumos": 10,
+      "nombreOriginal": "clara liquida pasteu",
+      "nombrePersonalizado": "Claras de huevo líquidas pasteurizadas",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "coca_cola": {
+      "consumos": 5,
+      "nombreOriginal": "coca cola",
+      "nombrePersonalizado": "Coca cola",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "cocktail_mezcla": {
+      "consumos": 3,
+      "nombreOriginal": "cocktail mezcla",
+      "nombrePersonalizado": "Cocktail mezcla",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "cogollos": {
+      "consumos": 14,
+      "nombreOriginal": "cogollos",
+      "nombrePersonalizado": "Cogollos de lechuga",
+      "seccion": "Fruta y Verdura"
+    },
+    "colacao": {
+      "consumos": 2,
+      "nombreOriginal": "colacao",
+      "nombrePersonalizado": "Colacao",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "colgador_wc_pino": {
+      "consumos": 15,
+      "nombreOriginal": "colgador wc pino",
+      "nombrePersonalizado": "Colgador para WC aroma pino",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "colonia": {
+      "consumos": 2,
+      "nombreOriginal": "colonia",
+      "nombrePersonalizado": "Colonia",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "combinado_aperitivos": {
+      "consumos": 1,
+      "nombreOriginal": "combinado aperitivos",
+      "nombrePersonalizado": "Combinado aperitivos",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "contramuslo_deshuesa": {
+      "consumos": 14,
+      "nombreOriginal": "contramuslo deshuesa",
+      "nombrePersonalizado": "Contramuslos de pollo deshuesados",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "corazones_cogollo": {
+      "consumos": 2,
+      "nombreOriginal": "corazones cogollo",
+      "nombrePersonalizado": "Corazones de cogollo de lechuga",
+      "seccion": "Fruta y Verdura"
+    },
+    "coñac": {
+      "consumos": 2,
+      "nombreOriginal": "coñac",
+      "nombrePersonalizado": "Coñac",
+      "seccion": "Bebidas y Aguas"
+    },
+    "crema_calabacín": {
+      "consumos": 5,
+      "nombreOriginal": "crema calabacín",
+      "nombrePersonalizado": "Crema de calabacín",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "crema_de_cacahuete": {
+      "consumos": 3,
+      "nombreOriginal": "crema de cacahuete",
+      "nombrePersonalizado": "Crema de cacahuete",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "crema_de_manos": {
+      "consumos": 1,
+      "nombreOriginal": "crema de manos",
+      "nombrePersonalizado": "Crema de manos",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "cuchara_postre_re": {
+      "consumos": 1,
+      "nombreOriginal": "cuchara postre re",
+      "nombrePersonalizado": "Cuchara Postre",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "delicias_de_pollo": {
+      "consumos": 13,
+      "nombreOriginal": "delicias de pollo",
+      "nombrePersonalizado": "Pollo Frango",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "deo_rollon_dermo_sen": {
+      "consumos": 5,
+      "nombreOriginal": "deo rollon dermo sen",
+      "nombrePersonalizado": "Desodorante roll-on Dermo Sensitive",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "deo_spray_aloe": {
+      "consumos": 13,
+      "nombreOriginal": "deo spray aloe",
+      "nombrePersonalizado": "Desodorante spray Aloe Vera verde",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "desengrasante_cocina": {
+      "consumos": 2,
+      "nombreOriginal": "desengrasante cocina",
+      "nombrePersonalizado": "Desengrasante cocina",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "desinfectante_wc": {
+      "consumos": 2,
+      "nombreOriginal": "desinfectante wc",
+      "nombrePersonalizado": "Desinfectante WC",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "desmaquillante": {
+      "consumos": 2,
+      "nombreOriginal": "desmaquillante",
+      "nombrePersonalizado": "Desmaquillante",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "digestive_0%": {
+      "consumos": 2,
+      "nombreOriginal": "digestive 0%",
+      "nombrePersonalizado": "Galletas Digestive 0% azúcares",
+      "seccion": "Panadería y Pastelería"
+    },
+    "discos_desma_oval": {
+      "consumos": 3,
+      "nombreOriginal": "discos desma oval",
+      "nombrePersonalizado": "Discos desmaquillantes",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "esponjas": {
+      "consumos": 2,
+      "nombreOriginal": "esponjas",
+      "nombrePersonalizado": "Esponjas",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "fabada_asturiana": {
+      "consumos": 7,
+      "nombreOriginal": "fabada asturiana",
+      "nombrePersonalizado": "Fabada Asturiana",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "fideo_cabello": {
+      "consumos": 1,
+      "nombreOriginal": "fideo cabello",
+      "nombrePersonalizado": "Fideos cabello de ángel",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "fideuá": {
+      "consumos": 2,
+      "nombreOriginal": "fideuá",
+      "nombrePersonalizado": "Fideuá",
+      "seccion": "❄️ Comidas preparadas"
+    },
+    "filete_pechuga": {
+      "consumos": 3,
+      "nombreOriginal": "filete pechuga",
+      "nombrePersonalizado": "Filete pechuga amarilla",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "film_transparente": {
+      "consumos": 2,
+      "nombreOriginal": "film transparente",
+      "nombrePersonalizado": "Rollo de film transparente",
+      "seccion": "🍨Helados"
+    },
+    "fregasuelos": {
+      "consumos": 3,
+      "nombreOriginal": "fregasuelos",
+      "nombrePersonalizado": "Fregasuelos",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "fresón": {
+      "consumos": 23,
+      "nombreOriginal": "fresón",
+      "nombrePersonalizado": "Fresones",
+      "seccion": "Fruta y Verdura"
+    },
+    "fte_merluza_al_huevo": {
+      "consumos": 11,
+      "nombreOriginal": "fte merluza al huevo",
+      "nombrePersonalizado": "Filetes de merluza rebozados al huevo",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "fuet_espetec_extra": {
+      "consumos": 2,
+      "nombreOriginal": "fuet espetec extra",
+      "nombrePersonalizado": "Fuet Espetec extra",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "galletas_tostadas": {
+      "consumos": 1,
+      "nombreOriginal": "galletas tostadas",
+      "nombrePersonalizado": "Galletas Tarta",
+      "seccion": "Panadería y Pastelería"
+    },
+    "galletitas_saladas": {
+      "consumos": 1,
+      "nombreOriginal": "galletitas saladas",
+      "nombrePersonalizado": "Galletitas saladas",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "garbanzo_mcocido": {
+      "consumos": 6,
+      "nombreOriginal": "garbanzo m.cocido",
+      "nombrePersonalizado": "Garbanzos de bote cocidos",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "gel_limpiador_baño": {
+      "consumos": 2,
+      "nombreOriginal": "gel limpiador baño",
+      "nombrePersonalizado": "Gel limpiador para baños",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "gnocchi_quesos": {
+      "consumos": 2,
+      "nombreOriginal": "gnocchi quesos",
+      "nombrePersonalizado": "Gnocchi Ñoquis",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "griego_bicapa_mango": {
+      "consumos": 6,
+      "nombreOriginal": "griego bicapa mango",
+      "nombrePersonalizado": "Yogur griego bicapa con mango",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "guisantes": {
+      "consumos": 2,
+      "nombreOriginal": "guisantes",
+      "nombrePersonalizado": "Guisantes",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "hamburguesa_pollo": {
+      "consumos": 2,
+      "nombreOriginal": "hamburguesa pollo",
+      "nombrePersonalizado": "Hamburguesa pollo",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "helados": {
+      "consumos": 2,
+      "nombreOriginal": "helados",
+      "nombrePersonalizado": "Helados",
+      "seccion": "🍨Helados"
+    },
+    "higienico_doble_roll": {
+      "consumos": 11,
+      "nombreOriginal": "higienico doble roll",
+      "nombrePersonalizado": "Papel higiénico doble rollo",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "hilo_dental": {
+      "consumos": 3,
+      "nombreOriginal": "hilo dental",
+      "nombrePersonalizado": "Hilo dental",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "huevos_super_gran": {
+      "consumos": 35,
+      "nombreOriginal": "huevos super gran",
+      "nombrePersonalizado": "Huevos (Talla XL)",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "infusión_de_jengibre": {
+      "consumos": 4,
+      "nombreOriginal": "infusión de jengibre",
+      "nombrePersonalizado": "Infusión de Jengibre",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "insecticida": {
+      "consumos": 2,
+      "nombreOriginal": "insecticida",
+      "nombrePersonalizado": "Insecticida",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "jabón_cocina": {
+      "consumos": 3,
+      "nombreOriginal": "jabón cocina",
+      "nombrePersonalizado": "Jabón Cocina",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "jamón_cocido_92%": {
+      "consumos": 7,
+      "nombreOriginal": "jamón cocido 92%",
+      "nombrePersonalizado": "Jamón York cocido extra (92% carne)",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "jamón_serrano": {
+      "consumos": 5,
+      "nombreOriginal": "jamón serrano",
+      "nombrePersonalizado": "Jamón serrano",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "judías_congeladas": {
+      "consumos": 3,
+      "nombreOriginal": "judías congeladas",
+      "nombrePersonalizado": "Judías Congeladas",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "kepchup": {
+      "consumos": 2,
+      "nombreOriginal": "kepchup",
+      "nombrePersonalizado": "Kepchup",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "ketchup": {
+      "consumos": 2,
+      "nombreOriginal": "ketchup",
+      "nombrePersonalizado": "Ketchup",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "kéfir": {
+      "consumos": 13,
+      "nombreOriginal": "kéfir",
+      "nombrePersonalizado": "Yogur Kéfir natural",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "la_mancha_blanco": {
+      "consumos": 6,
+      "nombreOriginal": "la mancha blanco",
+      "nombrePersonalizado": "Vino blanco D.O. La Mancha",
+      "seccion": "Bebidas y Aguas"
+    },
+    "laca_gel_brillo": {
+      "consumos": 1,
+      "nombreOriginal": "laca gel brillo",
+      "nombrePersonalizado": "Laca de uñas efecto gel brillo",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "lacon_cortado_a_mano": {
+      "consumos": 2,
+      "nombreOriginal": "lacon cortado a mano",
+      "nombrePersonalizado": "Lacón",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "lactovit_nutritivo": {
+      "consumos": 16,
+      "nombreOriginal": "lactovit nutritivo",
+      "nombrePersonalizado": "Gel de ducha Lactovit nutritivo",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "lasaña_boloñesa": {
+      "consumos": 1,
+      "nombreOriginal": "lasaña boloñesa",
+      "nombrePersonalizado": "Lasaña boloñesa precocinada",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "lavavajillas_fresh": {
+      "consumos": 5,
+      "nombreOriginal": "lavavajillas fresh",
+      "nombrePersonalizado": "Lavavajillas Fairy todo en uno",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "leche_desnatada_p_6": {
+      "consumos": 20,
+      "nombreOriginal": "leche desnatada p 6",
+      "nombrePersonalizado": "Leche desnatada (Pack de 6)",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "lejia": {
+      "consumos": 7,
+      "nombreOriginal": "lejia",
+      "nombrePersonalizado": "Lejia",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "lejia_con_detergente": {
+      "consumos": 5,
+      "nombreOriginal": "lejia con detergente",
+      "nombrePersonalizado": "Lejia con detergente",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "lenteja_pardina": {
+      "consumos": 7,
+      "nombreOriginal": "lenteja pardina",
+      "nombrePersonalizado": "Lentejas pardinas",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "levadura_panaderia": {
+      "consumos": 2,
+      "nombreOriginal": "levadura panaderia",
+      "nombrePersonalizado": "Levadura fresca de panadería",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "limon": {
+      "consumos": 12,
+      "nombreOriginal": "limon",
+      "nombrePersonalizado": "Limones",
+      "seccion": "Fruta y Verdura"
+    },
+    "limpia_coche": {
+      "consumos": 2,
+      "nombreOriginal": "limpia coche",
+      "nombrePersonalizado": "Limpia coche",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "limpiador_mopa_spray": {
+      "consumos": 1,
+      "nombreOriginal": "limpiador mopa spray",
+      "nombrePersonalizado": "Limpiador para mopa con spray",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "limpiador_vitro": {
+      "consumos": 2,
+      "nombreOriginal": "limpiador vitro",
+      "nombrePersonalizado": "Crema limpiadora para vitrocerámica",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "limpiahogar_multi": {
+      "consumos": 4,
+      "nombreOriginal": "limpiahogar multi",
+      "nombrePersonalizado": "Cristasol brujas",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "loción_mosquitos": {
+      "consumos": 2,
+      "nombreOriginal": "loción mosquitos",
+      "nombrePersonalizado": "Loción mosquitos",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "lomo_adobado": {
+      "consumos": 6,
+      "nombreOriginal": "lomo adobado",
+      "nombrePersonalizado": "Cinta de lomo de cerdo adobado",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "lomo_embuchado": {
+      "consumos": 6,
+      "nombreOriginal": "lomo embuchado",
+      "nombrePersonalizado": "Lomo embuchado en lonchas",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "lote_3_bayetas_peq": {
+      "consumos": 3,
+      "nombreOriginal": "lote 3 bayetas peq.",
+      "nombrePersonalizado": "Trapos bayetas",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "lápiz_de_ojos": {
+      "consumos": 2,
+      "nombreOriginal": "lápiz de ojos",
+      "nombrePersonalizado": "Lápiz de ojos",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "macarron": {
+      "consumos": 14,
+      "nombreOriginal": "macarron",
+      "nombrePersonalizado": "Macarrones",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "maiz_frito_crujiente": {
+      "consumos": 2,
+      "nombreOriginal": "maiz frito crujiente",
+      "nombrePersonalizado": "Kikos",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "mantel_rollo_colores": {
+      "consumos": 1,
+      "nombreOriginal": "mantel rollo colores",
+      "nombrePersonalizado": "Mantel rollo colores",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "manz_roja_acidulce": {
+      "consumos": 4,
+      "nombreOriginal": "manz. roja acidulce",
+      "nombrePersonalizado": "Manzanas rojas acidulces",
+      "seccion": "Fruta y Verdura"
+    },
+    "maquinillas_de_afeitar": {
+      "consumos": 2,
+      "nombreOriginal": "maquinillas de afeitar",
+      "nombrePersonalizado": "Maquinillas de afeitar",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "masa_quebrada_brisa": {
+      "consumos": 1,
+      "nombreOriginal": "masa quebrada brisa",
+      "nombrePersonalizado": "Masa fresca quebrada brisa",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "mayonesa": {
+      "consumos": 3,
+      "nombreOriginal": "mayonesa",
+      "nombrePersonalizado": "Mayonesa",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "maíz": {
+      "consumos": 2,
+      "nombreOriginal": "maíz",
+      "nombrePersonalizado": "Maíz",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "merluza_congelada_filetes": {
+      "consumos": 2,
+      "nombreOriginal": "merluza congelada filetes",
+      "nombrePersonalizado": "Merluza congelada Lomos y Centros",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "mezcla_4_quesos": {
+      "consumos": 11,
+      "nombreOriginal": "mezcla 4 quesos",
+      "nombrePersonalizado": "Queso rallado mezcla 4 quesos",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "miel": {
+      "consumos": 2,
+      "nombreOriginal": "miel",
+      "nombrePersonalizado": "Miel",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "mini_biscotte_normal": {
+      "consumos": 1,
+      "nombreOriginal": "mini biscotte normal",
+      "nombrePersonalizado": "Mini biscotte normal",
+      "seccion": "Panadería y Pastelería"
+    },
+    "mini_polos_almendrados": {
+      "consumos": 3,
+      "nombreOriginal": "mini polos almendrados",
+      "nombrePersonalizado": "Mini polos almendrados",
+      "seccion": "🍨Helados"
+    },
+    "mini_taquitos_jamon": {
+      "consumos": 7,
+      "nombreOriginal": "mini taquitos jamon",
+      "nombrePersonalizado": "Mini taquitos de jamón serrano",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "molde_rectangular": {
+      "consumos": 3,
+      "nombreOriginal": "molde rectangular",
+      "nombrePersonalizado": "Molde rectangular",
+      "seccion": "🍨Helados"
+    },
+    "molde_redondo": {
+      "consumos": 3,
+      "nombreOriginal": "molde redondo",
+      "nombrePersonalizado": "Molde redondo",
+      "seccion": "🍨Helados"
+    },
+    "mostaza": {
+      "consumos": 2,
+      "nombreOriginal": "mostaza",
+      "nombrePersonalizado": "Mostaza",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "mozzarella_fresca": {
+      "consumos": 5,
+      "nombreOriginal": "mozzarella fresca",
+      "nombrePersonalizado": "Bola de queso mozzarella fresca",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "multiusos": {
+      "consumos": 3,
+      "nombreOriginal": "multiusos",
+      "nombrePersonalizado": "Friega suelos Multiusos",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "nata_para_cocinar": {
+      "consumos": 2,
+      "nombreOriginal": "nata para cocinar",
+      "nombrePersonalizado": "Nata líquida para cocinar",
+      "seccion": "Fruta y Verdura"
+    },
+    "nescafé": {
+      "consumos": 2,
+      "nombreOriginal": "nescafé",
+      "nombrePersonalizado": "Nescafé descafeinado",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "nescafé_natural": {
+      "consumos": 5,
+      "nombreOriginal": "nescafé natural",
+      "nombrePersonalizado": "Nescafé natural",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "nocilla": {
+      "consumos": 1,
+      "nombreOriginal": "nocilla",
+      "nombrePersonalizado": "Nocilla",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "nuez_moscada": {
+      "consumos": 2,
+      "nombreOriginal": "nuez moscada",
+      "nombrePersonalizado": "Nuez moscada",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "nuez_natural": {
+      "consumos": 11,
+      "nombreOriginal": "nuez natural",
+      "nombrePersonalizado": "Nueces peladas naturales",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "nuggets_de_pollo": {
+      "consumos": 3,
+      "nombreOriginal": "nuggets de pollo",
+      "nombrePersonalizado": "Nuggets de pollo",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "orégano": {
+      "consumos": 2,
+      "nombreOriginal": "orégano",
+      "nombrePersonalizado": "Orégano",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "p_integral_trigo100%": {
+      "consumos": 22,
+      "nombreOriginal": "p integral trigo100%",
+      "nombrePersonalizado": "Pan integral trigo 100% (Paty)",
+      "seccion": "Panadería y Pastelería"
+    },
+    "palillos": {
+      "consumos": 2,
+      "nombreOriginal": "palillos",
+      "nombrePersonalizado": "Palillos",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "palillos_redondos": {
+      "consumos": 1,
+      "nombreOriginal": "palillos redondos",
+      "nombrePersonalizado": "Palillos redondos",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "palomitas": {
+      "consumos": 3,
+      "nombreOriginal": "palomitas",
+      "nombrePersonalizado": "Palomitas",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "pan_de_pipas": {
+      "consumos": 4,
+      "nombreOriginal": "pan de pipas",
+      "nombrePersonalizado": "Pan de pipas",
+      "seccion": "Panadería y Pastelería"
+    },
+    "pan_h_brioche": {
+      "consumos": 11,
+      "nombreOriginal": "pan h brioche",
+      "nombrePersonalizado": "Pan de hamburguesa estilo brioche",
+      "seccion": "Panadería y Pastelería"
+    },
+    "pan_semillas": {
+      "consumos": 35,
+      "nombreOriginal": "pan semillas",
+      "nombrePersonalizado": "Pan desayuno Many",
+      "seccion": "Panadería y Pastelería"
+    },
+    "panec_100%_integral": {
+      "consumos": 11,
+      "nombreOriginal": "panec. 100% integral",
+      "nombrePersonalizado": "Panecillos 100% integrales",
+      "seccion": "Panadería y Pastelería"
+    },
+    "papel_aluminio": {
+      "consumos": 2,
+      "nombreOriginal": "papel aluminio",
+      "nombrePersonalizado": "Rollo de papel de aluminio",
+      "seccion": "🍨Helados"
+    },
+    "papel_freidora_de_aire": {
+      "consumos": 3,
+      "nombreOriginal": "papel freidora de aire",
+      "nombrePersonalizado": "Papel freidora de aire",
+      "seccion": "🍨Helados"
+    },
+    "papel_humedo_wc": {
+      "consumos": 9,
+      "nombreOriginal": "papel humedo wc",
+      "nombrePersonalizado": "Toallitas de papel húmedo para WC",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "pasas_sultanas": {
+      "consumos": 8,
+      "nombreOriginal": "pasas sultanas",
+      "nombrePersonalizado": "Pasas sultanas",
+      "seccion": "Fruta y Verdura"
+    },
+    "pasta_colores": {
+      "consumos": 2,
+      "nombreOriginal": "pasta colores",
+      "nombrePersonalizado": "Pasta colores",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "pat_classicas": {
+      "consumos": 13,
+      "nombreOriginal": "pat. classicas",
+      "nombrePersonalizado": "Bolsa de patatas fritas clásicas",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "patata_3_kg": {
+      "consumos": 13,
+      "nombreOriginal": "patata 3 kg",
+      "nombrePersonalizado": "Patata 3 kg",
+      "seccion": "Fruta y Verdura"
+    },
+    "patata_waffle": {
+      "consumos": 3,
+      "nombreOriginal": "patata waffle",
+      "nombrePersonalizado": "Patatas Reja",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "patatas_serrano": {
+      "consumos": 4,
+      "nombreOriginal": "patatas serrano",
+      "nombrePersonalizado": "Patatas serrano",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "pañuelo_locion": {
+      "consumos": 6,
+      "nombreOriginal": "pañuelo locion",
+      "nombrePersonalizado": "Pañuelos de papel con loción",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "pechuga_pavo_92%": {
+      "consumos": 2,
+      "nombreOriginal": "pechuga pavo 92%",
+      "nombrePersonalizado": "Pechuga pavo 92%",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "pechugas_pollo_amarillo": {
+      "consumos": 3,
+      "nombreOriginal": "pechugas pollo amarillo",
+      "nombrePersonalizado": "Pechugas pollo Amarillo",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "pepinillos_ag_peq": {
+      "consumos": 1,
+      "nombreOriginal": "pepinillos ag peq.",
+      "nombrePersonalizado": "Pepinillos agridulces pequeños",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "pepino": {
+      "consumos": 2,
+      "nombreOriginal": "pepino",
+      "nombrePersonalizado": "Pepino",
+      "seccion": "Fruta y Verdura"
+    },
+    "perejil": {
+      "consumos": 2,
+      "nombreOriginal": "perejil",
+      "nombrePersonalizado": "Perejil",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "perf_ojos_water_106": {
+      "consumos": 1,
+      "nombreOriginal": "perf. ojos water 106",
+      "nombrePersonalizado": "Perf. ojos water 106",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "pescado_langostino_cocido": {
+      "consumos": 1,
+      "nombreOriginal": "pescado langostino cocido",
+      "nombrePersonalizado": "Langostino cocido",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "picatoste_frito": {
+      "consumos": 4,
+      "nombreOriginal": "picatoste frito",
+      "nombrePersonalizado": "Picatostes fritos para cremas",
+      "seccion": "Panadería y Pastelería"
+    },
+    "picos_campero": {
+      "consumos": 8,
+      "nombreOriginal": "picos campero",
+      "nombrePersonalizado": "Picos de pan camperos",
+      "seccion": "Panadería y Pastelería"
+    },
+    "pila_alcalina_lr03": {
+      "consumos": 1,
+      "nombreOriginal": "pila alcalina lr03",
+      "nombrePersonalizado": "Pila alcalina lr03"
+    },
+    "pila_alcalina_lr6": {
+      "consumos": 1,
+      "nombreOriginal": "pila alcalina lr6",
+      "nombrePersonalizado": "Pilas Lr6 AA"
+    },
+    "pilas_lr3_aaa": {
+      "consumos": 3,
+      "nombreOriginal": "pilas lr3 aaa",
+      "nombrePersonalizado": "Pilas Lr3 AAA"
+    },
+    "pimienta_molida": {
+      "consumos": 2,
+      "nombreOriginal": "pimienta molida",
+      "nombrePersonalizado": "Pimienta molida",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "pimiento_rojo": {
+      "consumos": 9,
+      "nombreOriginal": "pimiento rojo",
+      "nombrePersonalizado": "Pimiento rojo",
+      "seccion": "Fruta y Verdura"
+    },
+    "pimiento_trico": {
+      "consumos": 3,
+      "nombreOriginal": "pimiento trico",
+      "nombrePersonalizado": "Pack de pimientos tricolor",
+      "seccion": "Fruta y Verdura"
+    },
+    "pimiento_verde": {
+      "consumos": 1,
+      "nombreOriginal": "pimiento verde",
+      "nombrePersonalizado": "Pimiento verde",
+      "seccion": "Fruta y Verdura"
+    },
+    "pincho_mexicano": {
+      "consumos": 13,
+      "nombreOriginal": "pincho mexicano",
+      "nombrePersonalizado": "Pinchos de pollo adobado sabor mexicano",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "pipa_gigante_aguasal": {
+      "consumos": 10,
+      "nombreOriginal": "pipa gigante aguasal",
+      "nombrePersonalizado": "Bolsa pipas gigantes aguasal",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "pipas": {
+      "consumos": 1,
+      "nombreOriginal": "pipas",
+      "nombrePersonalizado": "Pipas",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "pizza_fam_4_quesos": {
+      "consumos": 3,
+      "nombreOriginal": "pizza fam 4 quesos",
+      "nombrePersonalizado": "Pizza familiar de 4 quesos",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "pizza_familiar_jamón_y_queso": {
+      "consumos": 12,
+      "nombreOriginal": "pizza familiar jamón y queso",
+      "nombrePersonalizado": "Pizza familiar jamón y queso",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "piña_granel": {
+      "consumos": 28,
+      "nombreOriginal": "piña granel",
+      "nombrePersonalizado": "Piña natural",
+      "seccion": "Fruta y Verdura"
+    },
+    "platano": {
+      "consumos": 9,
+      "nombreOriginal": "platano",
+      "nombrePersonalizado": "Plátanos de Canarias",
+      "seccion": "Fruta y Verdura"
+    },
+    "plato_grande": {
+      "consumos": 1,
+      "nombreOriginal": "plato grande",
+      "nombrePersonalizado": "Plato grande",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "plato_postre": {
+      "consumos": 1,
+      "nombreOriginal": "plato postre",
+      "nombrePersonalizado": "Plato postre",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "pollo_crispy": {
+      "consumos": 18,
+      "nombreOriginal": "pollo crispy",
+      "nombrePersonalizado": "Pollo rebozado crispy Rafa",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "protegeslips_normal": {
+      "consumos": 2,
+      "nombreOriginal": "protegeslips normal",
+      "nombrePersonalizado": "Protegeslips normal",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "q_rallado_emmental": {
+      "consumos": 1,
+      "nombreOriginal": "q rallado emmental",
+      "nombrePersonalizado": "Q rallado emmental",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "queso_fresco_cabra": {
+      "consumos": 1,
+      "nombreOriginal": "queso fresco cabra",
+      "nombrePersonalizado": "Queso fresco de cabra",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "queso_lonchas_cabra": {
+      "consumos": 4,
+      "nombreOriginal": "queso lonchas cabra",
+      "nombrePersonalizado": "Queso de cabra en lonchas",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "queso_lonchas_semi": {
+      "consumos": 7,
+      "nombreOriginal": "queso lonchas semi",
+      "nombrePersonalizado": "Queso lonchas semi",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "queso_manchego_curad": {
+      "consumos": 11,
+      "nombreOriginal": "queso manchego curad",
+      "nombrePersonalizado": "Cuña de queso manchego curado",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "queso_sandwich": {
+      "consumos": 2,
+      "nombreOriginal": "queso sandwich",
+      "nombrePersonalizado": "Queso sandwich",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "quitaesmalte": {
+      "consumos": 2,
+      "nombreOriginal": "quitaesmalte",
+      "nombrePersonalizado": "Quitaesmalte",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "raclette_ahumada": {
+      "consumos": 6,
+      "nombreOriginal": "raclette ahumada",
+      "nombrePersonalizado": "Lonchas de queso Raclette ahumado",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "rasqueta_vitro_+5rec": {
+      "consumos": 2,
+      "nombreOriginal": "rasqueta vitro +5rec",
+      "nombrePersonalizado": "Rasqueta para vitrocerámica (+5 recambios)",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "rebuenas": {
+      "consumos": 12,
+      "nombreOriginal": "rebuenas",
+      "nombrePersonalizado": "Galletas rellenas chocolate",
+      "seccion": "Panadería y Pastelería"
+    },
+    "rec_pastillas_insect": {
+      "consumos": 3,
+      "nombreOriginal": "rec pastillas insect",
+      "nombrePersonalizado": "Pastillas Mosquitos",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "relleno_fajitas": {
+      "consumos": 7,
+      "nombreOriginal": "relleno fajitas",
+      "nombrePersonalizado": "Preparado de pollo/verduras para fajitas",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "rodajas_emperador": {
+      "consumos": 1,
+      "nombreOriginal": "rodajas emperador",
+      "nombrePersonalizado": "Rodajas emperador",
+      "seccion": "🐟 Pescadería - ❄️ Congelados"
+    },
+    "rollo_hogar_doble": {
+      "consumos": 7,
+      "nombreOriginal": "rollo hogar doble",
+      "nombrePersonalizado": "Rollo de papel de cocina doble",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "romana_200_gr": {
+      "consumos": 10,
+      "nombreOriginal": "romana 200 gr",
+      "nombrePersonalizado": "Lechuga romana cortada (200 g)",
+      "seccion": "Fruta y Verdura"
+    },
+    "sal_bote": {
+      "consumos": 2,
+      "nombreOriginal": "sal bote",
+      "nombrePersonalizado": "Sal bote",
+      "seccion": "Panadería y Pastelería"
+    },
+    "sal_de_mesa": {
+      "consumos": 2,
+      "nombreOriginal": "sal de mesa",
+      "nombrePersonalizado": "Sal de mesa",
+      "seccion": "Panadería y Pastelería"
+    },
+    "sal_lavavajillas": {
+      "consumos": 1,
+      "nombreOriginal": "sal lavavajillas",
+      "nombrePersonalizado": "Sal lavavajillas",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "salsa_barbacoa": {
+      "consumos": 9,
+      "nombreOriginal": "salsa barbacoa",
+      "nombrePersonalizado": "Salsa barbacoa",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "salsa_cesar": {
+      "consumos": 6,
+      "nombreOriginal": "salsa cesar",
+      "nombrePersonalizado": "Salsa César para ensaladas",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "salsa_de_queso": {
+      "consumos": 2,
+      "nombreOriginal": "salsa de queso",
+      "nombrePersonalizado": "Salsa de queso",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "salsa_de_yogurt": {
+      "consumos": 3,
+      "nombreOriginal": "salsa de yogurt",
+      "nombrePersonalizado": "Salsa de yogurt",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "salsa_mexicana": {
+      "consumos": 3,
+      "nombreOriginal": "salsa mexicana",
+      "nombrePersonalizado": "Salsa mexicana Picante",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "salsa_mexicana_queso": {
+      "consumos": 2,
+      "nombreOriginal": "salsa mexicana queso",
+      "nombrePersonalizado": "Salsa mexicana queso",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "salsa_ranchera": {
+      "consumos": 7,
+      "nombreOriginal": "salsa ranchera",
+      "nombrePersonalizado": "Salsa ranchera",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "salsa_teriyaki": {
+      "consumos": 5,
+      "nombreOriginal": "salsa teriyaki",
+      "nombrePersonalizado": "Salsa teriyaki",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "salvaslip": {
+      "consumos": 2,
+      "nombreOriginal": "salvaslip",
+      "nombrePersonalizado": "Salvaslip",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "sarta_dulce": {
+      "consumos": 9,
+      "nombreOriginal": "sarta dulce",
+      "nombrePersonalizado": "Chorizo en sarta dulce",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "sazonador_fajita": {
+      "consumos": 2,
+      "nombreOriginal": "sazonador fajita",
+      "nombrePersonalizado": "Sazonador fajita",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "servil_blancas": {
+      "consumos": 14,
+      "nombreOriginal": "servil. blancas",
+      "nombrePersonalizado": "Paquete de servilletas blancas",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "sidra": {
+      "consumos": 1,
+      "nombreOriginal": "sidra",
+      "nombrePersonalizado": "Sidra",
+      "seccion": "Bebidas y Aguas"
+    },
+    "solomillo_cerdo": {
+      "consumos": 4,
+      "nombreOriginal": "solomillo cerdo",
+      "nombrePersonalizado": "Solomillo cerdo",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "solomillo_de_pollo": {
+      "consumos": 2,
+      "nombreOriginal": "solomillo de pollo",
+      "nombrePersonalizado": "Solomillos de pollo Adobado",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "spaghetti_al_huevo": {
+      "consumos": 5,
+      "nombreOriginal": "spaghetti al huevo",
+      "nombrePersonalizado": "Espaguetis al huevo",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "spaghetti_carbonara": {
+      "consumos": 3,
+      "nombreOriginal": "spaghetti carbonara",
+      "nombrePersonalizado": "Espaguetis a la carbonara preparados",
+      "seccion": "❄️ Comidas preparadas"
+    },
+    "suavizante_azul": {
+      "consumos": 5,
+      "nombreOriginal": "suavizante azul",
+      "nombrePersonalizado": "Suavizante azul",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "tampax_compak_reg": {
+      "consumos": 1,
+      "nombreOriginal": "tampax compak reg",
+      "nombrePersonalizado": "Tampax compak reg",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "taquitos_chorizo": {
+      "consumos": 5,
+      "nombreOriginal": "taquitos chorizo",
+      "nombrePersonalizado": "Taquitos de chorizo",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "tenedor_reutilizable": {
+      "consumos": 1,
+      "nombreOriginal": "tenedor reutilizable",
+      "nombrePersonalizado": "Tenedor reutilizable",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "toallita_refrescante": {
+      "consumos": 1,
+      "nombreOriginal": "toallita refrescante",
+      "nombrePersonalizado": "Toallita refrescante",
+      "seccion": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    "toallitas": {
+      "consumos": 3,
+      "nombreOriginal": "toallitas",
+      "nombrePersonalizado": "Toallitas",
+      "seccion": "Perfumería y Cosmética"
+    },
+    "tomate_cherry_rama": {
+      "consumos": 18,
+      "nombreOriginal": "tomate cherry rama",
+      "nombrePersonalizado": "Tomate cherry rama",
+      "seccion": "Fruta y Verdura"
+    },
+    "tomate_frito": {
+      "consumos": 4,
+      "nombreOriginal": "tomate frito",
+      "nombrePersonalizado": "Tomate frito",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "tomate_natural_ralla": {
+      "consumos": 2,
+      "nombreOriginal": "tomate natural ralla",
+      "nombrePersonalizado": "Tomate natural ralla",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "tomate_triturado": {
+      "consumos": 49,
+      "nombreOriginal": "tomate triturado",
+      "nombrePersonalizado": "Tomate triturado grande",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "tomate_triturado_pequeño": {
+      "consumos": 15,
+      "nombreOriginal": "tomate triturado pequeño",
+      "nombrePersonalizado": "Tomate triturado pequeño",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "tomate_untar_tarro": {
+      "consumos": 7,
+      "nombreOriginal": "tomate untar tarro",
+      "nombrePersonalizado": "Tomate untar tarro",
+      "seccion": "Fruta y Verdura"
+    },
+    "tomates": {
+      "consumos": 4,
+      "nombreOriginal": "tomates",
+      "nombrePersonalizado": "Tomates",
+      "seccion": "Fruta y Verdura"
+    },
+    "tomillo": {
+      "consumos": 3,
+      "nombreOriginal": "tomillo",
+      "nombrePersonalizado": "Tomillo",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "tortelloni_carne": {
+      "consumos": 2,
+      "nombreOriginal": "tortelloni carne",
+      "nombrePersonalizado": "Tortelloni carne",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "tortilla_patata": {
+      "consumos": 8,
+      "nombreOriginal": "tortilla patata",
+      "nombrePersonalizado": "Tortilla patata",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "tortillas_mexicanas": {
+      "consumos": 4,
+      "nombreOriginal": "tortillas mexicanas",
+      "nombrePersonalizado": "Tortillas de trigo para fajitas/mexicanas",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "tortita_campestre": {
+      "consumos": 7,
+      "nombreOriginal": "tortita campestre",
+      "nombrePersonalizado": "Tortitas de cereales rústicas/campestres",
+      "seccion": "Panadería y Pastelería"
+    },
+    "tortita_maíz_serrano": {
+      "consumos": 3,
+      "nombreOriginal": "tortita maíz serrano",
+      "nombrePersonalizado": "Tortita maíz serrano",
+      "seccion": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    "tradicional": {
+      "consumos": 3,
+      "nombreOriginal": "tradicional",
+      "nombrePersonalizado": "Masa o pan tradicional",
+      "seccion": "Panadería y Pastelería"
+    },
+    "verdura_cocido": {
+      "consumos": 4,
+      "nombreOriginal": "verdura cocido",
+      "nombrePersonalizado": "Verdura cocido",
+      "seccion": "Fruta y Verdura"
+    },
+    "vinagre_de_vino_blan": {
+      "consumos": 2,
+      "nombreOriginal": "vinagre de vino blan",
+      "nombrePersonalizado": "Botella de vinagre de vino blanco",
+      "seccion": "🥩 Charcutería, Quesos, Aceites"
+    },
+    "vino_tinto": {
+      "consumos": 4,
+      "nombreOriginal": "vino tinto",
+      "nombrePersonalizado": "Vino tinto",
+      "seccion": "Bebidas y Aguas"
+    },
+    "yogomix_natural_boli": {
+      "consumos": 2,
+      "nombreOriginal": "yogomix natural boli",
+      "nombrePersonalizado": "Yogomix natural boli",
+      "seccion": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    "zanahoria_🥕": {
+      "consumos": 3,
+      "nombreOriginal": "zanahoria 🥕",
+      "nombrePersonalizado": "Zanahoria 🥕",
+      "seccion": "Fruta y Verdura"
+    },
+    "ñoquis_de_patata": {
+      "consumos": 13,
+      "nombreOriginal": "ñoquis de patata",
+      "nombrePersonalizado": "Paquete de ñoquis de patata frescos",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    "ñoras": {
+      "consumos": 3,
+      "nombreOriginal": "ñoras",
+      "nombrePersonalizado": "Ñoras",
+      "seccion": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    }
+  },
+  "listas": {
+    "2026-07-18_20-30-55": {
+      "estado": "archivada",
+      "fechaCompra": "2026-07-18",
+      "fechaCreacion": "2026-07-18",
+      "orden": "seccion",
+      "productos": {
+        "+_proteínas_flan": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "+prot_natilla_vaini": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "atún_con_tomate_p3": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "crema_de_cacahuete": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "film_transparente": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "huevos_super_gran": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "papel_aluminio": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pizza_familiar_jamón_y_queso": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_cherry_rama": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "ñoras": {
+          "cantidad": 1,
+          "comprado": true
+        }
+      }
+    },
+    "2026-07-25_0-7-22": {
+      "estado": "archivada",
+      "fechaCompra": "2026-07-27",
+      "fechaCreacion": "2026-07-25",
+      "orden": "seccion",
+      "productos": {
+        "arroz_fallera": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "bíf_0%0%_nat": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "cogollos": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "colacao": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "delicias_de_pollo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "helados": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "palomitas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pan_semillas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "papel_freidora_de_aire": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "ñoras": {
+          "cantidad": 1,
+          "comprado": true
+        }
+      }
+    },
+    "2026-08-02_22-2-25": {
+      "estado": "archivada",
+      "fechaCompra": "2026-08-03",
+      "fechaCreacion": "2026-08-02",
+      "orden": "seccion",
+      "productos": {
+        "+_proteínas_flan": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "+prot_natilla_vaini": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "arroz_fallera": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "bíf_0%0%_nat": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "cogollos": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pimiento_rojo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_untar_tarro": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomates": {
+          "cantidad": 1,
+          "comprado": true
+        }
+      }
+    },
+    "2026-08-07_18-10-0": {
+      "estado": "archivada",
+      "fechaCompra": "2026-08-08",
+      "fechaCreacion": "2026-08-07",
+      "orden": "seccion",
+      "productos": {
+        "+_proteínas_flan": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "aceite_virgen_ex": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "arroz_fallera": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "arroz_ultracongelado": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "cacahuete_sin_sal": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "caldo_de_pollo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "cogollos": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "esponjas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "fte_merluza_al_huevo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "lactovit_nutritivo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "limon": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "limpiahogar_multi": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "mezcla_4_quesos": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pat_classicas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pechugas_pollo_amarillo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pimiento_rojo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "queso_lonchas_semi": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "salsa_cesar": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "salsa_mexicana": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "salsa_mexicana_queso": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "sarta_dulce": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_cherry_rama": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_frito": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_triturado": {
+          "cantidad": 2,
+          "comprado": true
+        },
+        "tortilla_patata": {
+          "cantidad": 1,
+          "comprado": true
+        }
+      }
+    },
+    "2026-08-14_18-39-58": {
+      "estado": "archivada",
+      "fechaCompra": "2026-08-15",
+      "fechaCreacion": "2026-08-14",
+      "orden": "seccion",
+      "productos": {
+        "+_proteínas_flan": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "+prot_natilla_vaini": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "aceite_virgen_ex": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "agua_mineral": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "ali_oli": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "arroz_fallera": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "atún_con_tomate_p3": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "batido_cacao_pack_6": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "bíf_0%0%_nat": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "cogollos": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "contramuslo_deshuesa": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "desinfectante_wc": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "huevos_super_gran": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "lactovit_nutritivo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "leche_desnatada_p_6": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pan_semillas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "patata_3_kg": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pimiento_rojo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pizza_familiar_jamón_y_queso": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "piña_granel": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "queso_lonchas_semi": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "solomillo_cerdo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_cherry_rama": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_triturado": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_triturado_pequeño": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_untar_tarro": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomates": {
+          "cantidad": 1,
+          "comprado": true
+        }
+      }
+    },
+    "2026-08-22_20-12-3": {
+      "estado": "archivada",
+      "fechaCompra": "2026-08-24",
+      "fechaCreacion": "2026-08-22",
+      "orden": "seccion",
+      "productos": {
+        "+_proteínas_flan": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "+prot_natilla_vaini": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "bíf_0%0%_nat": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "caldo_de_pollo": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "contramuslo_deshuesa": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "huevos_super_gran": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "leche_desnatada_p_6": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "mezcla_4_quesos": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "patata_3_kg": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pepino": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pimiento_rojo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "rollo_hogar_doble": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "servil_blancas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "taquitos_chorizo": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "tomate_cherry_rama": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_triturado": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "tortilla_patata": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "zanahoria_🥕": {
+          "cantidad": 1,
+          "comprado": true
+        }
+      }
+    },
+    "2026-08-31_12-13-42": {
+      "estado": "archivada",
+      "fechaCompra": "2026-09-05",
+      "fechaCreacion": "2026-08-31",
+      "orden": "seccion",
+      "productos": {
+        "+_proteínas_flan": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "+prot_natilla_vaini": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "agua_mineral": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "atún_con_tomate_p3": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "batido_cacao_pack_6": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "bíf_0%0%_nat": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "cacahuete_sin_sal": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "champú_rafa": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "colgador_wc_pino": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "deo_rollon_dermo_sen": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "fregasuelos": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "higienico_doble_roll": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "lactovit_nutritivo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "limpia_coche": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "lote_3_bayetas_peq": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "macarron": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "palomitas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pan_de_pipas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pan_h_brioche": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pan_semillas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "papel_humedo_wc": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "piña_granel": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "queso_manchego_curad": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "rebuenas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "salsa_barbacoa": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_cherry_rama": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "yogomix_natural_boli": {
+          "cantidad": 1,
+          "comprado": true
+        }
+      }
+    },
+    "2026-09-18_22-22-30": {
+      "estado": "archivada",
+      "fechaCompra": "2026-09-23",
+      "fechaCreacion": "2026-09-18",
+      "orden": "seccion",
+      "productos": {
+        "antical": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "champiñón_en_lata": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "picatoste_frito": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "sal_de_mesa": {
+          "cantidad": 1,
+          "comprado": true
+        }
+      }
+    },
+    "2026-09-28_17-51-45": {
+      "estado": "archivada",
+      "fechaCompra": "2026-10-02",
+      "fechaCreacion": "2026-09-28",
+      "orden": "seccion",
+      "productos": {
+        "+_proteínas_flan": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "+prot_natilla_vaini": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "barra_campesina": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "batata": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "batido_cacao_pack_6": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "cacahuete_sin_sal": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "hamburguesa_pollo": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "huevos_super_gran": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pan_semillas": {
+          "cantidad": 2,
+          "comprado": true
+        },
+        "pollo_crispy": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "rebuenas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_cherry_rama": {
+          "cantidad": 1,
+          "comprado": true
+        }
+      }
+    },
+    "2026-10-10_22-8-57": {
+      "estado": "archivada",
+      "fechaCompra": "2026-10-20",
+      "fechaCreacion": "2026-10-10",
+      "orden": "seccion",
+      "productos": {
+        "ajo_granulado": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "tomate_frito": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "tomillo": {
+          "cantidad": 1,
+          "comprado": false
+        }
+      }
+    },
+    "2026-11-01_12-4-13": {
+      "estado": "activa",
+      "fechaCompra": "2026-11-06",
+      "fechaCreacion": "2026-11-01",
+      "orden": "seccion",
+      "productos": {
+        "+_proteínas_flan": {
+          "cantidad": 2,
+          "comprado": true
+        },
+        "+prot_natilla_vaini": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "aceite_virgen_ex": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "agua_mineral": {
+          "cantidad": 1,
+          "comprado": false
+        },
+        "ajo_seco_250_g": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "atún_con_tomate_p3": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "batido_cacao_pack_6": {
+          "cantidad": 2,
+          "comprado": true
+        },
+        "bíf_0%0%_nat": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "cacahuete_sin_sal": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "cebolla_dulce": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "cogollos": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "fabada_asturiana": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "jamón_serrano": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "lenteja_pardina": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "manz_roja_acidulce": {
+          "cantidad": 2,
+          "comprado": true
+        },
+        "mezcla_4_quesos": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "p_integral_trigo100%": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pan_semillas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "pipa_gigante_aguasal": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "piña_granel": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "platano": {
+          "cantidad": 3,
+          "comprado": true
+        },
+        "queso_lonchas_semi": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "queso_manchego_curad": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "rebuenas": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "suavizante_azul": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_cherry_rama": {
+          "cantidad": 1,
+          "comprado": true
+        },
+        "tomate_triturado": {
+          "cantidad": 3,
+          "comprado": true
+        },
+        "tomate_triturado_pequeño": {
+          "cantidad": 3,
+          "comprado": true
+        },
+        "vino_tinto": {
+          "cantidad": 1,
+          "comprado": true
+        }
+      }
+    }
+  },
+  "secciones": [
+    {
+      "id": "Perfumería y Cosmética",
+      "nombre": "🧴 Perfumería y Cosmética"
+    },
+    {
+      "id": "🧼 Limpieza - Higiene - Mosquitos",
+      "nombre": "🧼 Limpieza - Higiene - Mosquitos"
+    },
+    {
+      "id": "Fruta y Verdura",
+      "nombre": "🍎 Fruta y Verdura"
+    },
+    {
+      "id": "Bebidas y Aguas",
+      "nombre": "🥤 Bebidas y Aguas"
+    },
+    {
+      "id": "🥩 Charcutería, Quesos, Aceites",
+      "nombre": "🥩 Charcutería, Quesos, Aceites"
+    },
+    {
+      "id": "Panadería y Pastelería",
+      "nombre": "🍞 Panadería y Pastelería"
+    },
+    {
+      "id": "🥛 Lácteos - Café - Botes tomate - Huevos",
+      "nombre": "🥛 Lácteos - Café - Botes tomate - Huevos"
+    },
+    {
+      "id": "🥫 Despensa - Ingredientes - Frutos secos",
+      "nombre": "🥫 Despensa - Ingredientes - Frutos secos"
+    },
+    {
+      "id": "🥩 Carnicería - Refrigerados - Atún - Especias",
+      "nombre": "🥩 Carnicería - Refrigerados - Atún - Especias"
+    },
+    {
+      "id": "🐟 Pescadería - ❄️ Congelados",
+      "nombre": "🐟 Pescadería - ❄️ Congelados"
+    },
+    {
+      "id": "❄️ Comidas preparadas",
+      "nombre": "❄️ Comidas preparadas"
+    },
+    {
+      "id": "Sin Sección",
+      "nombre": "📍 Sin Sección / Pasillo"
+    },
+    {
+      "id": "🍨Helados",
+      "nombre": "🍨Helados"
+    }
+  ],
+  "users": {
+    "e7q86domU5VtDestdREtpjFtVS02": {
+      "listas": {
+        "2026-11-20_1795184082116": {
+          "estado": "activa",
+          "fechaCompra": "",
+          "fechaCreacion": "2026-11-20",
+          "nombre": "Mi Compra Principal",
+          "orden": "seccion"
+        }
+      },
+      "secciones": [
+        {
+          "id": "Sin Pasillo",
+          "nombre": "📍 Sin Pasillo"
+        },
+        {
+          "id": "Fruta y Verdura",
+          "nombre": "🍎 Fruta y Verdura"
+        },
+        {
+          "id": "Panadería y Pastelería",
+          "nombre": "🍞 Panadería y Pastelería"
+        },
+        {
+          "id": "Carnicería - Refrigerados",
+          "nombre": "🥩 Carnicería - Refrigerados"
+        },
+        {
+          "id": "Pescadería - Congelados",
+          "nombre": "🐟 Pescadería - ❄️ Congelados"
+        },
+        {
+          "id": "Lácteos - Huevos",
+          "nombre": "🥛 Lácteos - Huevos"
+        },
+        {
+          "id": "Despensa - Arroz - Pastas",
+          "nombre": "🥫 Despensa - Arroz - Pastas"
+        },
+        {
+          "id": "Bebidas y Aguas",
+          "nombre": "🥤 Bebidas y Aguas"
+        },
+        {
+          "id": "Charcutería y Quesos",
+          "nombre": "🧀 Charcutería y Quesos"
+        },
+        {
+          "id": "Limpieza y Hogar",
+          "nombre": "🧼 Limpieza y Hogar"
+        },
+        {
+          "id": "Perfumería e Higiene",
+          "nombre": "🧴 Perfumería e Higiene"
+        }
+      ]
+    }
+  }
+}

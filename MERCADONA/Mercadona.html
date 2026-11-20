@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista Compra Mercadona</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#007a33">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mercadona">
+    <link rel="apple-touch-icon" href="logo192.png">
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root { 
+            --m-green: #007a33; 
+            --m-green-dark: #005a25;
+            --m-orange: #f29100; 
+            --bg: #f4f6f8; 
+            --card-bg: #ffffff; 
+        }
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; 
+            background: var(--bg); 
+            color: #333; 
+            padding-bottom: 95px;
+        }
+        
+        #loading-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: var(--m-green); color: white; }
+        #login-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: white; padding: 25px; text-align: center; }
+        .btn-login { background: white; border: 1px solid #ddd; padding: 14px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.1); color: #333; font-size: 16px; display: inline-flex; align-items: center; gap: 10px; }
+
+        header { 
+            background: var(--m-green); 
+            color: white; 
+            padding: 12px 16px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 90; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.12); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        .header-left { display: flex; align-items: center; gap: 8px; }
+        .header-right { display: flex; align-items: center; gap: 8px; }
+        .family-pill {
+            background: rgba(255,255,255,0.22);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border: 1px solid rgba(255,255,255,0.3);
+            white-space: nowrap;
+        }
+        .family-pill:active { background: rgba(255,255,255,0.35); }
+        .user-pill {
+            background: rgba(0,0,0,0.15);
+            padding: 5px 10px;
+            border-radius: 16px;
+            font-size: 12px;
+            max-width: 140px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tabs-mobile { display: flex; background: rgba(0,0,0,0.06); padding: 5px; margin: 10px 15px; border-radius: 10px; gap: 6px; }
+        .tab { flex: 1; text-align: center; padding: 11px; border-radius: 8px; font-weight: bold; cursor: pointer; color: #555; transition: 0.2s; white-space: nowrap; font-size: 14px; }
+        .tab.active { background: white; color: var(--m-green); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+
+        .app-grid { padding: 0 15px; max-width: 1200px; margin: 0 auto; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .panel-title { display: none; color: var(--m-green); margin-top: 0; border-bottom: 2px solid var(--m-green); padding-bottom: 10px; }
+
+        @media (min-width: 768px) {
+            .tabs-mobile { display: none; }
+            .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; align-items: start; padding-top: 20px; }
+            .panel { display: block !important; background: white; padding: 22px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+            .panel-title { display: block; }
+        }
+
+        /* Títulos de pasillo plegables */
+        .section-group-title { 
+            background: #e2ebd5; 
+            color: #005b26; 
+            padding: 9px 12px; 
+            font-size: 13px; 
+            font-weight: bold; 
+            border-radius: 6px; 
+            margin: 12px 0 8px 0; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
+            border-left: 5px solid var(--m-green); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.15s;
+        }
+        .section-group-title:active { background: #d2e4c0; }
+        .section-toggle-icon { font-size: 12px; transition: transform 0.2s ease; display: inline-block; }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 10px; 
+            padding: 11px 14px; 
+            margin-bottom: 9px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06); 
+            border: 1px solid #eee; 
+        }
+        .card-info { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .card-title { font-weight: 500; font-size: 15px; text-transform: capitalize; margin-bottom: 3px; line-height: 1.25; }
+        .card-ticket-name { font-size: 11px; color: #888; text-transform: uppercase; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .badge-card-section { background: #f0f0f0; color: #555; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: bold; cursor: pointer; border: none; }
+        .crossed { text-decoration: line-through; color: #dc3545 !important; font-weight: bold; opacity: 0.75; }
+
+        .btn-add { 
+            background: var(--m-green); 
+            color: white; 
+            border: none; 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 50%; 
+            font-size: 22px; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            flex-shrink: 0; 
+            box-shadow: 0 2px 5px rgba(0,122,51,0.25);
+        }
+        .btn-add:active { transform: scale(0.92); }
+
+        /* Controles de compra y cantidad */
+        .qty-list-controls { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+        .qty-btn-list { 
+            background: #eaf5eb; 
+            border: 1px solid var(--m-green); 
+            color: var(--m-green); 
+            font-size: 16px; 
+            font-weight: bold; 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 0; 
+        }
+        .qty-btn-list:active { background: rgba(0,122,51,0.2); }
+
+        .cart-wrapper { position: relative; display: inline-block; flex-shrink: 0; margin-left: 4px; }
+        .btn-cart-buy { 
+            background: #f1f3f4; 
+            border: 2px solid #ccc; 
+            width: 52px; 
+            height: 48px; 
+            border-radius: 12px; 
+            font-size: 22px; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            filter: grayscale(100%); 
+            opacity: 0.55; 
+            transition: all 0.15s ease;
+        }
+        .btn-cart-buy.active { 
+            background: #eaf7ed !important; 
+            border-color: var(--m-green) !important; 
+            filter: grayscale(0%) !important; 
+            opacity: 1 !important; 
+            box-shadow: 0 0 0 2px rgba(0,122,51,0.2);
+        }
+        .btn-cart-buy:active { transform: scale(0.93); }
+
+        .cart-badge { 
+            position: absolute; 
+            top: -6px; 
+            right: -6px; 
+            background: var(--m-orange); 
+            color: white; 
+            font-size: 12px; 
+            font-weight: bold; 
+            border-radius: 20px; 
+            min-width: 22px; 
+            height: 22px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            border: 2px solid white; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); 
+            pointer-events: none; 
+            padding: 0 4px; 
+        }
+
+        .controls-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        .search-wrapper { position: relative; flex: 1 1 auto; min-width: 0; }
+        .search-bar { 
+            width: 100%; 
+            padding: 12px 35px 12px 12px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            outline: none; 
+            background: #fff; 
+        }
+        .clear-search-btn { 
+            position: absolute; 
+            right: 8px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            background: #ddd; 
+            border: none; 
+            width: 22px; 
+            height: 22px; 
+            border-radius: 50%; 
+            color: #666; 
+            font-size: 14px; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .select-bar { 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            font-size: 13px; 
+            outline: none; 
+            background: #fff; 
+            font-weight: bold; 
+            color: #444; 
+            cursor: pointer; 
+        }
+
+        .primary { 
+            background: var(--m-green); 
+            color: white; 
+            border: none; 
+            padding: 13px; 
+            border-radius: 8px; 
+            font-size: 15px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            width: 100%; 
+        }
+        .primary:active { background: var(--m-green-dark); }
+        .hidden { display: none !important; }
+        .badge { font-size:12px; background:var(--m-green); color:white; padding:4px 9px; border-radius:20px; font-weight: bold; }
+
+        /* Botón Flotante Permanente (FAB) en Móvil */
+        #fab-add {
+            position: fixed;
+            bottom: 22px;
+            right: 20px;
+            z-index: 99;
+            background: var(--m-orange);
+            color: white;
+            border: none;
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(242, 145, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.15s, background-color 0.2s;
+        }
+        #fab-add:active { transform: scale(0.92); background: #d88100; }
+
+        .quick-add-box {
+            background: white;
+            border: 1px solid #e1e6eb;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .fold-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            justify-content: flex-end;
+        }
+        .btn-fold {
+            background: #eee;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            color: #555;
+            font-weight: 500;
+        }
+        .btn-fold:active { background: #ddd; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.55); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 20px; border-radius: 12px; width: 90%; max-width: 440px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+        .modal-input { width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 14px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+        .action-row { display: flex; gap: 8px; margin-bottom: 12px; }
+
+        .btn-config { background: transparent; color: var(--m-green); border: 1px solid var(--m-green); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .seccion-item { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; background: #f9f9f9; padding: 8px; border-radius: 8px; border: 1px solid #eee; }
+        .btn-small { background: #dc3545; color: white; border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; font-size: 14px; }
+        .btn-reorder { background: #e9ecef; border: none; width: 34px; height: 34px; border-radius: 6px; cursor: pointer; font-size: 16px; color: #555; }
+        .filtro-seccion-item { display: flex; align-items: center; gap: 10px; padding: 8px 4px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .filtro-seccion-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--m-green); }
+
+        .email-member-badge {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f0f4f1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 13px;
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 95px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2b303a;
+            color: white;
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 500;
+            z-index: 2000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.25s, transform 0.25s;
+        }
+        #toast.show { opacity: 1; transform: translateX(-50%) translateY(-5px); }
+    </style>
+</head>
+<body>
+
+    <div id="loading-screen">
+        <h1 style="margin: 0; font-size: 44px;">🛒</h1>
+        <h2 style="margin-top: 15px; font-weight: 500;" id="loading-text">Cargando catálogo...</h2>
+    </div>
+
+    <!-- Pantalla de Login -->
+    <div id="login-screen" class="hidden">
+        <h2 style="color:var(--m-green); margin-bottom: 6px;">🛒 Lista Compra Mercadona</h2>
+        <p style="color: #666; margin-bottom: 25px; font-size: 14px;">Acceso familiar por cuenta autorizada</p>
+        
+        <div id="error-auth" class="hidden" style="background: #ffebee; color: #dc3545; padding: 12px 18px; border-radius: 8px; border: 1px solid #f5c6cb; margin-bottom: 20px; font-size: 13px; text-align: center; max-width: 320px;">
+            ⛔ <b>Acceso denegado:</b><br><span id="error-auth-msg">Tu correo no tiene asignado ningún catálogo todavía. Contacta con el administrador.</span>
+        </div>
+
+        <button class="btn-login" onclick="login()">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.616z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.173 0 7.548 0 9s.347 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z"/></svg>
+            Entrar con Google
+        </button>
+    </div>
+
+    <!-- Modal Editar Producto -->
+    <div id="modal-edicion" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--m-green);">Editar Producto</h3>
+            <label style="font-size:12px; font-weight:bold; color:#777;">Nombre Original / Ticket</label>  
+            <input type="text" id="edit-original" class="modal-input" disabled style="background:#eee; color:#666;">
+            
+            <label style="font-size:12px; font-weight:bold; color:#555;">Nombre Visible / Habitual</label>
+            <input type="text" id="edit-visible" class="modal-input" placeholder="Ej. Tomate triturado grande">
+            
+            <label style="font-size:12px; font-weight:bold; color:#555;">Sección / Pasillo</label>
+            <select id="edit-seccion" class="modal-input"></select>
+            
+            <div style="display:flex; gap:8px;">
+                <button class="primary" style="background:#dc3545; flex:0.3;" onclick="eliminarProducto()">🗑️</button>
+                <button class="primary" style="background:#888; flex:0.7;" onclick="cerrarModal()">Cancelar</button>
+                <button class="primary" style="flex:1;" onclick="guardarEdicion()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Gestión de Miembros y Catálogo Familiar -->
+    <div id="modal-familia" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--m-green);">👨‍👩‍👧‍👦 Configurar Catálogo Familiar</h3>
+            <p style="font-size: 12px; color: #666; margin-top: 0;">
+                Estás en el catálogo: <b id="modal-nombre-familia-txt">2014 DLV</b>.
+                <br>Solo los correos autorizados aquí podrán ver y usar este catálogo.
+            </p>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="font-size:12px; font-weight:bold; color:#555;">Correos electrónicos autorizados:</label>
+                <div id="lista-correos-familia" style="margin-top: 8px; max-height: 180px; overflow-y: auto;"></div>
+            </div>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                <input type="email" id="nuevo-correo-miembro" class="modal-input" style="margin:0; flex:1;" placeholder="ejemplo@gmail.com" onkeypress="if(event.key==='Enter') agregarMiembroFamilia()">
+                <button class="primary" style="margin:0; width:auto; padding: 10px 14px;" onclick="agregarMiembroFamilia()">➕ Añadir</button>
+            </div>
+            
+            <button class="primary" style="background:#555;" onclick="cerrarModalFamilia()">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal Gestión de Secciones -->
+    <div id="modal-secciones" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--m-green);">⚙️ Gestionar Pasillos</h3>
+            <p style="font-size: 12px; color: #666; margin-top: 0;">Organiza el orden de pasillos para tu recorrido en tienda.</p>
+            
+            <div id="lista-secciones-editar" style="margin-bottom: 12px;"></div>
+            
+            <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                <input type="text" id="nueva-seccion-input" class="modal-input" style="margin:0; flex:1;" placeholder="Nombre nuevo pasillo..." onkeypress="if(event.key==='Enter') crearSeccion()">
+                <button class="primary" style="margin:0; width:auto; padding: 10px 14px;" onclick="crearSeccion()">➕</button>
+            </div>
+            
+            <div style="display:flex; gap:8px;">
+                <button class="primary" style="background:#888; flex:1;" onclick="cerrarModalSecciones()">Cancelar</button>
+                <button class="primary" style="flex:1;" onclick="guardarSecciones()">💾 Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Filtrar Pasillos -->
+    <div id="modal-filtro-secciones" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--m-green);">👁️ Filtrar Pasillos</h3>
+            <p style="font-size: 12px; color: #666; margin-top: 0;">Oculta los pasillos por los que hoy no vas a pasar.</p>
+            
+            <div id="lista-filtro-secciones" style="max-height: 380px; overflow-y: auto; margin-bottom: 12px; border: 1px solid #eee; border-radius: 8px; padding: 5px;"></div>
+            
+            <div style="display:flex; gap:8px; margin-bottom: 10px;">
+                <button class="primary" style="background:#555; padding:8px; font-size: 13px;" onclick="marcarTodasSecciones(true)">Mostrar todas</button>
+                <button class="primary" style="background:#555; padding:8px; font-size: 13px;" onclick="marcarTodasSecciones(false)">Ocultar todas</button>
+            </div>
+            
+            <div style="display:flex; gap:8px;">
+                <button class="primary" style="background:#888; flex:1;" onclick="cerrarModalFiltro()">Cancelar</button>
+                <button class="primary" style="flex:1;" onclick="guardarFiltroSecciones()">💾 Aplicar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APLICACIÓN PRINCIPAL -->
+    <div id="app" class="hidden">
+        <header>
+            <div class="header-left">
+                <strong style="font-size: 17px; display: flex; align-items: center; gap: 6px;">🛒 Mercadona</strong>
+                <div class="family-pill" onclick="abrirModalFamilia()" title="Gestionar correos autorizados para este catálogo">
+                    📁 <span id="family-badge-name">2014 DLV</span> ⚙️
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="user-pill" id="user-display">👤 Usuario</div>
+                <button onclick="logout()" style="background:none; border:none; color:white; opacity: 0.95; font-size:13px; cursor:pointer; font-weight:bold;">Salir</button>
+            </div>
+        </header>
+
+        <!-- Navegación móvil sin Historial -->
+        <div class="tabs-mobile">
+            <div class="tab active" onclick="switchTab('lista')" id="tab-lista">🛒 Mi Lista</div>
+            <div class="tab" onclick="switchTab('catalogo')" id="tab-catalogo">📖 Catálogo</div>
+        </div>
+
+        <div class="app-grid">
+            
+            <!-- PANEL MI LISTA (COMPRA ACTUAL) -->
+            <div id="panel-lista" class="panel active">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                    <div>
+                        <h3 class="panel-title" style="margin:0; border:none;">Compra Actual</h3>
+                        <div style="font-size: 12px; color: #888;" id="fecha-lista">Lista en curso</div>
+                    </div>
+                    <span class="badge" style="background:var(--m-orange);"><span id="contador-lista">0</span> artículos</span>
+                </div>
+
+                <!-- Buscador directo desde Mi Lista para comprar sin salir -->
+                <div class="quick-add-box">
+                    <div style="display:flex; gap: 8px;">
+                        <input type="text" id="buscador-rapido-lista" class="search-bar" placeholder="🔍 Añadir a la lista (ej: Leche, Huevos)..." onkeypress="if(event.key==='Enter') agregarRapidoDesdeLista()">
+                        <button class="primary" style="width: auto; margin:0; padding: 0 16px; white-space:nowrap;" onclick="agregarRapidoDesdeLista()">+ Añadir</button>
+                    </div>
+                </div>
+
+                <div id="active-list">
+                    <div class="action-row">
+                        <button class="primary" style="background:var(--m-orange); margin:0; flex: 1; padding: 9px 4px; font-size: 12px;" onclick="cargarHabituales()">⭐ 15 Habituales</button>
+                        <button class="primary" style="background:#dc3545; margin:0; flex: 1; padding: 9px 4px; font-size: 12px;" onclick="vaciarListaActual()">🗑️ Vaciar Lista</button>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px;">
+                        <div style="display: flex; gap: 6px; align-items: center; flex: 1;">
+                            <label style="font-size: 12px; color: #555; font-weight: bold; white-space: nowrap;">Orden:</label>
+                            <select id="orden-lista" class="select-bar" style="margin: 0; flex: 1; padding: 8px;" onchange="cambiarOrdenLista()">
+                                <option value="seccion">📍 Por Pasillo</option>
+                                <option value="alfa">🔤 Alfabético</option>
+                            </select>
+                        </div>
+                        <button class="btn-config" onclick="abrirModalFiltroSecciones()">👁️ Pasillos</button>
+                    </div>
+
+                    <div id="items-comprando"></div>
+                </div>
+            </div>
+
+            <!-- PANEL CATÁLOGO -->
+            <div id="panel-catalogo" class="panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                    <h3 class="panel-title" style="margin:0; border:none;">Catálogo</h3>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button class="btn-config" onclick="abrirModalSecciones()">⚙️ Pasillos</button>
+                        <span class="badge"><span id="contador-productos">0</span> prods</span>
+                    </div>
+                </div>
+                
+                <div class="controls-row">
+                    <div class="search-wrapper">
+                        <input type="text" id="buscador" class="search-bar" placeholder="🔍 Escribe para buscar (ej: cafe, pollo)..." oninput="filtrarCatalogoInstaneamente()">
+                        <button class="clear-search-btn hidden" id="btn-clear-search" onclick="limpiarBusqueda()" title="Limpiar">×</button>
+                    </div>
+                    <select id="orden-catalogo" class="select-bar" onchange="renderizarCatalogo()">
+                        <option value="seccion">📍 Por Pasillo</option>
+                        <option value="alfa">🔤 A - Z</option>
+                        <option value="consumos">⭐ Habituales</option>
+                    </select>
+                </div>
+
+                <!-- Botones para Plegar / Desplegar todos los pasillos rápidamente -->
+                <div class="fold-bar" id="fold-controls">
+                    <button class="btn-fold" onclick="plegarTodasSecciones(true)">📁 Plegar pasillos</button>
+                    <button class="btn-fold" onclick="plegarTodasSecciones(false)">📂 Desplegar todos</button>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+                    <input type="text" id="nuevo-producto" class="search-bar" style="margin:0;" placeholder="Crear nuevo alimento..." onkeypress="if(event.key==='Enter') crearProductoEnCatalogo()">
+                    <button class="primary" style="width: auto; margin:0; padding: 0 16px;" onclick="crearProductoEnCatalogo()">+ Guardar</button>
+                </div>
+
+                <div id="items-catalogo"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Botón flotante FAB para buscar / añadir rápido desde cualquier parte -->
+    <button id="fab-add" onclick="irAlCatalogoYBuscador()" title="Buscar y Añadir Alimentos">➕</button>
+
+    <div id="toast">Notificación</div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4hCPs_xAHkRroAhk3me5pGnF0Bf81AGw",
+            authDomain: "markarma279.firebaseapp.com",
+            databaseURL: "https://markarma279-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "markarma279",
+            messagingSenderId: "280620278315",
+            appId: "1:280620278315:web:42adbb1aacb3ac2239806e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const firebaseDb = firebase.database();
+
+        let currentUser = null;
+        let idFamiliaActual = "2014_dlv";
+        let nombreFamiliaActual = "2014 DLV";
+        let miembrosFamiliaActual = {};
+
+        let datosListaActual = { productos: {}, orden: 'seccion', seccionesVisibles: {} };
+        let catalogoProductos = {};
+        let seccionesPersonalizadas = [];
+        let seccionesTemporales = [];
+        let filtroSeccionesTemp = {};
+
+        // Control de secciones plegadas
+        let estadoPlegadoSecciones = {};
+
+        function mostrarToast(mensaje) {
+            const t = document.getElementById('toast');
+            t.innerText = mensaje;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        function limpiarKey(texto) {
+            return (texto || '').toLowerCase().trim().replace(/[.#$[\]]/g, '').replace(/\s+/g, '_');
+        }
+
+        function sanitizeEmail(email) {
+            return (email || '').toLowerCase().trim().replace(/[^a-z0-9]/g, '_');
+        }
+
+        // Navegación por pestañas (Solo Lista y Catálogo)
+        const tabsOrder = ['lista', 'catalogo'];
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            const activeTabBtn = document.getElementById(`tab-${tab}`);
+            if (activeTabBtn) activeTabBtn.classList.add('active');
+
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            const activePanel = document.getElementById(`panel-${tab}`);
+            if (activePanel) activePanel.classList.add('active');
+        }
+
+        function irAlCatalogoYBuscador() {
+            switchTab('catalogo');
+            setTimeout(() => {
+                const b = document.getElementById('buscador');
+                if (b) {
+                    b.focus();
+                    b.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
+        }
+
+        // Autenticación Google
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                currentUser = user;
+                document.getElementById('user-display').innerText = `👤 ${user.displayName || user.email.split('@')[0]}`;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('loading-screen').classList.remove('hidden');
+                determinarFamiliaUsuario(user);
+            } else {
+                currentUser = null;
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('login-screen').classList.remove('hidden');
+                document.getElementById('app').classList.add('hidden');
+                document.getElementById('fab-add').classList.add('hidden');
+            }
+        });
+
+        function login() { 
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider).catch(err => {
+                document.getElementById('error-auth-msg').innerText = err.message;
+                document.getElementById('error-auth').classList.remove('hidden');
+            });
+        }
+        function logout() { auth.signOut(); }
+
+        // Ruta de la familia del usuario autenticado
+        function getFamilyBasePath() {
+            return `mercadona/familias/${idFamiliaActual}`;
+        }
+
+        // Determinar a qué catálogo pertenece el usuario según su correo
+        function determinarFamiliaUsuario(user) {
+            const userEmailKey = sanitizeEmail(user.email);
+            
+            // Comprobamos en el nodo de autorizaciones
+            firebaseDb.ref(`mercadona/autorizaciones/${userEmailKey}`).once('value', snap => {
+                const auto = snap.val();
+                if (auto && auto.familiaId) {
+                    // Usuario asignado a una familia específica
+                    idFamiliaActual = auto.familiaId;
+                    nombreFamiliaActual = auto.nombreFamilia || "Mi Catálogo";
+                    iniciarAppFamilia();
+                } else {
+                    // Si no está registrado en autorizaciones:
+                    // Verificamos si existe la familia principal "2014 DLV"
+                    firebaseDb.ref(`mercadona/familias/2014_dlv`).once('value', snapFam => {
+                        const famData = snapFam.val();
+                        if (!famData) {
+                            // Inicializamos "2014 DLV" y autorizamos a este primer usuario como admin de la familia
+                            idFamiliaActual = "2014_dlv";
+                            nombreFamiliaActual = "2014 DLV";
+                            inicializarFamiliaBase("2014_dlv", "2014 DLV", user.email);
+                        } else {
+                            // Comprobamos si el correo está en la lista de miembros de 2014 DLV
+                            const miembros = famData.miembros || {};
+                            if (miembros[userEmailKey] || Object.keys(miembros).length === 0) {
+                                idFamiliaActual = "2014_dlv";
+                                nombreFamiliaActual = famData.nombre || "2014 DLV";
+                                // Guardamos su autorización fija
+                                firebaseDb.ref(`mercadona/autorizaciones/${userEmailKey}`).set({
+                                    familiaId: idFamiliaActual,
+                                    nombreFamilia: nombreFamiliaActual,
+                                    email: user.email
+                                });
+                                firebaseDb.ref(`mercadona/familias/2014_dlv/miembros/${userEmailKey}`).set(user.email);
+                                iniciarAppFamilia();
+                            } else {
+                                // No autorizado para 2014 DLV ni tiene familia asignada
+                                document.getElementById('loading-screen').classList.add('hidden');
+                                document.getElementById('app').classList.add('hidden');
+                                document.getElementById('login-screen').classList.remove('hidden');
+                                document.getElementById('error-auth').classList.remove('hidden');
+                                auth.signOut();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function inicializarFamiliaBase(famId, famNombre, emailAdmin) {
+            const emailKey = sanitizeEmail(emailAdmin);
+            
+            // Migrar catálogo y secciones existentes de mercadona si existen
+            firebaseDb.ref('mercadona').once('value', snapRoot => {
+                const rootData = snapRoot.val() || {};
+                const catExistente = rootData.catalogo || {};
+                const secExistente = rootData.secciones || [];
+                const listaExistente = (rootData.listas && rootData.listas['2026-11-01_12-4-13']) ? rootData.listas['2026-11-01_12-4-13'] : { productos: {}, orden: 'seccion' };
+
+                const payload = {
+                    nombre: famNombre,
+                    miembros: { [emailKey]: emailAdmin },
+                    catalogo: catExistente,
+                    secciones: secExistente.length ? secExistente : [
+                        { id: "Sin Pasillo", nombre: "📍 Sin Pasillo" },
+                        { id: "Fruta y Verdura", nombre: "🍎 Fruta y Verdura" },
+                        { id: "Lácteos - Huevos", nombre: "🥛 Lácteos - Huevos" }
+                    ],
+                    listaActiva: listaExistente
+                };
+
+                firebaseDb.ref(`mercadona/familias/${famId}`).set(payload).then(() => {
+                    firebaseDb.ref(`mercadona/autorizaciones/${emailKey}`).set({
+                        familiaId: famId,
+                        nombreFamilia: famNombre,
+                        email: emailAdmin
+                    }).then(() => {
+                        iniciarAppFamilia();
+                    });
+                });
+            });
+        }
+
+        function iniciarAppFamilia() {
+            document.getElementById('family-badge-name').innerText = nombreFamiliaActual;
+            document.getElementById('modal-nombre-familia-txt').innerText = nombreFamiliaActual;
+
+            const basePath = getFamilyBasePath();
+
+            // 1. Escuchar Miembros de la familia
+            firebaseDb.ref(`${basePath}/miembros`).on('value', snap => {
+                miembrosFamiliaActual = snap.val() || {};
+                renderizarMiembrosEnModal();
+            });
+
+            // 2. Escuchar Pasillos / Secciones
+            firebaseDb.ref(`${basePath}/secciones`).on('value', snap => {
+                const data = snap.val();
+                if (data && Array.isArray(data) && data.length > 0) {
+                    seccionesPersonalizadas = data;
+                } else {
+                    seccionesPersonalizadas = [
+                        { id: "Sin Pasillo", nombre: "📍 Sin Pasillo" },
+                        { id: "🍎 Fruta y Verdura", nombre: "🍎 Fruta y Verdura" },
+                        { id: "🍞 Panadería y Pastelería", nombre: "🍞 Panadería y Pastelería" },
+                        { id: "🥩 Carnicería - Refrigerados", nombre: "🥩 Carnicería - Refrigerados" },
+                        { id: "🐟 Pescadería - ❄️ Congelados", nombre: "🐟 Pescadería - ❄️ Congelados" },
+                        { id: "🥛 Lácteos - Café - Botes tomate - Huevos", nombre: "🥛 Lácteos - Café - Botes tomate - Huevos" },
+                        { id: "🥫 Despensa - Ingredientes - Frutos secos", nombre: "🥫 Despensa - Ingredientes - Frutos secos" },
+                        { id: "🥤 Bebidas y Aguas", nombre: "🥤 Bebidas y Aguas" },
+                        { id: "🧼 Limpieza - Higiene - Mosquitos", nombre: "🧼 Limpieza - Higiene - Mosquitos" },
+                        { id: "🧴 Perfumería y Cosmética", nombre: "🧴 Perfumería y Cosmética" }
+                    ];
+                    firebaseDb.ref(`${basePath}/secciones`).set(seccionesPersonalizadas);
+                }
+                renderizarSelectSecciones();
+                renderizarCatalogo();
+                renderizarListaActual();
+            });
+
+            // 3. Escuchar Catálogo Familiar
+            firebaseDb.ref(`${basePath}/catalogo`).on('value', snap => {
+                catalogoProductos = snap.val() || {};
+                document.getElementById('contador-productos').innerText = Object.keys(catalogoProductos).length;
+                renderizarCatalogo();
+                renderizarListaActual();
+            });
+
+            // 4. Escuchar Lista Activa Compartida de la Familia
+            firebaseDb.ref(`${basePath}/listaActiva`).on('value', snap => {
+                datosListaActual = snap.val() || { productos: {}, orden: 'seccion', seccionesVisibles: {} };
+                if (!datosListaActual.productos) datosListaActual.productos = {};
+                document.getElementById('orden-lista').value = datosListaActual.orden || 'seccion';
+                
+                document.getElementById('loading-screen').classList.add('hidden');
+                document.getElementById('app').classList.remove('hidden');
+                document.getElementById('fab-add').classList.remove('hidden');
+                renderizarListaActual();
+                renderizarCatalogo();
+            });
+        }
+
+        // GESTIÓN DE MIEMBROS FAMILIARES
+        function abrirModalFamilia() {
+            renderizarMiembrosEnModal();
+            document.getElementById('modal-familia').classList.remove('hidden');
+        }
+        function cerrarModalFamilia() {
+            document.getElementById('modal-familia').classList.add('hidden');
+        }
+
+        function renderizarMiembrosEnModal() {
+            const cont = document.getElementById('lista-correos-familia');
+            cont.innerHTML = '';
+            const entries = Object.entries(miembrosFamiliaActual);
+            if (entries.length === 0) {
+                cont.innerHTML = '<div style="color:#888; font-size:13px;">No hay miembros registrados aún.</div>';
+                return;
+            }
+            entries.forEach(([key, email]) => {
+                cont.innerHTML += `
+                    <div class="email-member-badge">
+                        <span>📧 ${email}</span>
+                        <button class="btn-small" style="width:26px; height:26px; font-size:12px;" onclick="eliminarMiembroFamilia('${key}', '${email}')">✕</button>
+                    </div>
+                `;
+            });
+        }
+
+        function agregarMiembroFamilia() {
+            const inp = document.getElementById('nuevo-correo-miembro');
+            const email = (inp.value || '').trim().toLowerCase();
+            if (!email || !email.includes('@')) {
+                alert("Por favor, introduce un correo electrónico válido.");
+                return;
+            }
+
+            const emailKey = sanitizeEmail(email);
+            const basePath = getFamilyBasePath();
+
+            // Guardar en la familia actual y en la tabla de autorizaciones
+            firebaseDb.ref(`${basePath}/miembros/${emailKey}`).set(email).then(() => {
+                firebaseDb.ref(`mercadona/autorizaciones/${emailKey}`).set({
+                    familiaId: idFamiliaActual,
+                    nombreFamilia: nombreFamiliaActual,
+                    email: email
+                }).then(() => {
+                    inp.value = '';
+                    mostrarToast(`✅ Correo autorizado en ${nombreFamiliaActual}`);
+                });
+            });
+        }
+
+        function eliminarMiembroFamilia(key, email) {
+            if (confirm(`¿Retirar acceso al catálogo ${nombreFamiliaActual} para ${email}?`)) {
+                const basePath = getFamilyBasePath();
+                firebaseDb.ref(`${basePath}/miembros/${key}`).remove();
+                firebaseDb.ref(`mercadona/autorizaciones/${key}`).remove();
+                mostrarToast("Miembro eliminado");
+            }
+        }
+
+        // BÚSQUEDA Y PLEGADO DE PASILLOS EN CATÁLOGO
+        function filtrarCatalogoInstaneamente() {
+            toggleClearSearchBtn();
+            renderizarCatalogo();
+        }
+
+        function toggleClearSearchBtn() {
+            const buscador = document.getElementById('buscador');
+            const btn = document.getElementById('btn-clear-search');
+            if (buscador.value.length > 0) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        function limpiarBusqueda() {
+            const buscador = document.getElementById('buscador');
+            buscador.value = '';
+            toggleClearSearchBtn();
+            renderizarCatalogo();
+        }
+
+        function toggleSeccionPlegada(secId) {
+            estadoPlegadoSecciones[secId] = !estadoPlegadoSecciones[secId];
+            renderizarCatalogo();
+        }
+
+        function plegarTodasSecciones(plegar) {
+            seccionesPersonalizadas.forEach(s => {
+                estadoPlegadoSecciones[s.id] = plegar;
+            });
+            renderizarCatalogo();
+        }
+
+        // RENDERIZADO DEL CATÁLOGO
+        function renderizarCatalogo() {
+            const cont = document.getElementById('items-catalogo');
+            const busqueda = (document.getElementById('buscador').value || '').toLowerCase().trim();
+            const orden = document.getElementById('orden-catalogo').value;
+            
+            let keys = Object.keys(catalogoProductos);
+            
+            let keysFiltradas = keys.filter(key => {
+                const prod = catalogoProductos[key];
+                const nVis = (prod.nombrePersonalizado || prod.nombre || "").toLowerCase();
+                const nOrig = (prod.nombreOriginal || "").toLowerCase();
+                return busqueda.length === 0 || nVis.includes(busqueda) || nOrig.includes(busqueda);
+            });
+
+            // Mostrar u ocultar barra de plegar según si estamos ordenando por pasillo
+            const foldBar = document.getElementById('fold-controls');
+            if (orden === 'seccion' && busqueda.length === 0) {
+                foldBar.classList.remove('hidden');
+            } else {
+                foldBar.classList.add('hidden');
+            }
+
+            const dibujarTarjeta = (key) => {
+                const prod = catalogoProductos[key];
+                const nombreVisual = prod.nombrePersonalizado || prod.nombre || prod.nombreOriginal || "";
+                const seccion = prod.seccion || "Sin Pasillo";
+                const estaEnLista = datosListaActual && datosListaActual.productos && datosListaActual.productos[key];
+                
+                let actionBtn = estaEnLista 
+                    ? `<div onclick="quitarDelCatalogo('${key}', event)" style="color: var(--m-green); font-size: 26px; padding: 0 8px; cursor: pointer;" title="Quitar de la lista">✅</div>` 
+                    : `<button class="btn-add" onclick="updateQty('${key}', 1, event)">+</button>`;
+
+                return `
+                    <div class="card">
+                        <div class="card-info" onclick="abrirEdicion('${key}')" style="cursor:pointer;">
+                            <div class="card-title">${nombreVisual}</div>
+                            <div class="card-ticket-name">
+                                <button class="badge-card-section" onclick="event.stopPropagation(); abrirEdicion('${key}')">📍 ${seccion}</button>
+                            </div>
+                        </div>
+                        ${actionBtn}
+                    </div>
+                `;
+            };
+
+            let htmlContent = '';
+
+            if (orden === 'seccion') {
+                let estructurado = {};
+                keysFiltradas.forEach(key => {
+                    const sec = catalogoProductos[key].seccion || "Sin Pasillo";
+                    if (!estructurado[sec]) estructurado[sec] = [];
+                    estructurado[sec].push(key);
+                });
+
+                const ordenSecciones = seccionesPersonalizadas.map(s => s.id);
+                const seccionesOrdenadas = Object.keys(estructurado).sort((a, b) => {
+                    const idxA = ordenSecciones.indexOf(a);
+                    const idxB = ordenSecciones.indexOf(b);
+                    if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+                    if (idxA === -1) return 1;
+                    if (idxB === -1) return -1;
+                    return idxA - idxB;
+                });
+
+                seccionesOrdenadas.forEach(secName => {
+                    estructurado[secName].sort((a,b) => (catalogoProductos[a].nombrePersonalizado || "").localeCompare(catalogoProductos[b].nombrePersonalizado || ""));
+                    
+                    // Si el usuario está buscando texto específico, desplegamos automáticamente para ver coincidencias
+                    const estaPlegada = busqueda.length === 0 ? !!estadoPlegadoSecciones[secName] : false;
+                    const flecha = estaPlegada ? '▶' : '▼';
+                    const conteo = estructurado[secName].length;
+
+                    htmlContent += `
+                        <div class="section-group-title" onclick="toggleSeccionPlegada('${secName.replace(/'/g, "\'")}')">
+                            <span>${secName} (${conteo})</span>
+                            <span class="section-toggle-icon">${flecha}</span>
+                        </div>
+                    `;
+
+                    if (!estaPlegada) {
+                        estructurado[secName].forEach(k => htmlContent += dibujarTarjeta(k));
+                    }
+                });
+            } else {
+                if (orden === 'alfa') {
+                    keysFiltradas.sort((a,b) => (catalogoProductos[a].nombrePersonalizado || "").localeCompare(catalogoProductos[b].nombrePersonalizado || ""));
+                } else if (orden === 'consumos') {
+                    keysFiltradas.sort((a,b) => (catalogoProductos[b].consumos || 0) - (catalogoProductos[a].consumos || 0));
+                    if (busqueda.length === 0) keysFiltradas = keysFiltradas.slice(0, 25);
+                }
+                keysFiltradas.forEach(k => htmlContent += dibujarTarjeta(k));
+            }
+            
+            cont.innerHTML = htmlContent || `<p style="text-align:center; color:#999; padding:25px;">No se encontraron alimentos.</p>`;
+        }
+
+        // RENDERIZADO DE "MI LISTA"
+        function renderizarListaActual() {
+            if (!datosListaActual) return;
+            const cont = document.getElementById('items-comprando');
+            const prods = datosListaActual.productos || {};
+            const keys = Object.keys(prods);
+
+            let totalItems = 0;
+            keys.forEach(k => totalItems += (prods[k].cantidad || 1));
+            document.getElementById('contador-lista').innerText = totalItems;
+
+            if (keys.length === 0) {
+                cont.innerHTML = `
+                    <div style="text-align: center; padding: 35px 0;">
+                        <span style="font-size: 42px;">📝</span>
+                        <p style="color: #666; font-size: 14px;">La lista de compra está vacía</p>
+                        <button class="primary" onclick="irAlCatalogoYBuscador()">🔍 Abrir Catálogo y Buscar</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const orden = datosListaActual.orden || 'seccion';
+            const seccionesVisibles = datosListaActual.seccionesVisibles || {};
+            
+            const pendientes = keys.filter(k => !prods[k].comprado);
+            const comprados = keys.filter(k => prods[k].comprado);
+
+            let htmlContent = '';
+
+            if (orden === 'seccion') {
+                let estructurado = {};
+                pendientes.forEach(k => {
+                    const sec = catalogoProductos[k]?.seccion || "Sin Pasillo";
+                    if (!estructurado[sec]) estructurado[sec] = [];
+                    estructurado[sec].push({ key: k, datos: prods[k] });
+                });
+
+                const ordenSecciones = seccionesPersonalizadas.map(s => s.id);
+                const seccionesOrdenadas = Object.keys(estructurado).sort((a, b) => {
+                    const idxA = ordenSecciones.indexOf(a);
+                    const idxB = ordenSecciones.indexOf(b);
+                    if (idxA === -1 && idxB === -1) return a.localeCompare(b);
+                    if (idxA === -1) return 1;
+                    if (idxB === -1) return -1;
+                    return idxA - idxB;
+                });
+
+                seccionesOrdenadas.forEach(secName => {
+                    if (seccionesVisibles[secName] === false) return;
+                    htmlContent += `<div class="section-group-title" style="cursor:default;"><span>${secName}</span></div>`;
+                    htmlContent += renderizarTarjetasLista(estructurado[secName]);
+                });
+            } else {
+                let items = pendientes.map(k => ({ key: k, datos: prods[k] }));
+                items.sort((a,b) => (catalogoProductos[a.key]?.nombrePersonalizado || "").localeCompare(catalogoProductos[b.key]?.nombrePersonalizado || ""));
+                htmlContent += renderizarTarjetasLista(items);
+            }
+
+            if (comprados.length > 0) {
+                htmlContent += `<div class="section-group-title" style="background:#eaf7ed; color:var(--m-green-dark); border-left-color:var(--m-green); margin-top:22px; cursor:default;"><span>✅ EN EL CARRO (${comprados.length})</span></div>`;
+                const itemsComprados = comprados.map(k => ({ key: k, datos: prods[k] }));
+                htmlContent += renderizarTarjetasLista(itemsComprados);
+            }
+
+            cont.innerHTML = htmlContent;
+        }
+
+        function renderizarTarjetasLista(itemsArray) {
+            let html = '';
+            itemsArray.forEach(item => {
+                const k = item.key;
+                const p = item.datos;
+                const cat = catalogoProductos[k] || {};
+                const nombre = cat.nombrePersonalizado || cat.nombre || cat.nombreOriginal || k;
+                const qty = p.cantidad || 1;
+
+                html += `
+                    <div class="card">
+                        <div class="card-info" onclick="abrirEdicion('${k}')" style="cursor:pointer;">
+                            <div class="card-title ${p.comprado ? 'crossed' : ''}">${nombre}</div>
+                            <div class="card-ticket-name">${cat.seccion || "Sin Pasillo"}</div>
+                        </div>
+
+                        <div class="qty-list-controls">
+                            <button class="qty-btn-list" onclick="updateQty('${k}', -1, event)">-</button>
+                            <button class="qty-btn-list" onclick="updateQty('${k}', 1, event)">+</button>
+                        </div>
+
+                        <div class="cart-wrapper">
+                            <button class="btn-cart-buy ${p.comprado ? 'active' : ''}" onclick="toggleCarrito('${k}', ${p.comprado})" title="Echar al carro / Comprado">
+                                🛒
+                            </button>
+                            <div class="cart-badge">${qty}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            return html;
+        }
+
+        // AÑADIR DIRECTO DESDE "MI LISTA"
+        function agregarRapidoDesdeLista() {
+            const input = document.getElementById('buscador-rapido-lista');
+            const texto = input.value.trim();
+            if (!texto) return;
+
+            const key = limpiarKey(texto);
+            const basePath = getFamilyBasePath();
+
+            if (!catalogoProductos[key]) {
+                firebaseDb.ref(`${basePath}/catalogo/${key}`).set({
+                    nombreOriginal: texto.toLowerCase(),
+                    nombrePersonalizado: texto,
+                    seccion: "Sin Pasillo",
+                    consumos: 1
+                });
+            }
+            
+            updateQty(key, 1);
+            input.value = '';
+            mostrarToast(`🛒 ${texto} añadido`);
+        }
+
+        // OPERACIONES DE CANTIDAD Y CARRO
+        function updateQty(idProducto, delta, event) {
+            if(event) event.stopPropagation();
+            const basePath = getFamilyBasePath();
+
+            let currentQty = 0;
+            if (datosListaActual && datosListaActual.productos && datosListaActual.productos[idProducto]) {
+                currentQty = datosListaActual.productos[idProducto].cantidad || 1;
+            }
+
+            let newQty = currentQty + delta;
+
+            if (newQty <= 0) {
+                firebaseDb.ref(`${basePath}/listaActiva/productos/${idProducto}`).remove();
+                mostrarToast("🗑️ Eliminado de la lista");
+            } else {
+                if (currentQty === 0) {
+                    firebaseDb.ref(`${basePath}/listaActiva/productos/${idProducto}`).set({ comprado: false, cantidad: newQty });
+                    const cons = (catalogoProductos[idProducto]?.consumos) || 0;
+                    firebaseDb.ref(`${basePath}/catalogo/${idProducto}/consumos`).set(cons + 1);
+                    mostrarToast("✅ Añadido");
+                } else {
+                    firebaseDb.ref(`${basePath}/listaActiva/productos/${idProducto}/cantidad`).set(newQty);
+                }
+            }
+        }
+
+        function toggleCarrito(idProducto, estadoActual) {
+            const basePath = getFamilyBasePath();
+            const nuevoEstado = !estadoActual;
+            firebaseDb.ref(`${basePath}/listaActiva/productos/${idProducto}/comprado`).set(nuevoEstado);
+        }
+
+        function quitarDelCatalogo(idProducto, event) {
+            if(event) event.stopPropagation();
+            const basePath = getFamilyBasePath();
+            firebaseDb.ref(`${basePath}/listaActiva/productos/${idProducto}`).remove();
+            mostrarToast("Quitado de la lista");
+        }
+
+        function cambiarOrdenLista() {
+            const orden = document.getElementById('orden-lista').value;
+            const basePath = getFamilyBasePath();
+            firebaseDb.ref(`${basePath}/listaActiva/orden`).set(orden);
+        }
+
+        function vaciarListaActual() {
+            if(confirm("⚠️ ¿Vaciar todos los alimentos de la lista de compra actual?")) {
+                const basePath = getFamilyBasePath();
+                firebaseDb.ref(`${basePath}/listaActiva/productos`).remove();
+                mostrarToast("Lista vaciada");
+            }
+        }
+
+        function cargarHabituales() {
+            const keys = Object.keys(catalogoProductos);
+            if (keys.length === 0) { alert("Tu catálogo aún está vacío."); return; }
+            keys.sort((a,b) => (catalogoProductos[b].consumos || 0) - (catalogoProductos[a].consumos || 0));
+            const top = keys.slice(0, 15);
+
+            const basePath = getFamilyBasePath();
+            top.forEach(k => {
+                if (!datosListaActual?.productos?.[k]) {
+                    firebaseDb.ref(`${basePath}/listaActiva/productos/${k}`).set({ comprado: false, cantidad: 1 });
+                    const cons = (catalogoProductos[k]?.consumos) || 0;
+                    firebaseDb.ref(`${basePath}/catalogo/${k}/consumos`).set(cons + 1);
+                }
+            });
+            mostrarToast("⭐ 15 habituales añadidos a la lista");
+        }
+
+        // EDICIÓN Y GESTIÓN DE PRODUCTOS
+        function abrirEdicion(id) {
+            const p = catalogoProductos[id];
+            if(!p) return;
+            productoEditandoId = id;
+            document.getElementById('edit-original').value = (p.nombreOriginal || p.nombre || "").toUpperCase();
+            document.getElementById('edit-visible').value = p.nombrePersonalizado || p.nombre || "";
+            renderizarSelectSecciones(p.seccion || "Sin Pasillo");
+            document.getElementById('modal-edicion').classList.remove('hidden');
+        }
+        function cerrarModal() { document.getElementById('modal-edicion').classList.add('hidden'); }
+
+        function guardarEdicion() {
+            const nVis = document.getElementById('edit-visible').value.trim();
+            const sec = document.getElementById('edit-seccion').value;
+            if (nVis && productoEditandoId) {
+                const basePath = getFamilyBasePath();
+                firebaseDb.ref(`${basePath}/catalogo/${productoEditandoId}`).update({ nombrePersonalizado: nVis, seccion: sec });
+                cerrarModal();
+                mostrarToast("Alimento actualizado");
+            }
+        }
+
+        function eliminarProducto() {
+            if (productoEditandoId && confirm("¿Eliminar producto del catálogo definitivamente?")) {
+                const basePath = getFamilyBasePath();
+                firebaseDb.ref(`${basePath}/catalogo/${productoEditandoId}`).remove();
+                cerrarModal();
+            }
+        }
+
+        function renderizarSelectSecciones(seleccionada) {
+            const select = document.getElementById('edit-seccion');
+            if(!select) return;
+            select.innerHTML = seccionesPersonalizadas.map(s => `<option value="${s.id}" ${seleccionada === s.id ? 'selected' : ''}>${s.nombre}</option>`).join('');
+        }
+
+        function crearProductoEnCatalogo() {
+            const input = document.getElementById('nuevo-producto');
+            const val = input.value.trim();
+            if (val) {
+                const key = limpiarKey(val);
+                const basePath = getFamilyBasePath();
+                firebaseDb.ref(`${basePath}/catalogo/${key}`).set({
+                    nombreOriginal: val.toLowerCase(),
+                    nombrePersonalizado: val,
+                    seccion: "Sin Pasillo",
+                    consumos: 1
+                });
+                input.value = '';
+                mostrarToast("Añadido al catálogo");
+            }
+        }
+
+        // Modal Pasillos / Secciones
+        function abrirModalSecciones() {
+            seccionesTemporales = JSON.parse(JSON.stringify(seccionesPersonalizadas));
+            renderizarSeccionesEnModal();
+            document.getElementById('modal-secciones').classList.remove('hidden');
+        }
+        function cerrarModalSecciones() { document.getElementById('modal-secciones').classList.add('hidden'); }
+
+        function renderizarSeccionesEnModal() {
+            const cont = document.getElementById('lista-secciones-editar');
+            cont.innerHTML = seccionesTemporales.map((s, i) => `
+                <div class="seccion-item">
+                    <input type="text" value="${s.nombre}" oninput="seccionesTemporales[${i}].nombre = this.value; seccionesTemporales[${i}].id = this.value;" style="flex:1; padding:8px; border:1px solid #ddd; border-radius:6px;">
+                    <button class="btn-reorder" onclick="moverSeccion(${i}, -1)">↑</button>
+                    <button class="btn-reorder" onclick="moverSeccion(${i}, 1)">↓</button>
+                    <button class="btn-small" onclick="eliminarSeccionTemp(${i})">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function moverSeccion(i, dir) {
+            const n = i + dir;
+            if (n < 0 || n >= seccionesTemporales.length) return;
+            const t = seccionesTemporales[i];
+            seccionesTemporales[i] = seccionesTemporales[n];
+            seccionesTemporales[n] = t;
+            renderizarSeccionesEnModal();
+        }
+
+        function eliminarSeccionTemp(i) {
+            if (seccionesTemporales.length <= 1) return;
+            seccionesTemporales.splice(i, 1);
+            renderizarSeccionesEnModal();
+        }
+
+        function crearSeccion() {
+            const inp = document.getElementById('nueva-seccion-input');
+            const val = inp.value.trim();
+            if (val) {
+                seccionesTemporales.push({ id: val, nombre: val });
+                inp.value = '';
+                renderizarSeccionesEnModal();
+            }
+        }
+
+        function guardarSecciones() {
+            const basePath = getFamilyBasePath();
+            firebaseDb.ref(`${basePath}/secciones`).set(seccionesTemporales).then(() => {
+                seccionesPersonalizadas = seccionesTemporales;
+                renderizarSelectSecciones();
+                renderizarCatalogo();
+                renderizarListaActual();
+                cerrarModalSecciones();
+                mostrarToast("Pasillos guardados");
+            });
+        }
+
+        // Filtro pasillos en compra
+        function abrirModalFiltroSecciones() {
+            filtroSeccionesTemp = { ...(datosListaActual?.seccionesVisibles || {}) };
+            const cont = document.getElementById('lista-filtro-secciones');
+            cont.innerHTML = seccionesPersonalizadas.map(s => `
+                <div class="filtro-seccion-item">
+                    <input type="checkbox" id="chk-${limpiarKey(s.id)}" ${filtroSeccionesTemp[s.id] !== false ? 'checked' : ''} onchange="filtroSeccionesTemp['${s.id}'] = this.checked">
+                    <label for="chk-${limpiarKey(s.id)}">${s.nombre}</label>
+                </div>
+            `).join('');
+            document.getElementById('modal-filtro-secciones').classList.remove('hidden');
+        }
+
+        function cerrarModalFiltro() { document.getElementById('modal-filtro-secciones').classList.add('hidden'); }
+        function marcarTodasSecciones(v) {
+            seccionesPersonalizadas.forEach(s => filtroSeccionesTemp[s.id] = v);
+            abrirModalFiltroSecciones();
+        }
+
+        function guardarFiltroSecciones() {
+            const basePath = getFamilyBasePath();
+            firebaseDb.ref(`${basePath}/listaActiva/seccionesVisibles`).set(filtroSeccionesTemp).then(() => {
+                cerrarModalFiltro();
+            });
+        }
+    </script>
+</body>
+</html>
